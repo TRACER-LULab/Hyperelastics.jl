@@ -1,0 +1,13 @@
+name = "Hyperelastics"
+uuid = "c20c605d-adbe-46e4-9db6-e2b04c3ba023"
+authors = ["Carson Farmer"]
+version = "0.1.0"
+
+[compat]
+julia = "1.7"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]
