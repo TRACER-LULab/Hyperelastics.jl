@@ -23,7 +23,7 @@ function uniaxial_data(s₁, λ₁)
     return HyperelasticData(s⃗, λ⃗)
 end
 
-I₁(λ⃗) = sum(λ⃗.^2)
+I₁(λ⃗) = sum(λ⃗ .^ 2)
 include("hyperelastic_models.jl")
 
 function HyperelasticProblem(data::HyperelasticData, model, u₀, ps; loss=L2DistLoss(), agg=AggMode.Mean(), kwargs...)
@@ -34,7 +34,7 @@ function HyperelasticProblem(data::HyperelasticData, model, u₀, ps; loss=L2Dis
     end
     f(u, p) = [value(loss, Vector(data.s⃗), s(u), agg)]
     func = OptimizationFunction(f, GalacticOptim.AutoForwardDiff())
-    return OptimizationProblem(func, u₀, ps, lb = LVector(μ = 0.0, Jₘ = 0.2178580576229847), ub = LVector(μ = Inf, Jₘ = Inf), kwargs...)
+    return OptimizationProblem(func, u₀, ps, lb=LVector(μ=0.0, Jₘ=0.2178580576229847), ub=LVector(μ=Inf, Jₘ=Inf), kwargs...)
 end
 
 end
