@@ -3,6 +3,19 @@ uuid = "c20c605d-adbe-46e4-9db6-e2b04c3ba023"
 authors = ["Carson Farmer"]
 version = "0.1.0"
 
+[deps]
+CSV = "336ed68f-0bac-5ca0-87d4-7b16caf5d00b"
+DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
+ForwardDiff = "f6369f11-7733-5829-9624-2563aa707210"
+GalacticOptim = "a75be94c-b780-496d-a8a9-0878b188d577"
+LabelledArrays = "2ee39098-c373-598a-b85f-a56591580800"
+LossFunctions = "30fc2ffe-d236-52d8-8643-a9d8f7c094a7"
+ModelingToolkit = "961ee093-0014-501f-94e3-6117800e7a78"
+NonlinearSolve = "8913a72c-1f9b-4ce2-8d82-65094dcecaec"
+Optim = "429524aa-4258-5aef-a3af-852621145aeb"
+Reexport = "189a3867-3050-52da-a836-e630ba90ab69"
+Symbolics = "0c5d862f-8b57-4792-8d23-62f2024744c7"
+
 [compat]
 julia = "1.7"
 
