@@ -1,7 +1,10 @@
+authors = ["Carson Farmer"]
 name = "Hyperelastics"
 uuid = "c20c605d-adbe-46e4-9db6-e2b04c3ba023"
-authors = ["Carson Farmer"]
 version = "0.1.0"
+
+[compat]
+julia = "1.7"
 
 [deps]
 CSV = "336ed68f-0bac-5ca0-87d4-7b16caf5d00b"
@@ -16,10 +19,8 @@ Optim = "429524aa-4258-5aef-a3af-852621145aeb"
 Reexport = "189a3867-3050-52da-a836-e630ba90ab69"
 Symbolics = "0c5d862f-8b57-4792-8d23-62f2024744c7"
 
-[compat]
-julia = "1.7"
-
 [extras]
+CPUSummary = "2a0fbf3d-bb9c-48f3-b0a9-814d99fd7ab9"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [targets]
