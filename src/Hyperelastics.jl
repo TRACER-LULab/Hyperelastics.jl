@@ -12,7 +12,7 @@ struct HyperelasticData
 end
 
 function biaxial_data(s₁, s₂, λ₁, λ₂)
-    s⃗ = [s₁; s₂]
+    s⃗ = [s₁; s₂]>
     λ⃗ = hcat([λ₁, λ₂]...)
     return HyperelasticData(s⃗, λ⃗)
 end
