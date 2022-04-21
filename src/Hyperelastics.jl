@@ -42,7 +42,7 @@ function s⃗̂(model, p, λ⃗; adb = AD.ForwardDiffBackend())
 end
 
 include("hyperelastic_models.jl")
-
+include("wypiwyg.jl")
 function HyperelasticProblem(data::HyperelasticData, model, u₀, ps; loss=L2DistLoss(), agg=AggMode.Mean(), kwargs...)
     s = hcat(collect.(data.s⃗)...)
     stresses_provided = size(s, 1)

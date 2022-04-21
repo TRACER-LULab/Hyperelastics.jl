@@ -190,6 +190,7 @@ function Amin((; C1, C2, C3, C4, N, M))
     (λ⃗) -> C1 * (I₁(λ⃗) - 3) + C2 / (N + 1) * (I₁(λ⃗) - 3)^(N + 1) + C3 / (M + 1) * (I₁(λ⃗) - 3)^(M + 1) + C4 * (I₂(λ⃗) - 3)
 end
 
+# Article Received - General form presented.
 function LopezPamies((; α, μ))
     (λ⃗) -> @tullio _ := (3.0^(1 - α[i])) / (2α[i]) * μ[i] * (I₁(λ⃗)^(α[i]) - 3^(α[i]))
 end
