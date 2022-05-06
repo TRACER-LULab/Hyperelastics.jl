@@ -11,7 +11,7 @@ General Mooney Rivlin
 
 Parameters: [C]
 
-Model: ``∑ᵢⱼCᵢⱼ(I₁-3)ⁱ(I₂-3)ʲ
+Model: ``∑\\limits_{i,j = 0}^{N,M} Cᵢⱼ(I₁-3)ⁱ(I₂-3)ʲ``
 """
 function GeneralizedMooneyRivlin((; C))
     function (λ⃗)
