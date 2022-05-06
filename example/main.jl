@@ -2,7 +2,7 @@ using Hyperelastics
 using GalacticOptim
 using AbstractDifferentiation  
 using ForwardDiff
-using Optim
+using GalacticOptimJL
 using DataFrames
 using CSV
 using LabelledArrays
@@ -25,7 +25,7 @@ df = CSV.read(data_file, DataFrame)
 data = uniaxial_data(df.stress_mpa.*1e6, df.stretch)
 
 ## GeneralizedMooneyRivlin
-model = GeneralizedMooneyRivlin
+model = GeneralMooneyRivlin
 u₀ = ComponentVector(C=[0.0 10e2 10e2; 10e2 10e2 10e2])
 
 ## MooneyRivlin model
@@ -188,7 +188,7 @@ u₀ = ComponentArray(μ=243221.2739932059, N=18.29074828993436)
 ##  Generic Model Parameter Identification
 HEProblem = HyperelasticProblem(data, model, u₀, [])
 HEProblem = HyperelasticProblem(data, model, u₀, [], lb=lb, ub=ub)
-sol = solve(HEProblem, BFGS())
+sol = solve(HEProblem, LBFGS())
 
 ## Sussman-Bathe Model
 # W = SussmanBathe
