@@ -9,17 +9,20 @@ using LabelledArrays
 using ComponentArrays
 using PlotlyLight
 using Plots
+
 ## Set the data File to read
-data_file = "example/VHB4910/monotonic_test_material_Heated-VHB4910_specimen_Dumbbell_H_strainrate_0.3_length_25.0_width_4.55_thickness_1.0.csv"
-# data_file = "example/VHB4910/UCN Longitudinal Uniaxial Test Data.csv"
-# data_file = "example/VHB4910/UCN Transverse Uniaxial Test Data.csv"
-# data_file = "example/VHB4910/biaxial.csv"
+# data_file = "example/VHB4910/monotonic_test_material_Heated-VHB4910_specimen_Dumbbell_H_strainrate_0.3_length_25.0_width_4.55_thickness_1.0.csv"
+# data_file = "example/PSHBladder/UCN Longitudinal Uniaxial Test Data.csv"
+# data_file = "example/PSHBladder/UCN Transverse Uniaxial Test Data.csv"
+data_file = "example/Treloar/uniaxial.csv"
 
 ## Read the file and create the HyperelasticData object
 df = CSV.read(data_file, DataFrame)
+
+## Create the uniaxial test data object
 # data = uniaxial_data(df.Stress*1e6, df.Strain.+1)
-data = uniaxial_data(df.stress[1:25:2550] .* 1e6, df.strain[1:25:2550] .+ 1)
-# data = biaxial_data(df.stress, df.stress, df.strain.+1, df.strain.+1)
+# data = uniaxial_data(df.stress[1:25:2550] .* 1e6, df.strain[1:25:2550] .+ 1)
+data = uniaxial_data(df.stress_mpa.*1e6, df.stretch)
 
 ## GeneralizedMooneyRivlin
 model = GeneralizedMooneyRivlin
@@ -178,38 +181,41 @@ ub = ComponentVector(μ=Inf, Jₘ=Inf)
 model = Killian
 u₀ = ComponentVector(μ=20e3,)
 
-## 
+## ArrudaBoyce
+model = ArrudaBoyce
+u₀ = ComponentArray(μ=243221.2739932059, N=18.29074828993436)
+
+##  Generic Model Parameter Identification
 HEProblem = HyperelasticProblem(data, model, u₀, [])
 HEProblem = HyperelasticProblem(data, model, u₀, [], lb=lb, ub=ub)
-sol = solve(HEProblem, LBFGS())
+sol = solve(HEProblem, BFGS())
+
+## Sussman-Bathe Model
+# W = SussmanBathe
+# p = ComponentVector(s⃗ = data.s⃗, λ⃗ = data.λ⃗, k = 4)
 
 ##
-W = SussmanBathe(getindex.(data.s⃗, 1), getindex.(data.λ⃗, 1), 3)
-∂W(x⃗) = AD.gradient(AD.FiniteDifferencesBackend(), x -> sum(W(x)), x⃗)[1]
-∂W([2.0, 1 / sqrt(2), 1 / sqrt(2)])
-s = ∂W.(collect.(data.λ⃗))
-s₁ = getindex.(s, 1) - getindex.(s, 3)
-
-plot(getindex.(data.λ⃗, 1), (s₁ .- getindex.(data.s⃗, 1)) ./ getindex.(data.s⃗, 1) .* 100, label="Error [%]")
-
+s⃗ = s⃗̂(model, sol.u, collect.(data.λ⃗))
+s₁ = getindex.(s⃗, 1)
+# plot(getindex.(data.λ⃗, 1), (s₁ .- getindex.(data.s⃗, 1)) ./ getindex.(data.s⃗, 1) .* 100, label="Error [%]")
 p = plot(getindex.(data.λ⃗, 1), s₁, label="Predicted")
 plot!(p, getindex.(data.λ⃗, 1), getindex.(data.s⃗, 1), label="True")
 
 ##
-e = range(-2.0, 2.0, length=201)
-λ = exp.(e)
-τ(λ) = exp(2log(λ)) - exp(-log(λ)) + 0.5 * (1 - cos(2π * log(λ))) * (0 ≤ log(λ) ≤ 1)
-data = uniaxial_data(τ.(λ), λ)
-W = SussmanBathe(getindex.(data.s⃗, 1), getindex.(data.λ⃗, 1), 5)
+# e = range(-2.0, 2.0, length=201)
+# λ = exp.(e)
+# τ(λ) = exp(2log(λ)) - exp(-log(λ)) + 0.5 * (1 - cos(2π * log(λ))) * (0 ≤ log(λ) ≤ 1)
+# data = uniaxial_data(τ.(λ), λ)
+# W = SussmanBathe(getindex.(data.s⃗, 1), getindex.(data.λ⃗, 1), 5)
 
-W([2.0, 1 / sqrt(2), 1 / sqrt(2)])
-## Make Predictions with Fitted Parameters
-∂W(x⃗) = AD.gradient(AD.FiniteDifferencesBackend(), x -> sum(W(x)), x⃗)[1]
-∂W([2.0, 1 / sqrt(2), 1 / sqrt(2)])
-s = ∂W.(collect.(data.λ⃗))
+# W([2.0, 1 / sqrt(2), 1 / sqrt(2)])
+# ## Make Predictions with Fitted Parameters
+# ∂W(x⃗) = AD.gradient(AD.FiniteDifferencesBackend(), x -> sum(W(x)), x⃗)[1]
+# ∂W([2.0, 1 / sqrt(2), 1 / sqrt(2)])
+# s = ∂W.(collect.(data.λ⃗))
 
-s₁ = getindex.(s, 1) - getindex.(s, 3)
-p = plot(getindex.(data.λ⃗, 1), (s₁ .- getindex.(data.s⃗, 1)) ./ getindex.(data.s⃗, 1) .* 100, label="Error [%]")
+# s₁ = getindex.(s, 1) - getindex.(s, 3)
+# p = plot(getindex.(data.λ⃗, 1), (s₁ .- getindex.(data.s⃗, 1)) ./ getindex.(data.s⃗, 1) .* 100, label="Error [%]")
 
-p = plot(getindex.(data.λ⃗, 1), s₁, label="Predicted")
-plot!(p, getindex.(data.λ⃗, 1), getindex.(data.s⃗, 1), label="True")
+# p = plot(getindex.(data.λ⃗, 1), s₁, label="Predicted")
+# plot!(p, getindex.(data.λ⃗, 1), getindex.(data.s⃗, 1), label="True")

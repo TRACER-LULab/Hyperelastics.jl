@@ -5,7 +5,8 @@ using GalacticOptim
 using ForwardDiff
 using AbstractDifferentiation
 using Tullio
-using OMEinsum
+using Reexport
+
 # using Enzyme
 # using Zygote
 using ComponentArrays
@@ -39,11 +40,14 @@ function s⃗̂(model, p, λ⃗; adb = AD.ForwardDiffBackend())
     σ₁₂₃ = map(x⃗ -> AD.gradient(adb, W, x⃗)[1].*x⃗,  λ⃗)
     σ̄₁₂₃ = map(x -> [x[1]-x[3], x[2]-x[3], x[3]-x[3]], σ₁₂₃)
     s₁₂₃ = map(x -> x[1]./ x[2], zip(σ̄₁₂₃, λ⃗))
+    return s₁₂₃
 end
 
 include("hyperelastic_models.jl")
+@reexport using .HyperelasticModels
+
 include("wypiwyg.jl")
-function HyperelasticProblem(data::HyperelasticData, model, u₀, ps; loss=L2DistLoss(), agg=AggMode.Mean(), kwargs...)
+function HyperelasticProblem(data::HyperelasticData, model, u₀, ps; loss=L2DistLoss(), agg=AggMode.Mean(), cons = (x,p) -> [true],  kwargs...)
     s = hcat(collect.(data.s⃗)...)
     stresses_provided = size(s, 1)
     s⃗(p) = s⃗̂(model, p, collect.(data.λ⃗))
@@ -54,7 +58,7 @@ function HyperelasticProblem(data::HyperelasticData, model, u₀, ps; loss=L2Dis
     end
 
     f(p, _) = [value(loss, s, ŝ(p), agg)]
-    func = OptimizationFunction(f, GalacticOptim.AutoForwardDiff())
+    func = OptimizationFunction(f, GalacticOptim.AutoForwardDiff(), cons = cons)
     return OptimizationProblem(func, u₀, ps; kwargs...)
 end
 end

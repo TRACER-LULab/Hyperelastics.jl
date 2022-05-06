@@ -4,32 +4,32 @@ using Quadrature
 using QuadGK
 using FiniteDifferences
 
-function SussmanBathe(s⃗, λ⃗, k)
-    e = log.(getindex.(λ⃗, 1))
-    τ = DataInterpolations.CubicSpline(getindex.(s⃗, 1), e)
-    w′(e) = 
+function SussmanBathe(p)
+    (; s⃗, λ⃗, k) = p
+    τ = DataInterpolations.CubicSpline(getindex.(s⃗, 1), getindex.(λ⃗, 1))
+    w′(λ) = 
         sum(
-        i->τ((0.25^i)*e)+τ((-0.5)*((0.25)^i)*e), 
+        i -> τ(λ^(0.25^i))+τ(λ^((-0.5)*0.25^i)),
         0:k
         )
     probs = QuadratureProblem.(
-        (u,p) -> w′(log(u)),
+        (u,p) -> w′(u),
         [1.0, 1.0, 1.0],
         [2.0, 1/sqrt(2), 1/sqrt(2)],
     )
     map(prob -> solve(prob, QuadGKJL()), probs)
     # (λ⃗) -> sum(solve(remake(prob, lb = ones(3), ub = λ⃗), HCubatureJL(), reltol = 1e-8, abstol = 1e-8))
     (λ⃗) -> sum(
-            map(i -> 
+            map(x -> 
                 solve(
                     remake(
-                        probs[i], 
+                        x[1], 
                         lb = 1.0,
-                        ub = λ⃗[i]
+                        ub = x[2]
                     ), 
                     QuadGKJL(),
                 ).u,
-                eachindex(probs)
+                zip(probs, λ⃗)
             )
         )
 end

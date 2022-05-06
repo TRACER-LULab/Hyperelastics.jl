@@ -1,12 +1,9 @@
-export GeneralizedMooneyRivlin, GeneralizedDarijaniNaghdabadi, GeneralizedBeda
+module HyperelasticModels
 
-export MooneyRivlin, NeoHookean, Gent, Biderman, Isihara, JamesGreenSimpson, Lion, Yeoh, HauptSedlan, HartmannNeff, HainesWilson, Carroll, Nunes, BahremanDarijani, Zhao
+using Tullio
 
-export Knowles, Swanson, YamashitaKawabata, DavisDeThomas, Gregory, ModifiedGregory, Beda, Amin, LopezPamies, GenYeoh, HartSmith, VerondaWestmann, FungDemiray, Vito, HumphreyYin, ModifiedYeoh, Martins, ChevalierMarco, GornetDesmorat, MansouriDarijani, GentThomas, Alexander, LambertDianiRey, HossMarczakI, HossMarczakII, ExpLn
+export GeneralizedMooneyRivlin, GeneralizedDarijaniNaghdabadi, GeneralizedBeda, MooneyRivlin, NeoHookean, Gent, Biderman, Isihara, JamesGreenSimpson, Lion, Yeoh, HauptSedlan, HartmannNeff, HainesWilson, Carroll, BahremanDarijani, Zhao, Knowles, Swanson, YamashitaKawabata, DavisDeThomas, Gregory, ModifiedGregory, Beda, Amin, LopezPamies, GenYeoh, HartSmith, VerondaWestmann, FungDemiray, Vito, ModifiedYeoh, Martins, ChevalierMarco, GornetDesmorat, MansouriDarijani, GentThomas, Alexander, LambertDianiRey, HossMarczakI, HossMarczakII, ExpLn, Kilian, VanDeWaals, TakamizawaHayashi, YeohFleming, PucciSaccomandi, HorganSaccomandi, Beatty, HorganMurphy, ArrudaBoyce, Ogden, LandisVandel, EdwardVilgis
 
-export Kilian, VanDeWaals, TakamizawaHayashi, YeohFleming, Gent3, PucciSaccomandi, HorganSaccomandi, Beatty, HorganMurphy
-
-## Table 1
 function GeneralizedMooneyRivlin((; C))
     function (λ⃗)
         I1 = I₁(λ⃗)
@@ -16,16 +13,16 @@ function GeneralizedMooneyRivlin((; C))
     end
 end
 
-function GeneralizedDarijaniNaghdabadi((;A, B, m, n))
+function GeneralizedDarijaniNaghdabadi((; A, B, m, n))
     (λ⃗) -> sum(A .* (λ⃗ .^ m .- 1) + B .* (λ⃗ .^ (-n) .- 1))
 end
 
-function GeneralizedBeda((;C, K, α, β))
+function GeneralizedBeda((; C, K, α, β))
     function (λ⃗)
         # @tullio W:= C[i]/α[i]*(I₁(λ⃗)-3)^α[i]+K[j]/β[j]*(I₂(λ⃗)-3)^β[j]
-        W1 = C ./ α .* (I₁(λ⃗) - 3) .^ α  |> sum
+        W1 = C ./ α .* (I₁(λ⃗) - 3) .^ α |> sum
         W2 = K ./ β .* (I₂(λ⃗) - 3) .^ β |> sum
-        return W1+W2
+        return W1 + W2
     end
 end
 
@@ -124,18 +121,18 @@ end
 
 ## Only developed for simple shear deformation.
 # function Nunes((; C1, C2))
-    # (λ⃗) -> C1 * (I₁(λ⃗) - 3) + 4 / 3 * C2 * (I₂(λ⃗) - 3)^(3 / 4)
-    # (λ⃗) -> 1/2*(C1*(I₁(λ⃗)-3)+C2*(I₂(λ⃗)-3)^(3/4))
+# (λ⃗) -> C1 * (I₁(λ⃗) - 3) + 4 / 3 * C2 * (I₂(λ⃗) - 3)^(3 / 4)
+# (λ⃗) -> 1/2*(C1*(I₁(λ⃗)-3)+C2*(I₂(λ⃗)-3)^(3/4))
 # end
 
 function BahremanDarijani((; A2, B2, A4, A6))
     W = GeneralizedDarijaniNaghdabadi(
         ComponentVector(
-            A = [0.0, A2, 0.0, A4, 0.0, A6], 
-            B = [0.0, B2], 
-            m = [0.0, 2.0, 0.0, 4.0, 0.0, 6.0], 
-            n = [0.0, 2.0])
-        )
+            A=[0.0, A2, 0.0, A4, 0.0, A6],
+            B=[0.0, B2],
+            m=[0.0, 2.0, 0.0, 4.0, 0.0, 6.0],
+            n=[0.0, 2.0])
+    )
     (λ⃗) -> W(λ⃗)
 end
 
@@ -176,11 +173,11 @@ end
 # Added general form of the Beda model
 function Beda((; C1, C2, C3, K1, α, β, ζ))
     W = GeneralizedBeda(ComponentVector(
-        C = [C1, C2, C3],
-        K = [K1],
-        α = [α, 1.0, ζ],
-        β = [β]
-        )
+        C=[C1, C2, C3],
+        K=[K1],
+        α=[α, 1.0, ζ],
+        β=[β]
+    )
     )
     (λ⃗) -> W(λ⃗)
     # (λ⃗) -> C1 / α * (I₁(λ⃗) - 3)^(α) + C2 * (I₁(λ⃗) - 3) + C3 / ζ * (I₁(λ⃗) - 3)^(ζ) + K1 / β * (I₂(λ⃗) - 3)^β
@@ -195,43 +192,45 @@ function LopezPamies((; α, μ))
     (λ⃗) -> @tullio _ := (3.0^(1 - α[i])) / (2α[i]) * μ[i] * (I₁(λ⃗)^(α[i]) - 3^(α[i]))
 end
 
-
+# ✔
 function GenYeoh((; K1, K2, K3, m, p, q))
     (λ⃗) -> K1 * (I₁(λ⃗) - 3)^m + K2 * (I₁(λ⃗) - 3)^p + K3 * (I₁(λ⃗) - 3)^q
 end
-
+# ✔
 function VerondaWestmann((; C1, C2, α))
     (λ⃗) -> C1 * (exp(α * (I₁(λ⃗) - 3)) - 1) + C2 * (I₂(λ⃗) - 3)
 end
-
+# ✔
 function FungDemiray((; μ, b))
     (λ⃗) -> μ / (2 * b) * (exp(b * (I₁(λ⃗) - 3)) - 1)
 end
-
-function Vito((; μ, b, α))
-    (λ⃗) -> μ / (2 * b) * (exp(b * (α * (I₁(λ⃗) - 3) + (1 - α) * (I₂(λ⃗) - 3))) - 1)
+# ✔
+function Vito((; α, β, γ))
+    (λ⃗) -> α * (exp(β * (I₁(λ⃗) - 3) + γ * (I₂(λ⃗) - 3)) - 1)
 end
 
-function HumphreyYin((; C1, C2))
-    (λ⃗) -> C1 * (exp(C2 * (I₁(λ⃗) - 3)) - 1)
-end
+# Only applicable for fiber composites
+# function HumphreyYin((; c, b, A, a))
+#     (λ⃗, α) -> c * (exp(b * (I₁(λ⃗) - 3)) - 1) + A*(exp(exp(a*(α-1)^2))-1)
+# end
 
+# Requested in ILL
 function ModifiedYeoh((; C10, C20, C30, α, β))
     (λ⃗) -> C10 * (I₁(λ⃗) - 3) + C20 * (I₁(λ⃗) - 3)^2 + C30 * (I₁(λ⃗) - 3)^3 + α / β * (1 - exp(-β * (I₁(λ⃗) - 3)))
 end
-
+# ✔
 function MansouriDarijani((; A1, m1, B1, n1))
     (λ⃗) -> A1 * (exp(m1 * (I₁(λ⃗) - 3)) - 1) + B1 * (exp(n1 * (I₂(λ⃗) - 3)) - 1)
 end
-
+# ✔
 function GentThomas((; C1, C2))
     (λ⃗) -> C1 * (I₁(λ⃗) - 3) + C2 * log(I₂(λ⃗) / 3)
 end
-
+# Suitable for low strains
 function HossMarczakI((; α, β, μ, b, n))
     (λ⃗) -> α / β * (1 - exp(-β * (I₁(λ⃗) - 3))) + μ / (2b) * ((1 + b / n * (I₁(λ⃗) - 3))^n - 1)
 end
-
+# Suitable for high strains
 function HossMarczakII((; α, β, μ, b, n, C2))
     (λ⃗) -> α / β * (1 - exp(-β * (I₁(λ⃗) - 3))) + μ / (2b) * ((1 + b / n * (I₁(λ⃗) - 3))^n - 1) + C2 * log(I₂(λ⃗) / 3)
 end
@@ -240,24 +239,84 @@ function ExpLn((; A, a, b))
     (λ⃗) -> A * (1 / a * exp(a * (I₁(λ⃗) - 3)) + b * (I₁(λ⃗) - 2) * (1 - log(I₁(λ⃗) - 2)) - 1 / a - b)
 end
 
-function Killian((; μ, JL))
-    (λ⃗) -> -μ * JL * (log(1 - sqrt((I₁(λ⃗) - 3) / JL)) + sqrt((I₁(λ⃗) - 3) / JL))
+#####################
+###### TABLE 3 ######
+#####################
+# model not mentioned in original article ?????? 
+# function Warner((; μ, Iₘ))
+#     (λ⃗) -> -1/2*μ*Iₘlog(1-(I₁(λ⃗)-3)/(Iₘ-3))
+# end 
+
+# does not easily match the form in the paper
+# function Killian((; μ, JL))
+#     (λ⃗) -> -μ * JL * (log(1 - sqrt((I₁(λ⃗) - 3) / JL)) + sqrt((I₁(λ⃗) - 3) / JL))
+# end
+# ARticles requested -> Checked against review article from Marckmann and Verron
+function VanDerWaals((;μ, λm, β, α))
+    (λ⃗) -> μ*(-(λm^2-3)*(log(1-θ)+θ)-2/3*α*((I₁(λ⃗)-3)/2)^(3/2))
 end
 
-# function VanDerWaals((;μ, λm, β, α))
-#     (λ⃗) -> μ*(-(λm^2-3)*(log(1-θ)+θ)-2/3*α*((I₁(λ⃗)-3)/2)^(3/2))
-# end
-
-# function TakamizawaHayashi((;c, Jm))
-#     (λ⃗) -> -c*log(1-((I₁(λ⃗)-3)/Jm)^2)
-# end
-
-function YeohFleming((;A, B, C10, Im))
-    (λ⃗) -> A/B*(1-exp(-B*(I₁(λ⃗)-3)))-C10*(Im-3)*log(1-((I₁(λ⃗)-3)/(Im-3)))
-end
-
-
-# ---------------------------------------------------- #
 function Gent((; μ, Jₘ))
     (λ⃗) -> -μ * Jₘ / 2 * log(1 - (I₁(λ⃗) - 3) / Jₘ)
+end
+
+# With the assumption of isotropicity -> Verified with A description of arterial wall mechanics using limiting chain extensibility constitutitive models by Horgan and Saccomandi
+function TakamizawaHayashi((;c, Jm))
+    (λ⃗) -> -c*log(1-((I₁(λ⃗)-3)/Jm)^2)
+end
+
+function YeohFleming((; A, B, C10, Im))
+    (λ⃗) -> A / B * (1 - exp(-B * (I₁(λ⃗) - 3))) - C10 * (Im - 3) * log(1 - ((I₁(λ⃗) - 3) / (Im - 3)))
+end
+
+## Not a real model => Not referenced in the Gent paper cited
+# function Gent3Parameters((;μ, Jₘ, α))
+#     (λ⃗) -> 
+# end
+
+function PucciSaccomandi((; K, μ, Jₘ))
+    (λ⃗) -> K * log(I₂(λ⃗) / 3) - μ * Jₘ / 2 * log(1 - (I₁(λ⃗) - 3) / Jₘ)
+end 
+
+# Originally from CONSTITUTIVE MODELS FOR ATACTIC ELASTOMERS
+function HorganSaccomandi((;μ, J))
+    (λ⃗) -> -μ*J/2*log((J^3-J^2*I₁(λ⃗)+J*I₂(λ⃗)-1)/(J-1)^3)
+end 
+
+function Beatty((;G₀, Iₘ))
+    (λ⃗) -> -G₀*Iₘ*(Iₘ-3)/2/(2Iₘ-3)*log((1-(I₁(λ⃗)-3)/(Iₘ-3))/(1+(I₁(λ⃗)-3)/(Iₘ)))
+end
+
+"""
+Horgan Murphy Model
+parameters: μ, Jₘ, c
+model: `-\\frac{2μJₘ}{c^2}\\log\\bigg(1-\\frac{λ₁ᶜ+λ₂ᶜ+λ₃ᶜ-3}{Jₘ})`
+"""
+function HorganMurphy((;μ, Jₘ, c))
+    (λ⃗) -> -2*μ*Jₘ/c^2*log(1-(sum(λ⃗.^c)-3)/Jₘ)
+end
+# ---------------------------------------------------- #
+
+
+function ArrudaBoyce((; μ, N))
+    (λ⃗) -> μ * (0.5 * (I₁(λ⃗) - 3) + 1 / 20 / N * (I₁(λ⃗)^2 - 9) + 11 / 1050 / N^2 * (I₁(λ⃗) - 27) + 19 / 7000 / N^3 * (I₁(λ⃗)^4 - 81) + 519 / 673750 / N^4 * (I₁(λ⃗)^5 - 243))
+end
+
+function Ogden((; μ, α))
+    (λ⃗) -> @tullio _ := μ[i] / α[i] * (sum(λ⃗ .^ α[i]) - 3)
+end
+
+function LandisVandel((; μ))
+    (λ⃗) -> 2 * μ * (sum(λ⃗ .* (log.(λ⃗) .- 1)))
+end
+
+function EdwardVilgis((;Ns, Nc, α, η))
+    function W(λ⃗)
+        A = 0.5*Nc*((1-α^2)*I₁(λ⃗)/(1-α^2*I₁(λ⃗))+log(1-α^2*I₁(λ⃗)))
+        B = sum(i->(1+η)*(1-α^2)*λ⃗[i]/(1-η*λ⃗[i]^2)/(1-α^2*I₁(λ⃗))+log(1+η*λ⃗[i]^2), 1:3)
+        B = 0.5*Ns*(B+log(1-α^2*I₁(λ⃗)))
+        W = A+B
+        return W
+    end
+end
 end
