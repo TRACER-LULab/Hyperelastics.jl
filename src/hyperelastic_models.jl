@@ -1,9 +1,18 @@
 module HyperelasticModels
 
 using Tullio
+using SpecialFunctions
+export GeneralizedMooneyRivlin, GeneralizedDarijaniNaghdabadi, GeneralizedBeda, MooneyRivlin, NeoHookean, Gent, Biderman, Isihara, JamesGreenSimpson, Lion, Yeoh, HauptSedlan, HartmannNeff, HainesWilson, Carroll, BahremanDarijani, Zhao, Knowles, Swanson, YamashitaKawabata, DavisDeThomas, Gregory, ModifiedGregory, Beda, Amin, LopezPamies, GenYeoh, HartSmith, VerondaWestmann, FungDemiray, Vito, ModifiedYeoh, Martins, ChevalierMarco, GornetDesmorat, MansouriDarijani, GentThomas, Alexander, LambertDianiRey, HossMarczakI, HossMarczakII, ExpLn, Kilian, VanDeWaals, TakamizawaHayashi, YeohFleming, PucciSaccomandi, HorganSaccomandi, Beatty, HorganMurphy, ArrudaBoyce, Ogden, EdwardVilgis
 
-export GeneralizedMooneyRivlin, GeneralizedDarijaniNaghdabadi, GeneralizedBeda, MooneyRivlin, NeoHookean, Gent, Biderman, Isihara, JamesGreenSimpson, Lion, Yeoh, HauptSedlan, HartmannNeff, HainesWilson, Carroll, BahremanDarijani, Zhao, Knowles, Swanson, YamashitaKawabata, DavisDeThomas, Gregory, ModifiedGregory, Beda, Amin, LopezPamies, GenYeoh, HartSmith, VerondaWestmann, FungDemiray, Vito, ModifiedYeoh, Martins, ChevalierMarco, GornetDesmorat, MansouriDarijani, GentThomas, Alexander, LambertDianiRey, HossMarczakI, HossMarczakII, ExpLn, Kilian, VanDeWaals, TakamizawaHayashi, YeohFleming, PucciSaccomandi, HorganSaccomandi, Beatty, HorganMurphy, ArrudaBoyce, Ogden, LandisVandel, EdwardVilgis
+export ValanisLandel, PengLandel, Ogden, Attard, Shariff, ArmanNarooei
 
+"""
+General Mooney Rivlin
+
+Parameters: [C]
+
+Model: ``∑ᵢⱼCᵢⱼ(I₁-3)ⁱ(I₂-3)ʲ
+"""
 function GeneralizedMooneyRivlin((; C))
     function (λ⃗)
         I1 = I₁(λ⃗)
@@ -252,8 +261,8 @@ end
 #     (λ⃗) -> -μ * JL * (log(1 - sqrt((I₁(λ⃗) - 3) / JL)) + sqrt((I₁(λ⃗) - 3) / JL))
 # end
 # ARticles requested -> Checked against review article from Marckmann and Verron
-function VanDerWaals((;μ, λm, β, α))
-    (λ⃗) -> μ*(-(λm^2-3)*(log(1-θ)+θ)-2/3*α*((I₁(λ⃗)-3)/2)^(3/2))
+function VanDerWaals((; μ, λm, β, α))
+    (λ⃗) -> μ * (-(λm^2 - 3) * (log(1 - θ) + θ) - 2 / 3 * α * ((I₁(λ⃗) - 3) / 2)^(3 / 2))
 end
 
 function Gent((; μ, Jₘ))
@@ -261,8 +270,8 @@ function Gent((; μ, Jₘ))
 end
 
 # With the assumption of isotropicity -> Verified with A description of arterial wall mechanics using limiting chain extensibility constitutitive models by Horgan and Saccomandi
-function TakamizawaHayashi((;c, Jm))
-    (λ⃗) -> -c*log(1-((I₁(λ⃗)-3)/Jm)^2)
+function TakamizawaHayashi((; c, Jm))
+    (λ⃗) -> -c * log(1 - ((I₁(λ⃗) - 3) / Jm)^2)
 end
 
 function YeohFleming((; A, B, C10, Im))
@@ -276,24 +285,125 @@ end
 
 function PucciSaccomandi((; K, μ, Jₘ))
     (λ⃗) -> K * log(I₂(λ⃗) / 3) - μ * Jₘ / 2 * log(1 - (I₁(λ⃗) - 3) / Jₘ)
-end 
+end
 
 # Originally from CONSTITUTIVE MODELS FOR ATACTIC ELASTOMERS
-function HorganSaccomandi((;μ, J))
-    (λ⃗) -> -μ*J/2*log((J^3-J^2*I₁(λ⃗)+J*I₂(λ⃗)-1)/(J-1)^3)
-end 
+"""
+Horgan Saccomandi Model
 
-function Beatty((;G₀, Iₘ))
-    (λ⃗) -> -G₀*Iₘ*(Iₘ-3)/2/(2Iₘ-3)*log((1-(I₁(λ⃗)-3)/(Iₘ-3))/(1+(I₁(λ⃗)-3)/(Iₘ)))
+Parameters: μ, J
+
+Model: ``-\\frac{μJ}{2}\\log\\bigg(\\frac{J^3-J^2I₁+JI₂-1}{(J-1)^3}\\bigg)```
+"""
+function HorganSaccomandi((; μ, J))
+    (λ⃗) -> -μ * J / 2 * log((J^3 - J^2 * I₁(λ⃗) + J * I₂(λ⃗) - 1) / (J - 1)^3)
+end
+
+"""
+Beatty Model
+
+Parameters: G₀, Iₘ
+
+Model: ``-\\frac{G₀Iₘ(Iₘ-3)}{2(2Iₘ-3)}\\log\\bigg(\\frac{1-\\frac{I₁-3}{Iₘ-3}}{1+\\frac{I₁-3}{Iₘ}} \\bigg)``
+"""
+function Beatty((; G₀, Iₘ))
+    (λ⃗) -> -G₀ * Iₘ * (Iₘ - 3) / 2 / (2Iₘ - 3) * log((1 - (I₁(λ⃗) - 3) / (Iₘ - 3)) / (1 + (I₁(λ⃗) - 3) / (Iₘ)))
 end
 
 """
 Horgan Murphy Model
-parameters: μ, Jₘ, c
-model: `-\\frac{2μJₘ}{c^2}\\log\\bigg(1-\\frac{λ₁ᶜ+λ₂ᶜ+λ₃ᶜ-3}{Jₘ})`
+
+Parameters: μ, Jₘ, c
+
+Model: ``-\\frac{2μJₘ}{c^2}\\log\\bigg(1-\\frac{λ₁ᶜ+λ₂ᶜ+λ₃ᶜ-3}{Jₘ})``
 """
-function HorganMurphy((;μ, Jₘ, c))
-    (λ⃗) -> -2*μ*Jₘ/c^2*log(1-(sum(λ⃗.^c)-3)/Jₘ)
+function HorganMurphy((; μ, Jₘ, c))
+    (λ⃗) -> -2 * μ * Jₘ / c^2 * log(1 - (sum(λ⃗ .^ c) - 3) / Jₘ)
+end
+
+########################
+###########33 TABLE 4
+########################
+"""
+Valanis-Landel
+
+Parameters: μ
+
+Model: ``2μ∑₁³(λᵢ(\\log\\lambda_i -1))
+"""
+function ValanisLandel((; μ))
+    (λ⃗) -> 2 * μ * sum(λ⃗ * (log.(λ⃗) - 1))
+end
+
+"""
+Peng - Landel
+
+Parameters: E
+
+Model: ``E∑₁³\\bigg[λᵢ - 1 - \\log(λᵢ) - \\frac{1}{6}\\log(λᵢ)² + \\frac{1}{18}\\log(λᵢ)³-\\frac{1}{216}\\log(λᵢ)⁴]
+"""
+function PengLandel((; E))
+    (λ⃗) -> sum(@. λ⃗ - 1 - log(λ⃗) - 1 / 6 * log(λ⃗)^2 + 1 / 18 * log(λ⃗)^3 - 1 / 216 * log(λ⃗)^4) * E
+end
+
+"""
+Ogden
+
+Parameters: μ⃗, α⃗
+
+Model: ``∑₁ᴺ \\frac{μᵢ}{αᵢ}(λ₁^αᵢ+λ₂^αᵢ+λ₃^αᵢ-3)``
+"""
+function Ogden((; μ, α))
+    (λ⃗) -> @tullio _ := μ[i] / α[i] * (sum(λ⃗ .^ α[i]) - 3)
+end
+
+"""
+Attard
+
+Parameters: A⃗, B⃗
+
+Model: ``∑₁ᴺ\\frac{Aᵢ}{2i}(λ₁^{2i}+λ₂^{2i}+λ₃^{2i}-3) + \\frac{Bᵢ}{2i}(λ₁^{-2i}+λ₂^{-2i}+λ₃^{-2i}-3)``
+"""
+function Attard((; A, B))
+    (λ⃗) -> @tullio _ := A[i] / 2 / i * (sum(λ⃗ .^ (2i)) - 3) + B[i] / 2 / i * (sum(λ⃗ .^ (-2i)) - 3)
+end
+
+"""
+Shariff
+
+Parameters: E, α₁, α₂, α₃, α₄, α₅
+
+Model: ``E*∑ᵢ∑ⱼαⱼΦⱼ(λᵢ)``
+"""
+function Shariff((; E, α))
+    ϕ = []
+    c(j, r) = factorial(j) / factorial(r) / factorial(j - r)
+    for j in eachindex(α)
+        if j == 0
+            push!(ϕ, x -> ln(x)^2 / 3)
+        elseif j == 1
+            push!(ϕ, x -> -exp(1) * expinti(-1) + exp(1) * expinti(-x) + x - 2log(x) - 1)
+        elseif j == 2
+            push!(ϕ, x -> (expinti(x) - expinti(1)) / exp(1) - x + 1)
+        elseif j == 3
+            push!(ϕ, x -> -1 / (0.6 * x^(0.6)) + 3 / (1.6 * x^(1.6)) - 3 / (2.6 * x^(2.6)) + 1 / (5.6 * x^(5.6)) + 107200 / 139776)
+        else
+            push!(ϕ, x -> (-1)^(j - 1) * log(x) + (-1)^(j - 1) * sum(r -> (-1)^r * c(j - 1, r) * x^r / r, range(1, j - 1)) - (-1)^(j - 1) * sum(r -> (-1)^r * c(j - 1, r) / r, range(1, j - 1)))
+        end
+    end
+    (λ⃗) -> E * (@tullio _ := ϕ[i](λ⃗[j]))
+end
+
+# Article requested
+"""
+Armna - Narooei
+
+Parameters: A⃗, B⃗, m⃗, n⃗, α⃗, β⃗
+
+Model: ``∑ᵢᴺ Aᵢ[exp(mᵢ(λ₁^{αᵢ}+λ₂^{αᵢ}+λ₃^{αᵢ}-3))-1] + Bᵢ[exp(nᵢ(λ₁^{-βᵢ}+λ₂^{-βᵢ}+λ₃^{-βᵢ}-3))-1] ``
+"""
+function ArmanNarooei((; A, B, m, n, α, β))
+    (λ⃗) -> @tullio _ := A[i] * (exp(m[i] * (sum(λ⃗ .^ α[i]) - 3)) - 1) + B[i] * (exp(n[i] * (sum(λ⃗ .^ (-β[i])) - 3)) - 1)
 end
 # ---------------------------------------------------- #
 
@@ -302,20 +412,14 @@ function ArrudaBoyce((; μ, N))
     (λ⃗) -> μ * (0.5 * (I₁(λ⃗) - 3) + 1 / 20 / N * (I₁(λ⃗)^2 - 9) + 11 / 1050 / N^2 * (I₁(λ⃗) - 27) + 19 / 7000 / N^3 * (I₁(λ⃗)^4 - 81) + 519 / 673750 / N^4 * (I₁(λ⃗)^5 - 243))
 end
 
-function Ogden((; μ, α))
-    (λ⃗) -> @tullio _ := μ[i] / α[i] * (sum(λ⃗ .^ α[i]) - 3)
-end
 
-function LandisVandel((; μ))
-    (λ⃗) -> 2 * μ * (sum(λ⃗ .* (log.(λ⃗) .- 1)))
-end
 
-function EdwardVilgis((;Ns, Nc, α, η))
+function EdwardVilgis((; Ns, Nc, α, η))
     function W(λ⃗)
-        A = 0.5*Nc*((1-α^2)*I₁(λ⃗)/(1-α^2*I₁(λ⃗))+log(1-α^2*I₁(λ⃗)))
-        B = sum(i->(1+η)*(1-α^2)*λ⃗[i]/(1-η*λ⃗[i]^2)/(1-α^2*I₁(λ⃗))+log(1+η*λ⃗[i]^2), 1:3)
-        B = 0.5*Ns*(B+log(1-α^2*I₁(λ⃗)))
-        W = A+B
+        A = 0.5 * Nc * ((1 - α^2) * I₁(λ⃗) / (1 - α^2 * I₁(λ⃗)) + log(1 - α^2 * I₁(λ⃗)))
+        B = sum(i -> (1 + η) * (1 - α^2) * λ⃗[i] / (1 - η * λ⃗[i]^2) / (1 - α^2 * I₁(λ⃗)) + log(1 + η * λ⃗[i]^2), 1:3)
+        B = 0.5 * Ns * (B + log(1 - α^2 * I₁(λ⃗)))
+        W = A + B
         return W
     end
 end

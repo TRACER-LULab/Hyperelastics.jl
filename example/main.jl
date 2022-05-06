@@ -1,6 +1,6 @@
 using Hyperelastics
 using GalacticOptim
-using AbstractDifferentiation
+using AbstractDifferentiation  
 using ForwardDiff
 using Optim
 using DataFrames
