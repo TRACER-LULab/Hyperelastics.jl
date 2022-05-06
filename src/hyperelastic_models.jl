@@ -2,10 +2,15 @@ module HyperelasticModels
 
 using Tullio
 using SpecialFunctions
-export GeneralizedMooneyRivlin, GeneralizedDarijaniNaghdabadi, GeneralizedBeda, MooneyRivlin, NeoHookean, Gent, Biderman, Isihara, JamesGreenSimpson, Lion, Yeoh, HauptSedlan, HartmannNeff, HainesWilson, Carroll, BahremanDarijani, Zhao, Knowles, Swanson, YamashitaKawabata, DavisDeThomas, Gregory, ModifiedGregory, Beda, Amin, LopezPamies, GenYeoh, HartSmith, VerondaWestmann, FungDemiray, Vito, ModifiedYeoh, Martins, ChevalierMarco, GornetDesmorat, MansouriDarijani, GentThomas, Alexander, LambertDianiRey, HossMarczakI, HossMarczakII, ExpLn, Kilian, VanDeWaals, TakamizawaHayashi, YeohFleming, PucciSaccomandi, HorganSaccomandi, Beatty, HorganMurphy, ArrudaBoyce, Ogden, EdwardVilgis
+export GeneralMooneyRivlin, GeneralDarijaniNaghdabadi, GeneralBeda, MooneyRivlin, NeoHookean, Gent, Biderman, Isihara, JamesGreenSimpson, Lion, Yeoh, HauptSedlan, HartmannNeff, HainesWilson, Carroll, BahremanDarijani, Zhao, Knowles, Swanson, YamashitaKawabata, DavisDeThomas, Gregory, ModifiedGregory, Beda, Amin, LopezPamies, GenYeoh, HartSmith, VerondaWestmann, FungDemiray, Vito, ModifiedYeoh, Martins, ChevalierMarco, GornetDesmorat, MansouriDarijani, GentThomas, Alexander, LambertDianiRey, HossMarczakI, HossMarczakII, ExpLn, Kilian, VanDerWaals, TakamizawaHayashi, YeohFleming, PucciSaccomandi, HorganSaccomandi, Beatty, HorganMurphy, ArrudaBoyce, Ogden, EdwardVilgis
 
 export ValanisLandel, PengLandel, Ogden, Attard, Shariff, ArmanNarooei
 
+
+I₁(λ⃗) = sum(λ⃗ .^ 2) + 5eps(Float64)
+I₂(λ⃗) = sum(λ⃗ .^ (-2)) + 5eps(Float64)
+I₃(λ⃗) = prod(λ⃗)^2
+J(λ⃗) = prod(λ⃗)
 """
 General Mooney Rivlin
 
@@ -13,7 +18,7 @@ Parameters: [C]
 
 Model: ``\\sum\\limits_{i,j = 0}^{N,M} C_{i,j}(I_1-3)^i(I_2-3)^j``
 """
-function GeneralizedMooneyRivlin((; C))
+function GeneralMooneyRivlin((; C))
     function (λ⃗)
         I1 = I₁(λ⃗)
         I2 = I₂(λ⃗)
@@ -22,11 +27,25 @@ function GeneralizedMooneyRivlin((; C))
     end
 end
 
-function GeneralizedDarijaniNaghdabadi((; A, B, m, n))
+"""
+General Darijani Naghdabadi
+
+Parameters: A⃗, B⃗, m⃗, n⃗
+
+Model: ``\\sum\\limits_{i = 1}{3}\\sum\\limits_{j=0}^{N} A_j (\\lambda_i^{m_j}-1) + B_j(\\lambda_i^{-n_j}-1)``
+"""
+function GeneralDarijaniNaghdabadi((; A, B, m, n))
     (λ⃗) -> sum(A .* (λ⃗ .^ m .- 1) + B .* (λ⃗ .^ (-n) .- 1))
 end
 
-function GeneralizedBeda((; C, K, α, β))
+"""
+General Beda
+
+Parameters: 
+
+Model: 
+"""
+function GeneralBeda((; C, K, α, β))
     function (λ⃗)
         # @tullio W:= C[i]/α[i]*(I₁(λ⃗)-3)^α[i]+K[j]/β[j]*(I₂(λ⃗)-3)^β[j]
         W1 = C ./ α .* (I₁(λ⃗) - 3) .^ α |> sum
