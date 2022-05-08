@@ -57,7 +57,7 @@ function GeneralBeda((; C, K, α, β))
 end
 
 function MooneyRivlin((; C10, C01))
-    W = GeneralizedMooneyRivlin(ComponentVector(
+    W = GeneralMooneyRivlin(ComponentVector(
         C=[
             0.0 C10
             C01 0.0
