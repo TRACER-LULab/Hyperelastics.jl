@@ -66,6 +66,7 @@ function MooneyRivlin((; C10, C01))
 end
 
 function NeoHookean((; μ))
+    display("NeoHookean Model")
     W = GeneralMooneyRivlin(ComponentVector(
         C=[
         0.0 μ
