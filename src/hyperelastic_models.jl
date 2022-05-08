@@ -2,12 +2,14 @@ module HyperelasticModels
 
 using Tullio
 using SpecialFunctions
+using ComponentArrays
+
 export GeneralMooneyRivlin, GeneralDarijaniNaghdabadi, GeneralBeda, MooneyRivlin, NeoHookean, Gent, Biderman, Isihara, JamesGreenSimpson, Lion, Yeoh, HauptSedlan, HartmannNeff, HainesWilson, Carroll, BahremanDarijani, Zhao, Knowles, Swanson, YamashitaKawabata, DavisDeThomas, Gregory, ModifiedGregory, Beda, Amin, LopezPamies, GenYeoh, HartSmith, VerondaWestmann, FungDemiray, Vito, ModifiedYeoh, Martins, ChevalierMarco, GornetDesmorat, MansouriDarijani, GentThomas, Alexander, LambertDianiRey, HossMarczakI, HossMarczakII, ExpLn, Kilian, VanDerWaals, TakamizawaHayashi, YeohFleming, PucciSaccomandi, HorganSaccomandi, Beatty, HorganMurphy, ArrudaBoyce, Ogden, EdwardVilgis
 
 export ValanisLandel, PengLandel, Ogden, Attard, Shariff, ArmanNarooei
 
 
-I₁(λ⃗) = sum(λ⃗ .^ 2) + 5eps(Float64)
+        I₁(λ⃗) = sum(λ⃗ .^ 2) + 5eps(Float64)
 I₂(λ⃗) = sum(λ⃗ .^ (-2)) + 5eps(Float64)
 I₃(λ⃗) = prod(λ⃗)^2
 J(λ⃗) = prod(λ⃗)
