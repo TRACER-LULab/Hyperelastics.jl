@@ -66,7 +66,7 @@ function MooneyRivlin((; C10, C01))
 end
 
 function NeoHookean((; μ))
-    W = GeneralizedMooneyRivlin(ComponentVector(
+    W = GeneralMooneyRivlin(ComponentVector(
         C=[
         0.0 μ
     ]))
@@ -74,7 +74,7 @@ function NeoHookean((; μ))
 end
 
 function Isihara((; C10, C20, C01))
-    W = GeneralizedMooneyRivlin(ComponentVector(
+    W = GeneralMooneyRivlin(ComponentVector(
         C=[
             0.0 C10 C20
             C01 0.0 0.0
@@ -83,7 +83,7 @@ function Isihara((; C10, C20, C01))
 end
 
 function Biderman((; C10, C01, C20, C30))
-    W = GeneralizedMooneyRivlin(ComponentVector(
+    W = GeneralMooneyRivlin(ComponentVector(
         C=[
             0.0 C10 C20 C30
             C01 0.0 0.0 0.0
@@ -93,7 +93,7 @@ function Biderman((; C10, C01, C20, C30))
 end
 
 function JamesGreenSimpson((; C10, C01, C11, C20, C30))
-    W = GeneralizedMooneyRivlin(ComponentVector(
+    W = GeneralMooneyRivlin(ComponentVector(
         C=[
             0.0 C10 C20 C30
             C01 C11 0.0 0.0
@@ -102,7 +102,7 @@ function JamesGreenSimpson((; C10, C01, C11, C20, C30))
 end
 
 function HainesWilson((; C10, C01, C11, C02, C20, C30))
-    W = GeneralizedMooneyRivlin(ComponentVector(
+    W = GeneralMooneyRivlin(ComponentVector(
         C=[
             0.0 C10 C20 C30
             C01 C11 0.0 0.0
@@ -112,7 +112,7 @@ function HainesWilson((; C10, C01, C11, C02, C20, C30))
 end
 
 function Yeoh((; C10, C20, C30))
-    W = GeneralizedMooneyRivlin(ComponentVector(
+    W = GeneralMooneyRivlin(ComponentVector(
         C=[
         0.0 C10 C20 C30
     ]))
@@ -120,7 +120,7 @@ function Yeoh((; C10, C20, C30))
 end
 
 function Lion((; C10, C01, C50))
-    W = GeneralizedMooneyRivlin(ComponentVector(
+    W = GeneralMooneyRivlin(ComponentVector(
         C=[
             0.0 C10 0.0 0.0 0.0 C50
             C01 0.0 0.0 0.0 0.0 0.0
@@ -129,7 +129,7 @@ function Lion((; C10, C01, C50))
 end
 
 function HauptSedlan((; C10, C01, C11, C02, C30))
-    W = GeneralizedMooneyRivlin(ComponentVector(
+    W = GeneralMooneyRivlin(ComponentVector(
         C=[
             0.0 C10 0.0 C30
             C01 C11 0.0 0.0
