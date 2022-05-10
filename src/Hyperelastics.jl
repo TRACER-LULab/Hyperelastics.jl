@@ -14,7 +14,8 @@ using ComponentArrays
 export HyperelasticData, uniaxial_data, biaxial_data, HyperelasticProblem
 
 include("hyperelastic_models.jl")
-@reexport using .HyperelasticModels
+using .HyperelasticModels
+
 export s⃗̂, I₁, I₂, I₃, J
 struct HyperelasticData
     s⃗
