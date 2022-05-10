@@ -12,10 +12,10 @@ using Reexport
 using ComponentArrays
 # Write your package code here.
 export HyperelasticData, uniaxial_data, biaxial_data, HyperelasticProblem
-export s⃗̂, I₁, I₂, I₃, J
 
 include("hyperelastic_models.jl")
 @reexport using .HyperelasticModels
+export s⃗̂, I₁, I₂, I₃, J
 struct HyperelasticData
     s⃗
     λ⃗
