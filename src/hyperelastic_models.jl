@@ -8,10 +8,34 @@ export GeneralMooneyRivlin, GeneralDarijaniNaghdabadi, GeneralBeda, MooneyRivlin
 
 export ValanisLandel, PengLandel, Ogden, Attard, Shariff, ArmanNarooei
 
+export I₁, I₂, I₃, J
 
-        I₁(λ⃗) = sum(λ⃗ .^ 2) + 5eps(Float64)
+"""
+First stretch invariant - Currently requires the addition of 5 times the machine precision to allow AD to work correctly
+
+``I_1 = \\lambda_1^2+\\lambda_2^2+\\lambda_3^2 + 5\\varepsilon``
+"""
+I₁(λ⃗) = sum(λ⃗ .^ 2) + 5eps(Float64)
+
+"""
+Second Stretch invariant
+
+``I_2 = \\lambda_1^{-2}+\\lambda_2^{-2}+\\lambda_3^{-2}``
+"""
 I₂(λ⃗) = sum(λ⃗ .^ (-2)) + 5eps(Float64)
+
+"""
+Third Stretch invariant
+
+``I_3 = (\\lambda_1\\lambda_\\lamdba_3)^2``
+"""
 I₃(λ⃗) = prod(λ⃗)^2
+
+"""
+Volumetric Stretch
+
+``J = \\lambda_1\\lambda_2\\lambda_3``
+"""
 J(λ⃗) = prod(λ⃗)
 """
 General Mooney Rivlin
@@ -36,16 +60,16 @@ Parameters: A⃗, B⃗, m⃗, n⃗
 
 Model: ``\\sum\\limits_{i = 1}{3}\\sum\\limits_{j=0}^{N} A_j (\\lambda_i^{m_j}-1) + B_j(\\lambda_i^{-n_j}-1)``
 """
-function GeneralDarijaniNaghdabadi((; A, B, m, n))
-    (λ⃗) -> sum(A .* (λ⃗ .^ m .- 1) + B .* (λ⃗ .^ (-n) .- 1))
+function GeneralDarijaniNaghdabadi((; A⃗, B⃗, m⃗, n⃗))
+    (λ⃗) -> sum(A⃗ .* (λ⃗ .^ m⃗ .- 1) + B⃗ .* (λ⃗ .^ (-n⃗) .- 1))
 end
 
 """
 General Beda
 
-Parameters: 
+Parameters: C, K, α, β
 
-Model: 
+Model: ``\\sum\\limits_{i = 1}^{N}\\frac{C_i}{\\alpha_i}(I_1-3)^{\\alpha_i} + \\sum\\limits_{j=1}^{M}\\frac{K_j}{\\beta_j}(I_2-3)^{\\beta_j}``
 """
 function GeneralBeda((; C, K, α, β))
     function (λ⃗)
@@ -56,6 +80,13 @@ function GeneralBeda((; C, K, α, β))
     end
 end
 
+"""
+Mooney Rivlin Model
+
+Parameters: C01, C10
+
+Model: ``C_{10}(I_1-3)+C_{01}(I_2-3)``
+"""
 function MooneyRivlin((; C10, C01))
     W = GeneralMooneyRivlin(ComponentVector(
         C=[
@@ -64,6 +95,7 @@ function MooneyRivlin((; C10, C01))
         ]))
     (λ⃗) -> W(λ⃗)
 end
+
 """
 NeoHookean
 
@@ -74,11 +106,18 @@ Model: ``\\frac{\\mu}{2}(I_1-3)``
 function NeoHookean((; μ))
     W = GeneralMooneyRivlin(ComponentVector(
         C=[
-        0.0 μ/2
+        0.0 μ / 2
     ]))
     (λ⃗) -> W(λ⃗)
 end
 
+"""
+Isihara 
+
+Parameters: C10, C20, C01
+
+Model: ``\\sum\\limits_{i,j=0}^{2, 1}C_{i,j}(I_1-3)^i(I_2-3)^j``
+"""
 function Isihara((; C10, C20, C01))
     W = GeneralMooneyRivlin(ComponentVector(
         C=[
@@ -88,6 +127,13 @@ function Isihara((; C10, C20, C01))
     (λ⃗) -> W(λ⃗)
 end
 
+"""
+Biderman 
+
+Parameters: C10, C01, C20, C30
+
+Model: ``\\sum\\limits_{i,j=0}^{3, 1}C_{i,j}(I_1-3)^i(I_2-3)^j``
+"""
 function Biderman((; C10, C01, C20, C30))
     W = GeneralMooneyRivlin(ComponentVector(
         C=[
@@ -98,6 +144,13 @@ function Biderman((; C10, C01, C20, C30))
     (λ⃗) -> W(λ⃗)
 end
 
+"""
+James-Green-Simpson 
+
+Parameters: C10, C01, C11, C20, C30
+
+Model: ``\\sum\\limits_{i,j=0}^{3, 1}C_{i,j}(I_1-3)^i(I_2-3)^j``
+"""
 function JamesGreenSimpson((; C10, C01, C11, C20, C30))
     W = GeneralMooneyRivlin(ComponentVector(
         C=[
@@ -107,6 +160,13 @@ function JamesGreenSimpson((; C10, C01, C11, C20, C30))
     (λ⃗) -> W(λ⃗)
 end
 
+"""
+Haines-Wilson
+
+Parameters: C10, C01, C11, C02, C20, C30
+
+Model: ``\\sum\\limits_{i,j=0}^{3, 2}C_{i,j}(I_1-3)^i(I_2-3)^j``
+"""
 function HainesWilson((; C10, C01, C11, C02, C20, C30))
     W = GeneralMooneyRivlin(ComponentVector(
         C=[
@@ -117,6 +177,13 @@ function HainesWilson((; C10, C01, C11, C02, C20, C30))
     (λ⃗) -> W(λ⃗)
 end
 
+"""
+Yeoh
+
+Parameters: C10, C20, C30
+
+Model: ``\\sum\\limits_{i,j=0}^{3, 0}C_{i,j}(I_1-3)^i(I_2-3)^j``
+"""
 function Yeoh((; C10, C20, C30))
     W = GeneralMooneyRivlin(ComponentVector(
         C=[
@@ -125,6 +192,13 @@ function Yeoh((; C10, C20, C30))
     (λ⃗) -> W(λ⃗)
 end
 
+"""
+Lion
+
+Parameters: C10, C01, C50
+
+Model: ``\\sum\\limits_{i,j=0}^{5,1}C_{i,j}(I_1-3)^i(I_2-3)^j``
+"""
 function Lion((; C10, C01, C50))
     W = GeneralMooneyRivlin(ComponentVector(
         C=[
@@ -134,6 +208,13 @@ function Lion((; C10, C01, C50))
     (λ⃗) -> W(λ⃗)
 end
 
+"""
+Haupt Sedlan
+
+Parameters: C10, C01, C11, C02, C30
+
+Model: ``\\sum\\limits_{i,j=0}^{3, 2}C_{i,j}(I_1-3)^i(I_2-3)^j``
+"""
 function HauptSedlan((; C10, C01, C11, C02, C30))
     W = GeneralMooneyRivlin(ComponentVector(
         C=[
@@ -144,6 +225,13 @@ function HauptSedlan((; C10, C01, C11, C02, C30))
     (λ⃗) -> W(λ⃗)
 end
 
+"""
+Hartmann-Neff
+
+Parameters: α, Ci0, C0j
+
+Model: ``\\sum\\limits_{i,j=0}^{M,N}C_{i,0}(I_1-3)^i -3\\sqrt{3}^j+\\alpha(I_1-3)
+"""
 function HartmannNeff((; α, Ci0, C0j))
     function f(λ⃗)
         @tullio ∑ = Ci0[i] * (I₁(λ⃗) - 3)^i + C0j[j] * (I₂(λ⃗)^(3 / 2) - 3sqrt(3))^j
@@ -151,6 +239,13 @@ function HartmannNeff((; α, Ci0, C0j))
     end
 end
 
+"""
+Carroll
+
+Parameters: A, B, C 
+
+Model: ``AI_1+BI_1^4+C\\sqrt{I_2}``
+"""
 function Carroll((; A, B, C))
     (λ⃗) -> A * I₁(λ⃗) + B * I₁(λ⃗)^4 + C * I₂(λ⃗)^(1 / 2)
 end

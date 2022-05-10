@@ -30,10 +30,10 @@ function uniaxial_data(s₁, λ₁)
     return HyperelasticData(s⃗, λ⃗)
 end
 
-I₁(λ⃗) = sum(λ⃗ .^ 2) + 5eps(Float64)
-I₂(λ⃗) = sum(λ⃗ .^ (-2)) + 5eps(Float64)
-I₃(λ⃗) = prod(λ⃗)^2
-J(λ⃗) = prod(λ⃗)
+# I₁(λ⃗) = sum(λ⃗ .^ 2) + 5eps(Float64)
+# I₂(λ⃗) = sum(λ⃗ .^ (-2)) + 5eps(Float64)
+# I₃(λ⃗) = prod(λ⃗)^2
+# J(λ⃗) = prod(λ⃗)
 
 function s⃗̂(model, p, λ⃗; adb = AD.ForwardDiffBackend())
     W = model(p)
