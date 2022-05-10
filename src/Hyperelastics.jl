@@ -12,6 +12,7 @@ using Reexport
 using ComponentArrays
 # Write your package code here.
 export HyperelasticData, uniaxial_data, biaxial_data, HyperelasticProblem
+export I₁, I₂, I₃, J, s⃗̂
 
 include("BasicDefinitions.jl")
 include("hyperelastic_models.jl")

@@ -1,5 +1,4 @@
 
-export I₁, I₂, I₃, J, s⃗̂
 """
 First stretch invariant - Currently requires the addition of 5 times the machine precision to allow AD to work correctly
 
