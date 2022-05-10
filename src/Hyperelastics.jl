@@ -13,6 +13,7 @@ using ComponentArrays
 # Write your package code here.
 export HyperelasticData, uniaxial_data, biaxial_data, HyperelasticProblem
 
+include("BasicDefinitions.jl")
 include("hyperelastic_models.jl")
 using .HyperelasticModels
 
@@ -34,22 +35,8 @@ function uniaxial_data(s₁, λ₁)
     return HyperelasticData(s⃗, λ⃗)
 end
 
-# I₁(λ⃗) = sum(λ⃗ .^ 2) + 5eps(Float64)
-# I₂(λ⃗) = sum(λ⃗ .^ (-2)) + 5eps(Float64)
-# I₃(λ⃗) = prod(λ⃗)^2
-# J(λ⃗) = prod(λ⃗)
-
-function s⃗̂(model, p, λ⃗; adb=AD.ForwardDiffBackend())
-    W = model(p)
-    σ₁₂₃ = map(x⃗ -> AD.gradient(adb, W, x⃗)[1] .* x⃗, λ⃗)
-    σ̄₁₂₃ = map(x -> [x[1] - x[3], x[2] - x[3], x[3] - x[3]], σ₁₂₃)
-    s₁₂₃ = map(x -> x[1] ./ x[2], zip(σ̄₁₂₃, λ⃗))
-    return s₁₂₃
-end
-
-
-
 include("wypiwyg.jl")
+
 function HyperelasticProblem(data::HyperelasticData, model, u₀, ps; loss=L2DistLoss(), agg=AggMode.Mean(), cons=(x, p) -> [true], kwargs...)
     s = hcat(collect.(data.s⃗)...)
     stresses_provided = size(s, 1)
