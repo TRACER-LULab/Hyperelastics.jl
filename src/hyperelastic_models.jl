@@ -458,7 +458,7 @@ Valanis-Landel
 
 Parameters: μ
 
-Model: ``2μ∑₁³(λᵢ(\\log\\lambda_i -1))
+Model: ``2\\mu\\sum\\limits_{1}^{3}(\\lambda_i(\\log\\lambda_i -1))
 """
 function ValanisLandel((; μ))
     (λ⃗) -> 2 * μ * sum(λ⃗ * (log.(λ⃗) - 1))
@@ -548,7 +548,7 @@ Model: ``K_1(I_1-3)+K_2\\log\\frac{I_2}{3}+\frac{\\mu}{\\alpha}(\\lambda_1^\alph
 function ContinuumHybrid((;K₁, K₂, α, μ))
     (λ⃗) -> K₁*(I₁(λ⃗)-3)+K₂*log(I₂/3)+μ/α*(sum(λ⃗.^α)-3)
 end
-                                                                                                            
+
 """
 Bechir-4 Term
 
