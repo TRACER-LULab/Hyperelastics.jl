@@ -728,23 +728,20 @@ Parameters: Lf, F, A, B, C, D
 
 Model: ``\\int\\limits_{1}^{L_f}\\bigg(F(\\lambda_1)A())
 """
-function WFB(())
+function WFB()
     error("Not Yet Implemented")
 end
 
-# ---------------------------------------------------- #
-
 """
-Arruda Boyce 
+Constrained Junction
 
-Parameters: μ, N
+Parameters: Gc, νkT, κ  
 
-Model: ``\\mu\\bigg(\\frac{1}{2}(I_1-3)+\\frac{I_1^2-9}{20N}+\\frac{11(I_1^3-27)}{1050N^2}+\\frac{19(I_1^4-81)}{7000N^3}+\\frac{519(I_1^5-243)}{673750N^4}``
+Model:
 """
-function ArrudaBoyce((; μ, N))
-    (λ⃗) -> μ * (0.5 * (I₁(λ⃗) - 3) + 1 / 20 / N * (I₁(λ⃗)^2 - 9) + 11 / 1050 / N^2 * (I₁(λ⃗) - 27) + 19 / 7000 / N^3 * (I₁(λ⃗)^4 - 81) + 519 / 673750 / N^4 * (I₁(λ⃗)^5 - 243))
+function ConstrainedJunction((;Gc, νkT, κ))
+    (λ⃗) -> Gc*(I₁(λ⃗)-3)+μkT/2*sum(i->κ*(λ⃗[i]-1)/(λ⃗[i]^2+κ)+log((λ⃗[i]^2+κ)/(1+κ))-log(λ⃗[i]^2), 1:3)
 end
-
 """
 Edward-Vilgis
 
@@ -761,4 +758,53 @@ function EdwardVilgis((; Ns, Nc, α, η))
         return W
     end
 end
+
+"""
+MCC (modified constrained chain)
+
+Parameters:
+
+Model:``\\frac{1}{2}\\zeta k T \\sum\\limits_{i=1}^{3}(\\lambda_i^2-1)+\\frac{1}{2}\\mu k T\\sum\\limits_{i=1}^{3}[B_i+D_i-\\log{(1+B_i)}-\\log{(1+D_i)}]``
+``B_i = \\frac{\\kappa^2(\\lambda_i^2-1)}{(\\lambda_i^2+\\kappa)^2}``
+``D_i = \\frac{\\lambda_i^2 B_i}{\\kappa}``
+"""
+function MCC((; ζkT, μkT, κ))
+    W(λ⃗) ->
+        1 / 2 * ζkT * sum(i -> λ⃗[i]^2 - 1, 1:3) + 1 / 2 * μkT * sum(i -> κ^2 * (λ⃗[i]^2 - 1) * (λ⃗[i]^2 + κ)^(-2) + (λ⃗[i]^2 * (κ^2 * (λ⃗[i]^2 - 1) * (λ⃗[i]^2 + κ)^(-2)) / κ) - log(1 + (κ^2 * (λ⃗[i]^2 - 1) * (λ⃗[i]^2 + κ)^(-2))) - log(1 + (λ⃗[i]^2 * (κ^2 * (λ⃗[i]^2 - 1) * (λ⃗[i]^2 + κ)^(-2)) / κ)))
+end
+
+"""
+Tube
+
+Parameters: Gc, Ge, β
+
+Model: ``\\sum\\limits_{i=1}^{3}\\frac{G_c}{2}(\\lambda_i^2-1)+\\frac{2Ge}{\\beta^2}(\\lambda_i^{-\\beta}-1)``
+"""
+function Tube((; Gc, Ge, β))
+    (λ⃗) -> @tullio _ := Gc / 2 * (λ⃗[i]^2 - 1) + 2Ge / β^2 * (λ⃗[i]^(-β) - 1)
+end
+
+"""
+Nonaffine - Tube
+
+Parameters: Gc, Ge
+
+Model: ``G_c \\sum\\limit_{i=1}^{3}\\frac{\\lambda_i^2}{2}+G_e\\sum\\limits_{i=1}^{3}\\lambda_i+\\frac{1}{\\lambda_i}``
+"""
+function NonaffineTube((; Gc, Ge))
+    (λ⃗) -> Gc * sum(λ⃗ .^ 2 ./ 2) + Ge * sum(λ⃗ .+ 1 ./ λ⃗)
+end
+# ---------------------------------------------------- #
+
+"""
+Arruda Boyce 
+
+Parameters: μ, N
+
+Model: ``\\mu\\bigg(\\frac{1}{2}(I_1-3)+\\frac{I_1^2-9}{20N}+\\frac{11(I_1^3-27)}{1050N^2}+\\frac{19(I_1^4-81)}{7000N^3}+\\frac{519(I_1^5-243)}{673750N^4}``
+"""
+function ArrudaBoyce((; μ, N))
+    (λ⃗) -> μ * (0.5 * (I₁(λ⃗) - 3) + 1 / 20 / N * (I₁(λ⃗)^2 - 9) + 11 / 1050 / N^2 * (I₁(λ⃗) - 27) + 19 / 7000 / N^3 * (I₁(λ⃗)^4 - 81) + 519 / 673750 / N^4 * (I₁(λ⃗)^5 - 243))
+end
+
 end
