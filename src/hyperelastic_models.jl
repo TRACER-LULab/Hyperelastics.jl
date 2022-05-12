@@ -451,7 +451,7 @@ function HorganMurphy((; μ, Jₘ, c))
 end
 
 ########################
-###########33 TABLE 4
+########### TABLE 4
 ########################
 """
 Valanis-Landel
@@ -469,7 +469,7 @@ Peng - Landel
 
 Parameters: E
 
-Model: ``E∑₁³\\bigg[λᵢ - 1 - \\log(λᵢ) - \\frac{1}{6}\\log(λᵢ)² + \\frac{1}{18}\\log(λᵢ)³-\\frac{1}{216}\\log(λᵢ)⁴]
+Model: ``E\\sum\\limits_{i=1}^{3}\\bigg[\\lambda_i - 1 - \\log(\\lambda_i) - \\frac{1}{6}\\log(\\lambda_i)² + \\frac{1}{18}\\log(\\lambda_i)³-\\frac{1}{216}\\log(\\lambda_i)⁴]
 """
 function PengLandel((; E))
     (λ⃗) -> sum(@. λ⃗ - 1 - log(λ⃗) - 1 / 6 * log(λ⃗)^2 + 1 / 18 * log(λ⃗)^3 - 1 / 216 * log(λ⃗)^4) * E
@@ -534,6 +534,44 @@ Model: ``∑ᵢᴺ Aᵢ[exp(mᵢ(λ₁^{αᵢ}+λ₂^{αᵢ}+λ₃^{αᵢ}-3))-1
 function ArmanNarooei((; A, B, m, n, α, β))
     (λ⃗) -> @tullio _ := A[i] * (exp(m[i] * (sum(λ⃗ .^ α[i]) - 3)) - 1) + B[i] * (exp(n[i] * (sum(λ⃗ .^ (-β[i])) - 3)) - 1)
 end
+
+################################
+###################      Table 5
+################################
+"""
+Continuum Hybrid
+
+Parameters: K₁, K₂, α, μ
+
+Model: ``K_1(I_1-3)+K_2\\log\\frac{I_2}{3}+\frac{\\mu}{\\alpha}(\\lambda_1^\alpha+\\lambda_2^\\alpha+\\lambda^\\alpha-3)``
+"""
+function ContinuumHybrid((;K₁, K₂, α, μ))
+    (λ⃗) -> K₁*(I₁(λ⃗)-3)+K₂*log(I₂/3)+μ/α*(sum(λ⃗.^α)-3)
+end
+                                                                                                            
+"""
+Bechir-4 Term
+
+Parameters: C11, C12, C21, C22
+
+Model: ``C_1^1(I_1-3)+\\sum\\limits_{n=1}^{2}\\sum\\limits_{r=1}^{2}C_n^{r}(\\lambda_1^{2n}+\\lambda_2^{2n}+\\lambda_3^{2n}-3)^r
+"""
+function Bechir4Term((;C11, C12, C21, C22))
+    C = [C11 C12; C21 C22]
+    (λ⃗) -> C[1,1]*(I₁(λ⃗)-3)+sum(n->sum(r->C[n,r]*(sum(λ⃗.^(2n))), 1:2), 1:2)
+end
+
+"""
+WFB - Skipped
+
+Parameters: Lf, F, A, B, C, D
+
+Model: ``\\int\\limits_{1}^{L_f}\\bigg(F(\\lambda_1)A())
+"""
+function WFB(())
+    error("Not Yet Implemented")
+end
+
 # ---------------------------------------------------- #
 
 
