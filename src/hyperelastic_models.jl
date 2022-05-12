@@ -273,42 +273,97 @@ function BahremanDarijani((; A2, B2, A4, A6))
     )
     (λ⃗) -> W(λ⃗)
 end
+"""
+Zhao
 
+Parameters: C₋₁¹,, C₁¹, C₂¹, C₂²
+
+Model: ``C_{-1}^1*(I_2-3)+C_{1}^{1}(I_1-3)+C_{2}^{1}(I_1^2-2I_2-3)+C_{2}^{2}(I_1^2-2I_2-3)^2``
+"""
 function Zhao((; C₋₁¹, C₁¹, C₂¹, C₂²))
     (λ⃗) -> C₋₁¹ * (I₂(λ⃗) - 3) + C₁¹ * (I₁(λ⃗) - 3) + C₂¹ * (I₁(λ⃗)^2 - 2I₂(λ⃗) - 3) + C₂² * (I₁(λ⃗)^2 - 2I₂(λ⃗) - 3)^2
 end
 
 ## Table 2
+"""
+Knowles
+
+Parameters: μ, b, n
+
+Model: ``\\frac{\\mu}{2b}((1+\\frac{b}{n}(I_1-3))^n-1)``
+"""
 function Knowles((; μ, b, n))
     (λ⃗) -> μ / (2b) * ((1 + (b / n) * (I₁(λ⃗) - 3))^n - 1)
 end
 
 # Article Requested
+"""
+Swanson
+
+Parameters: A, α, B, β
+
+Model: ``\\sum\\limit_{i=1}^{N} \\frac{3}{2}(\\frac{A_i}{1+\\alpha_i}(\\frac{I_1}{3})^{1+\\alpha_i}+\\frac{B_i}{1+\\beta_i}(\\frac{I_2}{3})^{1+\\beta_i}``
+"""
 function Swanson((; A, α, B, β))
     (λ⃗) -> @tullio _ := 3 / 2 * (A[i] / (1 + α[i]) * (I₁(λ⃗) / 3)^(1 + α[i]) + B[i] / (1 + β[i]) * (I₂(λ⃗) / 3)^(1 + β[i]))
 end
 
 # Original article in Japanese
+"""
+Yamashita-Kawabata
+
+Parameters: C1, C2, C3, N
+
+Model: ``C_1(I_1-3)+C_2(I_2-3)+\\frac{C_3}{N+1}(I_1-3)^{N+1}``
+"""
 function YamashitaKawabata((; C1, C2, C3, N))
     (λ⃗) -> C1 * (I₁(λ⃗) - 3) + C2 * (I₂(λ⃗) - 3) + C3 / (N + 1) * (I₁(λ⃗) - 3)^(N + 1)
 end
 
 # Article Requested
+"""
+Davis-DeThomas
+
+Parameters: A, n, C, k
+
+Model: ``\\frac{A}{2(1-\\frac{n}{2})}(I_1-3+C^2)^{1-\\frac{n}{2}}+k(I_1-3)^2``
+"""
 function DavisDeThomas((; A, n, C, k))
     (λ⃗) -> A / (2 * (1 - n / 2)) * (I₁(λ⃗) - 3 + C^2)^(1 - n / 2) + k * (I₁(λ⃗) - 3)^2
 end
 
 # Article Requested
+"""
+Gregory
+
+Parameters: A, B, C, m, n
+
+Model: ``\\frac{A}{2-n}(I_1-3+C^2)^{1-\\frac{n}{2}}+\\frac{B}{2+m}(I_1-3+C^2)^{1+\\frac{m}{2}}``
+"""
 function Gregory((; A, B, C, m, n))
     (λ⃗) -> A / (2 - n) * (I₁(λ⃗) - 3 + C^2)^(1 - n / 2) + B / (2 + m) * (I₁(λ⃗) - 3 + C^2)^(1 + m / 2)
 end
 
 # Proposed in 85 Model review
+"""
+Modified Gregory
+
+Parameters: A, α, M, B, β, N
+
+Model: ``\\frac{A}{1+\\alpha}(I_1-3+M^2)^{1+\\alpha}+\\frac{B}{1+\\beta}(I_1-3+N^2)^{1+\\beta}
+"""
 function ModifiedGregory((; A, α, M, B, β, N))
     (λ⃗) -> A / (1 + α) * (I₁(λ⃗) - 3 + M^2)^(1 + α) + B / (1 + β) * (I₁(λ⃗) - 3 + N^2)^(1 + β)
 end
 
 # Added general form of the Beda model
+"""
+Beda
+
+Parameters: C1, C2, C3, K1, α, β, ζ
+
+Model: ``\\frac{C_1}{\\alpha}(I_1-3)^{\\alpha}+C_2(I_1-3)+\\frac{C_3}{\\zeta}(I_1-3)^{\\zeta}+\\frac{K_1}{\\beta}(I_2-3)^\\beta``
+"""
 function Beda((; C1, C2, C3, K1, α, β, ζ))
     W = GeneralizedBeda(ComponentVector(
         C=[C1, C2, C3],
