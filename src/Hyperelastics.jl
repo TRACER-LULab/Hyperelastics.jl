@@ -16,7 +16,7 @@ export I₁, I₂, I₃, J, s⃗̂
 
 include("BasicDefinitions.jl")
 include("hyperelastic_models.jl")
-using .HyperelasticModels
+@reexport using .HyperelasticModels
 
 export s⃗̂, I₁, I₂, I₃, J
 struct HyperelasticData
