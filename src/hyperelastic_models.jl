@@ -376,20 +376,48 @@ function Beda((; C1, C2, C3, K1, α, β, ζ))
     # (λ⃗) -> C1 / α * (I₁(λ⃗) - 3)^(α) + C2 * (I₁(λ⃗) - 3) + C3 / ζ * (I₁(λ⃗) - 3)^(ζ) + K1 / β * (I₂(λ⃗) - 3)^β
 end
 
+"""
+Amin
+
+Parameters: C1, C2, C3, C4, N, M
+
+Model: ``C_1 (I_1 - 3) + \\frac{C_2}{N + 1} (I_1 - 3)^{N + 1} + \\frac{C_3}{M + 1} (I_1 - 3)^{M + 1} + C_4 (I_2 - 3)``
+"""
 function Amin((; C1, C2, C3, C4, N, M))
     (λ⃗) -> C1 * (I₁(λ⃗) - 3) + C2 / (N + 1) * (I₁(λ⃗) - 3)^(N + 1) + C3 / (M + 1) * (I₁(λ⃗) - 3)^(M + 1) + C4 * (I₂(λ⃗) - 3)
 end
 
 # Article Received - General form presented.
-function LopezPamies((; α, μ))
-    (λ⃗) -> @tullio _ := (3.0^(1 - α[i])) / (2α[i]) * μ[i] * (I₁(λ⃗)^(α[i]) - 3^(α[i]))
+"""
+Lopez-Pamies
+
+Parameters: α⃗, μ⃗
+
+Model: \\frac{3.0^{1 - \\alpha_ii}}{2\\alpha_i} \\mu_i (I_1^{\\alpha_i} - 3^{\\alpha_i})
+"""
+function LopezPamies((; α⃗, μ⃗))
+    (λ⃗) -> @tullio _ := (3.0^(1 - α⃗[i])) / (2α⃗[i]) * μ⃗[i] * (I₁(λ⃗)^(α⃗[i]) - 3^(α⃗[i]))
 end
 
 # ✔
+"""
+GenYeoh
+
+Parameters: K1, K2, K3, m, p, q
+
+Model: ``K_1 (I_1 - 3)^m + K_2 * (I_1 - 3)^p + K_3 * (I_1 - 3)^q``
+"""
 function GenYeoh((; K1, K2, K3, m, p, q))
     (λ⃗) -> K1 * (I₁(λ⃗) - 3)^m + K2 * (I₁(λ⃗) - 3)^p + K3 * (I₁(λ⃗) - 3)^q
 end
 # ✔
+"""
+Veronda-Westmann
+
+Parameters: C1, C2, α
+
+Model: ``C_1 (\\exp(\\alpha(I_1 - 3)) - 1) + C_2 (I_2 - 3)``
+"""
 function VerondaWestmann((; C1, C2, α))
     (λ⃗) -> C1 * (exp(α * (I₁(λ⃗) - 3)) - 1) + C2 * (I₂(λ⃗) - 3)
 end
