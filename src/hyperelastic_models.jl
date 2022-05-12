@@ -394,10 +394,24 @@ function VerondaWestmann((; C1, C2, α))
     (λ⃗) -> C1 * (exp(α * (I₁(λ⃗) - 3)) - 1) + C2 * (I₂(λ⃗) - 3)
 end
 # ✔
+"""
+Fung-Demiray
+
+Parameters: μ, b
+
+Model: ``\\frac{\\mu}{2 * b} (\\exp(b(I_1 - 3)) - 1)
+"""
 function FungDemiray((; μ, b))
     (λ⃗) -> μ / (2 * b) * (exp(b * (I₁(λ⃗) - 3)) - 1)
 end
 # ✔
+"""
+Vito
+
+Parameters: α, β, γ
+
+Model: ``\\alpha (\\exp\\bigg(\\beta (I_1 - 3)\\bigg) + \\gamma * (I_2 - 3)) - 1)
+"""
 function Vito((; α, β, γ))
     (λ⃗) -> α * (exp(β * (I₁(λ⃗) - 3) + γ * (I₂(λ⃗) - 3)) - 1)
 end
@@ -408,26 +422,68 @@ end
 # end
 
 # Requested in ILL
+"""
+Modified Yeoh
+
+Parameters: C10, C20, C30, α, β
+
+Model: ``C_{10} * (I_1 - 3) + C_{20} * (I_1 - 3)^2 + C_{30} * (I_1 - 3)^3 + \\alpha / \\beta * (1 - \\exp{-\\beta * (I_1 - 3)})``
+"""
 function ModifiedYeoh((; C10, C20, C30, α, β))
     (λ⃗) -> C10 * (I₁(λ⃗) - 3) + C20 * (I₁(λ⃗) - 3)^2 + C30 * (I₁(λ⃗) - 3)^3 + α / β * (1 - exp(-β * (I₁(λ⃗) - 3)))
 end
 # ✔
+"""
+Mansouri-Darijani
+
+Parameters: A1, m1, B1, n1
+
+Model: ``A_1\\exp{m_1(I_1-3)-1}+B_1\\exp{n_1(I_2-3)-1}``
+"""
 function MansouriDarijani((; A1, m1, B1, n1))
     (λ⃗) -> A1 * (exp(m1 * (I₁(λ⃗) - 3)) - 1) + B1 * (exp(n1 * (I₂(λ⃗) - 3)) - 1)
 end
 # ✔
+"""
+Gent Thomas
+
+Paramters: C1, C2
+
+Model: ``C_1(I_1-3)+C_2\\log(\\frac{I_2}{3})
+"""
 function GentThomas((; C1, C2))
     (λ⃗) -> C1 * (I₁(λ⃗) - 3) + C2 * log(I₂(λ⃗) / 3)
 end
 # Suitable for low strains
+"""
+Hoss Marczak I
+
+Parameters: α, β, μ, b, n
+
+Model: ``\\frac{\\alpha}{\\beta}(1-\\exp{-\\beta(I_1-3)})+\\fraC{\\mu}{2b}\\bigg((1+\\frac{b}{n}(I_1-3))^n -1\\bigg)``
+"""
 function HossMarczakI((; α, β, μ, b, n))
     (λ⃗) -> α / β * (1 - exp(-β * (I₁(λ⃗) - 3))) + μ / (2b) * ((1 + b / n * (I₁(λ⃗) - 3))^n - 1)
 end
 # Suitable for high strains
+"""
+Hoss Marczak II
+
+Parameters: α, β, μ, b, n, C2
+
+Model: ``\\frac{\\alpha}{\\beta}(1-\\exp{-\\beta(I_1-3)})+\\fraC{\\mu}{2b}\\bigg((1+\\frac{b}{n}(I_1-3))^n -1\\bigg)+C_2\\log(\\frac{I_2}{3})``
+"""
 function HossMarczakII((; α, β, μ, b, n, C2))
     (λ⃗) -> α / β * (1 - exp(-β * (I₁(λ⃗) - 3))) + μ / (2b) * ((1 + b / n * (I₁(λ⃗) - 3))^n - 1) + C2 * log(I₂(λ⃗) / 3)
 end
 
+"""
+Exp-Ln
+
+Parameters: A, a, b
+
+Model: ``A\\bigg[\\frac{1}{a}\\exp{(a(I_1-3))}+b(I_1-2)(1-\\log{I_1-2})-\\frac{1}{a}-b\\bigg]``
+"""
 function ExpLn((; A, a, b))
     (λ⃗) -> A * (1 / a * exp(a * (I₁(λ⃗) - 3)) + b * (I₁(λ⃗) - 2) * (1 - log(I₁(λ⃗) - 2)) - 1 / a - b)
 end
@@ -449,13 +505,27 @@ function VanDerWaals((; μ, λm, β, α))
     (λ⃗) -> μ * (-(λm^2 - 3) * (log(1 - θ) + θ) - 2 / 3 * α * ((I₁(λ⃗) - 3) / 2)^(3 / 2))
 end
 
+"""
+Gent
+
+Parameters: μ, Jₘ
+
+Model: ``-\\frac{\\mu J_m}{2}\\log{1-\\frac{I_1-3}{J_m}}``
+"""
 function Gent((; μ, Jₘ))
     (λ⃗) -> -μ * Jₘ / 2 * log(1 - (I₁(λ⃗) - 3) / Jₘ)
 end
 
 # With the assumption of isotropicity -> Verified with A description of arterial wall mechanics using limiting chain extensibility constitutitive models by Horgan and Saccomandi
-function TakamizawaHayashi((; c, Jm))
-    (λ⃗) -> -c * log(1 - ((I₁(λ⃗) - 3) / Jm)^2)
+"""
+Takamizawa-Hayashi
+
+Parameters: c, Jₘ
+
+Model: -c\\log{1-\\bigg(\\frac{I_1-3}{J_m}\\big)^2}
+"""
+function TakamizawaHayashi((; c, Jₘ))
+    (λ⃗) -> -c * log(1 - ((I₁(λ⃗) - 3) / Jₘ)^2)
 end
 
 function YeohFleming((; A, B, C10, Im))
@@ -467,6 +537,13 @@ end
 #     (λ⃗) -> 
 # end
 
+"""
+Pucci-Saccomandi
+
+Parameters: K, μ, Jₘ
+
+Model ``K\\log{\\frac{I_2}{3}}-\\frac{\\mu J_m}{2}\\log{1-\\frac{I_1-3}{J-m}}``
+"""
 function PucciSaccomandi((; K, μ, Jₘ))
     (λ⃗) -> K * log(I₂(λ⃗) / 3) - μ * Jₘ / 2 * log(1 - (I₁(λ⃗) - 3) / Jₘ)
 end
