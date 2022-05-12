@@ -600,8 +600,8 @@ Parameters: K₁, K₂, α, μ
 
 Model: ``K_1(I_1-3)+K_2\\log\\frac{I_2}{3}+\frac{\\mu}{\\alpha}(\\lambda_1^\alpha+\\lambda_2^\\alpha+\\lambda^\\alpha-3)``
 """
-function ContinuumHybrid((;K₁, K₂, α, μ))
-    (λ⃗) -> K₁*(I₁(λ⃗)-3)+K₂*log(I₂/3)+μ/α*(sum(λ⃗.^α)-3)
+function ContinuumHybrid((; K₁, K₂, α, μ))
+    (λ⃗) -> K₁ * (I₁(λ⃗) - 3) + K₂ * log(I₂ / 3) + μ / α * (sum(λ⃗ .^ α) - 3)
 end
 
 """
@@ -611,9 +611,9 @@ Parameters: C11, C12, C21, C22
 
 Model: ``C_1^1(I_1-3)+\\sum\\limits_{n=1}^{2}\\sum\\limits_{r=1}^{2}C_n^{r}(\\lambda_1^{2n}+\\lambda_2^{2n}+\\lambda_3^{2n}-3)^r
 """
-function Bechir4Term((;C11, C12, C21, C22))
+function Bechir4Term((; C11, C12, C21, C22))
     C = [C11 C12; C21 C22]
-    (λ⃗) -> C[1,1]*(I₁(λ⃗)-3)+sum(n->sum(r->C[n,r]*(sum(λ⃗.^(2n))), 1:2), 1:2)
+    (λ⃗) -> C[1, 1] * (I₁(λ⃗) - 3) + sum(n -> sum(r -> C[n, r] * (sum(λ⃗ .^ (2n))), 1:2), 1:2)
 end
 
 """
@@ -629,13 +629,24 @@ end
 
 # ---------------------------------------------------- #
 
+"""
+Arruda Boyce 
 
+Parameters: μ, N
+
+Model: ``\\mu\\bigg(\\frac{1}{2}(I_1-3)+\\frac{I_1^2-9}{20N}+\\frac{11(I_1^3-27)}{1050N^2}+\\frac{19(I_1^4-81)}{7000N^3}+\\frac{519(I_1^5-243)}{673750N^4}``
+"""
 function ArrudaBoyce((; μ, N))
     (λ⃗) -> μ * (0.5 * (I₁(λ⃗) - 3) + 1 / 20 / N * (I₁(λ⃗)^2 - 9) + 11 / 1050 / N^2 * (I₁(λ⃗) - 27) + 19 / 7000 / N^3 * (I₁(λ⃗)^4 - 81) + 519 / 673750 / N^4 * (I₁(λ⃗)^5 - 243))
 end
 
+"""
+Edward-Vilgis
 
+Parameters: Ns, Nc, α, η
 
+Model: ``\\frac{1}{2}N_C\\Bigg[\\frac{(1-\\alpha^2)I_1}{1-\\alpha^2I_1}+\\log(1-\\alpha^2I_1)\\Bigg]+\\frac{1}{2}N_S\\Bigg[\\sum_{i=1}^{3}\\Big\{\\frac{(1+\\eta)(1-\\alpha^2)\\lambda_i^2}{( 1+\\eta\\lambda_i^2)(1-\\alpha^2I_1)}+\\log(1+\\eta\\lambda_i^2)\\Big\\}+\\log(1-\\alpha^2I_1)\\Bigg]``
+"""
 function EdwardVilgis((; Ns, Nc, α, η))
     function W(λ⃗)
         A = 0.5 * Nc * ((1 - α^2) * I₁(λ⃗) / (1 - α^2 * I₁(λ⃗)) + log(1 - α^2 * I₁(λ⃗)))
