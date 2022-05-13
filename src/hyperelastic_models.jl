@@ -8,42 +8,42 @@ export GeneralMooneyRivlin, GeneralDarijaniNaghdabadi, GeneralBeda, MooneyRivlin
 
 export ValanisLandel, PengLandel, Ogden, Attard, Shariff, ArmanNarooei
 
-# include("BasicDefinitions.jl")
-"""
-First stretch invariant - Currently requires the addition of 5 times the machine precision to allow AD to work correctly
+include("BasicDefinitions.jl")
+# """
+# First stretch invariant - Currently requires the addition of 5 times the machine precision to allow AD to work correctly
 
-``I_1 = \\lambda_1^2+\\lambda_2^2+\\lambda_3^2 + 5\\varepsilon``
-"""
-function I₁(λ⃗)
-    sum(λ⃗ .^ 2) + 5eps(Float64)
-end
+# ``I_1 = \\lambda_1^2+\\lambda_2^2+\\lambda_3^2 + 5\\varepsilon``
+# """
+# function I₁(λ⃗)
+#     sum(λ⃗ .^ 2) + 5eps(Float64)
+# end
 
-"""
-Second Stretch invariant
+# """
+# Second Stretch invariant
 
-``I_2 = \\lambda_1^{-2}+\\lambda_2^{-2}+\\lambda_3^{-2}``
-"""
-function I₂(λ⃗)
-    sum(λ⃗ .^ (-2)) + 5eps(Float64)
-end
+# ``I_2 = \\lambda_1^{-2}+\\lambda_2^{-2}+\\lambda_3^{-2}``
+# """
+# function I₂(λ⃗)
+#     sum(λ⃗ .^ (-2)) + 5eps(Float64)
+# end
 
-"""
-Third Stretch invariant
+# """
+# Third Stretch invariant
 
-``I_3 = (\\lambda_1\\lambda_\\lamdba_3)^2``
-"""
-function I₃(λ⃗)
-    prod(λ⃗)^2
-end
+# ``I_3 = (\\lambda_1\\lambda_\\lamdba_3)^2``
+# """
+# function I₃(λ⃗)
+#     prod(λ⃗)^2
+# end
 
-"""
-Volumetric Stretch
+# """
+# Volumetric Stretch
 
-``J = \\lambda_1\\lambda_2\\lambda_3``
-"""
-function J(λ⃗)
-    prod(λ⃗)
-end
+# ``J = \\lambda_1\\lambda_2\\lambda_3``
+# """
+# function J(λ⃗)
+#     prod(λ⃗)
+# end
 """
 General Mooney Rivlin
 
@@ -550,7 +550,7 @@ Takamizawa-Hayashi
 
 Parameters: c, Jₘ
 
-Model: ``-c\\log{1-\\bigg(\\frac{I_1-3}{J_m}\\big)^2}``
+Model: ``-c\\log{1-\\big(\\frac{I_1-3}{J_m}\\big)^2}``
 """
 function TakamizawaHayashi((; c, Jₘ))
     (λ⃗) -> -c * log(1 - ((I₁(λ⃗) - 3) / Jₘ)^2)
@@ -713,6 +713,7 @@ end
 Bechir-4 Term
 
 Parameters: C11, C12, C21, C22
+
 Model: ``C_1^1(I_1-3)+\\sum\\limits_{n=1}^{2}\\sum\\limits_{r=1}^{2}C_n^{r}(\\lambda_1^{2n}+\\lambda_2^{2n}+\\lambda_3^{2n}-3)^r``
 """
 function Bechir4Term((; C11, C12, C21, C22))
@@ -725,7 +726,7 @@ WFB - Skipped
 
 Parameters: Lf, F, A, B, C, D
 
-Model: ``\\int\\limits_{1}^{L_f}\\bigg(F(\\lambda_1)A())``
+Model: ``\\int\\limits_{1}^{L_f}\\big(F(\\lambda_1)A()\\big)``
 """
 function WFB()
     error("Not Yet Implemented")
