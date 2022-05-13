@@ -53,7 +53,9 @@ Returns an `OptimizationProblem` for solving with GalacticOptim.jl. `data` is th
 """
 function HyperelasticProblem(data::HyperelasticData, model, u₀, ps; loss=L2DistLoss(), agg=AggMode.Mean(), cons=(x, p) -> [true], kwargs...)
     s = hcat(collect.(data.s⃗)...)
+    
     stresses_provided = size(s, 1)
+
     s⃗(p) = s⃗̂(model, p, collect.(data.λ⃗))
 
     function ŝ(p)
