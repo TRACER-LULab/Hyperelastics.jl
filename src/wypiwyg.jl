@@ -2,7 +2,6 @@ export SussmanBathe
 using DataInterpolations
 using Quadrature
 using QuadGK
-using FiniteDifferences
 
 function SussmanBathe(p)
     (; s⃗, λ⃗, k) = p
