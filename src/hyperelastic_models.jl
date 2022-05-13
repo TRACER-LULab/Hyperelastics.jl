@@ -237,7 +237,7 @@ Hartmann-Neff
 
 Parameters: α, Ci0, C0j
 
-Model: ``\\sum\\limits_{i,j=0}^{M,N}C_{i,0}(I_1-3)^i -3\\sqrt{3}^j+\\alpha(I_1-3)
+Model: ``\\sum\\limits_{i,j=0}^{M,N}C_{i,0}(I_1-3)^i -3\\sqrt{3}^j+\\alpha(I_1-3)``
 """
 function HartmannNeff((; α, Ci0, C0j))
     function f(λ⃗)
@@ -302,7 +302,7 @@ Swanson
 
 Parameters: A, α, B, β
 
-Model: ``\\sum\\limit_{i=1}^{N} \\frac{3}{2}(\\frac{A_i}{1+\\alpha_i}(\\frac{I_1}{3})^{1+\\alpha_i}+\\frac{B_i}{1+\\beta_i}(\\frac{I_2}{3})^{1+\\beta_i}``
+Model: ``\\sum\\limits_{i=1}^{N} \\frac{3}{2}(\\frac{A_i}{1+\\alpha_i}(\\frac{I_1}{3})^{1+\\alpha_i}+\\frac{B_i}{1+\\beta_i}(\\frac{I_2}{3})^{1+\\beta_i}``
 """
 function Swanson((; A, α, B, β))
     (λ⃗) -> @tullio _ := 3 / 2 * (A[i] / (1 + α[i]) * (I₁(λ⃗) / 3)^(1 + α[i]) + B[i] / (1 + β[i]) * (I₂(λ⃗) / 3)^(1 + β[i]))
@@ -350,7 +350,7 @@ Modified Gregory
 
 Parameters: A, α, M, B, β, N
 
-Model: ``\\frac{A}{1+\\alpha}(I_1-3+M^2)^{1+\\alpha}+\\frac{B}{1+\\beta}(I_1-3+N^2)^{1+\\beta}
+Model: ``\\frac{A}{1+\\alpha}(I_1-3+M^2)^{1+\\alpha}+\\frac{B}{1+\\beta}(I_1-3+N^2)^{1+\\beta}``
 """
 function ModifiedGregory((; A, α, M, B, β, N))
     (λ⃗) -> A / (1 + α) * (I₁(λ⃗) - 3 + M^2)^(1 + α) + B / (1 + β) * (I₁(λ⃗) - 3 + N^2)^(1 + β)
@@ -393,7 +393,7 @@ Lopez-Pamies
 
 Parameters: α⃗, μ⃗
 
-Model: \\frac{3.0^{1 - \\alpha_ii}}{2\\alpha_i} \\mu_i (I_1^{\\alpha_i} - 3^{\\alpha_i})
+Model: \\frac{3.0^{1 - \\alpha_ii}}{2\\alpha_i} \\mu_i (I_1^{\\alpha_i} - 3^{\\alpha_i})``
 """
 function LopezPamies((; α⃗, μ⃗))
     (λ⃗) -> @tullio _ := (3.0^(1 - α⃗[i])) / (2α⃗[i]) * μ⃗[i] * (I₁(λ⃗)^(α⃗[i]) - 3^(α⃗[i]))
@@ -427,7 +427,7 @@ Fung-Demiray
 
 Parameters: μ, b
 
-Model: ``\\frac{\\mu}{2 * b} (\\exp(b(I_1 - 3)) - 1)
+Model: ``\\frac{\\mu}{2 * b} (\\exp(b(I_1 - 3)) - 1)``
 """
 function FungDemiray((; μ, b))
     (λ⃗) -> μ / (2 * b) * (exp(b * (I₁(λ⃗) - 3)) - 1)
@@ -438,7 +438,7 @@ Vito
 
 Parameters: α, β, γ
 
-Model: ``\\alpha (\\exp\\bigg(\\beta (I_1 - 3)\\bigg) + \\gamma * (I_2 - 3)) - 1)
+Model: ``\\alpha (\\exp\\bigg(\\beta (I_1 - 3)\\bigg) + \\gamma * (I_2 - 3)) - 1)``
 """
 function Vito((; α, β, γ))
     (λ⃗) -> α * (exp(β * (I₁(λ⃗) - 3) + γ * (I₂(λ⃗) - 3)) - 1)
@@ -477,7 +477,7 @@ Gent Thomas
 
 Paramters: C1, C2
 
-Model: ``C_1(I_1-3)+C_2\\log(\\frac{I_2}{3})
+Model: ``C_1(I_1-3)+C_2\\log(\\frac{I_2}{3})``
 """
 function GentThomas((; C1, C2))
     (λ⃗) -> C1 * (I₁(λ⃗) - 3) + C2 * log(I₂(λ⃗) / 3)
@@ -488,7 +488,7 @@ Hoss Marczak I
 
 Parameters: α, β, μ, b, n
 
-Model: ``\\frac{\\alpha}{\\beta}(1-\\exp{-\\beta(I_1-3)})+\\fraC{\\mu}{2b}\\bigg((1+\\frac{b}{n}(I_1-3))^n -1\\bigg)``
+Model: ``\\frac{\\alpha}{\\beta}(1-\\exp{-\\beta(I_1-3)})+\\frac{\\mu}{2b}\\bigg((1+\\frac{b}{n}(I_1-3))^n -1\\bigg)``
 """
 function HossMarczakI((; α, β, μ, b, n))
     (λ⃗) -> α / β * (1 - exp(-β * (I₁(λ⃗) - 3))) + μ / (2b) * ((1 + b / n * (I₁(λ⃗) - 3))^n - 1)
@@ -499,7 +499,7 @@ Hoss Marczak II
 
 Parameters: α, β, μ, b, n, C2
 
-Model: ``\\frac{\\alpha}{\\beta}(1-\\exp{-\\beta(I_1-3)})+\\fraC{\\mu}{2b}\\bigg((1+\\frac{b}{n}(I_1-3))^n -1\\bigg)+C_2\\log(\\frac{I_2}{3})``
+Model: ``\\frac{\\alpha}{\\beta}(1-\\exp{-\\beta(I_1-3)})+\\frac{\\mu}{2b}\\bigg((1+\\frac{b}{n}(I_1-3))^n -1\\bigg)+C_2\\log(\\frac{I_2}{3})``
 """
 function HossMarczakII((; α, β, μ, b, n, C2))
     (λ⃗) -> α / β * (1 - exp(-β * (I₁(λ⃗) - 3))) + μ / (2b) * ((1 + b / n * (I₁(λ⃗) - 3))^n - 1) + C2 * log(I₂(λ⃗) / 3)
@@ -550,7 +550,7 @@ Takamizawa-Hayashi
 
 Parameters: c, Jₘ
 
-Model: -c\\log{1-\\bigg(\\frac{I_1-3}{J_m}\\big)^2}
+Model: ``-c\\log{1-\\bigg(\\frac{I_1-3}{J_m}\\big)^2}``
 """
 function TakamizawaHayashi((; c, Jₘ))
     (λ⃗) -> -c * log(1 - ((I₁(λ⃗) - 3) / Jₘ)^2)
@@ -618,7 +618,7 @@ Valanis-Landel
 
 Parameters: μ
 
-Model: ``2\\mu\\sum\\limits_{1}^{3}(\\lambda_i(\\log\\lambda_i -1))
+Model: ``2\\mu\\sum\\limits_{1}^{3}(\\lambda_i(\\log\\lambda_i -1))``
 """
 function ValanisLandel((; μ))
     (λ⃗) -> 2 * μ * sum(λ⃗ * (log.(λ⃗) - 1))
@@ -629,7 +629,7 @@ Peng - Landel
 
 Parameters: E
 
-Model: ``E\\sum\\limits_{i=1}^{3}\\bigg[\\lambda_i - 1 - \\log(\\lambda_i) - \\frac{1}{6}\\log(\\lambda_i)² + \\frac{1}{18}\\log(\\lambda_i)³-\\frac{1}{216}\\log(\\lambda_i)⁴]
+Model: ``E\\sum\\limits_{i=1}^{3}\\bigg[\\lambda_i - 1 - \\log(\\lambda_i) - \\frac{1}{6}\\log(\\lambda_i)^2 + \\frac{1}{18}\\log(\\lambda_i)^3-\\frac{1}{216}\\log(\\lambda_i)^4]``
 """
 function PengLandel((; E))
     (λ⃗) -> sum(@. λ⃗ - 1 - log(λ⃗) - 1 / 6 * log(λ⃗)^2 + 1 / 18 * log(λ⃗)^3 - 1 / 216 * log(λ⃗)^4) * E
@@ -703,7 +703,7 @@ Continuum Hybrid
 
 Parameters: K₁, K₂, α, μ
 
-Model: ``K_1(I_1-3)+K_2\\log\\frac{I_2}{3}+\frac{\\mu}{\\alpha}(\\lambda_1^\alpha+\\lambda_2^\\alpha+\\lambda^\\alpha-3)``
+Model: ``K_1(I_1-3)+K_2\\log\\frac{I_2}{3}+\\frac{\\mu}{\\alpha}(\\lambda_1^\\alpha+\\lambda_2^\\alpha+\\lambda^\\alpha-3)``
 """
 function ContinuumHybrid((; K₁, K₂, α, μ))
     (λ⃗) -> K₁ * (I₁(λ⃗) - 3) + K₂ * log(I₂ / 3) + μ / α * (sum(λ⃗ .^ α) - 3)
@@ -726,7 +726,7 @@ WFB - Skipped
 
 Parameters: Lf, F, A, B, C, D
 
-Model: ``\\int\\limits_{1}^{L_f}\\bigg(F(\\lambda_1)A())
+Model: ``\\int\\limits_{1}^{L_f}\\bigg(F(\\lambda_1)A())``
 """
 function WFB()
     error("Not Yet Implemented")
@@ -789,7 +789,7 @@ Nonaffine - Tube
 
 Parameters: Gc, Ge
 
-Model: ``G_c \\sum\\limit_{i=1}^{3}\\frac{\\lambda_i^2}{2}+G_e\\sum\\limits_{i=1}^{3}\\lambda_i+\\frac{1}{\\lambda_i}``
+Model: ``G_c \\sum\\limits_{i=1}^{3}\\frac{\\lambda_i^2}{2}+G_e\\sum\\limits_{i=1}^{3}\\lambda_i+\\frac{1}{\\lambda_i}``
 """
 function NonaffineTube((; Gc, Ge))
     (λ⃗) -> Gc * sum(λ⃗ .^ 2 ./ 2) + Ge * sum(λ⃗ .+ 1 ./ λ⃗)

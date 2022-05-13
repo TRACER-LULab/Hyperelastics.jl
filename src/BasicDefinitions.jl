@@ -20,7 +20,7 @@ end
 """
 Third Stretch invariant
 
-``I_3(\\vec{\\lambda}) = (\\lambda_1\\lambda_\\lamdba_3)^2``
+``I_3(\\vec{\\lambda}) = (\\lambda_1\\lambda_2\\lamdba_3)^2``
 """
 function I₃(λ⃗)
     prod(λ⃗)^2
