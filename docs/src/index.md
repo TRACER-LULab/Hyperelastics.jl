@@ -10,5 +10,5 @@ Documentation for [Hyperelastics](https://github.com/cfarm6/Hyperelastics.jl).
 ```
 
 ```@autodocs
-Modules = [Hyperelastics]
+Modules = [Hyperelastics, HyperelasticModels]
 ```
