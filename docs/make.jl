@@ -10,7 +10,7 @@ makedocs(;
     sitename="Hyperelastics.jl",
     format=Documenter.HTML(;
         prettyurls=get(ENV, "CI", "false") == "true",
-        canonical="https://cfarm6.github.io/Hyperelastics.jl",
+        canonical="https://TRACER-LULab.github.io/Hyperelastics.jl",
         assets=String[],
     ),
     pages=[
