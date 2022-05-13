@@ -19,6 +19,6 @@ makedocs(;
 )
 
 deploydocs(;
-    repo="github.com/cfarm6/Hyperelastics.jl",
+    repo="github.com/TRACER-LULab/Hyperelastics.jl",
     devbranch="main",
 )

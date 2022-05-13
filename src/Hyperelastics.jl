@@ -2,14 +2,11 @@ module Hyperelastics
 using Reexport
 using LossFunctions
 using GalacticOptim
-using ForwardDiff
 using AbstractDifferentiation
 using Tullio
 using Reexport
-
-# using Enzyme
-# using Zygote
 using ComponentArrays
+
 # Write your package code here.
 export HyperelasticData, uniaxial_data, biaxial_data, HyperelasticProblem
 export I₁, I₂, I₃, J, s⃗̂
