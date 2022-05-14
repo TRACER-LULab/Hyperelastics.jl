@@ -689,7 +689,7 @@ Armna - Narooei
 
 Parameters: A⃗, B⃗, m⃗, n⃗, α⃗, β⃗
 
-Model: ``∑ᵢᴺ Aᵢ[exp(mᵢ(λ₁^{αᵢ}+λ₂^{αᵢ}+λ₃^{αᵢ}-3))-1] + Bᵢ[exp(nᵢ(λ₁^{-βᵢ}+λ₂^{-βᵢ}+λ₃^{-βᵢ}-3))-1] ``
+Model: ``\\sum\\limits_{i=1}^{N} A_i\\big[\\exp{m_i(\\lambda_1^{\\alpha_i}+\\lambda_2^{\\alpha_i}+\\lambda_3^{\\alpha_i}-3)}-1] + B_i\\big[\\exp{n_i(\\lambda_1^{-\\beta_i}+\\lambda_2^{-\\beta_i}+\\lambda_3^{-\\beta_i}-3)}-1]``
 """
 function ArmanNarooei((; A, B, m, n, α, β))
     (λ⃗) -> @tullio _ := A[i] * (exp(m[i] * (sum(λ⃗ .^ α[i]) - 3)) - 1) + B[i] * (exp(n[i] * (sum(λ⃗ .^ (-β[i])) - 3)) - 1)
@@ -739,8 +739,8 @@ Parameters: Gc, νkT, κ
 
 Model:
 """
-function ConstrainedJunction((;Gc, νkT, κ))
-    (λ⃗) -> Gc*(I₁(λ⃗)-3)+μkT/2*sum(i->κ*(λ⃗[i]-1)/(λ⃗[i]^2+κ)+log((λ⃗[i]^2+κ)/(1+κ))-log(λ⃗[i]^2), 1:3)
+function ConstrainedJunction((; Gc, νkT, κ))
+    (λ⃗) -> Gc * (I₁(λ⃗) - 3) + μkT / 2 * sum(i -> κ * (λ⃗[i] - 1) / (λ⃗[i]^2 + κ) + log((λ⃗[i]^2 + κ) / (1 + κ)) - log(λ⃗[i]^2), 1:3)
 end
 """
 Edward-Vilgis
