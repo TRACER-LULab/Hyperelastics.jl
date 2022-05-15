@@ -2,8 +2,8 @@ using Pollen
 using Pkg
 
 # The main package you are documenting
-using Hyperelastics.jl
-m = Hyperelastics.jl
+using Hyperelastics
+m = Hyperelastics
 
 
 # Packages that will be indexed in the documentation. Add additional modules
