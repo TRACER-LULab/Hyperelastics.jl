@@ -1,55 +1,25 @@
 module HyperelasticModels
 
+# # Package Imports for Models
 using Tullio
 using SpecialFunctions
 using ComponentArrays
 
-export GeneralMooneyRivlin, GeneralDarijaniNaghdabadi, GeneralBeda, MooneyRivlin, NeoHookean, Gent, Biderman, Isihara, JamesGreenSimpson, Lion, Yeoh, HauptSedlan, HartmannNeff, HainesWilson, Carroll, BahremanDarijani, Zhao, Knowles, Swanson, YamashitaKawabata, DavisDeThomas, Gregory, ModifiedGregory, Beda, Amin, LopezPamies, GenYeoh, HartSmith, VerondaWestmann, FungDemiray, Vito, ModifiedYeoh, Martins, ChevalierMarco, GornetDesmorat, MansouriDarijani, GentThomas, Alexander, LambertDianiRey, HossMarczakI, HossMarczakII, ExpLn, Kilian, VanDerWaals, TakamizawaHayashi, YeohFleming, PucciSaccomandi, HorganSaccomandi, Beatty, HorganMurphy, ArrudaBoyce, Ogden, EdwardVilgis
-
-export ValanisLandel, PengLandel, Ogden, Attard, Shariff, ArmanNarooei
-
+# # Available Models
+export GeneralMooneyRivlin, GeneralDarijaniNaghdabadi, GeneralBeda, MooneyRivlin, NeoHookean, Gent, Biderman, Isihara, JamesGreenSimpson, Lion, Yeoh, HauptSedlan, HartmannNeff, HainesWilson, Carroll, BahremanDarijani, Zhao, Knowles, Swanson, YamashitaKawabata, DavisDeThomas, Gregory, ModifiedGregory, Beda, Amin, LopezPamies, GenYeoh, HartSmith, VerondaWestmann, FungDemiray, Vito, ModifiedYeoh, Martins, ChevalierMarco, GornetDesmorat, MansouriDarijani, GentThomas, Alexander, LambertDianiRey, HossMarczakI, HossMarczakII, ExpLn, Kilian, VanDerWaals, TakamizawaHayashi, YeohFleming, PucciSaccomandi, HorganSaccomandi, Beatty, HorganMurphy, ArrudaBoyce, Ogden, Ed
+# # Invariant Defintions
 include("BasicDefinitions.jl")
-# """
-# First stretch invariant - Currently requires the addition of 5 times the machine precision to allow AD to work correctly
-
-# ``I_1 = \\lambda_1^2+\\lambda_2^2+\\lambda_3^2 + 5\\varepsilon``
-# """
-# function I₁(λ⃗)
-#     sum(λ⃗ .^ 2) + 5eps(Float64)
-# end
-
-# """
-# Second Stretch invariant
-
-# ``I_2 = \\lambda_1^{-2}+\\lambda_2^{-2}+\\lambda_3^{-2}``
-# """
-# function I₂(λ⃗)
-#     sum(λ⃗ .^ (-2)) + 5eps(Float64)
-# end
-
-# """
-# Third Stretch invariant
-
-# ``I_3 = (\\lambda_1\\lambda_\\lamdba_3)^2``
-# """
-# function I₃(λ⃗)
-#     prod(λ⃗)^2
-# end
-
-# """
-# Volumetric Stretch
-
-# ``J = \\lambda_1\\lambda_2\\lambda_3``
-# """
-# function J(λ⃗)
-#     prod(λ⃗)
-# end
+# # Available Models
+# ```math
+# \frac{1}{2}
+# ```
 """
 General Mooney Rivlin
 
 Parameters: [C]
 
-Model: ``\\sum\\limits_{i,j = 0}^{N,M} C_{i,j}(I_1-3)^i(I_2-3)^j``
+Model:    
+``\\sum\\limits_{i,j = 0}^{N,M} C_{i,j}(I_1-3)^i(I_2-3)^j``
 """
 function GeneralMooneyRivlin((; C))
     function (λ⃗)
@@ -80,7 +50,6 @@ Model: ``\\sum\\limits_{i = 1}^{N}\\frac{C_i}{\\alpha_i}(I_1-3)^{\\alpha_i} + \\
 """
 function GeneralBeda((; C, K, α, β))
     function (λ⃗)
-        # @tullio W:= C[i]/α[i]*(I₁(λ⃗)-3)^α[i]+K[j]/β[j]*(I₂(λ⃗)-3)^β[j]
         W1 = C ./ α .* (I₁(λ⃗) - 3) .^ α |> sum
         W2 = K ./ β .* (I₂(λ⃗) - 3) .^ β |> sum
         return W1 + W2
@@ -220,7 +189,10 @@ Haupt Sedlan
 
 Parameters: C10, C01, C11, C02, C30
 
-Model: ``\\sum\\limits_{i,j=0}^{3, 2}C_{i,j}(I_1-3)^i(I_2-3)^j``
+Model: 
+```math
+\\sum\\limits_{i,j=0}^{3, 2}C_{i,j}(I_1-3)^i(I_2-3)^j
+```
 """
 function HauptSedlan((; C10, C01, C11, C02, C30))
     W = GeneralMooneyRivlin(ComponentVector(
@@ -381,7 +353,10 @@ Amin
 
 Parameters: C1, C2, C3, C4, N, M
 
-Model: ``C_1 (I_1 - 3) + \\frac{C_2}{N + 1} (I_1 - 3)^{N + 1} + \\frac{C_3}{M + 1} (I_1 - 3)^{M + 1} + C_4 (I_2 - 3)``
+Model:
+```latex
+C_1 (I_1 - 3) + \\frac{C_2}{N + 1} (I_1 - 3)^{N + 1} + \\frac{C_3}{M + 1} (I_1 - 3)^{M + 1} + C_4 (I_2 - 3)
+```
 """
 function Amin((; C1, C2, C3, C4, N, M))
     (λ⃗) -> C1 * (I₁(λ⃗) - 3) + C2 / (N + 1) * (I₁(λ⃗) - 3)^(N + 1) + C3 / (M + 1) * (I₁(λ⃗) - 3)^(M + 1) + C4 * (I₂(λ⃗) - 3)
@@ -582,7 +557,7 @@ Horgan Saccomandi Model
 
 Parameters: μ, J
 
-Model: ``-\\frac{μJ}{2}\\log\\bigg(\\frac{J^3-J^2I₁+JI₂-1}{(J-1)^3}\\bigg)```
+Model: ``-\\frac{\\mu J}{2}\\log\\bigg(\\frac{J^3-J^2I_1+JI_2-1}{(J-1)^3}\\bigg)```
 """
 function HorganSaccomandi((; μ, J))
     (λ⃗) -> -μ * J / 2 * log((J^3 - J^2 * I₁(λ⃗) + J * I₂(λ⃗) - 1) / (J - 1)^3)
@@ -593,7 +568,7 @@ Beatty Model
 
 Parameters: G₀, Iₘ
 
-Model: ``-\\frac{G₀Iₘ(Iₘ-3)}{2(2Iₘ-3)}\\log\\bigg(\\frac{1-\\frac{I₁-3}{Iₘ-3}}{1+\\frac{I₁-3}{Iₘ}} \\bigg)``
+Model: ``-\\frac{G_0 I_m(I_m-3)}{2(2I_m-3)}\\log\\bigg(\\frac{1-\\frac{I_1-3}{I_m-3}}{1+\\frac{I_1-3}{I_m}} \\bigg)``
 """
 function Beatty((; G₀, Iₘ))
     (λ⃗) -> -G₀ * Iₘ * (Iₘ - 3) / 2 / (2Iₘ - 3) * log((1 - (I₁(λ⃗) - 3) / (Iₘ - 3)) / (1 + (I₁(λ⃗) - 3) / (Iₘ)))
@@ -604,7 +579,7 @@ Horgan Murphy Model
 
 Parameters: μ, Jₘ, c
 
-Model: ``-\\frac{2μJₘ}{c^2}\\log\\bigg(1-\\frac{λ₁ᶜ+λ₂ᶜ+λ₃ᶜ-3}{Jₘ})``
+Model: ``-\\frac{2\\mu J_m}{c^2}\\log\\bigg(1-\\frac{\\lambda_1^c+\\lambda_2^c+\\lambda_3^c-3}{J_m})``
 """
 function HorganMurphy((; μ, Jₘ, c))
     (λ⃗) -> -2 * μ * Jₘ / c^2 * log(1 - (sum(λ⃗ .^ c) - 3) / Jₘ)
@@ -640,7 +615,7 @@ Ogden
 
 Parameters: μ⃗, α⃗
 
-Model: ``∑₁ᴺ \\frac{μᵢ}{αᵢ}(λ₁^αᵢ+λ₂^αᵢ+λ₃^αᵢ-3)``
+Model: ``\\sum\\limits_{i=1}^{N}\\frac{\\mu_i}{\\alpha_i}(\\lambda_1^{\\alpha_i}+\\lambda_2^{\\alpha_i}+\\lambda_3^{\\alpha_i}-3)``
 """
 function Ogden((; μ, α))
     (λ⃗) -> @tullio _ := μ[i] / α[i] * (sum(λ⃗ .^ α[i]) - 3)
@@ -651,7 +626,7 @@ Attard
 
 Parameters: A⃗, B⃗
 
-Model: ``∑₁ᴺ\\frac{Aᵢ}{2i}(λ₁^{2i}+λ₂^{2i}+λ₃^{2i}-3) + \\frac{Bᵢ}{2i}(λ₁^{-2i}+λ₂^{-2i}+λ₃^{-2i}-3)``
+Model: ``\\sum\\limits_{i=1}^N\\frac{A_i}{2i}(\\lambda_1^{2i}+\\lambda_2^{2i}+\\lambda_3^{2i}-3) + \\frac{B_i}{2i}(\\lambda_1^{-2i}+\\lambda_2^{-2i}+\\lambda_3^{-2i}-3)``
 """
 function Attard((; A, B))
     (λ⃗) -> @tullio _ := A[i] / 2 / i * (sum(λ⃗ .^ (2i)) - 3) + B[i] / 2 / i * (sum(λ⃗ .^ (-2i)) - 3)

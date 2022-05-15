@@ -12,7 +12,7 @@ export HyperelasticData, uniaxial_data, biaxial_data, HyperelasticProblem
 export I₁, I₂, I₃, J, s⃗̂
 
 include("BasicDefinitions.jl")
-include("hyperelastic_models.jl")
+include("HyperelasticModels.jl")
 @reexport using .HyperelasticModels
 
 export s⃗̂, I₁, I₂, I₃, J
