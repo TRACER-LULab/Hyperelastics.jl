@@ -685,7 +685,7 @@ end
 
 # Article requested
 """
-Armna - Narooei
+Arman - Narooei
 
 Parameters: A⃗, B⃗, m⃗, n⃗, α⃗, β⃗
 
