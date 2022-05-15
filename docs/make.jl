@@ -1,24 +1,28 @@
-using Hyperelastics
-using Documenter
+"""
+This script builds the Pollen.jl documentation so that it can be loaded
+by the frontend. It accepts one argument: the path where the generated
+files should be stored.
 
-DocMeta.setdocmeta!(Hyperelastics, :DocTestSetup, :(using Hyperelastics); recursive=true)
+    > julia docs/make.jl DIR
 
-makedocs(;
-    modules=[Hyperelastics],
-    authors="Carson Farmer",
-    repo="https://github.com/cfarm6/Hyperelastics.jl/blob/{commit}{path}#{line}",
-    sitename="Hyperelastics.jl",
-    format=Documenter.HTML(;
-        prettyurls=get(ENV, "CI", "false") == "true",
-        canonical="https://TRACER-LULab.github.io/Hyperelastics.jl",
-        assets=String[],
+Use `./serve.jl` for interactive development.
+"""
+
+# Create target folder
+isempty(ARGS) && error("Please pass a file path to make.jl:\n\t> julia docs/make.jl DIR ")
+DIR = abspath(mkpath(ARGS[1]))
+
+# Create Project
+project = include("project.jl")
+
+@info "Rewriting documents..."
+Pollen.rewritesources!(project)
+
+@info "Writing to disk at \"$DIR\"..."
+Pollen.build(
+    FileBuilder(
+        JSONFormat(),
+        DIR,
     ),
-    pages=[
-        "Home" => "index.md",
-    ],
-)
-
-deploydocs(;
-    repo="github.com/TRACER-LULab/Hyperelastics.jl",
-    devbranch="main",
+    project,
 )
