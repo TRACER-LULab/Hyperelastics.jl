@@ -5,7 +5,6 @@ Pkg.develop(path = "..")
 using Revise
 using Publish
 using Hyperelastics
-using Artifacts, LazyArtifacts
 
 p = Publish.Project(Hyperelastics)
 

@@ -3,7 +3,6 @@ using Pkg
 Pkg.develop(path = "..")
 
 using Publish
-using Artifacts, LazyArtifacts
 using Hyperelastics
 
 p = Publish.Project(BitSAD)
