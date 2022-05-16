@@ -39,8 +39,8 @@ Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [publish]
 title = "Hyperelastics.jl"
-theme = "_default"
-    [publish.tectonic]
-    args = ["-w", "https://ttassets.z13.web.core.windows.net/tlextras-2020.0r0.tar"]
+theme = "_flux-theme"
+ignore = ["^(gh-pages|juliamnt|julia.dmg)$"]
+
 [targets]
 test = ["Test"]
