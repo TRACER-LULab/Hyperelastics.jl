@@ -1,6 +1,4 @@
 # Hyperelastics
 [![Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://TRACER-LULab.github.io/Hyperelastics.jl/stable) [![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://TRACER-LULab.github.io/Hyperelastics.jl/dev)
 
-```math
-g(t) = \frac{1^2}{3}
-```
+<img src="https://render.githubusercontent.com/render/math?math=%5Cfrac%7B1%7D%7B2%7D">
