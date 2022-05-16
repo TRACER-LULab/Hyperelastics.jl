@@ -38,7 +38,6 @@ CPUSummary = "2a0fbf3d-bb9c-48f3-b0a9-814d99fd7ab9"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [publish]
-ignore = ["^(gh-pages|juliamnt|julia.dmg)$"]
 title = "Hyperelastics.jl"
 theme = "default"
 
