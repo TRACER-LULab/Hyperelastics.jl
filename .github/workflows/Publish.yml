@@ -18,11 +18,11 @@ jobs:
         with:
           version: '1.7'
       - name: Install dependencies
-        run: julia --color=yes --project=. -e 'using Pkg; Pkg.instantiate()'
+        run: julia --project=. -e 'using Pkg; Pkg.instantiate()'
       - name: Build and deploy
         run: |
           cd gh-pages
-          julia --color=yes --project=.. -e 'using Publish, Hyperelastics; deploy(Hyperelastics; root="/Hyperelastics.jl", label="dev")'
+          julia --project=.. -e 'using Publish, Hyperelastics; deploy(Hyperelastics; root="/Hyperelastics.jl", label="dev")'
           git config user.name github-actions
           git config user.email github-actions@github.com
           git add .
