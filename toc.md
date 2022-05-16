@@ -1,14 +1,13 @@
+{style="text-align: center"}
 **Documentation**
 * [Introduction](README.md)
-* [Models](docs/models.md)
 
+{style="text-align: center"}
 **Examples**
-* [Basics](example/main.jl)
+* [Treloar Data](example/main.jl)
 
+{style="text-align: center"}
 **Model Referece**
 * [Index](docstrings.md)
-
-**Models**
-* [Model List](src/HyperelasticModels.jl)
 
 [**LICENSE**](LICENSE.md)
