@@ -19,6 +19,7 @@ SpecialFunctions = "276daf66-3868-5448-9aa4-cd146d93841b"
 Tullio = "bc48ee85-29a4-5162-ae0b-a64e1601d4bc"
 
 [compat]
+Tullio = "0.3"
 Quadrature = "1"
 GalacticOptim = "3"
 AbstractDifferentiation = "0.4"
