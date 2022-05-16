@@ -10,3 +10,5 @@
 
 **Models**
 * [Model List](src/HyperelasticModels.jl)
+
+[**LICENSE**](LICENSE.md)
