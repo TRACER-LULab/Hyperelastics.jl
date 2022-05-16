@@ -512,7 +512,7 @@ Gent
 
 Parameters: μ, Jₘ
 
-Model: ``-\\frac{\\mu J_m}{2}\\log{1-\\frac{I_1-3}{J_m}}``
+Model: ``-\\frac{\\mu J_m}{2}\\log{\\bigg(1-\\frac{I_1-3}{J_m}\\bigg)}``
 """
 function Gent((; μ, Jₘ))
     (λ⃗) -> -μ * Jₘ / 2 * log(1 - (I₁(λ⃗) - 3) / Jₘ)
