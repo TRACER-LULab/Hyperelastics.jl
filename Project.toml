@@ -20,6 +20,10 @@ Tullio = "bc48ee85-29a4-5162-ae0b-a64e1601d4bc"
 
 [compat]
 Quadrature = "1"
+GalacticOptim = "3"
+AbstractDifferentiation = "0.4"
+ComponentArrays = "0.11"
+QuadGK = "2"
 julia = "1.7"
 
 [extras]
