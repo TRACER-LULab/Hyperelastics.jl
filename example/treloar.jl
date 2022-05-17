@@ -13,7 +13,7 @@ s⃗₁ = [0.0, 0.2856, 0.3833, 0.4658, 0.5935, 0.6609, 0.8409, 1.006, 1.2087, 1
 data = uniaxial_data(s⃗₁, λ⃗₁)
 
 # # Fit the Gent Model
-# $$W(\vec{\lambda}) = -\frac{\mu J_m}{2}\log{\bigg(1-\frac{I_1-3}{J_m}\bigg)}$$
+# $W(\vec{\lambda}) = -\frac{\mu J_m}{2}\log{\bigg(1-\frac{I_1-3}{J_m}\bigg)}$
 #
 # Initial guess for the parameters
 p₀ = ComponentVector(μ=1e5, Jₘ=55.0)
@@ -37,12 +37,13 @@ sol = solve(HEProblem, LBFGS())
 ŝ = s⃗̂(Gent, sol.u, collect.(data.λ⃗))
 ŝ₁ = getindex.(ŝ, 1)
 # Plot the Results
-plot(getindex.(data.λ⃗, 1), getindex.(data.s⃗, 1), label="Experimental")
-plot!(getindex.(data.λ⃗, 1), ŝ₁, label="Predicted Gent")
+plot(getindex.(data.λ⃗, 1), getindex.(data.s⃗, 1)./1e6, label="Experimental")
+plot!(getindex.(data.λ⃗, 1), ŝ₁./1e6, label="Predicted Gent")
+plot!(xlabel = "Stretch", ylabel = "Stress [MPa]") #src
 savefig("gent.png") #src
 # ![Gent Plot](../gent.png)
 # # Using the NeoHookean Model
-# $$W(\vec{\lambda}) = \frac{\mu}{2}(I_1-3)$$
+# $W(\vec{\lambda}) = \frac{\mu}{2}(I_1-3)$
 p₀ = ComponentVector(μ=100e3)
 HEProblem = HyperelasticProblem(
     data,
@@ -60,12 +61,21 @@ plot!(getindex.(data.λ⃗, 1), ŝ₁, label="Predicted NeoHookean")
 savefig("neohookean.png") #src 
 # ![Neohookean Plot](../neohookean.png)
 # # Sussman-Bathe Model
-# $$W(\vec{\lambda}) = \sum\limits_{i=1}^{3} w(\lambda_i)$$
+# $W(\vec{\lambda}) = \sum\limits_{i=1}^{3} w(\lambda_i)$
 # 
 # Note: the Sussman-Bathe model currently only supports differentiation via FiniteDifferences.jl as the AbstractDifferentiation.jl backend
 using FiniteDifferences, AbstractDifferentiation
-ŝ = s⃗̂(SussmanBathe, (s⃗ = data.s⃗, λ⃗ = data.λ⃗, k = 3), collect.(data.λ⃗), adb = AD.FiniteDifferencesBackend())
+ŝ = s⃗̂(
+        SussmanBathe, 
+        (s⃗ = data.s⃗, λ⃗ = data.λ⃗, k = 3), 
+        collect.(data.λ⃗), 
+        adb = AD.FiniteDifferencesBackend()
+    )
 ŝ₁ = getindex.(ŝ, 1)
-plot!(getindex.(data.λ⃗, 1), ŝ₁, label="Predicted Sussman-Bathe k = 3")
+plot!(
+    getindex.(data.λ⃗, 1), 
+    ŝ₁, 
+    label="Predicted Sussman-Bathe k = 3"
+)
 savefig("sussmanbathe.png") #src
 # ![Sussman Bathe Plot](../sussmanbathe.png)

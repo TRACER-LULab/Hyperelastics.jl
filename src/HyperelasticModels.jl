@@ -515,7 +515,7 @@ Parameters: μ, Jₘ
 Model: ``-\\frac{\\mu J_m}{2}\\log{\\bigg(1-\\frac{I_1-3}{J_m}\\bigg)}``
 """
 function Gent((; μ, Jₘ))
-    (λ⃗) -> - (μ * Jₘ) / 2 * log(1 - (I₁(λ⃗) - 3) / Jₘ)
+    (λ⃗) -> -(μ * Jₘ) / 2 * log(1 - (I₁(λ⃗) - 3) / Jₘ)
 end
 
 """
@@ -711,11 +711,12 @@ Constrained Junction
 
 Parameters: Gc, νkT, κ  
 
-Model:
+Model: ``G_c (I_1-3)+ \\frac{\\nu k T}{2}(\\sum\\limits_{i=1}^{3}\\kappa\\frac{\\lambda_i-1}{\\lambda_i^2+\\kappa}+\\log{\\frac{\\lambda_i^2+\\kappa}{1+\\kappa}}-\\log{\\lambda_i^2})
 """
 function ConstrainedJunction((; Gc, νkT, κ))
     (λ⃗) -> Gc * (I₁(λ⃗) - 3) + μkT / 2 * sum(i -> κ * (λ⃗[i] - 1) / (λ⃗[i]^2 + κ) + log((λ⃗[i]^2 + κ) / (1 + κ)) - log(λ⃗[i]^2), 1:3)
 end
+
 """
 Edward-Vilgis
 
