@@ -57,7 +57,11 @@ sol = solve(HEProblem, LBFGS())
 # Plot and compare the stresses
 ŝ = s⃗̂(NeoHookean, sol.u, collect.(data.λ⃗))
 ŝ₁ = getindex.(ŝ, 1)
-plot!(getindex.(data.λ⃗, 1), ŝ₁, label="Predicted NeoHookean")
+plot!(
+    getindex.(data.λ⃗, 1), 
+    ŝ₁./1e6, 
+    label="Predicted NeoHookean"
+)
 savefig("neohookean.png") #src 
 # ![Neohookean Plot](../neohookean.png)
 # # Sussman-Bathe Model
@@ -74,7 +78,7 @@ ŝ = s⃗̂(
 ŝ₁ = getindex.(ŝ, 1)
 plot!(
     getindex.(data.λ⃗, 1), 
-    ŝ₁, 
+    ŝ₁./1e6, 
     label="Predicted Sussman-Bathe k = 3"
 )
 savefig("sussmanbathe.png") #src
