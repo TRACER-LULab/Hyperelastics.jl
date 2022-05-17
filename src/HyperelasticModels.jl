@@ -808,7 +808,7 @@ Extended Tube Model
 
 Parameters: Gc, Ge, δ, β
 
-Model: ``\\frac{G_c}{2}\\bigg[\\frac{(1-\\delta^2)(I_1-3)}{1-\delta^2(I_1-3)}+\\log{(1-\\delta^2(I_1-3))}\bigg]+\\frac{2G_e}{\\beta^2}\\sum\\limits_{i=1}^{3}(\\lambda_i^{-\\beta}-1)
+Model: ``\\frac{G_c}{2}\\bigg[\\frac{(1-\\delta^2)(I_1-3)}{1-\\delta^2(I_1-3)}+\\log{(1-\\delta^2(I_1-3))}\\bigg]+\\frac{2G_e}{\\beta^2}\\sum\\limits_{i=1}^{3}(\\lambda_i^{-\\beta}-1)
 """
 function ExtendedTubeModel((Gc, Ge, δ, β))
     (λ⃗) -> Gc/2*( (1-δ^2)*(I₁(λ⃗)-3)/(1-δ^2*(I₁-3))+log(1-δ^2*(I₁(λ⃗)-3)))+2*Ge/β*sum(λ⃗.^(-β).-1)
