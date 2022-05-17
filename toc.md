@@ -3,7 +3,7 @@
 
 **Examples**
 {style="margin: 0 auto; max-width: 350px"}
-* [Treloar Data](example/main.jl)
+* [Treloar Data](example/treloar.jl)
 
 [**Model Index**](docstrings.md)
 
