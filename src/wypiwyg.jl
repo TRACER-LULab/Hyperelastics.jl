@@ -17,7 +17,6 @@ function SussmanBathe(p)
         [2.0, 1/sqrt(2), 1/sqrt(2)],
     )
     map(prob -> solve(prob, QuadGKJL()), probs)
-    # (λ⃗) -> sum(solve(remake(prob, lb = ones(3), ub = λ⃗), HCubatureJL(), reltol = 1e-8, abstol = 1e-8))
     (λ⃗) -> sum(
             map(x -> 
                 solve(

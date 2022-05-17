@@ -6,11 +6,10 @@ using SpecialFunctions
 using ComponentArrays
 
 # # Available Models
-export GeneralMooneyRivlin, GeneralDarijaniNaghdabadi, GeneralBeda, MooneyRivlin, NeoHookean, Gent, Biderman, Isihara, JamesGreenSimpson, Lion, Yeoh, HauptSedlan, HartmannNeff, HainesWilson, Carroll, BahremanDarijani, Zhao, Knowles, Swanson, YamashitaKawabata, DavisDeThomas, Gregory, ModifiedGregory, Beda, Amin, LopezPamies, GenYeoh, HartSmith, VerondaWestmann, FungDemiray, Vito, ModifiedYeoh, Martins, ChevalierMarco, GornetDesmorat, MansouriDarijani, GentThomas, Alexander, LambertDianiRey, HossMarczakI, HossMarczakII, ExpLn, Kilian, VanDerWaals, TakamizawaHayashi, YeohFleming, PucciSaccomandi, HorganSaccomandi, Beatty, HorganMurphy, ArrudaBoyce, Ogden, EdwardVilgis, NonaffineTube, Tube, MCC, Bechir4Term, ConstrainedJunction, ContinuumHybrid, ArmanNarooei, PengLandel, ValanisLandel, Attard, Shariff
+export GeneralMooneyRivlin, GeneralDarijaniNaghdabadi, GeneralBeda, MooneyRivlin, NeoHookean, Gent, Biderman, Isihara, JamesGreenSimpson, Lion, Yeoh, HauptSedlan, HartmannNeff, HainesWilson, Carroll, BahremanDarijani, Zhao, Knowles, Swanson, YamashitaKawabata, DavisDeThomas, Gregory, ModifiedGregory, Beda, Amin, LopezPamies, GenYeoh, HartSmith, VerondaWestmann, FungDemiray, Vito, ModifiedYeoh, Martins, ChevalierMarco, GornetDesmorat, MansouriDarijani, GentThomas, Alexander, LambertDianiRey, HossMarczakI, HossMarczakII, ExpLn, Kilian, VanDerWaals, TakamizawaHayashi, YeohFleming, PucciSaccomandi, HorganSaccomandi, Beatty, HorganMurphy, ArrudaBoyce, Ogden, EdwardVilgis, NonaffineTube, Tube, MCC, Bechir4Term, ConstrainedJunction, ContinuumHybrid, ArmanNarooei, PengLandel, ValanisLandel, Attard, Shariff, ThreeChainModel, ModifiedFloryErman
 
 # # Invariant Defintions
 include("BasicDefinitions.jl") #src
-
 
 """
 General Mooney Rivlin
@@ -189,9 +188,7 @@ Haupt Sedlan
 Parameters: C10, C01, C11, C02, C30
 
 Model: 
-```math
-\\sum\\limits_{i,j=0}^{3, 2}C_{i,j}(I_1-3)^i(I_2-3)^j
-```
+``\\sum\\limits_{i,j=0}^{3, 2}C_{i,j}(I_1-3)^i(I_2-3)^j``
 """
 function HauptSedlan((; C10, C01, C11, C02, C30))
     W = GeneralMooneyRivlin(ComponentVector(
@@ -352,10 +349,7 @@ Amin
 
 Parameters: C1, C2, C3, C4, N, M
 
-Model:
-```math
-C_1 (I_1 - 3) + \\frac{C_2}{N + 1} (I_1 - 3)^{N + 1} + \\frac{C_3}{M + 1} (I_1 - 3)^{M + 1} + C_4 (I_2 - 3)
-```
+Model:``C_1 (I_1 - 3) + \\frac{C_2}{N + 1} (I_1 - 3)^{N + 1} + \\frac{C_3}{M + 1} (I_1 - 3)^{M + 1} + C_4 (I_2 - 3)``
 """
 function Amin((; C1, C2, C3, C4, N, M))
     (λ⃗) -> C1 * (I₁(λ⃗) - 3) + C2 / (N + 1) * (I₁(λ⃗) - 3)^(N + 1) + C3 / (M + 1) * (I₁(λ⃗) - 3)^(M + 1) + C4 * (I₂(λ⃗) - 3)
@@ -769,7 +763,18 @@ Model: ``G_c \\sum\\limits_{i=1}^{3}\\frac{\\lambda_i^2}{2}+G_e\\sum\\limits_{i=
 function NonaffineTube((; Gc, Ge))
     (λ⃗) -> Gc * sum(λ⃗ .^ 2 ./ 2) + Ge * sum(λ⃗ .+ 1 ./ λ⃗)
 end
-# ---------------------------------------------------- #
+"""
+Three Chain Model
+
+Parameters: μ, N
+
+Model: `` \\frac{\\mu\\sqrt{N}}{3}\\sum\\limits_{i=1}^{3}\\bigg(\\lambda_i\\beta_i+\\sqrt{N}\\log\\bigg(\\frac{\\beta_i}{\\sinh \\beta_i}\\bigg)\\bigg)
+
+"""
+function ThreeChainModel((; μ, N))
+    ℒinv(x) = x * (3 - 1.0651 * x^2 - 0.962245 * x^4 + 1.47353 * x^6 - 0.48953 * x^8) / (1 - x) / (1 + 1.01524 * x)
+    (λ⃗) -> μ * sqrt(N) / 3 * sum(λ⃗ .* ℒinv.(λ⃗ ./ sqrt(N)) .+ sqrt(N) .* log.((ℒinv.(λ⃗ ./ sqrt(N))) ./ (sinh.(ℒinv.(λ⃗ ./ sqrt(N))))))
+end
 
 """
 Arruda Boyce 
@@ -780,6 +785,33 @@ Model: ``\\mu\\bigg(\\frac{1}{2}(I_1-3)+\\frac{I_1^2-9}{20N}+\\frac{11(I_1^3-27)
 """
 function ArrudaBoyce((; μ, N))
     (λ⃗) -> μ * (0.5 * (I₁(λ⃗) - 3) + 1 / 20 / N * (I₁(λ⃗)^2 - 9) + 11 / 1050 / N^2 * (I₁(λ⃗) - 27) + 19 / 7000 / N^3 * (I₁(λ⃗)^4 - 81) + 519 / 673750 / N^4 * (I₁(λ⃗)^5 - 243))
+end
+
+"""
+Modified Flory Erman
+
+Parameters: μ, N, κ
+
+Model: ``W_{\\text{Arruda-Boyce}}+\\sum\\limits_{i=1}^{3}\\frac{\\mu}{2}[B_i+D_i]
+"""
+
+function ModifiedFloryErman((;μ, N, κ))
+    function W(λ⃗)
+        B = map(i-> κ^2*(λ⃗[i]^2-1)/(λ⃗[i]^2+κ)^2, 1:3)
+        D = map(i-> λ⃗[i]^2*B[i]/κ, 1:3)
+        ArrudaBoyce((μ=μ, N=N))(λ⃗) + map(i->B[i]+D[i]-log(B[i]+1)-log(D[i]+1), 1:3)
+    end
+end
+
+"""
+Extended Tube Model
+
+Parameters: Gc, Ge, δ, β
+
+Model: ``\\frac{G_c}{2}\\bigg[\\frac{(1-\\delta^2)(I_1-3)}{1-\delta^2(I_1-3)}+\\log{(1-\\delta^2(I_1-3))}\bigg]+\\frac{2G_e}{\\beta^2}\\sum\\limits_{i=1}^{3}(\\lambda_i^{-\\beta}-1)
+"""
+function ExtendedTubeModel((Gc, Ge, δ, β))
+    (λ⃗) -> Gc/2*( (1-δ^2)*(I₁(λ⃗)-3)/(1-δ^2*(I₁-3))+log(1-δ^2*(I₁(λ⃗)-3)))+2*Ge/β*sum(λ⃗.^(-β).-1)
 end
 
 end
