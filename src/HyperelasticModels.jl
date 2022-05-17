@@ -81,7 +81,7 @@ Model: ``\\frac{\\mu}{2}(I_1-3)``
 function NeoHookean((; μ))
     W = GeneralMooneyRivlin(ComponentVector(
         C=[
-        0.0 μ / 2
+        0.0 μ
     ]))
     (λ⃗) -> W(λ⃗)
 end
@@ -515,7 +515,7 @@ Parameters: μ, Jₘ
 Model: ``-\\frac{\\mu J_m}{2}\\log{\\bigg(1-\\frac{I_1-3}{J_m}\\bigg)}``
 """
 function Gent((; μ, Jₘ))
-    (λ⃗) -> -μ * Jₘ / 2 * log(1 - (I₁(λ⃗) - 3) / Jₘ)
+    (λ⃗) -> - (μ * Jₘ) / 2 * log(1 - (I₁(λ⃗) - 3) / Jₘ)
 end
 
 """
