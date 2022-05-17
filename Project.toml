@@ -25,6 +25,7 @@ DataInterpolations = "3"
 GalacticOptim = "3"
 LossFunctions = "0.7"
 PkgTemplates = "0.7"
+Publish = "0.10"
 QuadGK = "2"
 Quadrature = "1"
 Reexport = "1"
@@ -38,9 +39,9 @@ CPUSummary = "2a0fbf3d-bb9c-48f3-b0a9-814d99fd7ab9"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [publish]
-title = "Hyperelastics.jl"
-theme = "_flux-theme"
 ignore = ["^(gh-pages|juliamnt|julia.dmg)$"]
+theme = "_flux-theme"
+title = "Hyperelastics.jl"
 
 [targets]
 test = ["Test"]
