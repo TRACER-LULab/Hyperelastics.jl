@@ -26,6 +26,7 @@ Tullio = "bc48ee85-29a4-5162-ae0b-a64e1601d4bc"
 
 [compat]
 AbstractDifferentiation = "0.4"
+Cobweb = "0.1"
 ComponentArrays = "0.11"
 DataInterpolations = "3"
 GalacticOptim = "3"
