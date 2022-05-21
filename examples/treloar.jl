@@ -4,7 +4,7 @@ using GalacticOptim
 using GalacticOptimJL
 using ComponentArrays
 using Plots
-
+pgfplotsx()
 # # Treloar's Uniaxial Data
 s₁ = [0.0, 0.2856, 0.3833, 0.4658, 0.5935, 0.6609, 0.8409, 1.006, 1.2087, 1.5617, 1.915, 2.2985, 2.6519, 3.0205, 3.3816, 3.7351, 4.0812, 4.4501, 4.8414, 5.2026, 5.5639] * 1e6
 λ₁ = [1.0, 1.4273, 1.6163, 1.882, 2.1596, 2.4383, 3.0585, 3.6153, 4.1206, 4.852, 5.4053, 5.7925, 6.1803, 6.4787, 6.6627, 6.936, 7.133, 7.1769, 7.2712, 7.4425, 7.512]
@@ -35,11 +35,19 @@ sol = solve(HEProblem, LBFGS())
 # 
 # Predict the new stresses
 W = Gent(sol.u)
-ŝ = s⃗̂(W, collect.(data.λ⃗))
+ŝ = s⃗̂(W, λ⃗_predict)
 ŝ₁ = getindex.(ŝ, 1)
 # Plot the Results
-scatter(getindex.(data.λ⃗, 1), getindex.(data.s⃗, 1) ./ 1e6, label="Experimental")
-plot!(getindex.(data.λ⃗, 1), ŝ₁ ./ 1e6, label="Predicted Gent")
+scatter(
+    getindex.(data.λ⃗, 1), 
+    getindex.(data.s⃗, 1) ./ 1e6, 
+    label="Experimental"
+)
+plot!(
+    getindex.(λ⃗_predict,1), 
+    ŝ₁ ./ 1e6, 
+    label="Predicted Gent"
+)
 plot!(xlabel="Stretch", ylabel="Stress [MPa]", legend=:topleft) #src
 savefig("examples/gent.png") #src
 # ![Gent Plot](examples/gent.png)
@@ -57,10 +65,10 @@ sol = solve(HEProblem, LBFGS())
 # 
 # Plot and compare the stresses
 W = NeoHookean(sol.u)
-ŝ = s⃗̂(W, collect.(data.λ⃗))
+ŝ = s⃗̂(W, λ⃗_predict)
 ŝ₁ = getindex.(ŝ, 1)
 plot!(
-    getindex.(data.λ⃗, 1),
+    getindex.(λ⃗_predict, 1),
     ŝ₁ ./ 1e6,
     label="Predicted NeoHookean"
 )
@@ -76,14 +84,14 @@ using AbstractDifferentiation
 W = Hyperelastics.SussmanBathe((s⃗=data.s⃗, λ⃗=data.λ⃗, k=3))
 ŝ = s⃗̂(
     W,
-    test_λ⃗,
+    λ⃗_predict,
     adb=AD.FiniteDifferencesBackend()
 )
 
 ŝ₁ = getindex.(ŝ, 1)
 
 plot!(
-    getindex.(test_λ⃗, 1),
+    getindex.(λ⃗_predict, 1),
     ŝ₁ ./ 1e6,
     label="Predicted Sussman-Bathe k = 4"
 )
