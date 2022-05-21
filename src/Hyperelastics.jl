@@ -6,6 +6,7 @@ using AbstractDifferentiation
 using Tullio
 using Reexport
 using ComponentArrays
+using SpecialFunctions
 
 # Write your package code here.
 export HyperelasticData, uniaxial_data, biaxial_data, HyperelasticProblem
@@ -13,7 +14,6 @@ export I₁, I₂, I₃, J, s⃗̂
 
 include("BasicDefinitions.jl")
 include("HyperelasticModels.jl")
-@reexport using .HyperelasticModels
 
 export s⃗̂, I₁, I₂, I₃, J
 struct HyperelasticData
@@ -57,7 +57,7 @@ function HyperelasticProblem(data::HyperelasticData, model, u₀, ps; loss=L2Dis
 
     stresses_provided = size(s, 1)
 
-    s⃗(p) = s⃗̂(model, p, collect.(data.λ⃗))
+    s⃗(p) = s⃗̂(model(p), collect.(data.λ⃗))
 
     function ŝ(p)
         s₁₂₃ = s⃗(p)

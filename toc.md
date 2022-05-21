@@ -2,7 +2,7 @@
 
 ---
 **Examples**
-* [Treloar Data](example/treloar.jl)
+* [Treloar Data](examples/treloar.jl)
 
 ---
 [**API Reference**](docstrings.md)

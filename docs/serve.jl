@@ -8,7 +8,7 @@ using Hyperelastics
 using Artifacts, LazyArtifacts
 
 # override default theme
-cp(artifact"flux-theme", "../_flux-theme"; force = true)
+# cp(artifact"Tracer-Theme", "../_Tracer-Theme"; force=true)
 
 p = Publish.Project(Hyperelastics)
 
