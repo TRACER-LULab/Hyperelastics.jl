@@ -67,10 +67,12 @@ Parameters: μ
 Model: ``\\frac{\\mu}{2}(I_1-3)``
 """
 function NeoHookean((; μ))
-    W = GeneralMooneyRivlin(ComponentVector(
-        C=[
-        0.0 μ
-    ]))
+    # W = GeneralMooneyRivlin(ComponentVector(
+    #     C=[
+    #     0.0 μ/2
+    # ]))
+    W(λ⃗) = μ/2*(I₁(λ⃗)-3)
+
 end
 
 """

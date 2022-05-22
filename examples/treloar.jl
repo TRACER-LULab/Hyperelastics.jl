@@ -1,12 +1,7 @@
 # # Package Imports 
 using Hyperelastics
-using GalacticOptim
-using GalacticOptimJL
-using ComponentArrays
+using GalacticOptim, GalacticOptimJL, ComponentArrays
 using Plots
-using StatsPlots
-using LinearAlgebra
-using Turing
 pgfplotsx()
 # # Treloar's Uniaxial Data
 s₁ = [0.0, 0.2856, 0.3833, 0.4658, 0.5935, 0.6609, 0.8409, 1.006, 1.2087, 1.5617, 1.915, 2.2985, 2.6519, 3.0205, 3.3816, 3.7351, 4.0812, 4.4501, 4.8414, 5.2026, 5.5639] * 1e6
@@ -103,11 +98,12 @@ savefig("examples/sussmanbathe.png") #src
 # ![Sussman Bathe Plot](examples/sussmanbathe.png)
 plot!() #src
 
-# # Using Turing.jl for Parameter Estimation
+# # Using Turing.jl for Parameter Estimation\
+using Turing, StatsPlots, LinearAlgebra
 # Create the model for the distribution
 @model function fitHE(s₁, data)
     # Prior Distributions
-    σ ~ InverseGamma(2, 3) # STD. of the data
+    σ ~ InverseGamma(2, 3) # noise in the measurement data
     μ ~ truncated(Normal(270e3, 20e3), 200e3, 300e3) # Truncated Normal for μ
     Jₘ ~ truncated(Normal(120.0, 10.0), Jₘ_min, 150) # Truncated Normal for Jₘ
 
@@ -125,21 +121,20 @@ end
 test_s = map(s -> [s], s₁)
 model = fitHE(test_s, data)
 # # Samble the distributions to fit the data and print the results
-chain = sample(model, NUTS(0.65), MCMCSerial(), 1000, 3; progress=true)
+chain = sample(model, NUTS(0.65), MCMCThreads(), 500, 3; progress=true)
 # $\mu$ = 245kPa ± 5.238kPa, $J_m$ = 80.9±1.1583
 # Plot the Chain
 plot(chain)
 savefig("examples/chain.png") #src
 # [chain]("examples/chain.png")
 # Data Retrodiction to observe the results with 300 samples from the chain
-plot(legend=false, xlabel = "Stretch", ylabel = "Stress [MPa]") # src
-posterior_samples = sample(chain[[:μ, :Jₘ]], 300; replace=false)
+plot(legend=false, xlabel="Stretch", ylabel="Stress [MPa]") # src
+posterior_samples = sample(chain[[:μ, :Jₘ]], 500; replace=false)
 for p in eachrow(Array(posterior_samples))
-    W = Gent((μ = p[1], Jₘ = p[2]))
+    W = Gent((μ=p[1], Jₘ=p[2]))
     s_p = getindex.(s⃗̂(W, λ⃗_predict), 1)
-    plot!(getindex.(λ⃗_predict,1), s_p./1e6, alpha=0.1, color="#BBBBBB")
+    plot!(getindex.(λ⃗_predict, 1), s_p ./ 1e6, alpha=0.1, color="#BBBBBB")
 end
-plot!()
-scatter!(λ₁, s₁./1e6)
+scatter!(λ₁, s₁ ./ 1e6, color=:black)
 savefig("examples/dataretrodiction.png") #src
 # [retrodiction]("examples/dataretrodiction.png")
