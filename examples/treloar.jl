@@ -109,6 +109,7 @@ using Turing, StatsPlots, LinearAlgebra
 
     # Simulate the data
     W = Gent((μ=μ, Jₘ=Jₘ)) # Create the HE model
+    
     ŝ₁ = getindex.(s⃗̂(W, collect.(data.λ⃗)), 1) # Sample the HE Model
 
     # Observations
