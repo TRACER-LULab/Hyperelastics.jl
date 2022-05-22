@@ -76,14 +76,13 @@ savefig("examples/neohookean.png") #src
 # $W(\vec{\lambda}) = \sum\limits_{i=1}^{3} w(\lambda_i)$
 # 
 # Note: the Sussman-Bathe model currently only supports differentiation via FiniteDifferences.jl as the AbstractDifferentiation.jl backend
-using FiniteDifferences
 using AbstractDifferentiation
 
 W = Hyperelastics.SussmanBathe((s⃗=data.s⃗, λ⃗=data.λ⃗, k=3))
 ŝ = s⃗̂(
     W,
     λ⃗_predict,
-    adb=AD.FiniteDifferencesBackend()
+    adb = AD.FiniteDifferencesBackend()
 )
 
 ŝ₁ = getindex.(ŝ, 1)
@@ -104,12 +103,11 @@ using Turing, StatsPlots, LinearAlgebra
 @model function fitHE(s₁, data)
     # Prior Distributions
     σ ~ InverseGamma(2, 3) # noise in the measurement data
-    μ ~ truncated(Normal(270e3, 20e3), 200e3, 300e3) # Truncated Normal for μ
-    Jₘ ~ truncated(Normal(120.0, 10.0), Jₘ_min, 150) # Truncated Normal for Jₘ
+    μ ~ Normal(270e3, 20e3) # Normal for μ
+    Jₘ ~ truncated(Normal(120.0, 10.0), lower=Jₘ_min) # Truncated Normal for Jₘ with lower bound
 
     # Simulate the data
     W = Gent((μ=μ, Jₘ=Jₘ)) # Create the HE model
-    
     ŝ₁ = getindex.(s⃗̂(W, collect.(data.λ⃗)), 1) # Sample the HE Model
 
     # Observations
@@ -122,7 +120,7 @@ end
 test_s = map(s -> [s], s₁)
 model = fitHE(test_s, data)
 # # Samble the distributions to fit the data and print the results
-chain = sample(model, NUTS(0.65), MCMCThreads(), 500, 3; progress=true)
+chain = sample(model, NUTS(0.65), MCMCThreads(), 1000, 3)
 # $\mu$ = 245kPa ± 5.238kPa, $J_m$ = 80.9±1.1583
 # Plot the Chain
 plot(chain)
@@ -139,3 +137,24 @@ end
 scatter!(λ₁, s₁ ./ 1e6, color=:black)
 savefig("examples/dataretrodiction.png") #src
 # [retrodiction]("examples/dataretrodiction.png")
+# # Generating partial derivatives of the SEF with Symbolics.jl
+using Symbolics
+# Create the symbolic variables required
+@syms μ Jₘ
+@syms λ₁ λ₂ λ₃
+# Make the symbolic model
+W = Gent((μ = μ, Jₘ = Jₘ))
+# Create the partial derivative operators for the principal stretches
+∂λ = Differential.([λ₁, λ₂, λ₃])
+# Differentiate the SEF with respect to the principal stretches
+∂W∂λ = map(∂ -> ∂((W([λ₁, λ₂, λ₃]))), ∂λ)
+∂W∂λ = expand_derivatives.(∂W∂λ)
+# Create a function from the symbolic expression for each partial derivative
+∂W∂λ = substitute.(∂W∂λ, (Dict(μ => mean(chain, :μ), Jₘ => mean(chain, :Jₘ)), ))
+∂W∂λ = simplify.(∂W∂λ)
+∂W∂λ = map(∂ -> build_function(∂, [λ₁, λ₂, λ₃], expression = Val{false}), ∂W∂λ)
+s⃗_predict = map(λ -> map(∂ -> ∂(λ), ∂W∂λ), λ⃗_predict)
+σ⃗_predict = map(x -> x[1].*x[2], zip(s⃗_predict, λ⃗_predict))
+σ₁ = getindex.(σ⃗_predict, 1) - getindex.(σ⃗_predict, 3)
+s1 = σ₁ ./ getindex.(λ⃗_predict, 1)
+plot!(getindex.(λ⃗_predict, 1), s1./1e6, color = :black, label = "Symbolic mean")

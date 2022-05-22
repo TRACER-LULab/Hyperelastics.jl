@@ -2,7 +2,7 @@ module Hyperelastics
 using Reexport
 using LossFunctions
 using GalacticOptim
-using AbstractDifferentiation
+using AbstractDifferentiation, ForwardDiff, FiniteDifferences
 using Tullio
 using Reexport
 using ComponentArrays
