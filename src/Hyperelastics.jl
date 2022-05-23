@@ -83,7 +83,7 @@ function HyperelasticProblem(data::Vector{HyperelasticData}, model, u₀, ps; lo
 
     stresses_provided = size(s, 1)
 
-    s⃗(p) = s⃗̂(model, p, λ)
+    s⃗(p) = s⃗̂(model(p), λ)
 
     function ŝ(p)
         s₁₂₃ = s⃗(p)
