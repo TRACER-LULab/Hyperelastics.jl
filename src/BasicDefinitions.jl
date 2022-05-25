@@ -5,7 +5,7 @@ First stretch invariant - Currently requires the addition of 5 times the machine
 ``I_1(\\vec{\\lambda}) = \\lambda_1^2+\\lambda_2^2+\\lambda_3^2 + 5\\varepsilon``
 """
 function I₁(λ⃗)
-    sum(λ⃗ .^ 2)+100eps(Float64)
+    sum(λ⃗ .^ 2)+10eps(Float64)
 end
 
 """

@@ -10,7 +10,7 @@ s₁ = [0.0, 0.2856, 0.3833, 0.4658, 0.5935, 0.6609, 0.8409, 1.006, 1.2087, 1.56
 # # Create a Uniaxaial Test Results Object
 data = uniaxial_data(s₁, λ₁)
 
-# # Fit the Gent Model
+# ## Fit the Gent Model
 # $W(\vec{\lambda}) = -\frac{\mu J_m}{2}\log{\bigg(1-\frac{I_1-3}{J_m}\bigg)}$
 #
 # Initial guess for the parameters
@@ -48,8 +48,8 @@ plot!(
 )
 plot!(xlabel="Stretch", ylabel="Stress [MPa]", legend=:topleft) #src
 savefig("examples/gent.png") #src
-# ![Gent Plot](examples/gent.png)
-# # Using the NeoHookean Model
+# ![Gent Plot](../examples/gent.png)
+# ## Using the NeoHookean Model
 # $W(\vec{\lambda}) = \frac{\mu}{2}(I_1-3)$
 p₀ = ComponentVector(μ=100e3)
 HEProblem = HyperelasticProblem(
@@ -59,7 +59,7 @@ HEProblem = HyperelasticProblem(
     []
 )
 sol = solve(HEProblem, LBFGS())
-# $\mu$ = 534kPa
+# $\mu$ = 267kPa
 # 
 # Plot and compare the stresses
 W = NeoHookean(sol.u)
@@ -71,8 +71,8 @@ plot!(
     label="Predicted NeoHookean"
 )
 savefig("examples/neohookean.png") #src 
-# ![Neohookean Plot](examples/neohookean.png)
-# # Sussman-Bathe Model
+# ![Neohookean Plot](../examples/neohookean.png)
+# ## Sussman-Bathe Model
 # $W(\vec{\lambda}) = \sum\limits_{i=1}^{3} w(\lambda_i)$
 # 
 # Note: the Sussman-Bathe model currently only supports differentiation via FiniteDifferences.jl as the AbstractDifferentiation.jl backend
@@ -94,23 +94,22 @@ plot!(
 )
 
 savefig("examples/sussmanbathe.png") #src
-# ![Sussman Bathe Plot](examples/sussmanbathe.png)
+# ![Sussman Bathe Plot](../examples/sussmanbathe.png)
 plot!() #src
-
-# # Using Turing.jl for Parameter Estimation\
+# # Using Turing.jl for Parameter Estimation
 using Turing, StatsPlots, LinearAlgebra
 # Create the model for the distribution
 @model function fitHE(s₁, data)
-    # Prior Distributions
+    ## Prior Distributions
     σ ~ InverseGamma(2, 3) # noise in the measurement data
     μ ~ Normal(270e3, 20e3) # Normal for μ
     Jₘ ~ truncated(Normal(120.0, 10.0), lower=Jₘ_min) # Truncated Normal for Jₘ with lower bound
 
-    # Simulate the data
+    ## Simulate the data
     W = Gent((μ=μ, Jₘ=Jₘ)) # Create the HE model
     ŝ₁ = getindex.(s⃗̂(W, collect.(data.λ⃗)), 1) # Sample the HE Model
 
-    # Observations
+    ## Observations
     for i in 1:length(ŝ₁)
         s₁[i] ~ MvNormal([ŝ₁[i]], σ^2 * I)
     end
@@ -121,11 +120,10 @@ test_s = map(s -> [s], s₁)
 model = fitHE(test_s, data)
 # # Samble the distributions to fit the data and print the results
 chain = sample(model, NUTS(0.65), MCMCThreads(), 1000, 3)
-# $\mu$ = 245kPa ± 5.238kPa, $J_m$ = 80.9±1.1583
-# Plot the Chain
+# $\mu$ = 245kPa ± 5.238kPa, $J_m$ = 80.9±1.1583   
 plot(chain)
 savefig("examples/chain.png") #src
-# [chain]("examples/chain.png")
+# ![chain](../examples/chain.png)
 # Data Retrodiction to observe the results with 300 samples from the chain
 plot(legend=false, xlabel="Stretch", ylabel="Stress [MPa]") # src
 posterior_samples = sample(chain[[:μ, :Jₘ]], 500; replace=false)
@@ -136,25 +134,30 @@ for p in eachrow(Array(posterior_samples))
 end
 scatter!(λ₁, s₁ ./ 1e6, color=:black)
 savefig("examples/dataretrodiction.png") #src
-# [retrodiction]("examples/dataretrodiction.png")
+# ![retrodiction](../examples/dataretrodiction.png)
 # # Generating partial derivatives of the SEF with Symbolics.jl
 using Symbolics
-# Create the symbolic variables required
+# ## Create the symbolic variables required
 @syms μ Jₘ
 @syms λ₁ λ₂ λ₃
-# Make the symbolic model
+# ## Make the symbolic model
 W = Gent((μ = μ, Jₘ = Jₘ))
-# Create the partial derivative operators for the principal stretches
+# ## Create the partial derivative operators for the principal stretches
 ∂λ = Differential.([λ₁, λ₂, λ₃])
-# Differentiate the SEF with respect to the principal stretches
+# ## Differentiate the SEF with respect to the principal stretches
 ∂W∂λ = map(∂ -> ∂((W([λ₁, λ₂, λ₃]))), ∂λ)
 ∂W∂λ = expand_derivatives.(∂W∂λ)
-# Create a function from the symbolic expression for each partial derivative
+# ## Create a function from the symbolic expression for each partial derivative
+# Using the mean values from the Bayesian Parameter Estimation as the material properties
 ∂W∂λ = substitute.(∂W∂λ, (Dict(μ => mean(chain, :μ), Jₘ => mean(chain, :Jₘ)), ))
 ∂W∂λ = simplify.(∂W∂λ)
 ∂W∂λ = map(∂ -> build_function(∂, [λ₁, λ₂, λ₃], expression = Val{false}), ∂W∂λ)
+# Predict the results
 s⃗_predict = map(λ -> map(∂ -> ∂(λ), ∂W∂λ), λ⃗_predict)
 σ⃗_predict = map(x -> x[1].*x[2], zip(s⃗_predict, λ⃗_predict))
 σ₁ = getindex.(σ⃗_predict, 1) - getindex.(σ⃗_predict, 3)
 s1 = σ₁ ./ getindex.(λ⃗_predict, 1)
-plot!(getindex.(λ⃗_predict, 1), s1./1e6, color = :black, label = "Symbolic mean")
+# Plot the results
+plot!(getindex.(λ⃗_predict, 1), s1./1e6, color = :red, label = "Symbolic mean")
+savefig("examples/symbolic_plot.png") #src
+# ![symbolic](../examples/symbolic_plot.png)
