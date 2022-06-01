@@ -2,12 +2,14 @@
 export GeneralMooneyRivlin, GeneralDarijaniNaghdabadi, GeneralBeda, MooneyRivlin, NeoHookean, Gent, Biderman, Isihara, JamesGreenSimpson, Lion, Yeoh, HauptSedlan, HartmannNeff, HainesWilson, Carroll, BahremanDarijani, Zhao, Knowles, Swanson, YamashitaKawabata, DavisDeThomas, Gregory, ModifiedGregory, Beda, Amin, LopezPamies, GenYeoh, HartSmith, VerondaWestmann, FungDemiray, Vito, ModifiedYeoh, Martins, ChevalierMarco, GornetDesmorat, MansouriDarijani, GentThomas, Alexander, LambertDianiRey, HossMarczakI, HossMarczakII, ExpLn, Kilian, VanDerWaals, TakamizawaHayashi, YeohFleming, PucciSaccomandi, HorganSaccomandi, Beatty, HorganMurphy, ArrudaBoyce, Ogden, EdwardVilgis, NonaffineTube, Tube, MCC, Bechir4Term, ConstrainedJunction, ContinuumHybrid, ArmanNarooei, PengLandel, ValanisLandel, Attard, Shariff, ThreeChainModel, ModifiedFloryErman, ABGI, BechirChevalier, Bootstrapped8Chain, DavidsonGoulbourne, ExtendedTubeModel, FullNetwork, GeneralConstitutiveModel, Lim, MicroSphere, NetworkAveragingTube, WFB, ZunigaBeatty
 
 """
-General Mooney Rivlin
+General Mooney Rivlin[^1]
 
 Parameters: [C]
 
-Model:    
+Model:
 ``\\sum\\limits_{i,j = 0}^{N,M} C_{i,j}(I_1-3)^i(I_2-3)^j``
+
+[^1]: > Mooney M. A theory of large elastic deformation. Journal of applied physics. 1940 Sep;11(9):582-92.
 """
 function GeneralMooneyRivlin((; C))
     function W(λ⃗)
@@ -19,22 +21,26 @@ function GeneralMooneyRivlin((; C))
 end
 
 """
-General Darijani Naghdabadi
+General Darijani Naghdabadi [^1]
 
 Parameters: A⃗, B⃗, m⃗, n⃗
 
 Model: ``\\sum\\limits_{i = 1}{3}\\sum\\limits_{j=0}^{N} A_j (\\lambda_i^{m_j}-1) + B_j(\\lambda_i^{-n_j}-1)``
+
+[^1]: > Bahreman M, Darijani H. New polynomial strain energy function; application to rubbery circular cylinders under finite extension and torsion. Journal of Applied Polymer Science. 2015 Apr 5;132(13).
 """
 function GeneralDarijaniNaghdabadi((; A⃗, B⃗, m⃗, n⃗))
     W(λ⃗) = sum(A⃗ .* (λ⃗ .^ m⃗ .- 1) + B⃗ .* (λ⃗ .^ (-n⃗) .- 1))
 end
 
 """
-General Beda
+General Beda [^1]
 
 Parameters: C, K, α, β
 
 Model: ``\\sum\\limits_{i = 1}^{N}\\frac{C_i}{\\alpha_i}(I_1-3)^{\\alpha_i} + \\sum\\limits_{j=1}^{M}\\frac{K_j}{\\beta_j}(I_2-3)^{\\beta_j}``
+
+[^1]: > Beda T. Reconciling the fundamental phenomenological expression of the strain energy of rubber with established experimental facts. Journal of Polymer Science Part B: Polymer Physics. 2005 Jan 15;43(2):125-34.
 """
 function GeneralBeda((; C, K, α, β))
     function W(λ⃗)
@@ -45,42 +51,48 @@ function GeneralBeda((; C, K, α, β))
 end
 
 """
-Mooney Rivlin Model
+Mooney Rivlin Model [^1]
 
 Parameters: C01, C10
 
 Model: ``C_{10}(I_1-3)+C_{01}(I_2-3)``
+
+[^1]: > Mooney M. A theory of large elastic deformation. Journal of applied physics. 1940 Sep;11(9):582-92.
 """
 function MooneyRivlin((; C10, C01))
     W = GeneralMooneyRivlin(ComponentVector(
         C=[
             0.0 C10
             C01 0.0
-        ])) 
+        ]))
 end
 
 """
-NeoHookean
+NeoHookean [^1]
 
 Parameters: μ
 
 Model: ``\\frac{\\mu}{2}(I_1-3)``
+
+[^1]: > Treloar LR. The elasticity of a network of long-chain molecules—II. Transactions of the Faraday Society. 1943;39:241-6.
 """
 function NeoHookean((; μ))
     # W = GeneralMooneyRivlin(ComponentVector(
     #     C=[
     #     0.0 μ/2
     # ]))
-    W(λ⃗) = μ/2*(I₁(λ⃗)-3)
+    W(λ⃗) = μ / 2 * (I₁(λ⃗) - 3)
 
 end
 
 """
-Isihara 
+Isihara [^1]
 
 Parameters: C10, C20, C01
 
 Model: ``\\sum\\limits_{i,j=0}^{2, 1}C_{i,j}(I_1-3)^i(I_2-3)^j``
+
+[^1]: > Isihara A, Hashitsume N, Tatibana M. Statistical theory of rubber‐like elasticity. IV.(two‐dimensional stretching). The Journal of Chemical Physics. 1951 Dec;19(12):1508-12.
 """
 function Isihara((; C10, C20, C01))
     W = GeneralMooneyRivlin(ComponentVector(
@@ -91,11 +103,13 @@ function Isihara((; C10, C20, C01))
 end
 
 """
-Biderman 
+Biderman [^1]
 
 Parameters: C10, C01, C20, C30
 
 Model: ``\\sum\\limits_{i,j=0}^{3, 1}C_{i,j}(I_1-3)^i(I_2-3)^j``
+
+[^1]: > Biderman VL. Calculation of rubber parts. Rascheti na prochnost. 1958;40.
 """
 function Biderman((; C10, C01, C20, C30))
     W = GeneralMooneyRivlin(ComponentVector(
@@ -107,11 +121,13 @@ function Biderman((; C10, C01, C20, C30))
 end
 
 """
-James-Green-Simpson 
+James-Green-Simpson [^1]
 
 Parameters: C10, C01, C11, C20, C30
 
 Model: ``\\sum\\limits_{i,j=0}^{3, 1}C_{i,j}(I_1-3)^i(I_2-3)^j``
+
+[^1]: > James AG, Green A, Simpson GM. Strain energy functions of rubber. I. Characterization of gum vulcanizates. Journal of Applied Polymer Science. 1975 Jul;19(7):2033-58.
 """
 function JamesGreenSimpson((; C10, C01, C11, C20, C30))
     W = GeneralMooneyRivlin(ComponentVector(
@@ -122,11 +138,13 @@ function JamesGreenSimpson((; C10, C01, C11, C20, C30))
 end
 
 """
-Haines-Wilson
+Haines-Wilson [^1]
 
 Parameters: C10, C01, C11, C02, C20, C30
 
 Model: ``\\sum\\limits_{i,j=0}^{3, 2}C_{i,j}(I_1-3)^i(I_2-3)^j``
+
+[^1]: > Haines DW, Wilson WD. Strain-energy density function for rubberlike materials. Journal of the Mechanics and Physics of Solids. 1979 Aug 1;27(4):345-60.
 """
 function HainesWilson((; C10, C01, C11, C02, C20, C30))
     W = GeneralMooneyRivlin(ComponentVector(
@@ -171,7 +189,7 @@ Haupt Sedlan
 
 Parameters: C10, C01, C11, C02, C30
 
-Model: 
+Model:
 ``\\sum\\limits_{i,j=0}^{3, 2}C_{i,j}(I_1-3)^i(I_2-3)^j``
 """
 function HauptSedlan((; C10, C01, C11, C02, C30))
@@ -200,7 +218,7 @@ end
 """
 Carroll
 
-Parameters: A, B, C 
+Parameters: A, B, C
 
 Model: ``AI_1+BI_1^4+C\\sqrt{I_2}``
 """
@@ -468,10 +486,10 @@ end
 #####################
 ###### TABLE 3 ######
 #####################
-# model not mentioned in original article ?????? 
+# model not mentioned in original article ??????
 # function Warner((; μ, Iₘ))
 #     W(λ⃗) = -1/2*μ*Iₘlog(1-(I₁(λ⃗)-3)/(Iₘ-3))
-# end 
+# end
 
 # does not easily match the form in the paper
 # function Killian((; μ, JL))
@@ -485,14 +503,14 @@ Parameters: μ, λm, β, α
 Model:
 
 ``W(\\vec{\\lambda}) = -\\mu\\{(\\lambda_m^2-3)\\log(1-\\Theta)+\\Theta\\}-\\frac{2\\alpha}{3}\\bigg(\\frac{I-3}{2}\\bigg)^{3/2}``
- 
+
 ``\\Theta = \\frac{\\beta I_1 + (1-\\beta)I_2-3}{\\lambda_m^2-3)}``
 
 """
 function VanDerWaals((; μ, λm, β, α))
     function W(λ⃗)
-        I = β*I₁(λ⃗)+(1-β)*I₂(λ⃗)
-        θ = (I-3)/(λm^2-3)
+        I = β * I₁(λ⃗) + (1 - β) * I₂(λ⃗)
+        θ = (I - 3) / (λm^2 - 3)
         μ * (-(λm^2 - 3) * log(1 - θ) + θ) - 2 / 3 * α * ((I - 3) / 2)^(3 / 2)
     end
 end
@@ -522,11 +540,6 @@ end
 function YeohFleming((; A, B, C10, Im))
     W(λ⃗) = A / B * (1 - exp(-B * (I₁(λ⃗) - 3))) - C10 * (Im - 3) * log(1 - ((I₁(λ⃗) - 3) / (Im - 3)))
 end
-
-## Not a real model => Not referenced in the Gent paper cited
-# function Gent3Parameters((;μ, Jₘ, α))
-#     W(λ⃗) = 
-# end
 
 """
 Pucci-Saccomandi
@@ -625,7 +638,7 @@ Shariff
 
 Parameters: E, α₁, α₂, α₃, α₄, α₅
 
-Model: 
+Model:
 ``E\\sum\\limits_{i=1}^3\\sum\\limits_{j=1}^{N}\\alpha_j \\Phi_j(\\lambda_i)``
 """
 function Shariff((; E, α))
@@ -699,7 +712,7 @@ end
 """
 Constrained Junction
 
-Parameters: Gc, νkT, κ  
+Parameters: Gc, νkT, κ
 
 Model: ``G_c (I_1-3)+ \\frac{\\nu k T}{2}(\\sum\\limits_{i=1}^{3}\\kappa\\frac{\\lambda_i-1}{\\lambda_i^2+\\kappa}+\\log{\\frac{\\lambda_i^2+\\kappa}{1+\\kappa}}-\\log{\\lambda_i^2})``
 """
@@ -715,7 +728,7 @@ Parameters: Ns, Nc, α, η
 Model: ``\\frac{1}{2}N_C\\Bigg[\\frac{(1-\\alpha^2)I_1}{1-\\alpha^2I_1}+\\log(1-\\alpha^2I_1)\\Bigg]+\\frac{1}{2}N_S\\Bigg[\\sum_{i=1}^{3}\\Big\\{\\frac{(1+\\eta)(1-\\alpha^2)\\lambda_i^2}{( 1+\\eta\\lambda_i^2)(1-\\alpha^2I_1)}+\\log(1+\\eta\\lambda_i^2)\\Big\\}+\\log(1-\\alpha^2I_1)\\Bigg]``
 """
 function EdwardVilgis((; Ns, Nc, α, η))
-    W(λ⃗) = 0.5 * Nc * ((1 - α^2) * I₁(λ⃗) / (1 - α^2 * I₁(λ⃗)) + log(1 - α^2 * I₁(λ⃗))) + 0.5 * Ns * ((1 + η) * (1 - α^2) * λ⃗[1] / (1 + η * λ⃗[1]^2) / (1 - α^2 * I₁(λ⃗)) + log(1 + η * λ⃗[1]^2)+(1 + η) * (1 - α^2) * λ⃗[2] / (1 + η * λ⃗[2]^2) / (1 - α^2 * I₁(λ⃗)) + log(1 + η * λ⃗[2]^2)+(1 + η) * (1 - α^2) * λ⃗[3] / (1 + η * λ⃗[3]^2) / (1 - α^2 * I₁(λ⃗)) + log(1 + η * λ⃗[3]^2)+ log(1 - α^2 * I₁(λ⃗)))
+    W(λ⃗) = 0.5 * Nc * ((1 - α^2) * I₁(λ⃗) / (1 - α^2 * I₁(λ⃗)) + log(1 - α^2 * I₁(λ⃗))) + 0.5 * Ns * ((1 + η) * (1 - α^2) * λ⃗[1] / (1 + η * λ⃗[1]^2) / (1 - α^2 * I₁(λ⃗)) + log(1 + η * λ⃗[1]^2) + (1 + η) * (1 - α^2) * λ⃗[2] / (1 + η * λ⃗[2]^2) / (1 - α^2 * I₁(λ⃗)) + log(1 + η * λ⃗[2]^2) + (1 + η) * (1 - α^2) * λ⃗[3] / (1 + η * λ⃗[3]^2) / (1 - α^2 * I₁(λ⃗)) + log(1 + η * λ⃗[3]^2) + log(1 - α^2 * I₁(λ⃗)))
 end
 
 """
@@ -725,11 +738,11 @@ Parameters:
 
 Model:
 
-``\\frac{1}{2}\\zeta k T \\sum\\limits_{i=1}^{3}(\\lambda_i^2-1)+\\frac{1}{2}\\mu k T\\sum\\limits_{i=1}^{3}[B_i+D_i-\\log{(1+B_i)}-\\log{(1+D_i)}]``   
+``\\frac{1}{2}\\zeta k T \\sum\\limits_{i=1}^{3}(\\lambda_i^2-1)+\\frac{1}{2}\\mu k T\\sum\\limits_{i=1}^{3}[B_i+D_i-\\log{(1+B_i)}-\\log{(1+D_i)}]``
 
-``B_i = \\frac{\\kappa^2(\\lambda_i^2-1)}{(\\lambda_i^2+\\kappa)^2}``   
+``B_i = \\frac{\\kappa^2(\\lambda_i^2-1)}{(\\lambda_i^2+\\kappa)^2}``
 
-``D_i = \\frac{\\lambda_i^2 B_i}{\\kappa}``   
+``D_i = \\frac{\\lambda_i^2 B_i}{\\kappa}``
 """
 function MCC((; ζkT, μkT, κ))
     W(λ⃗) =
@@ -771,7 +784,7 @@ function ThreeChainModel((; μ, N))
 end
 
 """
-Arruda Boyce 
+Arruda Boyce
 
 Parameters: μ, N
 
@@ -885,8 +898,8 @@ Parameters: Gc, Ge, N
 
 Model: ``G_c N \\log\\bigg(\\frac{3N+\\frac{1}{2}I_1}{3N-I_1}\\bigg)+G_e\\sum\\limits_{i=1}^{3}\\frac{1}{\\lambda_I}``
 """
-function GeneralConstitutiveModel((;Gc, Ge, N))
-    W(λ⃗) = Gc*N*log((3N+0.5*I₁(λ⃗))/(3N-I₁(λ⃗))) + Ge*sum(λ⃗.^(-1))
+function GeneralConstitutiveModel((; Gc, Ge, N))
+    W(λ⃗) = Gc * N * log((3N + 0.5 * I₁(λ⃗)) / (3N - I₁(λ⃗))) + Ge * sum(λ⃗ .^ (-1))
 end
 
 """
@@ -896,10 +909,10 @@ Parameters: μ, N, ρ
 
 Model: ``(1-\\rho)W_{3Chain}+\\rho W_{8chain}``
 """
-function FullNetwork((;μ, N, ρ))
+function FullNetwork((; μ, N, ρ))
     W3 = ThreeChainModel((μ=μ, N=N))
     W8 = ArrudaBoyce((μ=μ, N=N))
-    W(λ⃗) = (1-ρ)*W3(λ⃗)+ρ*W8(λ⃗)
+    W(λ⃗) = (1 - ρ) * W3(λ⃗) + ρ * W8(λ⃗)
 end
 
 """
@@ -909,11 +922,11 @@ Parameters: μ, N₃, N₈
 
 Model: ``\\sqrt{\\frac{N_3+N_8}{2N_3}}W_{3Chain}+\\sqrt{\\frac{I_1}{3N_8}}W_{8Chain}``
 """
-function ZunigaBeatty((;μ, N₃, N₈))
-    ΛL  = √((N₃+N₈)/2)
-    Λch = 1/√(3)*√(I₁(λ⃗))
-    ρ₃  = ΛL/√(N₃)
-    ρ₈  = Λch/√(N₈)
+function ZunigaBeatty((; μ, N₃, N₈))
+    ΛL = √((N₃ + N₈) / 2)
+    Λch = 1 / √(3) * √(I₁(λ⃗))
+    ρ₃ = ΛL / √(N₃)
+    ρ₈ = Λch / √(N₈)
     W3 = ThreeChainModel((μ=μ, N=N₃))
     W8 = ArrudaBoyce((μ=μ, N₈=N₈))
     W(λ⃗) = ρ₃ * W3(λ⃗) + ρ₈ * W8(λ⃗)
@@ -926,12 +939,12 @@ Parameters: μ₁, μ₂, N, Î₁
 
 Model: ``(1-f(\\frac{I_1-3}{\\hat{I_1}-3}))W_{NeoHookean}(μ₁)+fW_{ArrudaBoyce}(μ₂, N)``
 """
-function Lim((;μ₁, μ₂, N, Î₁); f = (x)->x^3*(10-15x+6x^2))
-    Wg = NeoHookean((μ=μ₁))
-    W8 = ArrudaBoyce((μ=μ₂, N = N))
+function Lim((; μ₁, μ₂, N, Î₁); f=(x) -> x^3 * (10 - 15x + 6x^2))
+    Wg = NeoHookean((μ = μ₁))
+    W8 = ArrudaBoyce((μ=μ₂, N=N))
     function W(λ⃗)
-        ζ = (I₁-3)/(Î₁-3)
-        (1-f(ζ))*Wg(λ⃗)+f(ζ)*W8(λ⃗)
+        ζ = (I₁ - 3) / (Î₁ - 3)
+        (1 - f(ζ)) * Wg(λ⃗) + f(ζ) * W8(λ⃗)
     end
 end
 
@@ -940,7 +953,7 @@ Bechir Chevalier
 
 Parameters: μ₀, η, ρ, N₃, N₈
 
-Model: 
+Model:
 
 ``W_{3Chain}(\\mu_f, N_3)+W_{8Chain}(\\frac{\\mu_c}{3}, N_8)``
 
@@ -950,13 +963,13 @@ Model:
 
 ``\\alpha = \\max{\\lambda_1, \\lambda_2, \\lambda_3}``
 """
-function BechirChevalier((;μ₀, η, ρ, N₃, N₈))
-    μf = ρ*√(I₁/3/N₈)
-    W3 = ThreeChainModel((μ = μf,N= N₃))
+function BechirChevalier((; μ₀, η, ρ, N₃, N₈))
+    μf = ρ * √(I₁ / 3 / N₈)
+    W3 = ThreeChainModel((μ=μf, N=N₃))
     function W(λ⃗)
         α = maximum(λ⃗)
-        μc = (1-η*α/√(N₃))*μ₀
-        W8 = ArrudaBoyce((μ = μc/3, N=N₈))
-        W3(λ⃗)+W8(λ⃗)
+        μc = (1 - η * α / √(N₃)) * μ₀
+        W8 = ArrudaBoyce((μ=μc / 3, N=N₈))
+        W3(λ⃗) + W8(λ⃗)
     end
 end
