@@ -2,16 +2,16 @@ module Hyperelastics
 using Reexport
 using LossFunctions
 using Optimization
-using AbstractDifferentiation, ForwardDiff, FiniteDifferences
+using AbstractDifferentiation, ForwardDiff
 using Tullio
 using Reexport
-using ComponentArrays
 using SpecialFunctions
 
 # Write your package code here.
 export HyperelasticData, uniaxial_data, biaxial_data, HyperelasticProblem
 export I₁, I₂, I₃, J, s⃗̂
 
+include("data_driven.jl")
 include("basic_definitions.jl")
 include("isotropic_incompressible_models.jl")
 
@@ -43,8 +43,6 @@ function uniaxial_data(s₁, λ₁)
     return HyperelasticData(s⃗, λ⃗)
 end
 
-include("wypiwyg.jl")
-
 """
 ---
 HyperelasticProblem(data::HyperelasticData, model, u₀, ps; loss=L2DistLoss(), agg=AggMode.Mean(), cons=(x, p) -> [true], kwargs...)
@@ -65,7 +63,7 @@ function HyperelasticProblem(data::HyperelasticData, model, u₀, ps; loss=L2Dis
     end
 
     f(p, _) = [value(loss, s, ŝ(p), agg)]
-    func = OptimizationFunction(f, GalacticOptim.AutoForwardDiff(), cons=cons)
+    func = OptimizationFunction(f, Optimization.AutoForwardDiff(), cons=cons)
     return OptimizationProblem(func, u₀, ps; kwargs...)
 end
 

@@ -1,8 +1,8 @@
-# # Package Imports 
+# # Package Imports
 using Hyperelastics
 using GalacticOptim, GalacticOptimJL, ComponentArrays
 using Plots
-pgfplotsx()
+pgfplotsx() #src
 # # Treloar's Uniaxial Data
 s₁ = [0.0, 0.2856, 0.3833, 0.4658, 0.5935, 0.6609, 0.8409, 1.006, 1.2087, 1.5617, 1.915, 2.2985, 2.6519, 3.0205, 3.3816, 3.7351, 4.0812, 4.4501, 4.8414, 5.2026, 5.5639] * 1e6
 λ₁ = [1.0, 1.4273, 1.6163, 1.882, 2.1596, 2.4383, 3.0585, 3.6153, 4.1206, 4.852, 5.4053, 5.7925, 6.1803, 6.4787, 6.6627, 6.936, 7.133, 7.1769, 7.2712, 7.4425, 7.512]
@@ -30,7 +30,7 @@ HEProblem = HyperelasticProblem(
 )
 sol = solve(HEProblem, LBFGS())
 # $\mu$ = 240kPa, $J_m$ = 79.97
-# 
+#
 # Predict the new stresses
 W = Gent(sol.u)
 ŝ = s⃗̂(W, λ⃗_predict)
@@ -60,7 +60,7 @@ HEProblem = HyperelasticProblem(
 )
 sol = solve(HEProblem, LBFGS())
 # $\mu$ = 267kPa
-# 
+#
 # Plot and compare the stresses
 W = NeoHookean(sol.u)
 ŝ = s⃗̂(W, λ⃗_predict)
@@ -70,11 +70,11 @@ plot!(
     ŝ₁ ./ 1e6,
     label="Predicted NeoHookean"
 )
-savefig("examples/neohookean.png") #src 
+savefig("examples/neohookean.png") #src
 # ![Neohookean Plot](../examples/neohookean.png)
 # ## Sussman-Bathe Model
 # $W(\vec{\lambda}) = \sum\limits_{i=1}^{3} w(\lambda_i)$
-# 
+#
 # Note: the Sussman-Bathe model currently only supports differentiation via FiniteDifferences.jl as the AbstractDifferentiation.jl backend
 using AbstractDifferentiation
 
@@ -120,7 +120,7 @@ test_s = map(s -> [s], s₁)
 model = fitHE(test_s, data)
 # # Samble the distributions to fit the data and print the results
 chain = sample(model, NUTS(0.65), MCMCThreads(), 1000, 3)
-# $\mu$ = 245kPa ± 5.238kPa, $J_m$ = 80.9±1.1583   
+# $\mu$ = 245kPa ± 5.238kPa, $J_m$ = 80.9±1.1583
 plot(chain)
 savefig("examples/chain.png") #src
 # ![chain](../examples/chain.png)

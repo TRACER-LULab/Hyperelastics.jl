@@ -77,12 +77,7 @@ Model: ``\\frac{\\mu}{2}(I_1-3)``
 [^1]: > Treloar LR. The elasticity of a network of long-chain molecules—II. Transactions of the Faraday Society. 1943;39:241-6.
 """
 function NeoHookean((; μ))
-    # W = GeneralMooneyRivlin(ComponentVector(
-    #     C=[
-    #     0.0 μ/2
-    # ]))
     W(λ⃗) = μ / 2 * (I₁(λ⃗) - 3)
-
 end
 
 """
@@ -163,10 +158,10 @@ Parameters: C10, C20, C30
 Model: ``\\sum\\limits_{i,j=0}^{3, 0}C_{i,j}(I_1-3)^i(I_2-3)^j``
 """
 function Yeoh((; C10, C20, C30))
-    W = GeneralMooneyRivlin(ComponentVector(
+    W = GeneralMooneyRivlin((
         C=[
         0.0 C10 C20 C30
-    ]))
+    ], ))
 end
 
 """
@@ -699,17 +694,6 @@ function Bechir4Term((; C11, C12, C21, C22))
 end
 
 """
-WFB - Skipped
-
-Parameters: Lf, F, A, B, C, D
-
-Model: ``\\int\\limits_{1}^{L_f}\\big(F(\\lambda_1)A()\\big)``
-"""
-function WFB()
-    error("Not Yet Implemented")
-end
-
-"""
 Constrained Junction
 
 Parameters: Gc, νkT, κ
@@ -791,7 +775,8 @@ Parameters: μ, N
 Model: ``\\mu\\bigg(\\frac{1}{2}(I_1-3)+\\frac{I_1^2-9}{20N}+\\frac{11(I_1^3-27)}{1050N^2}+\\frac{19(I_1^4-81)}{7000N^3}+\\frac{519(I_1^5-243)}{673750N^4}\\bigg)``
 """
 function ArrudaBoyce((; μ, N))
-    ℒinv(x) = x * (3 - 1.0651 * x^2 - 0.962245 * x^4 + 1.47353 * x^6 - 0.48953 * x^8) / (1 - x) / (1 + 1.01524 * x)
+    # ℒinv(x) = x * (3 - 1.0651 * x^2 - 0.962245 * x^4 + 1.47353 * x^6 - 0.48953 * x^8) / (1 - x) / (1 + 1.01524 * x)
+    ℒinv(x) = x * (3 - x^2) / (1 - x^2)
     function W(λ⃗)
         rchain_Nl = √(I₁(λ⃗) / 3 / N)
         β = ℒinv(rchain_Nl)
@@ -838,16 +823,67 @@ function ABGI((; μ, N, Ge, n))
 end
 
 """
-Micro-Sphere
+Micro-Sphere [^1]
 
-Parameters:
+Parameters: μ, N, p, U, q
 
-Model:
+Model: See Paper
+
+---
+[^1]: > Miehe C, Göktepe S, Lulei F. A micro-macro approach to rubber-like materials—part I: the non-affine micro-sphere model of rubber elasticity. Journal of the Mechanics and Physics of Solids. 2004 Nov 1;52(11):2617-60.
 """
-function MicroSphere((; μ, N, P, U, q))
-    error("Not Yet implemented")
-end
+function MicroSphere((; μ, N, p, U, q))
+    a = √(2) / 2
+    b = 0.836095596749
+    c = 0.387907304067
+    r⃗ = [
+        [0, 0, 1],
+        [0, 1, 0],
+        [1, 0, 0],
+        [0, a, a],
+        [0, -a, a],
+        [a, 0, a],
+        [-a, 0, a],
+        [a, a, 0],
+        [-a, a, 0],
+        [b, c, c],
+        [-b, c, c],
+        [b, -c, c],
+        [-b, -c, c],
+        [c, b, c],
+        [-c, b, c],
+        [c, -b, c],
+        [-c, -b, c],
+        [c, c, b],
+        [-c, c, b],
+        [c, -c, b],
+        [-c, -c, b],
+    ]
+    w1 = 0.0265214244093
+    w2 = 0.0199301476312
+    w3 = 0.0250712367487
 
+    w = 2 .* [fill(w1, 3); fill(w2, 6); fill(w3, 12)] # Multiply by two since integration is over the half-sphere
+
+    ℒinv(x) = x * (3 - x^2) / (1 - x^2)
+
+    function W(λ⃗)
+        F = diagm(λ⃗)
+        @tullio t⃗[i] := F * r⃗[i]
+        @tullio n⃗[i] := inv(F') * r⃗[i]
+        @tullio λ̄[i] := norm(t⃗[i])
+        @tullio ν̄[i] := norm(n⃗[i])
+        @tullio λ := (λ̄[i]^p) * w[i]
+        λ = (λ)^(1 / p)
+        λr = λ / √N
+        β = ℒinv(λr)
+        ψf = N * μ * (λr * β + log(β / sinh(β)))
+        @tullio ν := ν̄[i]^q*w[i]
+        ν = ν^(1/q)
+        ψc = N*U*μ*ν
+        return ψf+ψc
+    end
+end
 
 """
 Bootstrapped 8Chain Model
