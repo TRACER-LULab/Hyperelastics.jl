@@ -11,12 +11,21 @@ using SpecialFunctions
 export HyperelasticData, uniaxial_data, biaxial_data, HyperelasticProblem
 export I₁, I₂, I₃, J, s⃗̂
 
-include("data_driven.jl")
 include("basic_definitions.jl")
+include("datasets.jl")
+include("data_driven.jl")
 include("isotropic_incompressible_models.jl")
-
+include("macro_micro_macro_model.jl")
 export s⃗̂, I₁, I₂, I₃, J
-struct HyperelasticData
+
+abstract type AbstractHyperelasticData end
+
+struct UniaxialHyperelasticData <: AbstractHyperelasticData
+    s⃗
+    λ⃗
+end
+
+struct BiaxialHyperelasticData <: AbstractHyperelasticData
     s⃗
     λ⃗
 end
@@ -29,7 +38,7 @@ Create a biaxial hyperelastic data object from arrays of test data. The function
 function biaxial_data(s₁, s₂, λ₁, λ₂)
     s⃗ = zip(s₁, s₂)
     λ⃗ = zip(λ₁, λ₂, (λ₁ .* λ₂) .^ (-1))
-    return HyperelasticData(s⃗, λ⃗)
+    return BiaxialHyperelasticData(s⃗, λ⃗)
 end
 
 """
@@ -40,7 +49,7 @@ Create a uniaxial hyperelastic data object from arrays of test data. The functio
 function uniaxial_data(s₁, λ₁)
     s⃗ = zip(s₁)
     λ⃗ = zip(λ₁, (λ₁) .^ (-0.5), (λ₁) .^ (-0.5))
-    return HyperelasticData(s⃗, λ⃗)
+    return UniaxialHyperelasticData(s⃗, λ⃗)
 end
 
 """
@@ -50,7 +59,7 @@ HyperelasticProblem(data::HyperelasticData, model, u₀, ps; loss=L2DistLoss(), 
 Returns an `OptimizationProblem` for solving with GalacticOptim.jl. `data` is the hyperelastic experimental data, `model` is the strain energy density as a function of the parameters (i.e. `f(p) = W(p)(λ⃗)`). `ps` is any hyperparameters for the model (currently not supported). `loss` defines the loss function to be used in the optimization. Currently defaults to the ``L^2``-norm between the predicted and experimental data. `agg` defines the aggregration mode of the errors, defaults to the mean of the errors. `cons` define any constrain equations involving the parameters of the model. `kwargs` are passed to `OptimizationProblem`. To set parameter bounds, use the keywords `lb` and `ub` respectively.
 
 """
-function HyperelasticProblem(data::HyperelasticData, model, u₀, ps; loss=L2DistLoss(), agg=AggMode.Mean(), cons=(x, p) -> [true], kwargs...)
+function HyperelasticProblem(data::AbstractHyperelasticData, model, u₀, ps; loss=L2DistLoss(), agg=AggMode.Mean(), cons=(x, p) -> [true], kwargs...)
     s = hcat(collect.(data.s⃗)...)
 
     stresses_provided = size(s, 1)
@@ -74,7 +83,7 @@ HyperelasticProblem(data::Vector{HyperelasticData}, model, u₀, ps; loss=L2Dist
 Returns an `OptimizationProblem` for solving with GalacticOptim.jl. `data` is a vector of hyperelastic data and fits to all sets equally, `model` is the strain energy density as a function of the parameters (i.e. `f(p) = W(p)(λ⃗)`). `ps` is any hyperparameters for the model (currently not supported). `loss` defines the loss function to be used in the optimization. Currently defaults to the ``L^2``-norm between the predicted and experimental data. `agg` defines the aggregration mode of the errors, defaults to the mean of the errors. `cons` define any constrain equations involving the parameters of the model. `kwargs` are passed to `OptimizationProblem`. To set parameter bounds, use the keywords `lb` and `ub` respectively.
 
 """
-function HyperelasticProblem(data::Vector{HyperelasticData}, model, u₀, ps; loss=L2DistLoss(), agg=AggMode.Mean(), cons=(x, p) -> [true], kwargs...)
+function HyperelasticProblem(data::Vector{AbstractHyperelasticData}, model, u₀, ps; loss=L2DistLoss(), agg=AggMode.Mean(), cons=(x, p) -> [true], kwargs...)
 
     s = getindex.(vcat(collect.(zip(getfield.(data, :s⃗)...))...), 1) |> transpose
     λ = collect.(vcat(collect.(zip(getfield.(data, :λ⃗)...))...))
@@ -89,7 +98,7 @@ function HyperelasticProblem(data::Vector{HyperelasticData}, model, u₀, ps; lo
     end
 
     f(p, _) = [value(loss, s, ŝ(p), agg)]
-    func = OptimizationFunction(f, GalacticOptim.AutoForwardDiff(), cons=cons)
+    func = OptimizationFunction(f, Optimization.AutoForwardDiff(), cons=cons)
     return OptimizationProblem(func, u₀, ps; kwargs...)
 end
 

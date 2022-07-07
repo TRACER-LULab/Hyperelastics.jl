@@ -1,5 +1,5 @@
 # # Available Models
-export GeneralMooneyRivlin, GeneralDarijaniNaghdabadi, GeneralBeda, MooneyRivlin, NeoHookean, Gent, Biderman, Isihara, JamesGreenSimpson, Lion, Yeoh, HauptSedlan, HartmannNeff, HainesWilson, Carroll, BahremanDarijani, Zhao, Knowles, Swanson, YamashitaKawabata, DavisDeThomas, Gregory, ModifiedGregory, Beda, Amin, LopezPamies, GenYeoh, HartSmith, VerondaWestmann, FungDemiray, Vito, ModifiedYeoh, Martins, ChevalierMarco, GornetDesmorat, MansouriDarijani, GentThomas, Alexander, LambertDianiRey, HossMarczakI, HossMarczakII, ExpLn, Kilian, VanDerWaals, TakamizawaHayashi, YeohFleming, PucciSaccomandi, HorganSaccomandi, Beatty, HorganMurphy, ArrudaBoyce, Ogden, EdwardVilgis, NonaffineTube, Tube, MCC, Bechir4Term, ConstrainedJunction, ContinuumHybrid, ArmanNarooei, PengLandel, ValanisLandel, Attard, Shariff, ThreeChainModel, ModifiedFloryErman, ABGI, BechirChevalier, Bootstrapped8Chain, DavidsonGoulbourne, ExtendedTubeModel, FullNetwork, GeneralConstitutiveModel, Lim, MicroSphere, NetworkAveragingTube, WFB, ZunigaBeatty
+export GeneralMooneyRivlin, GeneralDarijaniNaghdabadi, GeneralBeda, MooneyRivlin, NeoHookean, Gent, Biderman, Isihara, JamesGreenSimpson, Lion, Yeoh, HauptSedlan, HartmannNeff, HainesWilson, Carroll, BahremanDarijani, Zhao, Knowles, Swanson, YamashitaKawabata, DavisDeThomas, Gregory, ModifiedGregory, Beda, Amin, LopezPamies, GenYeoh, HartSmith, VerondaWestmann, FungDemiray, Vito, ModifiedYeoh, Martins, ChevalierMarco, GornetDesmorat, MansouriDarijani, GentThomas, Alexander, LambertDianiRey, HossMarczakI, HossMarczakII, ExpLn, Kilian, VanDerWaals, TakamizawaHayashi, YeohFleming, PucciSaccomandi, HorganSaccomandi, Beatty, HorganMurphy, ArrudaBoyce, Ogden, EdwardVilgis, NonaffineTube, Tube, MCC, Bechir4Term, ConstrainedJunction, ContinuumHybrid, ArmanNarooei, PengLandel, ValanisLandel, Attard, Shariff, ThreeChainModel, ModifiedFloryErman, ABGI, BechirChevalier, Bootstrapped8Chain, DavidsonGoulbourne, ExtendedTubeModel, FullNetwork, GeneralConstitutiveModel, Lim, NonaffineMicroSphere, KhiemItskov, WFB, ZunigaBeatty
 
 """
 General Mooney Rivlin[^1]
@@ -161,7 +161,7 @@ function Yeoh((; C10, C20, C30))
     W = GeneralMooneyRivlin((
         C=[
         0.0 C10 C20 C30
-    ], ))
+    ],))
 end
 
 """
@@ -801,11 +801,13 @@ function ModifiedFloryErman((; μ, N, κ))
 end
 
 """
-Extended Tube Model
+Extended Tube Model [^1]
 
 Parameters: Gc, Ge, δ, β
 
 Model: ``\\frac{G_c}{2}\\bigg[\\frac{(1-\\delta^2)(I_1-3)}{1-\\delta^2(I_1-3)}+\\log{(1-\\delta^2(I_1-3))}\\bigg]+\\frac{2G_e}{\\beta^2}\\sum\\limits_{i=1}^{3}(\\lambda_i^{-\\beta}-1)``
+
+[^1]: > Kaliske M, Heinrich G. An extended tube-model for rubber elasticity: statistical-mechanical theory and finite element implementation. Rubber Chemistry and Technology. 1999 Sep;72(4):602-32.
 """
 function ExtendedTubeModel((Gc, Ge, δ, β))
     W(λ⃗) = Gc / 2 * ((1 - δ^2) * (I₁(λ⃗) - 3) / (1 - δ^2 * (I₁ - 3)) + log(1 - δ^2 * (I₁(λ⃗) - 3))) + 2 * Ge / β^2 * sum(λ⃗ .^ (-β) .- 1)
@@ -823,7 +825,7 @@ function ABGI((; μ, N, Ge, n))
 end
 
 """
-Micro-Sphere [^1]
+Non-Affine Micro-Sphere [^1]
 
 Parameters: μ, N, p, U, q
 
@@ -832,7 +834,66 @@ Model: See Paper
 ---
 [^1]: > Miehe C, Göktepe S, Lulei F. A micro-macro approach to rubber-like materials—part I: the non-affine micro-sphere model of rubber elasticity. Journal of the Mechanics and Physics of Solids. 2004 Nov 1;52(11):2617-60.
 """
-function MicroSphere((; μ, N, p, U, q))
+function NonaffineMicroSphere((; μ, N, p, U, q))
+    a = √(2) / 2
+    b = 0.836095596749
+    c = 0.387907304067
+    r⃗ = [
+        [0, 0, 1],
+        [0, 1, 0],
+        [1, 0, 0],
+        [0, a, a],
+        [0, -a, a],
+        [a, 0, a],
+        [-a, 0, a],
+        [a, a, 0],
+        [-a, a, 0],
+        [b, c, c],
+        [-b, c, c],
+        [b, -c, c],
+        [-b, -c, c],
+        [c, b, c],
+        [-c, b, c],
+        [c, -b, c],
+        [-c, -b, c],
+        [c, c, b],
+        [-c, c, b],
+        [c, -c, b],
+        [-c, -c, b],
+    ]
+    w1 = 0.02652142440932
+    w2 = 0.0199301476312
+    w3 = 0.0250712367487
+
+    w = 2 .* [fill(w1, 3); fill(w2, 6); fill(w3, 12)] # Multiply by two since integration is over the half-sphere
+
+    ℒinv(x) = x * (3 - x^2) / (1 - x^2)
+
+    function W(λ⃗)
+        F = diagm(λ⃗)
+        @tullio t⃗[i] := F * r⃗[i]
+        @tullio n⃗[i] := inv(F') * r⃗[i]
+        @tullio λ̄[i] := norm(t⃗[i])
+        @tullio ν̄[i] := norm(n⃗[i])
+        @tullio λ := (λ̄[i]^p) * w[i]# |> Base.Fix2(^, (1 / p))
+        λr = λ^(1 / p) / √N
+        β = ℒinv(λr)
+        @tullio ν := ν̄[i]^q * w[i]# |> Base.Fix2(^, 1 / q)
+        return N * U * μ * ν^(1 / q) + N * μ * (λr * β + log(β / sinh(β)))
+    end
+end
+
+"""
+Affine Micro-Sphere [^1]
+
+Parameters: μ, N, p, U, q
+
+Model: See Paper
+
+---
+[^1]: > Miehe C, Göktepe S, Lulei F. A micro-macro approach to rubber-like materials—part I: the non-affine micro-sphere model of rubber elasticity. Journal of the Mechanics and Physics of Solids. 2004 Nov 1;52(11):2617-60.
+"""
+function AffineMicroSphere((; μ, N, p, U, q))
     a = √(2) / 2
     b = 0.836095596749
     c = 0.387907304067
@@ -873,15 +934,11 @@ function MicroSphere((; μ, N, p, U, q))
         @tullio n⃗[i] := inv(F') * r⃗[i]
         @tullio λ̄[i] := norm(t⃗[i])
         @tullio ν̄[i] := norm(n⃗[i])
-        @tullio λ := (λ̄[i]^p) * w[i]
-        λ = (λ)^(1 / p)
-        λr = λ / √N
+        @tullio λ := (λ̄[i]) * w[i]# |> Base.Fix2(^, (1 / p))
+        λr = λ^(1 / p) / √N
         β = ℒinv(λr)
-        ψf = N * μ * (λr * β + log(β / sinh(β)))
-        @tullio ν := ν̄[i]^q*w[i]
-        ν = ν^(1/q)
-        ψc = N*U*μ*ν
-        return ψf+ψc
+        @tullio ν := ν̄[i]^q * w[i]# |> Base.Fix2(^, 1 / q)
+        return N * U * μ * ν^(1 / q) + N * μ * (λr * β + log(β / sinh(β)))
     end
 end
 
@@ -917,15 +974,18 @@ function DavidsonGoulbourne((; Gc, Ge, λmax))
 end
 
 """
-Network Averaging Tube
+Khiêm-Itskov Model [^1]
 
 Parameters: μcκ, n, q, μt
 
 Model: ``\\mu_c \\kappa n \\log\\bigg(\\frac{\\sin(\\frac{\\pi}{\\sqrt{n}})(\\frac{I_1}{3})^{\\frac{q}{2}}}{\\sin(\\frac{\\pi}{\\sqrt{n}}(\\frac{I_1}{3})^{\\frac{q}{2}}}\\bigg)+\\mu_t\\big[\\frac{I_2}{3}^{1/2} - 1 \\big]``
+
+[^1]: > Khiêm VN, Itskov M. Analytical network-averaging of the tube model:: Rubber elasticity. Journal of the Mechanics and Physics of Solids. 2016 Oct 1;95:254-69.
 """
-function NetworkAveragingTube((; μcκ, n, q, μt))
+function KhiemItskov((; μcκ, n, q, μt))
     W(λ⃗) = μcκ * n * log((sin(π / sqrt(n)) * (I₁(λ⃗) / 3)^(q / 2)) / (sin(π / sqrt(n) * (I₁(λ⃗) / 3)^(q / 2)))) + μt * ((I₂(λ⃗) / 3)^(1 / 2) - 1)
 end
+
 
 """
 General Constitutive Model

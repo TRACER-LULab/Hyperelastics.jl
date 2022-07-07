@@ -7,11 +7,11 @@ using QuadGK, DataInterpolations
 using LinearAlgebra
 using NonlinearSolve
 pgfplotsx() # src
-# # Wavy Data from Sussman and Bathe equation (11)
+## # Wavy Data from Sussman and Bathe equation (11)
 e = range(-2, 2, length=100)
 λ = exp.(e)
 τ = @. (exp(3e) - exp(-3e)) * (1 + 0.2sin(10e)) - (exp(-1.5e) - exp(1.5e)) * (1 + 0.2sin(-5e))
-τ_noise = τ .+ randn(100)*30
+τ_noise = τ .+ randn(100) * 30
 s = τ ./ λ
 data = uniaxial_data(s, λ)
 
@@ -122,3 +122,67 @@ We = Hyperelastics.LatoreeMontans(
         type=:none,
     )
 )
+#######
+diff = ∂Ψ∂λᵢ.(λ⃗) .- ∂Ψ̂∂λᵢ.(λ⃗)
+plot(getindex.(λ⃗, 2), getindex.(diff, 1))
+plot!(getindex.(λ⃗, 2), getindex.(diff, 2))
+plot!(getindex.(λ⃗, 2), getindex.(diff, 3))
+
+##
+x, w = gausslobatto(30)
+W1(λ⃗) = sum(i->w[i] .* ∂Ψ∂λᵢ([λ⃗[1] * (x[i] + 1) / 2 + (1 - x[i]) / 2, λ⃗[2], λ⃗[3]])[1], eachindex(w))
+W2(λ⃗) = sum(i->w[i] .* ∂Ψ∂λᵢ([λ⃗[1], λ⃗[2] * (x[i] + 1) / 2 + (1 - x[i]) / 2, λ⃗[3]])[2], eachindex(w))
+W3(λ⃗) = sum(i->w[i] .* ∂Ψ∂λᵢ([λ⃗[1], λ⃗[2], λ⃗[3] * (x[i] + 1) / 2 + (1 - x[i]) / 2])[3], eachindex(w))
+
+Δ(λ⃗) = [W1(λ⃗), W2(λ⃗), W3(λ⃗)]
+as = Δ.(λ⃗)
+plot(getindex.(as, 1), getindex.(as, 2), getindex.(as, 3), size = (500, 500))
+
+∂W̃∂λ(λ⃗) = AD.gradient(AD.ForwardDiffBackend(), W, λ⃗)[1]
+∂W̃∂λ([2.0, 1 / sqrt(2), 1 / sqrt(2)])
+s̃ᵢ_W(λ⃗, i) = ∂W̃∂λ(λ⃗)[i] - ∂W̃∂λ(λ⃗)[3] * λ⃗[3] / λ⃗[i]
+##
+chain_plot = plot(range(extrema(λ₂)..., length=1000), pchain, xlims=(0, 3.2), xticks=0:0.8:3.2)
+
+s₂ = Base.Fix2(s̃ᵢ_W, 2).(λ⃗)
+s̃₂ = Base.Fix2(s̃ᵢ, 2).(λ⃗)
+scatter(λ₂, σ₂)
+plot(getindex.(λ⃗, 2), s₂)
+plot!(getindex.(λ⃗, 2), s̃₂)
+
+λ₂_test = range(extrema(λ₂)..., length=20)
+plot(λ₂_test, s̃.(3.1, λ₂_test, 2))
+plot(λ₂_test, s̃.(3.1, λ₂_test, 1))
+scatter!(λ₂, σ₁)
+
+n1 = 20
+xs = collect(range(0.5, 3, length=n1))
+ys = collect(range(0.5, 3, length=n1))
+x_grid = [x for x = xs for y = ys]
+y_grid = [y for x = xs for y = ys]
+zs = s̃.(xs .* ones(n1)', ys' .* ones(n1), 2) ./ 1e6
+surface(xs, ys, zs, xlabel="l1", ylabel="l2", zlims=(0.6, 1.3), size=(900, 900), camera=(45, 15))
+plot!(λ₂, σ₂)
+
+s₁ = p1(λ⃗)
+s₂ = p2(λ⃗)
+stress_plot = scatter(λ₂, σ₂)
+plot!(getindex.(λ⃗, 2), s₂)
+scatter(λ₂, σ₁)
+plot!(getindex.(λ⃗, 2), s₁)
+
+using AbstractDifferentiation
+using ForwardDiff
+using FiniteDifferences
+s⃗(λ⃗) = AD.gradient(AD.FiniteDifferencesBackend(), Ψ, λ⃗)
+s̃ = s⃗.(λ⃗)
+s̃ = getindex.(s̃, 1)
+s̃₃ = getindex.(s̃, 3)
+s̃₂ = getindex.(s̃, 2)
+λ̃₂ = getindex.(λ⃗, 2)
+λ̃₃ = getindex.(λ⃗, 3)
+s2 = @. s̃₂ - λ̃₃ / λ̃₂ * s̃₃
+
+plot(λ̃₂, s2)
+plot!(λ̃₂, s̃₂)
+plot!(λ₂, σ₂)

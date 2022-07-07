@@ -4943,6 +4943,7 @@ s₁ = [
     0.195415969,
     0.194749302
 ]
+
 ## Get 200 Random Samples from λ₁ and s₁
 rand_data = rand(collect.(zip(λ₁, s₁)), 500)
 λ₁_rand = getindex.(rand_data, 1)
@@ -4950,31 +4951,45 @@ s₁_rand = getindex.(rand_data, 2) .* 1e6
 data = uniaxial_data(s₁_rand, λ₁_rand)
 #
 pgfplotsx()
-ps = Dict(
-    Gent => (μ = 32.141e3, Jₘ = 338),
-    NeoHookean => (μ = 34.303e3,),
-    EdwardVilgis => (Ns = 191650.69410835154, Nc = 24469.431747201077, α = 0.07809348649921058, η = 0.15533762763919895),
-    ArrudaBoyce => (μ = 31.695e3, N = 47.95),
-    Ogden => (μ =  [673e3, 3.07e3, 667e3], α = [0.0688, 3.36, 0.0692]),
-    Yeoh => (C10 = 18.696e3, C20 = -0.223e3, C30 = 0.007e3)
+default(size=(450, 450), linewidth=1.5, framestyle=:box, legendfontsize=10, guidefont=12, tickfontsize=12, guidefontsize=15, gridalpha=0.25)
+labels = Dict(
+    Gent => "Gent",
+    ArrudaBoyce => "Arruda-Boyce",
+    EdwardVilgis => "Edward-Vilgis",
+    NeoHookean => "neo-Hookean",
+    Ogden => "Ogden",
+    Yeoh => "Yeoh"
 )
-W = keys(ps)
-λ_test = range(extrema(λ₁)..., length = 30)
-λ⃗_test = map(x->[x, 1/sqrt(x), 1/sqrt(x)], λ_test)
-p = scatter(λ₁[1:100:end], s₁[1:100:end], label = "Experimental")
+ps = Dict(
+    Gent => (μ=32.141e3, Jₘ=338),
+    NeoHookean => (μ=34.303e3,),
+    EdwardVilgis => (Ns=191650.69410835154, Nc=24469.431747201077, α=0.07809348649921058, η=0.15533762763919895),
+    ArrudaBoyce => (μ=31.695e3, N=47.95),
+    Ogden => (μ=[673e3, 3.07e3, 667e3], α=[0.0688, 3.36, 0.0692]),
+    Yeoh => (C10=18.696e3, C20=-0.223e3, C30=0.007e3)
+)
+W = [EdwardVilgis, ArrudaBoyce, Gent, NeoHookean, Yeoh, Ogden]
+λ_test = range(1.0, maximum(λ₁), length=30)
+λ⃗_test = map(x -> [x, 1 / sqrt(x), 1 / sqrt(x)], λ_test)
+p = scatter(λ₁[1:100:end], s₁[1:100:end], label="Experimental")
 for w ∈ W
-    s⃗ = s⃗̂(w(ps[w]), λ⃗_test)
-    plot!(p, λ_test, getindex.(s⃗, 1)./1e6, label = string(w))
+    s⃗ = Hyperelastics.s⃗̂(w(ps[w]), λ⃗_test)
+    s⃗[1] = [0.0, 0.0, 0.0]
+    if w == EdwardVilgis
+        plot!(p, λ_test, getindex.(s⃗, 1) ./ 1e6, label=labels[w], color=:black)
+    else
+        plot!(p, λ_test, getindex.(s⃗, 1) ./ 1e6, label=labels[w])
+    end
 end
-plot!(p, legend = :topleft, xlabel = "Stretch [-]", ylabel = "Nominal Stress [MPa]")
-savefig(p, "main-model-curves.pdf")
+plot!(p, legend=:bottomright, xlabel="Stretch [-]", ylabel="Nominal Stress [MPa]")
+savefig(p, "main-model-curves_new.pdf")
 ##
 W = EdwardVilgis
 p₀ = ComponentVector((Ns=32.338e3, Nc=20.371e3, α=0.0916, η=0.147))
 λ_max = maximum(λ₁)
-I₁_max = λ_max^2+2*λ_max^(-2)
-α_max = sqrt(1/I₁_max)
+I₁_max = λ_max^2 + 2 * λ_max^(-2)
+α_max = sqrt(1 / I₁_max)
 lb = ComponentVector((Ns=0.0, Nc=0.0, α=0.0, η=0.0))
 ub = ComponentVector((Ns=Inf, Nc=Inf, α=α_max, η=Inf))
-prob = HyperelasticProblem(data, W, p₀, [] , lb = lb, ub = ub)
+prob = HyperelasticProblem(data, W, p₀, [], lb=lb, ub=ub)
 solve(prob, LBFGS())
