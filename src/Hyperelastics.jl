@@ -8,7 +8,7 @@ using Reexport
 using SpecialFunctions
 
 # Write your package code here.
-export HyperelasticData, uniaxial_data, biaxial_data, HyperelasticProblem
+export HyperelasticData, UniaxialHyperelasticData, BiaxialHyperelasticData, HyperelasticProblem
 export I₁, I₂, I₃, J, s⃗̂
 
 include("basic_definitions.jl")
@@ -16,6 +16,7 @@ include("datasets.jl")
 include("data_driven.jl")
 include("isotropic_incompressible_models.jl")
 include("macro_micro_macro_model.jl")
+include("average_chain_behavior.jl")
 export s⃗̂, I₁, I₂, I₃, J
 
 abstract type AbstractHyperelasticData end
@@ -23,6 +24,12 @@ abstract type AbstractHyperelasticData end
 struct UniaxialHyperelasticData <: AbstractHyperelasticData
     s⃗
     λ⃗
+    UniaxialHyperelasticData(s⃗, λ⃗) =
+        let
+            s⃗ = zip(s⃗)
+            λ⃗ = zip(λ⃗, (λ⃗) .^ (-0.5), (λ⃗) .^ (-0.5))
+            new(s⃗, λ⃗)
+        end
 end
 
 struct BiaxialHyperelasticData <: AbstractHyperelasticData
@@ -35,7 +42,7 @@ biaxial_data(s₁, s₂, λ₁, λ₂)
 
 Create a biaxial hyperelastic data object from arrays of test data. The function returns a HyperelasticData object with the stresses and principal stretches. Currently, this assumes the material is incompressible.
 """
-function biaxial_data(s₁, s₂, λ₁, λ₂)
+function BiaxialHyperelasticData(s₁, s₂, λ₁, λ₂)
     s⃗ = zip(s₁, s₂)
     λ⃗ = zip(λ₁, λ₂, (λ₁ .* λ₂) .^ (-1))
     return BiaxialHyperelasticData(s⃗, λ⃗)
@@ -46,11 +53,11 @@ uniaxial_data(s₁, λ₁)
 
 Create a uniaxial hyperelastic data object from arrays of test data. The function returns a HyperelasticData object with the stresses and principal stretches. Currently, this assumes the material is incompressible.
 """
-function uniaxial_data(s₁, λ₁)
-    s⃗ = zip(s₁)
-    λ⃗ = zip(λ₁, (λ₁) .^ (-0.5), (λ₁) .^ (-0.5))
-    return UniaxialHyperelasticData(s⃗, λ⃗)
-end
+# function UniaxialHyperelasticData(s₁, λ₁)
+#     s⃗ = zip(s₁)
+#     λ⃗ = zip(λ₁, (λ₁) .^ (-0.5), (λ₁) .^ (-0.5))
+#     return UniaxialHyperelasticData(s⃗, λ⃗)
+# end
 
 """
 ---
