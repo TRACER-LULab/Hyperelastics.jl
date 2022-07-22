@@ -8,8 +8,9 @@ using Reexport
 using SpecialFunctions
 
 # Write your package code here.
-export HyperelasticData, UniaxialHyperelasticData, BiaxialHyperelasticData, HyperelasticProblem
-export I₁, I₂, I₃, J, s⃗̂
+export AbstractHyperelasticData, UniaxialHyperelasticData, BiaxialHyperelasticData, HyperelasticProblem
+export I₁, I₂, I₃, J
+export StrainEnergyDensityFunction, NominalStressFunction, TrueStressFunction
 
 include("basic_definitions.jl")
 include("datasets.jl")
@@ -17,10 +18,14 @@ include("data_driven.jl")
 include("isotropic_incompressible_models.jl")
 include("macro_micro_macro_model.jl")
 include("average_chain_behavior.jl")
-export s⃗̂, I₁, I₂, I₃, J
 
 abstract type AbstractHyperelasticData end
+abstract type AbstractHyperelasticModel end
+"""
+uniaxial_data(s₁, λ₁)
 
+Create a uniaxial hyperelastic data object from arrays of test data. The function returns a HyperelasticData object with the stresses and principal stretches. Currently, this assumes the material is incompressible.
+"""
 struct UniaxialHyperelasticData <: AbstractHyperelasticData
     s⃗
     λ⃗
@@ -38,7 +43,7 @@ struct BiaxialHyperelasticData <: AbstractHyperelasticData
 end
 
 """
-biaxial_data(s₁, s₂, λ₁, λ₂)
+BiaxialHyperelasticData(s₁, s₂, λ₁, λ₂)
 
 Create a biaxial hyperelastic data object from arrays of test data. The function returns a HyperelasticData object with the stresses and principal stretches. Currently, this assumes the material is incompressible.
 """
@@ -48,16 +53,6 @@ function BiaxialHyperelasticData(s₁, s₂, λ₁, λ₂)
     return BiaxialHyperelasticData(s⃗, λ⃗)
 end
 
-"""
-uniaxial_data(s₁, λ₁)
-
-Create a uniaxial hyperelastic data object from arrays of test data. The function returns a HyperelasticData object with the stresses and principal stretches. Currently, this assumes the material is incompressible.
-"""
-# function UniaxialHyperelasticData(s₁, λ₁)
-#     s⃗ = zip(s₁)
-#     λ⃗ = zip(λ₁, (λ₁) .^ (-0.5), (λ₁) .^ (-0.5))
-#     return UniaxialHyperelasticData(s⃗, λ⃗)
-# end
 
 """
 ---
@@ -66,15 +61,14 @@ HyperelasticProblem(data::HyperelasticData, model, u₀, ps; loss=L2DistLoss(), 
 Returns an `OptimizationProblem` for solving with GalacticOptim.jl. `data` is the hyperelastic experimental data, `model` is the strain energy density as a function of the parameters (i.e. `f(p) = W(p)(λ⃗)`). `ps` is any hyperparameters for the model (currently not supported). `loss` defines the loss function to be used in the optimization. Currently defaults to the ``L^2``-norm between the predicted and experimental data. `agg` defines the aggregration mode of the errors, defaults to the mean of the errors. `cons` define any constrain equations involving the parameters of the model. `kwargs` are passed to `OptimizationProblem`. To set parameter bounds, use the keywords `lb` and `ub` respectively.
 
 """
-function HyperelasticProblem(data::AbstractHyperelasticData, model, u₀, ps; loss=L2DistLoss(), agg=AggMode.Mean(), cons=(x, p) -> [true], kwargs...)
+function HyperelasticProblem(data::AbstractHyperelasticData, ψ, u₀, ps; loss=L2DistLoss(), agg=AggMode.Mean(), cons=(x, p) -> [true], kwargs...)
     s = hcat(collect.(data.s⃗)...)
 
     stresses_provided = size(s, 1)
 
-    s⃗(p) = s⃗̂(model(p), collect.(data.λ⃗))
-
     function ŝ(p)
-        s₁₂₃ = s⃗(p)
+        s⃗ = NominalStressFunction(ψ, p)
+        s₁₂₃ = @. s⃗(collect(data.λ⃗))
         return hcat(s₁₂₃...)[1:stresses_provided, :]
     end
 
@@ -97,10 +91,9 @@ function HyperelasticProblem(data::Vector{AbstractHyperelasticData}, model, u₀
 
     stresses_provided = size(s, 1)
 
-    s⃗(p) = s⃗̂(model(p), λ)
-
     function ŝ(p)
-        s₁₂₃ = s⃗(p)
+        s⃗ = NominalStressFunction(ψ, p)
+        s₁₂₃ =  @. s⃗(collect(data.λ⃗))
         return hcat(s₁₂₃...)[1:stresses_provided, :]
     end
 

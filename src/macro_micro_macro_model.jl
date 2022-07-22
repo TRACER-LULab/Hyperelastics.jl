@@ -19,7 +19,8 @@ Parameters:
 ---
 [^1]: > Amores VJ, Benítez JM, Montáns FJ. Data-driven, structure-based hyperelastic manifolds: A macro-micro-macro approach. arXiv preprint arXiv:1903.11545. 2019 Mar 27.
 """
-function MacroMicroMacro((; Pchain, p₀, weights, coeff_loss, solver, data))
+struct MacroMicroMacro end
+function StrainEnergyDensityFunction(ψ::MacroMicroMacro, (; Pchain, p₀, weights, coeff_loss, solver, data))
     λchain(λ⃗, r⃗) = dot(r⃗ .* r⃗, λ⃗)   # Eq. (1)
     ∂λchain∂λ(λ⃗, r⃗) = r⃗ .* r⃗         # In text below Eq. (8)
     # 1b. Spherical quadrature from  `A micro-macro approach to rubber-like materials—Part I: the non-affine micro-sphere model of rubber elasticity`
@@ -100,4 +101,7 @@ function MacroMicroMacro((; Pchain, p₀, weights, coeff_loss, solver, data))
     W(λ⃗) = sum(x -> x[1] * Wch(λchain(λ⃗, x[2])), zip(w, r⃗))
 
     return W
+end
+function parameters(ψ::MacroMicroMacro)
+    return (:Pchain, :p₀, :weights, :coeff_loss, :solver, :data)
 end

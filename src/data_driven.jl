@@ -14,7 +14,8 @@ See [link](https://github.com/JuliaDiff/ForwardDiff.jl/issues/510) and [link](ht
 
 [^1]: > Sussman T, Bathe KJ. A model of incompressible isotropic hyperelastic material behavior using spline interpolations of tension–compression test data. Communications in numerical methods in engineering. 2009 Jan;25(1):53-63.
 """
-function SussmanBathe(p)
+struct SussmanBathe end
+function StrainEnergyDensityFunction(ψ::SussmanBathe, p)
     (; s⃗, λ⃗, k) = p
     ∫(f, a, b) = quadgk(f, a, b, rtol=1e-8)[1]
     σ = DataInterpolations.CubicSpline(getindex.(s⃗, 1) .* getindex.(λ⃗, 1), getindex.(λ⃗, 1))
@@ -23,6 +24,30 @@ function SussmanBathe(p)
         sum(Base.Fix2(f, λ), 0:k)
     end
     w(x⃗) = sum(x -> ∫(w′, 1.0, x), x⃗)
+end
+
+function NominalStressFunction(ψ::SussmanBathe, p)
+    (; s⃗, λ⃗, k) = p
+    σ̂ = DataInterpolations.CubicSpline(getindex.(s⃗, 1) .* getindex.(λ⃗, 1), getindex.(λ⃗, 1))
+    f(i, λ) = (σ̂(λ^((4.0)^(-i))) + σ̂(λ^(-0.5 * (4.0^(-i))))) / λ
+    function w′(λ)
+        sum(Base.Fix2(f, λ), 0:k)
+    end
+    s(λ⃗) = w′.(λ⃗)
+end
+
+function TrueStressFunction(ψ::SussmanBathe, p)
+    (; s⃗, λ⃗, k) = p
+    σ̂ = DataInterpolations.CubicSpline(getindex.(s⃗, 1) .* getindex.(λ⃗, 1), getindex.(λ⃗, 1))
+    f(i, λ) = (σ̂(λ^((4.0)^(-i))) + σ̂(λ^(-0.5 * (4.0^(-i))))) / λ
+    function w′(λ)
+        sum(Base.Fix2(f, λ), 0:k)
+    end
+    σ(λ⃗) = w′.(λ⃗).*λ⃗
+end
+
+function parameters(ψ::SussmanBathe)
+    return (:s⃗, :λ⃗, :k)
 end
 
 """
@@ -95,6 +120,7 @@ function N(t; k, i, t⃗)
         return 0.0
     end
 end
+
 """
 Latoree Montans [^1] - Incompressible Transversely isotropic
 
