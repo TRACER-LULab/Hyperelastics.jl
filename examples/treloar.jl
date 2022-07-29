@@ -140,38 +140,38 @@ savefig("examples/sussmanbathe.png") #src
 # ![Sussman Bathe Plot](../examples/sussmanbathe.png)
 plot!() #src
 # # Using Turing.jl for Parameter Estimation
-using Turing, StatsPlots, LinearAlgebra
-# Create the model for the distribution
-struct ps{T}
-    μ::T
-    Jₘ::T
-end
-Jₘ_min = maximum(I₁.(collect.(data.λ⃗))) - 3
-@model function fitHE(s₁, data)
-    ## Prior Distributions
-    σ ~ InverseGamma(1, 2) # noise in the measurement data
-    μ ~ Normal(240e3, 20e3) # Normal for μ
-    Jₘ ~ truncated(Normal(79.97, 8.0), lower=Jₘ_min) # Truncated Normal for Jₘ with lower bound
+# using Turing, StatsPlots, LinearAlgebra
+# # Create the model for the distribution
+# struct ps{T}
+#     μ::T
+#     Jₘ::T
+# end
+# Jₘ_min = maximum(I₁.(collect.(data.λ⃗))) - 3
+# @model function fitHE(s₁, data)
+#     ## Prior Distributions
+#     σ ~ InverseGamma(1, 2) # noise in the measurement data
+#     μ ~ Normal(240e3, 20e3) # Normal for μ
+#     Jₘ ~ truncated(Normal(79.97, 8.0), lower=Jₘ_min) # Truncated Normal for Jₘ with lower bound
 
-    ## Simulate the data
-    s⃗ = NominalStressFunction(Gent(), ComponentVector(μ=μ, Jₘ=Jₘ))
-    ŝ₁ = @. getindex(s⃗(collect(data.λ⃗)), 1) # Sample the HE Model
+#     ## Simulate the data
+#     s⃗ = NominalStressFunction(Gent(), ComponentVector(μ=μ, Jₘ=Jₘ))
+#     ŝ₁ = @. getindex(s⃗(collect(data.λ⃗)), 1) # Sample the HE Model
 
-    ## Observations
-    for (index, ŝ) in enumerate(ŝ₁)
-        s₁[index] ~ MvNormal([ŝ], σ^2 * I)
-    end
+#     ## Observations
+#     for (index, ŝ) in enumerate(ŝ₁)
+#         s₁[index] ~ MvNormal([ŝ], σ^2 * I)
+#     end
 
-    return nothing
-end
-test_s = map(s -> [s], s₁)
-model = fitHE(test_s, data)
-# # Samble the distributions to fit the data and print the results
-chain = sample(model, NUTS(0.65), MCMCThreads(), 100, 1, progress=false)
-# $\mu$ = 245kPa ± 5.238kPa, $J_m$ = 80.9±1.1583
+#     return nothing
+# end
+# test_s = map(s -> [s], s₁)
+# model = fitHE(test_s, data)
+# # # Samble the distributions to fit the data and print the results
+# chain = sample(model, NUTS(0.65), MCMCThreads(), 100, 1, progress=false)
+# # $\mu$ = 245kPa ± 5.238kPa, $J_m$ = 80.9±1.1583
 
-plot(chain)
-savefig("examples/chain.png") #src
+# plot(chain)
+# savefig("examples/chain.png") #src
 # ![chain](../examples/chain.png)
 # Data Retrodiction to observe the results with 300 samples from the chain
 plot(legend=false, xlabel="Stretch", ylabel="Stress [MPa]") # src
