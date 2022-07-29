@@ -1,6 +1,7 @@
 # # Package Imports
 using Hyperelastics
-using Optimization, OptimizationOptimJL, ComponentArrays
+using Optimization, OptimizationOptimJL, ModelingToolkit, OptimizationMultistartOptimization
+using ComponentArrays
 using Plots
 pgfplotsx() #src
 # # Treloar's Uniaxial Data
@@ -15,22 +16,15 @@ data = UniaxialHyperelasticData(s₁, λ₁)
 #
 # Initial guess for the parameters
 p₀ = ComponentVector(μ=1e5, Jₘ=55.0)
-# Set the bounds for the value $J_m$
-Jₘ_min = I₁(collect.(data.λ⃗)[end]) - 3
-lb = ComponentVector(μ=1.0, Jₘ=Jₘ_min)
-ub = ComponentVector(μ=Inf, Jₘ=Inf)
 # Create the optimization problem and solve
 HEProblem = HyperelasticProblem(
     data,
     Gent(),
     p₀,
     [],
-    lb=lb,
-    ub=ub
 )
 sol = solve(HEProblem, LBFGS())
 # $\mu$ = 240kPa, $J_m$ = 79.97
-#
 # Predict the new stresses
 ŝ = NominalStressFunction(Gent(), sol.u)
 ŝ₁ = getindex.(ŝ.(λ⃗_predict), 1)
@@ -48,9 +42,69 @@ plot!(
 plot!(xlabel="Stretch", ylabel="Stress [MPa]", legend=:topleft) #src
 savefig("examples/gent.png") #src
 # ![Gent Plot](../examples/gent.png)
+
+# ## Using the EdwardVilgis Model
+p₀ = ComponentVector(Ns=20e3, Nc=20e3, α=0.05, η=0.05)
+HEProblem = HyperelasticProblem(
+    data,
+    EdwardVilgis(),
+    p₀,
+    []
+)
+sol = solve(HEProblem, Evolutionary.CMAES())
+#
+# Plot and compare the stresses
+ŝ = NominalStressFunction(EdwardVilgis(), sol.u)
+ŝ₁ = getindex.(ŝ.(λ⃗_predict), 1)
+plot!(
+    getindex.(λ⃗_predict, 1),
+    ŝ₁ ./ 1e6,
+    label="Predicted EdwardVilgis"
+)
+
+# ## Using the ExtendedTubeModel Model
+p₀ = ComponentVector(Gc=3e3, Ge=3e3, δ=0.04, β=1.0)
+HEProblem = HyperelasticProblem(
+    data,
+    ExtendedTubeModel(),
+    p₀,
+    []
+)
+sol = solve(HEProblem, LBFGS())
+# $\mu$ = 534kPa
+#
+# Plot and compare the stresses
+ŝ = NominalStressFunction(ExtendedTubeModel(), sol.u)
+ŝ₁ = getindex.(ŝ.(λ⃗_predict), 1)
+plot!(
+    getindex.(λ⃗_predict, 1),
+    ŝ₁ ./ 1e6,
+    label="Predicted ExtendedTubeModel"
+)
+
+# ## Using the DavidsonGoulbourne Model
+p₀ = ComponentVector(Gc=0.07e6, Ge=0.2e6, λmax=5.0)
+HEProblem = HyperelasticProblem(
+    data,
+    DavidsonGoulbourne(),
+    p₀,
+    []
+)
+sol = solve(HEProblem, Evolutionary.CMAES(μ=10, λ=100))
+# $\mu$ = 534kPa
+#
+# Plot and compare the stresses
+ŝ = NominalStressFunction(DavidsonGoulbourne(), sol.u)
+ŝ₁ = getindex.(ŝ.(λ⃗_predict), 1)
+plot!(
+    getindex.(λ⃗_predict, 1),
+    ŝ₁ ./ 1e6,
+    label="Predicted DavidsonGoulbourne"
+)
+
 # ## Using the NeoHookean Model
 # $W(\vec{\lambda}) = \frac{\mu}{2}(I_1-3)$
-p₀ = ComponentVector(μ=100e3)
+p₀ = ComponentVector(μ=200e3)
 HEProblem = HyperelasticProblem(
     data,
     NeoHookean(),
@@ -72,8 +126,6 @@ savefig("examples/neohookean.png") #src
 # ![Neohookean Plot](../examples/neohookean.png)
 # ## Sussman-Bathe Model
 # $W(\vec{\lambda}) = \sum\limits_{i=1}^{3} w(\lambda_i)$
-#
-# Note: the Sussman-Bathe model currently only supports differentiation via FiniteDifferences.jl as the AbstractDifferentiation.jl backend
 s⃗ = NominalStressFunction(SussmanBathe(), (s⃗=data.s⃗, λ⃗=data.λ⃗, k=5))
 ŝ = s⃗.(λ⃗_predict)
 ŝ₁ = getindex.(ŝ, 1)
@@ -94,19 +146,20 @@ struct ps{T}
     μ::T
     Jₘ::T
 end
+Jₘ_min = maximum(I₁.(collect.(data.λ⃗))) - 3
 @model function fitHE(s₁, data)
     ## Prior Distributions
-    σ ~ InverseGamma(2, 3) # noise in the measurement data
+    σ ~ InverseGamma(1, 2) # noise in the measurement data
     μ ~ Normal(240e3, 20e3) # Normal for μ
     Jₘ ~ truncated(Normal(79.97, 8.0), lower=Jₘ_min) # Truncated Normal for Jₘ with lower bound
 
     ## Simulate the data
     s⃗ = NominalStressFunction(Gent(), ComponentVector(μ=μ, Jₘ=Jₘ))
-    ŝ₁ = getindex.(s⃗.(collect.(data.λ⃗)), 1) # Sample the HE Model
+    ŝ₁ = @. getindex(s⃗(collect(data.λ⃗)), 1) # Sample the HE Model
 
     ## Observations
-    for i in 1:length(ŝ₁)
-        s₁[i] ~ MvNormal([ŝ₁[i]], σ^2 * I)
+    for (index, ŝ) in enumerate(ŝ₁)
+        s₁[index] ~ MvNormal([ŝ], σ^2 * I)
     end
 
     return nothing
@@ -114,8 +167,9 @@ end
 test_s = map(s -> [s], s₁)
 model = fitHE(test_s, data)
 # # Samble the distributions to fit the data and print the results
-chain = sample(model, NUTS(0.65), MCMCSerial(), 100, 3)
+chain = sample(model, NUTS(0.65), MCMCThreads(), 100, 1, progress=false)
 # $\mu$ = 245kPa ± 5.238kPa, $J_m$ = 80.9±1.1583
+
 plot(chain)
 savefig("examples/chain.png") #src
 # ![chain](../examples/chain.png)
@@ -136,7 +190,7 @@ using Symbolics
 @syms μ Jₘ
 @syms λ₁ λ₂ λ₃
 # ## Make the symbolic model
-W = StrainEnergyDensityFunction(Gent(),(μ=μ, Jₘ=Jₘ))
+W = StrainEnergyDensityFunction(Gent(), (μ=μ, Jₘ=Jₘ))
 # ## Create the partial derivative operators for the principal stretches
 ∂λ = Differential.([λ₁, λ₂, λ₃])
 # ## Differentiate the SEF with respect to the principal stretches
