@@ -7,7 +7,7 @@ General Mooney Rivlin[^1]
 Parameters: [C]
 
 Model:
-``\\sum\\limits_{i,j = 0}^{N,M} C_{i,j}(I_1-3)^i(2I_2-3)^j``
+``\\sum\\limits_{i,j = 0}^{N,M} C_{i,j}(I_1-3)^i(I_2-3)^j``
 
 [^1]: > Mooney M. A theory of large elastic deformation. Journal of applied physics. 1940 Sep;11(9):582-92.
 """
@@ -45,8 +45,10 @@ Model: ``\\sum\\limits_{i = 1}{3}\\sum\\limits_{j=0}^{N} A_j (\\lambda_i^{m_j}-1
 struct GeneralDarijaniNaghdabadi <: AbstractHyperelasticModel end
 
 function StrainEnergyDensityFunction(ψ::GeneralDarijaniNaghdabadi, (; A⃗, B⃗, m⃗, n⃗))
-    @assert length(A⃗) == length(B⃗) == length(m⃗) == length(n⃗) "The vectors are not the same length"
-    W(λ⃗) = sum(A⃗ .* (λ⃗ .^ m⃗ .- 1) + B⃗ .* (λ⃗ .^ (-n⃗) .- 1))
+    @assert length(A⃗) == length(m⃗) "Length of A⃗ ≠ length of m⃗"
+    @assert length(B⃗) == length(n⃗) "Length of B⃗ ≠ length of n⃗"
+    W(λ⃗) = sum(i -> sum(A⃗ .* (λ⃗[i] .^ m⃗ .- 1)) + sum(B⃗ .* (λ⃗[i] .^ (-1 .* n⃗) .- 1)), 1:3)
+    # sum(i -> sum(A⃗ .* (λ⃗[i] .^ m⃗ .- 1)) + sum(B⃗ .* (λ⃗[i] .^ (-1 .* n⃗) .- 1)), [1:3])
 end
 
 function parameters(ψ::GeneralDarijaniNaghdabadi)
@@ -105,8 +107,8 @@ function StrainEnergyDensityFunction(ψ::MooneyRivlin, (; C10, C01))
     StrainEnergyDensityFunction(
         GeneralMooneyRivlin(),
         (C=[
-            0.0 C10
-            C01 0.0
+            0 C10
+            C01 0
         ],
         )
     )
@@ -116,8 +118,8 @@ function StrainEnergyDensityFunction(ψ::MooneyRivlin, (; C10, C01), I::Invarian
     StrainEnergyDensityFunction(
         GeneralMooneyRivlin(),
         (C=[
-            0.0 C10
-            C01 0.0
+            0 C10
+            C01 0
         ],
         ),
         I
@@ -169,8 +171,8 @@ function StrainEnergyDensityFunction(ψ::Isihara, (; C10, C20, C01))
     StrainEnergyDensityFunction(
         GeneralMooneyRivlin(),
         (C=[
-            0.0 C10 C20
-            C01 0.0 0.0
+            0 C10 C20
+            C01 0 0
         ],
         )
     )
@@ -180,8 +182,8 @@ function StrainEnergyDensityFunction(ψ::Isihara, (; C10, C20, C01), I::Invarian
     StrainEnergyDensityFunction(
         GeneralMooneyRivlin(),
         (C=[
-            0.0 C10 C20
-            C01 0.0 0.0
+            0 C10 C20
+            C01 0 0
         ],
         ),
         I
@@ -207,8 +209,8 @@ function StrainEnergyDensityFunction(ψ::Biderman, (; C10, C01, C20, C30))
     StrainEnergyDensityFunction(
         GeneralMooneyRivlin(),
         (C=[
-            0.0 C10 C20 C30
-            C01 0.0 0.0 0.0
+            0 C10 C20 C30
+            C01 0 0 0
         ],
         )
     )
@@ -218,8 +220,8 @@ function StrainEnergyDensityFunction(ψ::Biderman, (; C10, C01, C20, C30), I::In
     StrainEnergyDensityFunction(
         GeneralMooneyRivlin(),
         (C=[
-            0.0 C10 C20 C30
-            C01 0.0 0.0 0.0
+            0 C10 C20 C30
+            C01 0 0 0
         ],
         ),
         I
@@ -245,8 +247,8 @@ function StrainEnergyDensityFunction(ψ::JamesGreenSimpson, (; C10, C01, C11, C2
     StrainEnergyDensityFunction(
         GeneralMooneyRivlin(),
         (C=[
-            0.0 C10 C20 C30
-            C01 0.0 0.0 0.0
+            0 C10 C20 C30
+            C01 0 0 0
         ],
         )
     )
@@ -256,8 +258,8 @@ function StrainEnergyDensityFunction(ψ::JamesGreenSimpson, (; C10, C01, C11, C2
     StrainEnergyDensityFunction(
         GeneralMooneyRivlin(),
         (C=[
-            0.0 C10 C20 C30
-            C01 0.0 0.0 0.0
+            0 C10 C20 C30
+            C01 0 0 0
         ],
         ),
         I
@@ -283,9 +285,9 @@ function StrainEnergyDensityFunction(ψ::HainesWilson, (; C10, C01, C11, C02, C2
     StrainEnergyDensityFunction(
         GeneralMooneyRivlin(),
         (C=[
-            0.0 C10 C20 C30
-            C01 C11 0.0 0.0
-            C02 0.0 0.0 0.0
+            0 C10 C20 C30
+            C01 C11 0 0
+            C02 0 0 0
         ],
         )
     )
@@ -295,9 +297,9 @@ function StrainEnergyDensityFunction(ψ::HainesWilson, (; C10, C01, C11, C02, C2
     StrainEnergyDensityFunction(
         GeneralMooneyRivlin(),
         (C=[
-            0.0 C10 C20 C30
-            C01 C11 0.0 0.0
-            C02 0.0 0.0 0.0
+            0 C10 C20 C30
+            C01 C11 0 0
+            C02 0 0 0
         ],
         ),
         I
@@ -322,14 +324,14 @@ struct Yeoh <: AbstractHyperelasticModel end
 function StrainEnergyDensityFunction(ψ::Yeoh, (; C10, C20, C30))
     StrainEnergyDensityFunction(
         GeneralMooneyRivlin(),
-        (C=[0.0 C10 C20 C30],)
+        (C=[0 C10 C20 C30],)
     )
 end
 
 function StrainEnergyDensityFunction(ψ::Yeoh, (; C10, C20, C30), I::InvariantForm)
     StrainEnergyDensityFunction(
         GeneralMooneyRivlin(),
-        (C=[0.0 C10 C20 C30],),
+        (C=[0 C10 C20 C30],),
         I
     )
 end
@@ -353,8 +355,8 @@ function StrainEnergyDensityFunction(ψ::Lion, (; C10, C01, C50))
     StrainEnergyDensityFunction(
         GeneralMooneyRivlin(),
         (C=[
-            0.0 C10 0.0 0.0 0.0 C50
-            C01 0.0 0.0 0.0 0.0 0.0
+            0 C10 0 0 0 C50
+            C01 0 0 0 0 0
         ],)
     )
 end
@@ -363,8 +365,8 @@ function StrainEnergyDensityFunction(ψ::Lion, (; C10, C01, C50), I::InvariantFo
     StrainEnergyDensityFunction(
         GeneralMooneyRivlin(),
         (C=[
-            0.0 C10 0.0 0.0 0.0 C50
-            C01 0.0 0.0 0.0 0.0 0.0
+            0 C10 0 0 0 C50
+            C01 0 0 0 0 0
         ],),
         I
     )
@@ -391,9 +393,9 @@ function StrainEnergyDensityFunction(ψ::HauptSedlan, (; C10, C01, C11, C02, C30
     StrainEnergyDensityFunction(
         GeneralMooneyRivlin(),
         (C=[
-            0.0 C10 0.0 C30
-            C01 C11 0.0 0.0
-            C02 0.0 0.0 0.0
+            0 C10 0 C30
+            C01 C11 0 0
+            C02 0 0 0
         ],)
     )
 end
@@ -402,9 +404,9 @@ function StrainEnergyDensityFunction(ψ::HauptSedlan, (; C10, C01, C11, C02, C30
     StrainEnergyDensityFunction(
         GeneralMooneyRivlin(),
         (C=[
-            0.0 C10 0.0 C30
-            C01 C11 0.0 0.0
-            C02 0.0 0.0 0.0
+            0 C10 0 C30
+            C01 C11 0 0
+            C02 0 0 0
         ],),
         I
     )
@@ -485,10 +487,10 @@ function StrainEnergyDensityFunction(ψ::BahremanDarijani, (; A2, B2, A4, A6))
     StrainEnergyDensityFunction(
         GeneralDarijaniNaghdabadi(),
         (
-            A⃗=[0.0, A2, 0.0, A4, 0.0, A6],
-            B⃗=[0.0, B2],
-            m⃗=[0.0, 2.0, 0.0, 4.0, 0.0, 6.0],
-            n⃗=[0.0, 2.0])
+            A⃗=[0, A2, 0, A4, 0, A6],
+            B⃗=[0, B2],
+            m⃗=[0, 2, 0, 4, 0, 6],
+            n⃗=[0, 2])
     )
 end
 
@@ -543,10 +545,16 @@ function parameters(ψ::Knowles)
     return (:μ, :b, :n)
 end
 
+function parameter_bounds(ψ::Knowles, data::AbstractHyperelasticData)
+    lb = (μ=-Inf, b=0, n=0)
+    ub = nothing
+    return (lb=lb, ub=ub)
+end
+
 """
 Swanson [^1]
 
-Parameters: A, α, B, β
+Parameters: A⃗, α⃗, B⃗, β⃗
 
 Model: ``\\sum\\limits_{i=1}^{N} \\frac{3}{2}(\\frac{A_i}{1+\\alpha_i}(\\frac{I_1}{3})^{1+\\alpha_i}+\\frac{B_i}{1+\\beta_i}(\\frac{I_2}{3})^{1+\\beta_i}``
 
@@ -554,19 +562,18 @@ Model: ``\\sum\\limits_{i=1}^{N} \\frac{3}{2}(\\frac{A_i}{1+\\alpha_i}(\\frac{I_
 """
 struct Swanson <: AbstractHyperelasticModel end
 
-function StrainEnergyDensityFunction(ψ::Swanson, (; A, α, B, β))
-    @assert length(A) == length(α) == length(B) == length(β) "The vectors are not the same length"
+function StrainEnergyDensityFunction(ψ::Swanson, (; A⃗, α⃗, B⃗, β⃗))
+    @assert length(A⃗) == length(α⃗) == length(B⃗) == length(β⃗) "The vectors are not the same length"
     W(λ⃗) = @tullio _ := 3 / 2 * (A[i] / (1 + α[i]) * (I₁(λ⃗) / 3)^(1 + α[i]) + B[i] / (1 + β[i]) * (I₂(λ⃗) / 3)^(1 + β[i]))
 end
 
-function StrainEnergyDensityFunction(ψ::Swanson, (; A, α, B, β), I::InvariantForm)
-    @assert length(A) == length(α) == length(B) == length(β) "The vectors are not the same length"
-    W(I⃗) = @tullio _ := 3 / 2 * (A[i] / (1 + α[i]) * (I⃗[1] / 3)^(1 + α[i]) + B[i] / (1 + β[i]) * (I⃗[2] / 3)^(1 + β[i]))
+function StrainEnergyDensityFunction(ψ::Swanson, (; A⃗, α⃗, B⃗, β⃗), I::InvariantForm)
+    @assert length(A⃗) == length(α⃗) == length(B⃗) == length(β⃗) "The vectors are not the same length"
+    W(I⃗) = @tullio _ := 3 / 2 * (A⃗[i] / (1 + α⃗[i]) * (I⃗[1] / 3)^(1 + α⃗[i]) + B⃗[i] / (1 + β⃗[i]) * (I⃗[2] / 3)^(1 + β⃗[i]))
 end
 
-
 function parameters(ψ::Swanson)
-    return (:A, :α, :B, :β)
+    return (:A⃗, :α⃗, :B⃗, :β⃗)
 end
 
 """
@@ -678,7 +685,7 @@ function StrainEnergyDensityFunction(ψ::Beda, (; C1, C2, C3, K1, α, β, ζ))
         (
             C=[C1, C2, C3],
             K=[K1],
-            α=[α, 1.0, ζ],
+            α=[α, 1, ζ],
             β=[β]
         )
     )
@@ -690,7 +697,7 @@ function StrainEnergyDensityFunction(ψ::Beda, (; C1, C2, C3, K1, α, β, ζ), I
         (
             C=[C1, C2, C3],
             K=[K1],
-            α=[α, 1.0, ζ],
+            α=[α, 1, ζ],
             β=[β]
         ),
         I
@@ -729,7 +736,7 @@ Lopez-Pamies [^1]
 
 Parameters: α⃗, μ⃗
 
-Model: ``\\frac{3.0^{1 - \\alpha_i}}{2\\alpha_i} \\mu_i (I_1^{\\alpha_i} - 3^{\\alpha_i})``
+Model: ``\\frac{3^{1 - \\alpha_i}}{2\\alpha_i} \\mu_i (I_1^{\\alpha_i} - 3^{\\alpha_i})``
 
 [^1]: > Lopez-Pamies O. A new I1-based hyperelastic model for rubber elastic materials. Comptes Rendus Mecanique. 2010 Jan 1;338(1):3-11.
 """
@@ -737,12 +744,12 @@ struct LopezPamies <: AbstractHyperelasticModel end
 
 function StrainEnergyDensityFunction(ψ::LopezPamies, (; α⃗, μ⃗))
     @assert length(α⃗) == length(μ⃗) "length of α⃗ is not equal to length of μ⃗"
-    W(λ⃗) = @tullio _ := (3.0^(1 - α⃗[i])) / (2α⃗[i]) * μ⃗[i] * (I₁(λ⃗)^(α⃗[i]) - 3^(α⃗[i]))
+    W(λ⃗) = @tullio _ := (3^(1 - α⃗[i])) / (2α⃗[i]) * μ⃗[i] * (I₁(λ⃗)^(α⃗[i]) - 3^(α⃗[i]))
 end
 
 function StrainEnergyDensityFunction(ψ::LopezPamies, (; α⃗, μ⃗), I::InvariantForm)
     @assert length(α⃗) == length(μ⃗) "length of α⃗ is not equal to length of μ⃗"
-    W(I⃗) = @tullio _ := (3.0^(1 - α⃗[i])) / (2α⃗[i]) * μ⃗[i] * (I⃗[1]^(α⃗[i]) - 3^(α⃗[i]))
+    W(I⃗) = @tullio _ := (3^(1 - α⃗[i])) / (2α⃗[i]) * μ⃗[i] * (I⃗[1]^(α⃗[i]) - 3^(α⃗[i]))
 end
 
 function parameters(ψ::LopezPamies)
@@ -917,7 +924,7 @@ function NominalStressFunction(ψ::ChevalierMarco, (; a⃗, b⃗))
     ∂W∂I1(λ⃗) = exp(sum(@tullio _ := a⃗[i] * (I₁(λ⃗) - 3)^(i - 1)))
     ∂W∂I2(λ⃗) = @tullio _ := b⃗[i] / I₂(λ⃗)^(i - 1)
     function s(λ⃗)
-        𝐒 = 2 * (I * ∂W∂I1 - diagm(λ⃗ .^ 2)^(-2) * ∂W∂I2)
+        𝐒 = 2 * (I(3) * ∂W∂I1 - diagm(λ⃗ .^ 2)^(-2) * ∂W∂I2)
         sᵢ = diag(𝐒)
         sᵢ = sᵢ .- sᵢ[3] .* λ⃗[3] / λ⃗[1]
         return sᵢ
@@ -1112,6 +1119,12 @@ function parameters(ψ::HossMarczakI)
     return (:α, :β, :μ, :b, :n)
 end
 
+function parameter_bounds(ψ::HossMarczakI, data::AbstractHyperelasticData)
+    lb = (α=-Inf, β=0, μ=-Inf, b=0, n=0)
+    ub = nothing
+    return (lb=lb, ub=ub)
+end
+
 """
 Hoss Marczak II [^1]
 
@@ -1136,6 +1149,13 @@ end
 function parameters(ψ::HossMarczakII)
     return (:α, :β, :μ, :b, :n, :C2)
 end
+
+function parameter_bounds(ψ::HossMarczakII, data::AbstractHyperelasticData)
+    lb = (α=-Inf, β=0, μ=-Inf, b=0, n=0, C2=-Inf)
+    ub = nothing
+    return (lb=lb, ub=ub)
+end
+
 
 """
 Exp-Ln [^1]
@@ -1199,8 +1219,8 @@ function parameters(ψ::VanDerWaals)
 end
 
 function constraints(ψ::VanDerWaals, data::AbstractHyperelasticData)
-    I₁_max = maximum.(I₁.(data.λ⃗))
-    I₂_max = maximum.(I₂.(data.λ⃗))
+    I₁_max = maximum(I₁.(data.λ⃗))
+    I₂_max = maximum(I₂.(data.λ⃗))
     return f(u, p) = [1 - (u.β * I₁_max + (1 - u.β) * I₂_max - 3) / (u.λm^2 - 3)]
 end
 
@@ -1230,7 +1250,7 @@ end
 function parameter_bounds(ψ::Gent, data::AbstractHyperelasticData)
     I₁_max = maximum(I₁.(collect.(data.λ⃗)))
     Jₘ_min = I₁_max - 3
-    lb = (μ=0.0, Jₘ=Jₘ_min)
+    lb = (μ=0, Jₘ=Jₘ_min)
     ub = nothing
     return (lb=lb, ub=ub)
 end
@@ -1393,10 +1413,16 @@ function parameters(ψ::HorganMurphy)
     return (:μ, :Jₘ, :c)
 end
 
+function parameter_bounds(ψ::HorganMurphy, data::AbstractHyperelasticData)
+    lb = (μ=-Inf, Jₘ=0, c=0)
+    ub = (μ=Inf, Jₘ=Inf, c=Inf)
+    return (lb=lb, ub=ub)
+end
+
 function constraints(ψ::HorganMurphy, data::AbstractHyperelasticData)
     function f(u, p)
-        max_sum = maximum(λ⃗ -> sum(λ⃗ .^ c), data.λ⃗)
-        [1 - (max_sum - 3) / Jₘ]
+        max_sum = maximum(λ⃗ -> sum(λ⃗ .^ u.c), data.λ⃗)
+        [1 - (max_sum - 3) / u.Jₘ]
     end
     return f
 end
@@ -1432,13 +1458,12 @@ Model: ``E\\sum\\limits_{i=1}^{3}\\bigg[\\lambda_i - 1 - \\log(\\lambda_i) - \\f
 struct PengLandel <: AbstractHyperelasticModel end
 
 function StrainEnergyDensityFunction(ψ::PengLandel, (; E))
-    W(λ⃗) = sum(@. λ⃗ - 1 - log(λ⃗) - 1 / 6 * log(λ⃗)^2 + 1 / 18 * log(λ⃗)^3 - 1 / 216 * log(λ⃗)^4) * E
+    W(λ⃗) = @tullio _ := (λ⃗[i] - 1 - log(λ⃗[i]) - 1 / 6 * log(λ⃗[i])^2 + 1 / 18 * log(λ⃗[i])^3 - 1 / 216 * log(λ⃗[i])^4) * E
 end
 
 function parameters(ψ::PengLandel)
     return (:E,)
 end
-
 
 """
 Ogden [^1]
@@ -1470,19 +1495,19 @@ Model: ``\\sum\\limits_{i=1}^N\\frac{A_i}{2i}(\\lambda_1^{2i}+\\lambda_2^{2i}+\\
 """
 struct Attard <: AbstractHyperelasticModel end
 
-function StrainEnergyDensityFunction(ψ::Attard, (; A, B))
+function StrainEnergyDensityFunction(ψ::Attard, (; A⃗, B⃗))
     @assert length(A) == length(B) "Length of A and B are not equal"
-    W(λ⃗) = @tullio _ := A[i] / 2 / i * (sum(λ⃗ .^ (2i)) - 3) + B[i] / 2 / i * (sum(λ⃗ .^ (-2i)) - 3)
+    W(λ⃗) = @tullio _ := A⃗[i] / 2 / i * (sum(λ⃗ .^ (2i)) - 3) + B⃗[i] / 2 / i * (sum(λ⃗ .^ (-2i)) - 3)
 end
 
 function parameters(ψ::Attard)
-    return (:A, :B)
+    return (:A⃗, :B⃗)
 end
 
 """
 Shariff [^1]
 
-Parameters: E, α₁, α₂, α₃, α₄, α₅
+Parameters: E, α⃗
 
 Model:
 ``E\\sum\\limits_{i=1}^3\\sum\\limits_{j=1}^{N}\\alpha_j \\Phi_j(\\lambda_i)``
@@ -1491,12 +1516,12 @@ Model:
 """
 struct Shariff <: AbstractHyperelasticModel end
 
-function StrainEnergyDensityFunction(ψ::Shariff, (; E, α))
+function StrainEnergyDensityFunction(ψ::Shariff, (; E, α⃗))
     ϕ = []
     c(j, r) = factorial(j) / factorial(r) / factorial(j - r)
     for j in eachindex(α)
         if j == 0
-            push!(ϕ, x -> ln(x)^2 / 3)
+            push!(ϕ, x -> log(x)^2 / 3)
         elseif j == 1
             push!(ϕ, x -> -exp(1) * expinti(-1) + exp(1) * expinti(-x) + x - 2log(x) - 1)
         elseif j == 2
@@ -1511,7 +1536,7 @@ function StrainEnergyDensityFunction(ψ::Shariff, (; E, α))
 end
 
 function parameters(ψ::Shariff)
-    return (:E, :α)
+    return (:E, :α⃗)
 end
 
 """
@@ -1525,13 +1550,13 @@ Model: ``\\sum\\limits_{i=1}^{N} A_i\\big[\\exp{m_i(\\lambda_1^{\\alpha_i}+\\lam
 """
 struct ArmanNarooei <: AbstractHyperelasticModel end
 
-function StrainEnergyDensityFunction(ψ::ArmanNarooei, (; A, B, m, n, α, β))
+function StrainEnergyDensityFunction(ψ::ArmanNarooei, (; A⃗, B⃗, m⃗, n⃗, α⃗, β⃗))
     @assert length(A) == length(B) == length(m) == length(n) == length(α) == length(β) "Length of A, B, m, n, α and β are not equal"
-    W(λ⃗) = @tullio _ := A[i] * (exp(m[i] * (sum(λ⃗ .^ α[i]) - 3)) - 1) + B[i] * (exp(n[i] * (sum(λ⃗ .^ (-β[i])) - 3)) - 1)
+    W(λ⃗) = @tullio _ := A⃗[i] * (exp(m⃗[i] * (sum(λ⃗ .^ α⃗[i]) - 3)) - 1) + B⃗[i] * (exp(n⃗[i] * (sum(λ⃗ .^ (-β⃗[i])) - 3)) - 1)
 end
 
 function parameters(ψ::ArmanNarooei)
-    return (:A, :B, :m, :n, :α, :β)
+    return (:A⃗, :B⃗, :m⃗, :n⃗, :α⃗, :β⃗)
 end
 
 """
@@ -1593,6 +1618,13 @@ function parameters(ψ::ConstrainedJunction)
     return (:Gc, :μkT, :κ)
 end
 
+function parameter_bounds(ψ::ConstrainedJunction, data::AbstractHyperelasticData)
+    λ_min = minimum(minimum.(collect.(data.λ⃗)))
+    κ_min = -λ_min^2
+    lb = (Gc=-Inf, μkT=-Inf, κ=κ_min)
+    ub = nothing
+    return (lb=lb, ub=ub)
+end
 """
 Edward-Vilgis [^1]
 
@@ -1639,11 +1671,25 @@ Model:
 struct MCC <: AbstractHyperelasticModel end
 
 function StrainEnergyDensityFunction(ψ::MCC, (; ζkT, μkT, κ))
-    W(λ⃗) = 1 / 2 * ζkT * sum(i -> λ⃗[i]^2 - 1, 1:3) + 1 / 2 * μkT * sum(i -> κ^2 * (λ⃗[i]^2 - 1) * (λ⃗[i]^2 + κ)^(-2) + (λ⃗[i]^2 * (κ^2 * (λ⃗[i]^2 - 1) * (λ⃗[i]^2 + κ)^(-2)) / κ) - log(1 + (κ^2 * (λ⃗[i]^2 - 1) * (λ⃗[i]^2 + κ)^(-2))) - log(1 + (λ⃗[i]^2 * (κ^2 * (λ⃗[i]^2 - 1) * (λ⃗[i]^2 + κ)^(-2)) / κ)), 1:3)
+    function W(λ⃗)
+        @tullio B[i] := κ^2 * (λ⃗[i]^2 - 1) * (λ⃗[i]^2 + κ)^(-2)
+        @tullio D[i] := λ⃗[i]^2 * B[i] / κ
+        @tullio W1 := λ⃗[i]^2 - 1
+        @tullio W2 := B[i] - log(1 + B[i])
+        @tullio W3 := D[i] - log(1 + D[i])
+        return 1 / 2 * ζkT * W1 + 1 / 2 * μkT * (W2 + W3)
+    end
+    # W(λ⃗) = 1 / 2 * ζkT * sum(i -> λ⃗[i]^2 - 1, 1:3) + 1 / 2 * μkT * sum(i -> κ^2 * (λ⃗[i]^2 - 1) * (λ⃗[i]^2 + κ)^(-2) + (λ⃗[i]^2 * (κ^2 * (λ⃗[i]^2 - 1) * (λ⃗[i]^2 + κ)^(-2)) / κ) - log(1 + (κ^2 * (λ⃗[i]^2 - 1) * (λ⃗[i]^2 + κ)^(-2))) - log(1 + (λ⃗[i]^2 * (κ^2 * (λ⃗[i]^2 - 1) * (λ⃗[i]^2 + κ)^(-2)) / κ)), 1:3)
 end
 
 function parameters(ψ::MCC)
     return (:ζkT, :μkT, :κ)
+end
+
+function parameter_bounds(ψ::MCC, data::AbstractHyperelasticData)
+    lb = (ζkT=-Inf, μkT=-Inf, κ=0)
+    ub = nothing
+    return (lb=lb, ub=ub)
 end
 
 """
@@ -1699,8 +1745,7 @@ Model: `` \\frac{\\mu\\sqrt{N}}{3}\\sum\\limits_{i=1}^{3}\\bigg(\\lambda_i\\beta
 """
 struct ThreeChainModel <: AbstractHyperelasticModel
     ℒinv::Function
-    CohenExact3_2(y) = y * (3 - 36 / 35 * y^2) / (1 - 33 / 35 * y^2)
-    ThreeChainModel(; ℒinv::Function=CohenExact3_2) = new(ℒinv)
+    ThreeChainModel(; ℒinv::Function=TreloarApproximation) = new(ℒinv)
 end
 
 function StrainEnergyDensityFunction(ψ::ThreeChainModel, (; μ, N))
@@ -1712,7 +1757,9 @@ function parameters(ψ::ThreeChainModel)
 end
 
 function parameter_bounds(ψ::ThreeChainModel, data::AbstractHyperelasticData)
-    lb = (μ=-Inf, N=0.0)
+    λ_max = maximum(maximum.(collect.(data.λ⃗)))
+    N_min = λ_max^2
+    lb = (μ=-Inf, N=N_min)
     ub = nothing
     return (lb=lb, ub=ub)
 end
@@ -1733,8 +1780,7 @@ Model: ``\\mu\\bigg(\\frac{1}{2}(I_1-3)+\\frac{I_1^2-9}{20N}+\\frac{11(I_1^3-27)
 """
 struct ArrudaBoyce <: AbstractHyperelasticModel
     ℒinv::Function
-    CohenExact3_2(y) = y * (3 - 36 / 35 * y^2) / (1 - 33 / 35 * y^2)
-    ArrudaBoyce(; ℒinv::Function=CohenExact3_2) = new(ℒinv)
+    ArrudaBoyce(; ℒinv::Function=TreloarApproximation) = new(ℒinv)
 end
 
 function StrainEnergyDensityFunction(ψ::ArrudaBoyce, (; μ, N))
@@ -1758,7 +1804,10 @@ function parameters(ψ::ArrudaBoyce)
 end
 
 function parameter_bounds(ψ::ArrudaBoyce, data::AbstractHyperelasticData)
-    lb = (μ=-Inf, N=0.0)
+    I₁_max = maximum(I₁.(collect.(data.λ⃗)))
+    N_max = 11 / 35 * I₁_max # old
+    N_max = I₁_max / 3
+    lb = (μ=-Inf, N=N_max)
     ub = nothing
     return (lb=lb, ub=ub)
 end
@@ -1772,19 +1821,32 @@ Model: ``W_{\\text{Arruda-Boyce}}+\\sum\\limits_{i=1}^{3}\\frac{\\mu}{2}[B_i+D_i
 
 [^1]: > Edwards SF. The statistical mechanics of polymerized material. Proceedings of the Physical Society (1958-1967). 1967 Sep 1;92(1):9.
 """
-struct ModifiedFloryErman <: AbstractHyperelasticModel end
+struct ModifiedFloryErman <: AbstractHyperelasticModel
+    ℒinv::Function
+    ModifiedFloryErman(; ℒinv::Function=TreloarApproximation) = new(ℒinv)
+end
 
 function StrainEnergyDensityFunction(ψ::ModifiedFloryErman, (; μ, N, κ))
-    WAB = StrainEnergyDensityFunction(ArrudaBoyce(), (μ=μ, N=N))
+    WAB = StrainEnergyDensityFunction(ArrudaBoyce(ℒinv=ψ.ℒinv), (μ=μ, N=N))
     function W(λ⃗)
-        B = map(i -> κ^2 * (λ⃗[i]^2 - 1) / (λ⃗[i]^2 + κ)^2, 1:3)
-        D = map(i -> λ⃗[i]^2 * B[i] / κ, 1:3)
-        WAB(λ⃗) + sum(i -> B[i] + D[i] - log(B[i] + 1) - log(D[i] + 1), 1:3)
+        @tullio B[i] := κ^2 * (λ⃗[i]^2 - 1) / (λ⃗[i]^2 + κ)^2
+        @tullio D[i] := λ⃗[i]^2 * B[i] / κ
+        @tullio W2 := B[i] + D[i] - log(B[i] + 1) - log(D[i] + 1)
+        WAB(λ⃗) + W2
     end
 end
 
 function parameters(ψ::ModifiedFloryErman)
     return (:μ, :N, :κ)
+end
+
+function parameter_bounds(ψ::ModifiedFloryErman, data::AbstractHyperelasticData)
+    I₁_max = maximum(I₁.(collect.(data.λ⃗)))
+    N_max = 11 / 35 * I₁_max # old
+    N_max = I₁_max / 3
+    lb = (μ=-Inf, N=N_max, κ=0)
+    ub = nothing
+    return (lb=lb, ub=ub)
 end
 
 """
@@ -1809,7 +1871,7 @@ end
 function parameter_bounds(ψ::ExtendedTubeModel, data::AbstractHyperelasticData)
     I₁_max = maximum(I₁.(collect.(data.λ⃗)))
     δ_max = sqrt(1 / (I₁_max - 3))
-    lb = (Gc=-Inf, Ge=-Inf, δ=-δ_max, β=0.0)
+    lb = (Gc=-Inf, Ge=-Inf, δ=-δ_max, β=0)
     ub = (Gc=Inf, Ge=Inf, δ=δ_max, β=Inf)
     return (lb=lb, ub=ub)
 end
@@ -1824,10 +1886,13 @@ Model: ``W_{Arruda-Boyce} + G_e\\frac{\\lambda_1^n+\\lambda_2^2+\\lambda_3^2-3}{
 [^1]: > Meissner B, Matějka L. A Langevin-elasticity-theory-based constitutive equation for rubberlike networks and its comparison with biaxial stress–strain data. Part I. Polymer. 2003 Jul 1;44(16):4599-610.
 [^2]: > Meissner B, Matějka L. A Langevin-elasticity-theory-based constitutive equation for rubberlike networks and its comparison with biaxial stress–strain data. Part I. Polymer. 2003 Jul 1;44(16):4599-610.
 """
-struct ABGI <: AbstractHyperelasticModel end
+struct ABGI <: AbstractHyperelasticModel
+    ℒinv::Function
+    ABGI(; ℒinv::Function=TreloarApproximation) = new(ℒinv)
+end
 
 function StrainEnergyDensityFunction(ψ::ABGI, (; μ, N, Ge, n))
-    WAB = StrainEnergyDensityFunction(ArrudaBoyce(), (μ=μ, N=N))
+    WAB = StrainEnergyDensityFunction(ArrudaBoyce(ℒinv=ψ.ℒinv), (μ=μ, N=N))
     W(λ⃗) = WAB(λ⃗) + Ge * (sum(λ⃗ .^ n) - 3) / n
 end
 
@@ -1835,6 +1900,12 @@ function parameters(ψ::ABGI)
     return (:μ, :N, :Ge, :n)
 end
 
+function parameter_bounds(ψ::ABGI, data::AbstractHyperelasticData)
+    I₁_max = maximum(I₁.(collect.(data.λ⃗)))
+    lb = (μ=-Inf, N=11 / 35 * I₁_max, Ge=-Inf, n=0)
+    ub = nothing
+    return (lb=lb, ub=ub)
+end
 """
 Non-Affine Micro-Sphere [^1]
 
@@ -1850,8 +1921,7 @@ Model: See Paper
 """
 struct NonaffineMicroSphere <: AbstractHyperelasticModel
     ℒinv::Function
-    CohenExact3_2(y) = y * (3 - 36 / 35 * y^2) / (1 - 33 / 35 * y^2)
-    NonaffineMicroSphere(; ℒinv::Function=CohenExact3_2) = new(ℒinv)
+    NonaffineMicroSphere(; ℒinv::Function=TreloarApproximation) = new(ℒinv)
 end
 
 function StrainEnergyDensityFunction(ψ::NonaffineMicroSphere, (; μ, N, p, U, q))
@@ -1905,6 +1975,12 @@ function parameters(ψ::NonaffineMicroSphere)
     return (:μ, :N, :p, :U, :q)
 end
 
+function parameter_bounds(ψ::NonaffineMicroSphere, data::AbstractHyperelasticData)
+    lb = (μ=-Inf, N=0, p=0, U=0, q=0)
+    ub = nothing
+    return (lb=lb, ub=ub)
+end
+
 """
 Affine Micro-Sphere [^1]
 
@@ -1920,8 +1996,7 @@ Model: See Paper
 """
 struct AffineMicroSphere <: AbstractHyperelasticModel
     ℒinv::Function
-    CohenExact3_2(y) = y * (3 - 36 / 35 * y^2) / (1 - 33 / 35 * y^2)
-    AffineMicroSphere(; ℒinv::Function=CohenExact3_2) = new(ℒinv)
+    AffineMicroSphere(; ℒinv::Function=TreloarApproximation) = new(ℒinv)
 end
 
 function StrainEnergyDensityFunction(ψ::AffineMicroSphere, (; μ, N, p, U, q))
@@ -1994,8 +2069,7 @@ Model: ``W_8(\\frac{\\sum\\lambda}{\\sqrt{3N}}-\\frac{\\lambda_{chain}}{\\sqrt{N
 """
 struct Bootstrapped8Chain <: AbstractHyperelasticModel
     ℒinv::Function
-    CohenExact3_2(y) = y * (3 - 36 / 35 * y^2) / (1 - 33 / 35 * y^2)
-    Bootstrapped8Chain(; ℒinv::Function=CohenExact3_2) = new(ℒinv)
+    Bootstrapped8Chain(; ℒinv::Function=TreloarApproximation) = new(ℒinv)
 end
 
 function StrainEnergyDensityFunction(ψ::Bootstrapped8Chain, (; μ, N))
@@ -2011,6 +2085,14 @@ end
 
 function parameters(ψ::Bootstrapped8Chain)
     return (:μ, :N)
+end
+
+function parameter_bounds(ψ::Bootstrapped8Chain, data::AbstractHyperelasticData)
+    I₁_max = maximum(I₁.(collect.(data.λ⃗)))
+    N_min = I₁_max / 3
+    lb = (μ=-Inf, N=N_min)
+    ub = nothing
+    return (lb=lb, ub=ub)
 end
 
 """
@@ -2035,7 +2117,7 @@ end
 function parameter_bounds(ψ::DavidsonGoulbourne, data::AbstractHyperelasticData)
     I₁_max = maximum(I₁.(collect.(data.λ⃗)))
     λmax_min = sqrt(I₁_max / 3)
-    lb = (Gc=0.0, Ge=0.0, λmax=λmax_min)
+    lb = (Gc=0, Ge=0, λmax=λmax_min)
     ub = nothing
     return (lb=lb, ub=ub)
 end
@@ -2091,7 +2173,7 @@ end
 function parameter_bounds(ψ::GeneralConstitutiveModel, data::AbstractHyperelasticData)
     I₁_max = maximum(I₁.(collect.(data.λ⃗)))
     N_min = I₁_max / 3
-    lb = (Gc=-Inf, Ge=-Inf, N=-N_min)
+    lb = (Gc=-Inf, Ge=-Inf, N=N_min)
     ub = nothing
     return (lb=lb, ub=ub)
 end
@@ -2107,16 +2189,30 @@ Model: ``(1-\\rho)W_{3Chain}+\\rho W_{8chain}``
 [^2]: > Wu PD, van der Giessen E. On improved 3-D non-Gaussian network models for rubber elasticity. Mechanics research communications. 1992 Sep 1;19(5):427-33.
 [^3]: > Wu PD, Van Der Giessen E. On improved network models for rubber elasticity and their applications to orientation hardening in glassy polymers. Journal of the Mechanics and Physics of Solids. 1993 Mar 1;41(3):427-56.
 """
-struct FullNetwork <: AbstractHyperelasticModel end
+struct FullNetwork <: AbstractHyperelasticModel
+    ℒinv::Function
+    FullNetwork(; ℒinv::Function=TreloarApproximation) = new(ℒinv)
+end
 
 function StrainEnergyDensityFunction(ψ::FullNetwork, (; μ, N, ρ))
-    W3 = StrainEnergyDensityFunction(ThreeChainModel(), (μ=μ, N=N))
-    W8 = StrainEnergyDensityFunction(ArrudaBoyce(), (μ=μ, N=N))
+    W3 = StrainEnergyDensityFunction(ThreeChainModel(ℒinv=ψ.ℒinv), (μ=μ, N=N))
+    W8 = StrainEnergyDensityFunction(ArrudaBoyce(ℒinv=ψ.ℒinv), (μ=μ, N=N))
     W(λ⃗) = (1 - ρ) * W3(λ⃗) + ρ * W8(λ⃗)
 end
 
 function parameters(ψ::FullNetwork)
     return (:μ, :N, :ρ)
+end
+
+function parameter_bounds(ψ::FullNetwork, data::AbstractHyperelasticData)
+    I₁_max = maximum(I₁.(collect.(data.λ⃗)))
+    λ_max = maximum(maximum.(collect.(data.λ⃗)))
+    N₁ = λ_max^2
+    N₂ = I₁_max / 3
+    N_min = (N₁ > N₂) ? N₁ : N₂
+    lb = (μ=-Inf, N=N_min, ρ=-Inf)
+    ub = nothing
+    return (lb=lb, ub=ub)
 end
 
 """
@@ -2128,13 +2224,16 @@ Model: ``\\sqrt{\\frac{N_3+N_8}{2N_3}}W_{3Chain}+\\sqrt{\\frac{I_1}{3N_8}}W_{8Ch
 
 [^1]: > Elı́as-Zúñiga A, Beatty MF. Constitutive equations for amended non-Gaussian network models of rubber elasticity. International journal of engineering science. 2002 Dec 1;40(20):2265-94.
 """
-struct ZunigaBeatty <: AbstractHyperelasticModel end
+struct ZunigaBeatty <: AbstractHyperelasticModel
+    ℒinv::Function
+    ZunigaBeatty(; ℒinv::Function=TreloarApproximation) = new(ℒinv)
+end
 
 function StrainEnergyDensityFunction(ψ::ZunigaBeatty, (; μ, N₃, N₈))
     ΛL = √((N₃ + N₈) / 2)
     ρ₃ = ΛL / √(N₃)
-    W3 = StrainEnergyDensityFunction(ThreeChainModel(), (μ=μ, N=N₃))
-    W8 = StrainEnergyDensityFunction(ArrudaBoyce(), (μ=μ, N=N₈))
+    W3 = StrainEnergyDensityFunction(ThreeChainModel(ℒinv=ψ.ℒinv), (μ=μ, N=N₃))
+    W8 = StrainEnergyDensityFunction(ArrudaBoyce(ℒinv=ψ.ℒinv), (μ=μ, N=N₈))
     function W(λ⃗)
         Λch = 1 / √(3) * √(I₁(λ⃗))
         ρ₈ = Λch / √(N₈)
@@ -2146,6 +2245,15 @@ function parameters(ψ::ZunigaBeatty)
     return (:μ, :N₃, :N₈)
 end
 
+function parameter_bounds(ψ::ZunigaBeatty, data::AbstractHyperelasticData)
+    λ_max = maximum(maximum.(collect.(data.λ⃗)))
+    I₁_max = maximum(I₁.(collect.(data.λ⃗)))
+    N₃_min = λ_max^2
+    N₈_min = I₁_max / 3
+    lb = (μ=-Inf, N₃=N₃_min, N₈=N₈_min)
+    ub = nothing
+    return (lb=lb, ub=ub)
+end
 """
 Lim [^1]
 
@@ -2155,11 +2263,14 @@ Model: ``(1-f(\\frac{I_1-3}{\\hat{I_1}-3}))W_{NeoHookean}(μ₁)+fW_{ArrudaBoyce
 
 [^1]: > Lim GT. Scratch behavior of polymers. Texas A&M University; 2005.
 """
-struct Lim <: AbstractHyperelasticModel end
+struct Lim <: AbstractHyperelasticModel
+    ℒinv::Function
+    Lim(; ℒinv::Function=TreloarApproximation) = new(ℒinv)
+end
 
 function StrainEnergyDensityFunction(ψ::Lim, (; μ₁, μ₂, N, Î₁))
     Wg = StrainEnergyDensityFunction(NeoHookean(), (μ=μ₁,))
-    W8 = StrainEnergyDensityFunction(ArrudaBoyce(), (μ=μ₂, N=N))
+    W8 = StrainEnergyDensityFunction(ArrudaBoyce(ℒinv=ψ.ℒinv), (μ=μ₂, N=N))
     f(x) = x^3 * (10 - 15x + 6x^2)
     function W(λ⃗)
         ζ = (I₁(λ⃗) - 3) / (Î₁ - 3)
@@ -2169,7 +2280,7 @@ end
 
 function StrainEnergyDensityFunction(ψ::Lim, (; μ₁, μ₂, N, Î₁), I::InvariantForm)
     Wg = StrainEnergyDensityFunction(NeoHookean(), (μ = μ₁), I)
-    W8 = StrainEnergyDensityFunction(ArrudaBoyce(), (μ=μ₂, N=N), I)
+    W8 = StrainEnergyDensityFunction(ArrudaBoyce(ℒinv=ψ.ℒinv), (μ=μ₂, N=N), I)
     f(x) = x^3 * (10 - 15x + 6x^2)
     function W(I⃗)
         ζ = (I⃗[1] - 3) / (Î₁ - 3)
@@ -2179,6 +2290,14 @@ end
 
 function parameters(ψ::Lim)
     return (:μ₁, :μ₂, :N, :Î₁)
+end
+
+function parameter_bounds(ψ::Lim, data::AbstractHyperelasticData)
+    I₁_max = maximum(I₁.(collect.(data.λ⃗)))
+    N_min = I₁_max / 3
+    lb = (μ₁=-Inf, μ₂=-Inf, N=N_min, Î₁=3)
+    ub = nothing
+    return (lb=lb, ub=ub)
 end
 
 """
@@ -2198,19 +2317,28 @@ Model:
 
 [^1]: > Bechir H, Chevalier L, Idjeri M. A three-dimensional network model for rubber elasticity: The effect of local entanglements constraints. International journal of engineering science. 2010 Mar 1;48(3):265-74.
 """
-struct BechirChevalier <: AbstractHyperelasticModel end
+struct BechirChevalier <: AbstractHyperelasticModel
+    ℒinv::Function
+    BechirChevalier(; ℒinv::Function=TreloarApproximation) = new(ℒinv)
+end
 
 function StrainEnergyDensityFunction(ψ::BechirChevalier, (; μ₀, η, ρ, N₃, N₈))
     μf = ρ * √(I₁ / 3 / N₈)
-    W3 = StrainEnergyDensityFunction(ThreeChainModel(), (μ=μf, N=N₃))
+    W3 = StrainEnergyDensityFunction(ThreeChainModel(ℒinv=ψ.ℒinv), (μ=μf, N=N₃))
     function W(λ⃗)
         α = maximum(λ⃗)
         μc = (1 - η * α / √(N₃)) * μ₀
-        W8 = StrainEnergyDensityFunction(ArrudaBoyce(), (μ=μc / 3, N=N₈))
+        W8 = StrainEnergyDensityFunction(ArrudaBoyce(ℒinv=ψ.ℒinv), (μ=μc / 3, N=N₈))
         W3(λ⃗) + W8(λ⃗)
     end
 end
 
 function parameters(ψ::BechirChevalier)
     return (:μ₀, :η, :ρ, :N₃, :N₈)
+end
+
+function parameter_bounds(ψ::BechirChevalier, data)
+    lb = (μ₀=-Inf, η=-Inf, ρ=-Inf, N₃=0, N=0)
+    ub = nothing
+    return (lb=lb, ub=ub)
 end

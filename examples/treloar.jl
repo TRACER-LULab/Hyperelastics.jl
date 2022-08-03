@@ -15,18 +15,19 @@ data = UniaxialHyperelasticData(s₁, λ₁)
 # $W(\vec{\lambda}) = -\frac{\mu J_m}{2}\log{\bigg(1-\frac{I_1-3}{J_m}\bigg)}$
 #
 # Initial guess for the parameters
-p₀ = ComponentVector(μ=1e5, Jₘ=55.0)
+ψ = Gent()
+p₀ = ComponentVector(μ=240e3, Jₘ=80.0)
 # Create the optimization problem and solve
 HEProblem = HyperelasticProblem(
     data,
-    Gent(),
+    ψ,
     p₀,
     [],
 )
 sol = solve(HEProblem, LBFGS())
 # $\mu$ = 240kPa, $J_m$ = 79.97
 # Predict the new stresses
-ŝ = NominalStressFunction(Gent(), sol.u)
+ŝ = NominalStressFunction(ψ, sol.u)
 ŝ₁ = getindex.(ŝ.(λ⃗_predict), 1)
 # Plot the Results
 scatter(
@@ -37,69 +38,70 @@ scatter(
 plot!(
     getindex.(λ⃗_predict, 1),
     ŝ₁ ./ 1e6,
-    label="Predicted Gent"
+    label="Predicted $(string(ψ))"
 )
 plot!(xlabel="Stretch", ylabel="Stress [MPa]", legend=:topleft) #src
 savefig("examples/gent.png") #src
 # ![Gent Plot](../examples/gent.png)
 
 # ## Using the EdwardVilgis Model
+ψ = EdwardVilgis()
 p₀ = ComponentVector(Ns=20e3, Nc=20e3, α=0.05, η=0.05)
 HEProblem = HyperelasticProblem(
     data,
-    EdwardVilgis(),
-    p₀,
-    []
-)
-sol = solve(HEProblem, Evolutionary.CMAES())
-#
-# Plot and compare the stresses
-ŝ = NominalStressFunction(EdwardVilgis(), sol.u)
-ŝ₁ = getindex.(ŝ.(λ⃗_predict), 1)
-plot!(
-    getindex.(λ⃗_predict, 1),
-    ŝ₁ ./ 1e6,
-    label="Predicted EdwardVilgis"
-)
-
-# ## Using the ExtendedTubeModel Model
-p₀ = ComponentVector(Gc=3e3, Ge=3e3, δ=0.04, β=1.0)
-HEProblem = HyperelasticProblem(
-    data,
-    ExtendedTubeModel(),
+    ψ,
     p₀,
     []
 )
 sol = solve(HEProblem, LBFGS())
-# $\mu$ = 534kPa
 #
 # Plot and compare the stresses
-ŝ = NominalStressFunction(ExtendedTubeModel(), sol.u)
+ŝ = NominalStressFunction(ψ, sol.u)
 ŝ₁ = getindex.(ŝ.(λ⃗_predict), 1)
 plot!(
     getindex.(λ⃗_predict, 1),
     ŝ₁ ./ 1e6,
-    label="Predicted ExtendedTubeModel"
+    label="Predicted $(string(ψ))"
 )
 
-# ## Using the DavidsonGoulbourne Model
-p₀ = ComponentVector(Gc=0.07e6, Ge=0.2e6, λmax=5.0)
+# ## Using the ModifiedFloryErman Model
+ψ = ModifiedFloryErman()
+p₀ = ComponentVector(μ=240e3, N = 60.0, κ = 100.0)
 HEProblem = HyperelasticProblem(
     data,
-    DavidsonGoulbourne(),
+    ψ,
     p₀,
     []
 )
-sol = solve(HEProblem, Evolutionary.CMAES(μ=10, λ=100))
-# $\mu$ = 534kPa
+sol = solve(HEProblem, LBFGS())
 #
 # Plot and compare the stresses
-ŝ = NominalStressFunction(DavidsonGoulbourne(), sol.u)
+ŝ = NominalStressFunction(ψ, sol.u)
 ŝ₁ = getindex.(ŝ.(λ⃗_predict), 1)
 plot!(
     getindex.(λ⃗_predict, 1),
     ŝ₁ ./ 1e6,
-    label="Predicted DavidsonGoulbourne"
+    label="Predicted ModifiedFloryErman"
+)
+
+# ## Using the MCC Model
+RGBA(0.0, 1.0, 2.0, 0.1)|>typeof|>fieldnames;ψ = MCC()
+p₀ = ComponentVector(κ=100000000.0, μkT=10e3, ζkT=10e3)
+HEProblem = HyperelasticProblem(
+    data,
+    ψ,
+    p₀,
+    []
+)
+sol = solve(HEProblem, LBFGS())
+#
+# Plot and compare the stresses
+ŝ = NominalStressFunction(ψ, sol.u)
+ŝ₁ = getindex.(ŝ.(λ⃗_predict), 1)
+plot!(
+    getindex.(λ⃗_predict, 1),
+    ŝ₁ ./ 1e6,
+    label="Predicted $(string(ψ))"
 )
 
 # ## Using the NeoHookean Model
@@ -140,45 +142,45 @@ savefig("examples/sussmanbathe.png") #src
 # ![Sussman Bathe Plot](../examples/sussmanbathe.png)
 plot!() #src
 # # Using Turing.jl for Parameter Estimation
-# using Turing, StatsPlots, LinearAlgebra
-# # Create the model for the distribution
-# struct ps{T}
-#     μ::T
-#     Jₘ::T
-# end
-# Jₘ_min = maximum(I₁.(collect.(data.λ⃗))) - 3
-# @model function fitHE(s₁, data)
-#     ## Prior Distributions
-#     σ ~ InverseGamma(1, 2) # noise in the measurement data
-#     μ ~ Normal(240e3, 20e3) # Normal for μ
-#     Jₘ ~ truncated(Normal(79.97, 8.0), lower=Jₘ_min) # Truncated Normal for Jₘ with lower bound
+using Turing, StatsPlots, LinearAlgebra
+# Create the model for the distribution
+struct ps{T}
+    μ::T
+    Jₘ::T
+end
+Jₘ_min = maximum(I₁.(collect.(data.λ⃗))) - 3
+@model function fitHE(s₁, data)
+    ## Prior Distributions
+    σ ~ InverseGamma(1, 2) # noise in the measurement data
+    μ ~ Normal(100e3, 50e3) # Normal for μ
+    Jₘ ~ truncated(Normal(300.0, 30.0), lower=Jₘ_min) # Truncated Normal for Jₘ with lower bound
 
-#     ## Simulate the data
-#     s⃗ = NominalStressFunction(Gent(), ComponentVector(μ=μ, Jₘ=Jₘ))
-#     ŝ₁ = @. getindex(s⃗(collect(data.λ⃗)), 1) # Sample the HE Model
+    ## Simulate the data
+    s⃗ = NominalStressFunction(Gent(), ComponentVector(μ=μ, Jₘ=Jₘ))
+    ŝ₁ = @. getindex(s⃗(collect(data.λ⃗)), 1) # Sample the HE Model
 
-#     ## Observations
-#     for (index, ŝ) in enumerate(ŝ₁)
-#         s₁[index] ~ MvNormal([ŝ], σ^2 * I)
-#     end
+    ## Observations
+    for (index, ŝ) in enumerate(ŝ₁)
+        s₁[index] ~ MvNormal([ŝ], σ^2 * I)
+    end
 
-#     return nothing
-# end
-# test_s = map(s -> [s], s₁)
-# model = fitHE(test_s, data)
-# # # Samble the distributions to fit the data and print the results
-# chain = sample(model, NUTS(0.65), MCMCThreads(), 100, 1, progress=false)
-# # $\mu$ = 245kPa ± 5.238kPa, $J_m$ = 80.9±1.1583
+    return nothing
+end
+test_s = map(s -> [s], s₁)
+model = fitHE(test_s, data)
+# # Samble the distributions to fit the data and print the results
+chain = sample(model, NUTS(0.65), MCMCThreads(), 6000, 4, progress=true)
+# $\mu$ = 245kPa ± 5.238kPa, $J_m$ = 80.9±1.1583
 
-# plot(chain)
-# savefig("examples/chain.png") #src
+plot(chain)
+savefig("examples/chain.png") #src
 # ![chain](../examples/chain.png)
 # Data Retrodiction to observe the results with 300 samples from the chain
 plot(legend=false, xlabel="Stretch", ylabel="Stress [MPa]") # src
 posterior_samples = sample(chain[[:μ, :Jₘ]], 500; replace=false)
 for p in eachrow(Array(posterior_samples))
-    s⃗ = NominalStressFunction(Gent(), (μ=p[μ], Jₘ=p[Jₘ]))
-    s_p = getindex.(s⃗̂.(collect.(λ⃗_predict)), 1)
+    s⃗ = NominalStressFunction(Gent(), (μ=p[1], Jₘ=p[2]))
+    s_p = getindex.(s⃗.(collect.(λ⃗_predict)), 1)
     plot!(getindex.(λ⃗_predict, 1), s_p ./ 1e6, alpha=0.1, color="#BBBBBB")
 end
 scatter!(λ₁, s₁ ./ 1e6, color=:black)
