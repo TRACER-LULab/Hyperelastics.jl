@@ -28,7 +28,5 @@ include("data_driven.jl")
 include("macro_micro_macro_model.jl")
 include("average_chain_behavior.jl")
 include("optimization_interface.jl")
-# include("GeneratedNominalStressFunctions.jl")
-# include("GeneratedTrueStressFunctions.jl")
 
 end
