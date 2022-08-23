@@ -2,7 +2,6 @@ using DataInterpolations
 using QuadGK
 using LinearAlgebra
 using LossFunctions
-using NonlinearSolve
 export SussmanBathe, LatoreeMontans, StabilitySmoothedSussmanBathe
 """
 Sussman Bathe[^1]

@@ -1653,7 +1653,7 @@ Model:
 """
 struct MCC <: AbstractHyperelasticModel end
 
-function StrainEnergyDensityFunction(ψ::MCC, (λ⃗, ; ζkT, μkT, κ))
+function StrainEnergyDensityFunction(ψ::MCC, λ⃗, (; ζkT, μkT, κ))
     @tullio B[i] := κ^2 * (λ⃗[i]^2 - 1) * (λ⃗[i]^2 + κ)^(-2)
     @tullio D[i] := λ⃗[i]^2 * B[i] / κ
     @tullio W1 := λ⃗[i]^2 - 1
