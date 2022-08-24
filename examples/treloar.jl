@@ -1,9 +1,26 @@
 # # Package Imports
 using Hyperelastics
-using Optimization, OptimizationOptimJL, ModelingToolkit, OptimizationMultistartOptimization
+using Optimization, OptimizationOptimJL
 using ComponentArrays
-using Plots
-pgfplotsx() #src
+using CairoMakie
+# #
+function Makie.plot(ch::Chains)
+    fig = Figure()
+    for (ind, param) in enumerate(ch.name_map.parameters)
+        ax = Makie.Axis(fig[ind, 1], xlabel=string(param))
+        for (ind2, datavec) in enumerate(eachcol(getindex(ch, param).data))
+            # Get current default colorpalette
+            colors = Makie.current_default_theme().attributes[:palette][][:color][]
+            Makie.density!(ax, datavec, color=(:black, 0.0),
+                strokearound=true,
+                strokewidth=2,
+                strokecolor=colors[ind2%length(colors)]
+            )
+        end
+    end
+    display(fig)
+    return fig
+end
 # # Treloar's Uniaxial Data
 s₁ = [0.0, 0.2856, 0.3833, 0.4658, 0.5935, 0.6609, 0.8409, 1.006, 1.2087, 1.5617, 1.915, 2.2985, 2.6519, 3.0205, 3.3816, 3.7351, 4.0812, 4.4501, 4.8414, 5.2026, 5.5639] * 1e6
 λ₁ = [1.0, 1.4273, 1.6163, 1.882, 2.1596, 2.4383, 3.0585, 3.6153, 4.1206, 4.852, 5.4053, 5.7925, 6.1803, 6.4787, 6.6627, 6.936, 7.133, 7.1769, 7.2712, 7.4425, 7.512]
@@ -27,21 +44,29 @@ HEProblem = HyperelasticProblem(
 sol = solve(HEProblem, LBFGS())
 # $\mu$ = 240kPa, $J_m$ = 79.97
 # Predict the new stresses
-ŝ = NominalStressFunction(ψ, sol.u)
-ŝ₁ = getindex.(ŝ.(λ⃗_predict), 1)
+function ŝ(λ⃗, ψ, p)
+    s⃗ = NominalStressFunction(ψ, λ⃗, p)
+    return s⃗ .- s⃗[3] .* λ⃗[3] ./ λ⃗
+end
+ŝ₁ = map(λ -> ŝ(λ, ψ, sol.u)[1], λ⃗_predict)
 # Plot the Results
-scatter(
+fig = Figure()
+ax = Makie.Axis(fig[1,1], xlabel = "Stretch", ylabel = "Stress [MPa]")
+scatter!(
+    ax,
     getindex.(data.λ⃗, 1),
     getindex.(data.s⃗, 1) ./ 1e6,
-    label="Experimental"
-)
-plot!(
+    label = "Experimental"
+    )
+
+lines!(
+    ax,
     getindex.(λ⃗_predict, 1),
-    ŝ₁ ./ 1e6,
-    label="Predicted $(string(ψ))"
+    ŝ₁./1e6,
+    label = "Predicted $(string(ψ)[1:end-2])"
 )
-plot!(xlabel="Stretch", ylabel="Stress [MPa]", legend=:topleft) #src
-savefig("examples/gent.png") #src
+current_figure()
+save("examples/"*string(ψ)[1:end-2]*".png", current_figure()) #src
 # ![Gent Plot](../examples/gent.png)
 
 # ## Using the EdwardVilgis Model
@@ -56,14 +81,14 @@ HEProblem = HyperelasticProblem(
 sol = solve(HEProblem, LBFGS())
 #
 # Plot and compare the stresses
-ŝ = NominalStressFunction(ψ, sol.u)
-ŝ₁ = getindex.(ŝ.(λ⃗_predict), 1)
-plot!(
+ŝ₁ = map(λ -> ŝ(λ, ψ, sol.u)[1], λ⃗_predict)
+lines!(
+    ax,
     getindex.(λ⃗_predict, 1),
     ŝ₁ ./ 1e6,
     label="Predicted $(string(ψ))"
 )
-
+current_figure()
 # ## Using the ModifiedFloryErman Model
 ψ = ModifiedFloryErman()
 p₀ = ComponentVector(μ=240e3, N = 60.0, κ = 100.0)
@@ -76,16 +101,15 @@ HEProblem = HyperelasticProblem(
 sol = solve(HEProblem, LBFGS())
 #
 # Plot and compare the stresses
-ŝ = NominalStressFunction(ψ, sol.u)
-ŝ₁ = getindex.(ŝ.(λ⃗_predict), 1)
-plot!(
+ŝ₁ = map(λ -> ŝ(λ, ψ, sol.u)[1], λ⃗_predict)
+lines!(
     getindex.(λ⃗_predict, 1),
     ŝ₁ ./ 1e6,
     label="Predicted ModifiedFloryErman"
 )
-
+current_figure()
 # ## Using the MCC Model
-RGBA(0.0, 1.0, 2.0, 0.1)|>typeof|>fieldnames;ψ = MCC()
+ψ = MCC()
 p₀ = ComponentVector(κ=100000000.0, μkT=10e3, ζkT=10e3)
 HEProblem = HyperelasticProblem(
     data,
@@ -96,16 +120,17 @@ HEProblem = HyperelasticProblem(
 sol = solve(HEProblem, LBFGS())
 #
 # Plot and compare the stresses
-ŝ = NominalStressFunction(ψ, sol.u)
-ŝ₁ = getindex.(ŝ.(λ⃗_predict), 1)
-plot!(
+ŝ₁ = map(λ -> ŝ(λ, ψ, sol.u)[1], λ⃗_predict)
+lines!(
+    ax,
     getindex.(λ⃗_predict, 1),
     ŝ₁ ./ 1e6,
     label="Predicted $(string(ψ))"
 )
-
+current_figure()
 # ## Using the NeoHookean Model
 # $W(\vec{\lambda}) = \frac{\mu}{2}(I_1-3)$
+ψ = NeoHookean()
 p₀ = ComponentVector(μ=200e3)
 HEProblem = HyperelasticProblem(
     data,
@@ -117,15 +142,15 @@ sol = solve(HEProblem, LBFGS())
 # $\mu$ = 534kPa
 #
 # Plot and compare the stresses
-ŝ = NominalStressFunction(NeoHookean(), sol.u)
-ŝ₁ = getindex.(ŝ.(λ⃗_predict), 1)
-plot!(
+ŝ₁ = map(λ -> ŝ(λ, ψ, sol.u)[1], λ⃗_predict)
+lines!(
+    ax,
     getindex.(λ⃗_predict, 1),
     ŝ₁ ./ 1e6,
     label="Predicted NeoHookean"
 )
-savefig("examples/neohookean.png") #src
-# ![Neohookean Plot](../examples/neohookean.png)
+save("examples/" * string(ψ)[1:end-2] * ".png", current_figure()) #src
+# ![Neohookean Plot](../examples/NeoHookean.png)
 # ## Sussman-Bathe Model
 # $W(\vec{\lambda}) = \sum\limits_{i=1}^{3} w(\lambda_i)$
 s⃗ = NominalStressFunction(SussmanBathe(), (s⃗=data.s⃗, λ⃗=data.λ⃗, k=5))
@@ -156,8 +181,7 @@ Jₘ_min = maximum(I₁.(collect.(data.λ⃗))) - 3
     Jₘ ~ truncated(Normal(300.0, 30.0), lower=Jₘ_min) # Truncated Normal for Jₘ with lower bound
 
     ## Simulate the data
-    s⃗ = NominalStressFunction(Gent(), ComponentVector(μ=μ, Jₘ=Jₘ))
-    ŝ₁ = @. getindex(s⃗(collect(data.λ⃗)), 1) # Sample the HE Model
+    ŝ₁ = map(λ -> ŝ(λ, Gent(), ps(μ, Jₘ))[1], data.λ⃗)
 
     ## Observations
     for (index, ŝ) in enumerate(ŝ₁)
@@ -171,20 +195,20 @@ model = fitHE(test_s, data)
 # # Samble the distributions to fit the data and print the results
 chain = sample(model, NUTS(0.65), MCMCThreads(), 6000, 4, progress=true)
 # $\mu$ = 245kPa ± 5.238kPa, $J_m$ = 80.9±1.1583
-
-plot(chain)
-savefig("examples/chain.png") #src
+Makie.plot(chain)
+save("examples/chain.png", current_figure()) #src
 # ![chain](../examples/chain.png)
 # Data Retrodiction to observe the results with 300 samples from the chain
-plot(legend=false, xlabel="Stretch", ylabel="Stress [MPa]") # src
+fig = Figure()
+ax = Makie.Axis(fig[1,1], xlabel = "Stretch", ylabel = "Stress [MPa]")
 posterior_samples = sample(chain[[:μ, :Jₘ]], 500; replace=false)
 for p in eachrow(Array(posterior_samples))
-    s⃗ = NominalStressFunction(Gent(), (μ=p[1], Jₘ=p[2]))
-    s_p = getindex.(s⃗.(collect.(λ⃗_predict)), 1)
-    plot!(getindex.(λ⃗_predict, 1), s_p ./ 1e6, alpha=0.1, color="#BBBBBB")
+    ŝ₁ = map(λ -> ŝ(λ, Gent(), (μ=p[1], Jₘ=p[2]))[1],λ⃗_predict)
+    lines!(ax, getindex.(λ⃗_predict, 1), ŝ₁ ./ 1e6, alpha=0.1, color="#BBBBBB")
 end
-scatter!(λ₁, s₁ ./ 1e6, color=:black)
-savefig("examples/dataretrodiction.png") #src
+scatter!(ax, λ₁, s₁ ./ 1e6, color=:black)
+current_figure()
+save("examples/dataretrodiction.png", current_figure()) #src
 # ![retrodiction](../examples/dataretrodiction.png)
 # # Generating partial derivatives of the SEF with Symbolics.jl
 using Symbolics
@@ -192,15 +216,15 @@ using Symbolics
 @syms μ Jₘ
 @syms λ₁ λ₂ λ₃
 # ## Make the symbolic model
-W = StrainEnergyDensityFunction(Gent(), (μ=μ, Jₘ=Jₘ))
+W = StrainEnergyDensityFunction(Gent(), [λ₁, λ₂, λ₃], (μ=μ, Jₘ=Jₘ))
 # ## Create the partial derivative operators for the principal stretches
 ∂λ = Differential.([λ₁, λ₂, λ₃])
 # ## Differentiate the SEF with respect to the principal stretches
-∂W∂λ = map(∂ -> ∂((W([λ₁, λ₂, λ₃]))), ∂λ)
+∂W∂λ = map(∂ -> ∂(W), ∂λ)
 ∂W∂λ = expand_derivatives.(∂W∂λ)
 # ## Create a function from the symbolic expression for each partial derivative
 # Using the mean values from the Bayesian Parameter Estimation as the material properties
-∂W∂λ = substitute.(∂W∂λ, (Dict(μ => 240e3, Jₘ => 79.97),))
+∂W∂λ = substitute.(∂W∂λ, (Dict(μ => mean(chain[:μ]), Jₘ => mean(chain[:Jₘ])),))
 ∂W∂λ = simplify.(∂W∂λ)
 ∂W∂λ = map(∂ -> build_function(∂, [λ₁, λ₂, λ₃], expression=Val{false}), ∂W∂λ)
 # Predict the results
@@ -209,6 +233,7 @@ s⃗_predict = map(λ -> map(∂ -> ∂(λ), ∂W∂λ), λ⃗_predict)
 σ₁ = getindex.(σ⃗_predict, 1) - getindex.(σ⃗_predict, 3)
 s1 = σ₁ ./ getindex.(λ⃗_predict, 1)
 # Plot the results
-plot!(getindex.(λ⃗_predict, 1), s1 ./ 1e6, color=:red, label="Symbolic mean")
-savefig("examples/symbolic_plot.png") #src
+lines!(ax, getindex.(λ⃗_predict, 1), s1 ./ 1e6, color=:red, label="Symbolic mean")
+current_figure()
+save("examples/symbolic_plot.png", current_figure()) #src
 # ![symbolic](../examples/symbolic_plot.png)

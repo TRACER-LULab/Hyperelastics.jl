@@ -3,20 +3,22 @@ UniaxialHyperelasticData(s₁, λ₁)
 
 Create a uniaxial hyperelastic data object from arrays of test data. The function returns a HyperelasticData object with the stresses and principal stretches. Currently, this assumes the material is incompressible.
 """
-struct UniaxialHyperelasticData <: AbstractHyperelasticData
-    s⃗
-    λ⃗
-    UniaxialHyperelasticData(s⃗, λ⃗) =
-        let
-            s⃗ = zip(s⃗)
-            λ⃗ = zip(λ⃗, (λ⃗) .^ (-0.5), (λ⃗) .^ (-0.5))
-            new(s⃗, λ⃗)
-        end
+struct UniaxialHyperelasticData{T} <: AbstractHyperelasticData
+    s⃗::T
+    λ⃗::T
+    function UniaxialHyperelasticData(s₁, λ₁)
+        @assert length(s₁) == length(λ₁) "Length of stress must be equal to the length of the stretches"
+        f(x) = [x, 1/√x, 1/√x]
+        λ⃗ = map(f, λ₁)
+        g(x) = [x]
+        s⃗ = map(g, s₁)
+        return new{promote_type(typeof(s⃗), typeof(λ⃗))}(s⃗, λ⃗)
+    end
 end
 
-struct BiaxialHyperelasticData <: AbstractHyperelasticData
-    s⃗
-    λ⃗
+struct BiaxialHyperelasticData{T} <: AbstractHyperelasticData
+    s⃗::T
+    λ⃗::T
 end
 
 """
@@ -25,7 +27,9 @@ BiaxialHyperelasticData(s₁, s₂, λ₁, λ₂)
 Create a biaxial hyperelastic data object from arrays of test data. The function returns a HyperelasticData object with the stresses and principal stretches. Currently, this assumes the material is incompressible.
 """
 function BiaxialHyperelasticData(s₁, s₂, λ₁, λ₂)
-    s⃗ = zip(s₁, s₂)
-    λ⃗ = zip(λ₁, λ₂, (λ₁ .* λ₂) .^ (-1))
-    return BiaxialHyperelasticData(s⃗, λ⃗)
+    f(x) = [x[1], x[2], 1/x[1]/x[2]]
+    λ⃗ = map(f, zip(λ₁, λ₂))
+    g(x) = [x[1], x[2]]
+    s⃗ = map(g, zip(s₁, s₂))
+    return BiaxialHyperelasticData{promote_type(typeof(s⃗), typeof(λ⃗))}(s⃗, λ⃗)
 end

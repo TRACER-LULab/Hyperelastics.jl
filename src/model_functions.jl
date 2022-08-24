@@ -28,9 +28,11 @@ Return a function for the nominal (2nd Piola Kirchoff) Stress Function  for the 
 """
 function NominalStressFunction(ψ::AbstractHyperelasticModel, λ⃗, p; adb=AD.ForwardDiffBackend())
     W(λ⃗) = StrainEnergyDensityFunction(ψ, λ⃗, p)
-    ∂W∂λᵢ = AD.gradient(adb, W, λ⃗)[1]
-    sᵢ = ∂W∂λᵢ .- ∂W∂λᵢ[3] .* λ⃗[3] ./ λ⃗
-    return sᵢ
+    ∂W∂λ = AD.gradient(adb, W, λ⃗)[1]
+    # @tullio Δs[i,j] := (∂W∂λ[i]*λ⃗[i] - ∂W∂λ[j]*λ⃗[j])/λ⃗[i]
+    # # sᵢ = ∂W∂λ .- ∂W∂λ[3] .* λ⃗[3] ./ λ⃗
+    # # return sᵢ
+    # Δs
 end
 
 """
@@ -41,9 +43,9 @@ Return a function for the true (Cauchy) Stress Function  for the hyperelastic mo
 """
 function TrueStressFunction(ψ::AbstractHyperelasticModel, λ⃗, p; adb=AD.ForwardDiffBackend())
     W(λ⃗) = StrainEnergyDensityFunction(ψ, λ⃗, p)
-    ∂W∂λᵢ = AD.gradient(adb, W, λ⃗)[1]
-    σᵢ = ∂W∂λᵢ .* λ⃗ .- ∂W∂λᵢ[3] * λ⃗[3]
-    return σᵢ
+    ∂W∂λ = AD.gradient(adb, W, λ⃗)[1]
+    σ = ∂W∂λ.*λ⃗
+    return σ
 end
 
 function parameters(ψ::AbstractHyperelasticModel)
