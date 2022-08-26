@@ -3,6 +3,7 @@ using Hyperelastics
 using Optimization, OptimizationOptimJL
 using ComponentArrays
 using CairoMakie
+using Turing
 # #
 function Makie.plot(ch::Chains)
     fig = Figure()
@@ -51,22 +52,22 @@ end
 ŝ₁ = map(λ -> ŝ(λ, ψ, sol.u)[1], λ⃗_predict)
 # Plot the Results
 fig = Figure()
-ax = Makie.Axis(fig[1,1], xlabel = "Stretch", ylabel = "Stress [MPa]")
+ax = Makie.Axis(fig[1, 1], xlabel="Stretch", ylabel="Stress [MPa]")
 scatter!(
     ax,
     getindex.(data.λ⃗, 1),
     getindex.(data.s⃗, 1) ./ 1e6,
-    label = "Experimental"
-    )
+    label="Experimental"
+)
 
 lines!(
     ax,
     getindex.(λ⃗_predict, 1),
-    ŝ₁./1e6,
-    label = "Predicted $(string(ψ)[1:end-2])"
+    ŝ₁ ./ 1e6,
+    label="Predicted $(string(ψ)[1:end-2])"
 )
 current_figure()
-save("examples/"*string(ψ)[1:end-2]*".png", current_figure()) #src
+save("examples/" * string(ψ)[1:end-2] * ".png", current_figure()) #src
 # ![Gent Plot](../examples/gent.png)
 
 # ## Using the EdwardVilgis Model
@@ -91,7 +92,7 @@ lines!(
 current_figure()
 # ## Using the ModifiedFloryErman Model
 ψ = ModifiedFloryErman()
-p₀ = ComponentVector(μ=240e3, N = 60.0, κ = 100.0)
+p₀ = ComponentVector(μ=240e3, N=60.0, κ=100.0)
 HEProblem = HyperelasticProblem(
     data,
     ψ,
@@ -167,17 +168,24 @@ savefig("examples/sussmanbathe.png") #src
 # ![Sussman Bathe Plot](../examples/sussmanbathe.png)
 plot!() #src
 # # Using Turing.jl for Parameter Estimation
-using Turing, StatsPlots, LinearAlgebra
-# Create the model for the distribution
+using Turing, Distributions, LinearAlgebra
+using MCMCChains, SciMLExpectations, KernelDensity
+using Cuba
+Turing.setadbackend(:forwarddiff)
+# Create a type to store the parameters used to simulate the data.
 struct ps{T}
     μ::T
     Jₘ::T
 end
 Jₘ_min = maximum(I₁.(collect.(data.λ⃗))) - 3
+function ŝ(λ⃗, ψ, p)
+    s⃗ = NominalStressFunction(ψ, λ⃗, p)
+    return s⃗ .- s⃗[3] .* λ⃗[3] ./ λ⃗
+end
 @model function fitHE(s₁, data)
     ## Prior Distributions
     σ ~ InverseGamma(1, 2) # noise in the measurement data
-    μ ~ Normal(100e3, 50e3) # Normal for μ
+    μ ~ truncated(Normal(2.4e5, 0.5e5), 2.2e5, 2.6e5) # Normal for μ
     Jₘ ~ truncated(Normal(300.0, 30.0), lower=Jₘ_min) # Truncated Normal for Jₘ with lower bound
 
     ## Simulate the data
@@ -200,16 +208,26 @@ save("examples/chain.png", current_figure()) #src
 # ![chain](../examples/chain.png)
 # Data Retrodiction to observe the results with 300 samples from the chain
 fig = Figure()
-ax = Makie.Axis(fig[1,1], xlabel = "Stretch", ylabel = "Stress [MPa]")
-posterior_samples = sample(chain[[:μ, :Jₘ]], 500; replace=false)
+ax = Makie.Axis(fig[1, 1], xlabel="Stretch", ylabel="Stress [MPa]")
+posterior_samples = sample(chain[[:μ, :Jₘ]], 1000; replace=false)
 for p in eachrow(Array(posterior_samples))
-    ŝ₁ = map(λ -> ŝ(λ, Gent(), (μ=p[1], Jₘ=p[2]))[1],λ⃗_predict)
+    ŝ₁ = map(λ -> ŝ(λ, Gent(), (μ=p[1], Jₘ=p[2]))[1], λ⃗_predict)
     lines!(ax, getindex.(λ⃗_predict, 1), ŝ₁ ./ 1e6, alpha=0.1, color="#BBBBBB")
 end
 scatter!(ax, λ₁, s₁ ./ 1e6, color=:black)
 current_figure()
 save("examples/dataretrodiction.png", current_figure()) #src
 # ![retrodiction](../examples/dataretrodiction.png)
+# # Analysing the final distribution at the last data point
+fig = Figure()
+ax = Makie.Axis(fig[1, 1], xlabel="Stress [MPa]", ylabel="Probability")
+posterior_samples = sample(chain[[:μ, :Jₘ]], 2000; replace=false)
+μ_dist = kde(vec(Array(chain[:μ])))
+Jₘ_dist = kde(vec(Array(chain[:Jₘ])))
+s(x) = ŝ(λ⃗_predict[end], Gent(), ps(μ_dist(1), x[2]))[1]
+s₁_values = map(x-> s(x), eachrow(Array(posterior_samples)))
+density!(ax, s₁_values, color=(:slategray, 0.4))
+current_figure()
 # # Generating partial derivatives of the SEF with Symbolics.jl
 using Symbolics
 # ## Create the symbolic variables required
