@@ -24,9 +24,9 @@ function StrainEnergyDensityFunction(ψ::GeneralMooneyRivlin, I⃗, (; C), I::In
     return W
 end
 
-function parameters(ψ::GeneralMooneyRivlin)
-    return (:C,)
-end
+parameters(ψ::GeneralMooneyRivlin) = (:C,)
+
+citation(ψ::GeneralMooneyRivlin) = get_citation("mooney1940theory")
 
 """
 General Darijani Naghdabadi [^1]
@@ -50,6 +50,7 @@ function parameters(ψ::GeneralDarijaniNaghdabadi)
     return (:A⃗, :B⃗, :m⃗, :n⃗)
 end
 
+citation(ψ::GeneralDarijaniNaghdabadi) = get_citation("bahreman2015new")
 
 """
 General Beda [^1]
@@ -58,8 +59,7 @@ Parameters: C, K, α, β
 
 Model: ``\\sum\\limits_{i = 1}^{N}\\frac{C_i}{\\alpha_i}(I_1-3)^{\\alpha_i} + \\sum\\limits_{j=1}^{M}\\frac{K_j}{\\beta_j}(I_2-3)^{\\beta_j}``
 
-[^1]: > Beda T. Reconciling the funda
-mental phenomenological expression of the strain energy of rubber with established experimental facts. Journal of Polymer Science Part B: Polymer Physics. 2005 Jan 15;43(2):125-34.
+[^1]: > Beda T. Reconciling the fundamental phenomenological expression of the strain energy of rubber with established experimental facts. Journal of Polymer Science Part B: Polymer Physics. 2005 Jan 15;43(2):125-34.
 """
 struct GeneralBeda <: AbstractHyperelasticModel end
 
@@ -79,9 +79,9 @@ function StrainEnergyDensityFunction(ψ::GeneralBeda, I⃗, (; C, K, α, β), I:
     return W1 + W2
 end
 
-function parameters(ψ::GeneralBeda)
-    return (:C, :K, :α, :β)
-end
+parameters(ψ::GeneralBeda) = (:C, :K, :α, :β)
+
+citation(ψ::GeneralBeda) = get_citation("beda2005reconciling")
 
 """
 Mooney Rivlin Model [^1]
@@ -119,10 +119,9 @@ function StrainEnergyDensityFunction(ψ::MooneyRivlin, I⃗, (; C10, C01), I::In
     )
 end
 
-function parameters(ψ::MooneyRivlin)
-    return (:C10, :C01)
-end
+parameters(ψ::MooneyRivlin) = (:C10, :C01)
 
+citation(ψ::MooneyRivlin) = get_citation("mooney1940theory")
 
 """
 NeoHookean [^1]
@@ -143,9 +142,9 @@ function StrainEnergyDensityFunction(ψ::NeoHookean, I⃗, (; μ), I::InvariantF
     μ / 2 * (I⃗[1] - 3)
 end
 
-function parameters(ψ::NeoHookean)
-    return (:μ,)
-end
+parameters(ψ::NeoHookean) = (:μ,)
+
+citation(ψ::NeoHookean) = get_citation("treloar1943elasticity")
 
 """
 Isihara [^1]
@@ -183,9 +182,9 @@ function StrainEnergyDensityFunction(ψ::Isihara, I⃗, (; C10, C20, C01), I::In
     )
 end
 
-function parameters(ψ::Isihara)
-    return (:C10, :C20, :C01)
-end
+parameters(ψ::Isihara) = (:C10, :C20, :C01)
+
+citation(ψ::Isihara) = get_citation("isihara1951statistical")
 
 """
 Biderman [^1]
@@ -223,9 +222,9 @@ function StrainEnergyDensityFunction(ψ::Biderman, I⃗, (; C10, C01, C20, C30),
     )
 end
 
-function parameters(ψ::Biderman)
-    return (:C10, :C01, :C20, :C30)
-end
+parameters(ψ::Biderman) = (:C10, :C01, :C20, :C30)
+
+citation(ψ::Biderman) = get_citation("biderman1958calculation")
 
 """
 James-Green-Simpson [^1]
@@ -263,9 +262,9 @@ function StrainEnergyDensityFunction(ψ::JamesGreenSimpson, I⃗, (; C10, C01, C
     )
 end
 
-function parameters(ψ::JamesGreenSimpson)
-    return (:C10, :C01, :C11, :C20, :C30)
-end
+parameters(ψ::JamesGreenSimpson) = (:C10, :C01, :C11, :C20, :C30)
+
+citation(ψ::JamesGreenSimpson) = get_citation("james1975strain")
 
 """
 Haines-Wilson [^1]
@@ -305,9 +304,9 @@ function StrainEnergyDensityFunction(ψ::HainesWilson, I⃗, (; C10, C01, C11, C
     )
 end
 
-function parameters(ψ::HainesWilson)
-    return (:C10, :C01, :C11, :C02, :C20, :C30)
-end
+parameters(ψ::HainesWilson) = (:C10, :C01, :C11, :C02, :C20, :C30)
+
+citation(ψ::HainesWilson) = get_citation("haines1979strain")
 
 """
 Yeoh [^1]
@@ -337,9 +336,9 @@ function StrainEnergyDensityFunction(ψ::Yeoh, I⃗, (; C10, C20, C30), I::Invar
     )
 end
 
-function parameters(ψ::Yeoh)
-    return (:C10, :C20, :C30)
-end
+parameters(ψ::Yeoh) = (:C10, :C20, :C30)
+
+citation(ψ::Yeoh) = get_citation("yeoh1990characterization")
 
 """
 Lion [^1]
@@ -375,9 +374,9 @@ function StrainEnergyDensityFunction(ψ::Lion, I⃗, (; C10, C01, C50), I::Invar
     )
 end
 
-function parameters(ψ::Lion)
-    return (:C10, :C01, :C50)
-end
+parameters(ψ::Lion) = (:C10, :C01, :C50)
+
+citation(ψ::Lion) = get_citation("lion1997large")
 
 
 """
@@ -417,9 +416,9 @@ function StrainEnergyDensityFunction(ψ::HauptSedlan, I⃗, (; C10, C01, C11, C0
     )
 end
 
-function parameters(ψ::HauptSedlan)
-    return (:C10, :C01, :C11, :C02, :C30)
-end
+parameters(ψ::HauptSedlan) = (:C10, :C01, :C11, :C02, :C30)
+
+citation(ψ::HauptSedlan) = get_citation("haupt2001viscoplasticity")
 
 """
 Hartmann-Neff [^1]
@@ -444,9 +443,9 @@ function StrainEnergyDensityFunction(ψ::HartmannNeff, I⃗, (; α, Ci⃗0, C0j�
     return W1 + W2 + α * (I⃗[1]^3 - 3^3)
 end
 
-function parameters(ψ::HartmannNeff)
-    return (:α, :Ci⃗0, :C0j⃗)
-end
+parameters(ψ::HartmannNeff) = (:α, :Ci⃗0, :C0j⃗)
+
+citation(ψ::HartmannNeff) = get_citation("carroll2011strain")
 
 """
 Carroll [^1]
@@ -467,9 +466,9 @@ function StrainEnergyDensityFunction(ψ::Carroll, I⃗, (; A, B, C), I::Invarian
     A * I⃗[1] + B * I⃗[1]^4 + C * I⃗[2]^(1 / 2)
 end
 
-function parameters(ψ::Carroll)
-    return (:A, :B, :C)
-end
+parameters(ψ::Carroll) = (:A, :B, :C)
+
+citation(ψ::Carroll) = get_citation("carroll2011strain")
 
 """
 Bahreman Darijani [^1]
@@ -495,9 +494,9 @@ function StrainEnergyDensityFunction(ψ::BahremanDarijani, λ⃗, (; A2, B2, A4,
     )
 end
 
-function parameters(ψ::BahremanDarijani)
-    return (:A2, :B2, :A4, :A6)
-end
+parameters(ψ::BahremanDarijani) = (:A2, :B2, :A4, :A6)
+
+citation(ψ::BahremanDarijani) = get_citation("bahreman2015new")
 
 """
 Zhao [^1]
@@ -518,9 +517,9 @@ function StrainEnergyDensityFunction(ψ::Zhao, (; C₋₁¹, C₁¹, C₂¹, C�
     C₋₁¹ * (I⃗[2] - 3) + C₁¹ * (I⃗[1] - 3) + C₂¹ * (I⃗[1]^2 - 2I⃗[2] - 3) + C₂² * (I⃗[1]^2 - 2I⃗[2] - 3)^2
 end
 
-function parameters(ψ::Zhao)
-    return (:C₋₁¹, :C₁¹, :C₂¹, :C₂²)
-end
+parameters(ψ::Zhao) = (:C₋₁¹, :C₁¹, :C₂¹, :C₂²)
+
+citation(ψ::Zhao) = get_citation("zhao2019modeling")
 
 """
 Knowles [^1]
@@ -542,15 +541,15 @@ function StrainEnergyDensityFunction(ψ::Knowles, I⃗, (; μ, b, n), I::Invaria
 end
 
 
-function parameters(ψ::Knowles)
-    return (:μ, :b, :n)
-end
+parameters(ψ::Knowles) = (:μ, :b, :n)
 
 function parameter_bounds(ψ::Knowles, data::AbstractHyperelasticData)
     lb = (μ=-Inf, b=0, n=0)
     ub = nothing
     return (lb=lb, ub=ub)
 end
+
+citation(ψ::Knowles) = get_citation("knowles1977finite")
 
 """
 Swanson [^1]
@@ -573,9 +572,9 @@ function StrainEnergyDensityFunction(ψ::Swanson, I⃗, (; A⃗, α⃗, B⃗, β
     @tullio _ := 3 / 2 * (A⃗[i] / (1 + α⃗[i]) * (I⃗[1] / 3)^(1 + α⃗[i]) + B⃗[i] / (1 + β⃗[i]) * (I⃗[2] / 3)^(1 + β⃗[i]))
 end
 
-function parameters(ψ::Swanson)
-    return (:A⃗, :α⃗, :B⃗, :β⃗)
-end
+parameters(ψ::Swanson) = (:A⃗, :α⃗, :B⃗, :β⃗)
+
+citation(ψ::Swanson) = get_citation("swanson1985constitutive")
 
 """
 Yamashita-Kawabata [^1]
@@ -596,9 +595,9 @@ function StrainEnergyDensityFunction(ψ::YamashitaKawabata, I⃗, (; C1, C2, C3,
     1 * (I⃗[1] - 3) + C2 * (I⃗[2] - 3) + C3 / (N + 1) * (I⃗[1] - 3)^(N + 1)
 end
 
-function parameters(ψ::YamashitaKawabata)
-    return (:C1, :C2, :C3, :N)
-end
+parameters(ψ::YamashitaKawabata)  = (:C1, :C2, :C3, :N)
+
+citation(ψ::YamashitaKawabata) = get_citation("yamashita1992approximated")
 
 """
 Davis-DeThomas [^1]

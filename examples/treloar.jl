@@ -1,28 +1,8 @@
 # # Package Imports
 using Hyperelastics
-using Optimization, OptimizationOptimJL
-using ComponentArrays
+using Optimization, OptimizationOptimJL, ComponentArrays
 using CairoMakie
-using Turing
-# #
-function Makie.plot(ch::Chains)
-    fig = Figure()
-    for (ind, param) in enumerate(ch.name_map.parameters)
-        ax = Makie.Axis(fig[ind, 1], xlabel=string(param))
-        for (ind2, datavec) in enumerate(eachcol(getindex(ch, param).data))
-            # Get current default colorpalette
-            colors = Makie.current_default_theme().attributes[:palette][][:color][]
-            Makie.density!(ax, datavec, color=(:black, 0.0),
-                strokearound=true,
-                strokewidth=2,
-                strokecolor=colors[ind2%length(colors)]
-            )
-        end
-    end
-    display(fig)
-    return fig
-end
-# # Treloar's Uniaxial Data
+# # Treloar's UnPiaxial Data
 s₁ = [0.0, 0.2856, 0.3833, 0.4658, 0.5935, 0.6609, 0.8409, 1.006, 1.2087, 1.5617, 1.915, 2.2985, 2.6519, 3.0205, 3.3816, 3.7351, 4.0812, 4.4501, 4.8414, 5.2026, 5.5639] * 1e6
 λ₁ = [1.0, 1.4273, 1.6163, 1.882, 2.1596, 2.4383, 3.0585, 3.6153, 4.1206, 4.852, 5.4053, 5.7925, 6.1803, 6.4787, 6.6627, 6.936, 7.133, 7.1769, 7.2712, 7.4425, 7.512]
 λ⃗_predict = collect(map(x -> [x, 1 / √x, 1 / √x], range(minimum(λ₁), maximum(λ₁), length=30)))
@@ -172,6 +152,23 @@ using Turing, Distributions, LinearAlgebra
 using MCMCChains, SciMLExpectations, KernelDensity
 using Cuba
 Turing.setadbackend(:forwarddiff)
+function Makie.plot(ch::Chains)
+    fig = Figure()
+    for (ind, param) in enumerate(ch.name_map.parameters)
+        ax = Makie.Axis(fig[ind, 1], xlabel=string(param))
+        for (ind2, datavec) in enumerate(eachcol(getindex(ch, param).data))
+            # Get current default colorpalette
+            colors = Makie.current_default_theme().attributes[:palette][][:color][]
+            Makie.density!(ax, datavec, color=(:black, 0.0),
+                strokearound=true,
+                strokewidth=2,
+                strokecolor=colors[ind2%length(colors)]
+            )
+        end
+    end
+    display(fig)
+    return fig
+end
 # Create a type to store the parameters used to simulate the data.
 struct ps{T}
     μ::T
