@@ -29,6 +29,7 @@ Return a function for the nominal (2nd Piola Kirchoff) Stress Function  for the 
 function NominalStressFunction(ψ::AbstractHyperelasticModel, λ⃗, p; adb=AD.ForwardDiffBackend())
     W(λ⃗) = StrainEnergyDensityFunction(ψ, λ⃗, p)
     ∂W∂λ = AD.gradient(adb, W, λ⃗)[1]
+    return ∂W∂λ
     # @tullio Δs[i,j] := (∂W∂λ[i]*λ⃗[i] - ∂W∂λ[j]*λ⃗[j])/λ⃗[i]
     # # sᵢ = ∂W∂λ .- ∂W∂λ[3] .* λ⃗[3] ./ λ⃗
     # # return sᵢ
@@ -78,7 +79,7 @@ function citation(ψ::AbstractHyperelasticModel)
     @error "model $(ψ) does not have a citation defined in the bib file. Please file an issue to have the citation added"
 end
 
-function get_citation(s:AbstractString)
+function get_citation(s::AbstractString)
     bib_file = import_bibtex("../CITATIONS.bib")
     export_bibtex(bib_file[s])
 end

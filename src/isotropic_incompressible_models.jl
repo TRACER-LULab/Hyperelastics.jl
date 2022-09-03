@@ -595,7 +595,7 @@ function StrainEnergyDensityFunction(ψ::YamashitaKawabata, I⃗, (; C1, C2, C3,
     1 * (I⃗[1] - 3) + C2 * (I⃗[2] - 3) + C3 / (N + 1) * (I⃗[1] - 3)^(N + 1)
 end
 
-parameters(ψ::YamashitaKawabata)  = (:C1, :C2, :C3, :N)
+parameters(ψ::YamashitaKawabata) = (:C1, :C2, :C3, :N)
 
 citation(ψ::YamashitaKawabata) = get_citation("yamashita1992approximated")
 
@@ -1760,7 +1760,7 @@ Model: ``\\mu\\bigg(\\frac{1}{2}(I_1-3)+\\frac{I_1^2-9}{20N}+\\frac{11(I_1^3-27)
 """
 struct ArrudaBoyce <: AbstractHyperelasticModel
     ℒinv::Function
-    ArrudaBoyce(; ℒinv::Function=TreloarApproximation) = new(ℒinv)
+    ArrudaBoyce(; ℒinv::Function=ArrudaApproximation) = new(ℒinv)
 end
 
 function StrainEnergyDensityFunction(ψ::ArrudaBoyce, λ⃗, (; μ, N))
@@ -2127,10 +2127,45 @@ Model: ``G_c N \\log\\bigg(\\frac{3N+\\frac{1}{2}I_1}{3N-I_1}\\bigg)+G_e\\sum\\l
 
 [^1]: > Xiang Y, Zhong D, Wang P, Mao G, Yu H, Qu S. A general constitutive model of soft elastomers. Journal of the Mechanics and Physics of Solids. 2018 Aug 1;117:110-22.
 """
+struct GeneralConstitutiveModel_Network <: AbstractHyperelasticModel end
+
+function StrainEnergyDensityFunction(ψ::GeneralConstitutiveModel_Network, λ⃗, (; Gc, N))
+    I1 = I₁(λ⃗)
+    Gc * N * log((3 * N + 0.5 * I1) / (3 * N - I1))
+end
+
+function parameters(ψ::GeneralConstitutiveModel_Network)
+    return (:Gc, :N)
+end
+
+function parameter_bounds(ψ::GeneralConstitutiveModel_Network, data::AbstractHyperelasticData)
+    I₁_max = maximum(I₁.(collect.(data.λ⃗)))
+    N_min = I₁_max / 3
+    lb = (Gc=-Inf, N=N_min)
+    ub = nothing
+    return (lb=lb, ub=ub)
+end
+
+struct GeneralConstitutiveModel_Tube <: AbstractHyperelasticModel end
+
+function StrainEnergyDensityFunction(ψ::GeneralConstitutiveModel_Tube, λ⃗, (; Ge))
+    @tullio W := Ge/λ⃗[i]
+end
+
+function parameters(ψ::GeneralConstitutiveModel_Tube)
+    return (:Ge,)
+end
+
+function parameter_bounds(ψ::GeneralConstitutiveModel_Tube, data::AbstractHyperelasticData)
+    lb = nothing
+    ub = nothing
+    return (lb=lb, ub=ub)
+end
+
 struct GeneralConstitutiveModel <: AbstractHyperelasticModel end
 
-function StrainEnergyDensityFunction(ψ::GeneralConstitutiveModel, λ⃗, (; Gc, Ge, N))
-    Gc * N * log((3N + 0.5 * I₁(λ⃗)) / (3N - I₁(λ⃗))) + Ge * sum(λ⃗ .^ (-1))
+function StrainEnergyDensityFunction(ψ::GeneralConstitutiveModel, λ⃗, ps)
+    StrainEnergyDensityFunction(GeneralConstitutiveModel_Network(), λ⃗, ps) + StrainEnergyDensityFunction(GeneralConstitutiveModel_Tube(), λ⃗, ps)
 end
 
 function parameters(ψ::GeneralConstitutiveModel)
@@ -2144,6 +2179,7 @@ function parameter_bounds(ψ::GeneralConstitutiveModel, data::AbstractHyperelast
     ub = nothing
     return (lb=lb, ub=ub)
 end
+
 
 """
 Full Network - Wu Geisson [^1][^2][^3]
