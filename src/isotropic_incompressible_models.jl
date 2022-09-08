@@ -2118,15 +2118,7 @@ function constraints(ψ::KhiemItskov, data::AbstractHyperelasticData)
     return f
 end
 
-"""
-General Constitutive Model [^1]
 
-Parameters: Gc, Ge, N
-
-Model: ``G_c N \\log\\bigg(\\frac{3N+\\frac{1}{2}I_1}{3N-I_1}\\bigg)+G_e\\sum\\limits_{i=1}^{3}\\frac{1}{\\lambda_I}``
-
-[^1]: > Xiang Y, Zhong D, Wang P, Mao G, Yu H, Qu S. A general constitutive model of soft elastomers. Journal of the Mechanics and Physics of Solids. 2018 Aug 1;117:110-22.
-"""
 struct GeneralConstitutiveModel_Network <: AbstractHyperelasticModel end
 
 function StrainEnergyDensityFunction(ψ::GeneralConstitutiveModel_Network, λ⃗, (; Gc, N))
@@ -2149,7 +2141,7 @@ end
 struct GeneralConstitutiveModel_Tube <: AbstractHyperelasticModel end
 
 function StrainEnergyDensityFunction(ψ::GeneralConstitutiveModel_Tube, λ⃗, (; Ge))
-    @tullio W := Ge/λ⃗[i]
+    @tullio W := Ge / λ⃗[i]
 end
 
 function parameters(ψ::GeneralConstitutiveModel_Tube)
@@ -2162,6 +2154,15 @@ function parameter_bounds(ψ::GeneralConstitutiveModel_Tube, data::AbstractHyper
     return (lb=lb, ub=ub)
 end
 
+"""
+General Constitutive Model [^1]
+
+Parameters: Gc, Ge, N
+
+Model: ``G_c N \\log\\bigg(\\frac{3N+\\frac{1}{2}I_1}{3N-I_1}\\bigg)+G_e\\sum\\limits_{i=1}^{3}\\frac{1}{\\lambda_I}``
+
+[^1]: > Xiang Y, Zhong D, Wang P, Mao G, Yu H, Qu S. A general constitutive model of soft elastomers. Journal of the Mechanics and Physics of Solids. 2018 Aug 1;117:110-22.
+"""
 struct GeneralConstitutiveModel <: AbstractHyperelasticModel end
 
 function StrainEnergyDensityFunction(ψ::GeneralConstitutiveModel, λ⃗, ps)
