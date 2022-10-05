@@ -1,3 +1,4 @@
+export GeneralCompressible
 """
 Generic Compressible Model
 
@@ -7,7 +8,6 @@ Model: ``\\psi(\\vec{\\lambda})+\\frac{\\kappa}{2}(J-1)^2``
 
 Example Implementation: `StrainEnergyDensityFunction(Compressible(NeoHookean()), λ⃗, (κ=κ, μ=μ))`
 """
-
 struct GeneralCompressible <: AbstractHyperelasticModel
     incompressible_model::AbstractHyperelasticModel
 end
