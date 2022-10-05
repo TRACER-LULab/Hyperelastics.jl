@@ -1,7 +1,8 @@
 # # Package Imports
 using Hyperelastics
-using Optimization, OptimizationOptimJL, ComponentArrays
-using CairoMakie
+using Optimization, OptimizationOptimJL, ComponentArrays, DataInterpolations
+using CairoMakie, ColorSchemes
+using MKL
 # # Treloar's UnPiaxial Data
 s₁ = [0.0, 0.2856, 0.3833, 0.4658, 0.5935, 0.6609, 0.8409, 1.006, 1.2087, 1.5617, 1.915, 2.2985, 2.6519, 3.0205, 3.3816, 3.7351, 4.0812, 4.4501, 4.8414, 5.2026, 5.5639] * 1e6
 λ₁ = [1.0, 1.4273, 1.6163, 1.882, 2.1596, 2.4383, 3.0585, 3.6153, 4.1206, 4.852, 5.4053, 5.7925, 6.1803, 6.4787, 6.6627, 6.936, 7.133, 7.1769, 7.2712, 7.4425, 7.512]
@@ -31,12 +32,20 @@ function ŝ(λ⃗, ψ, p)
 end
 ŝ₁ = map(λ -> ŝ(λ, ψ, sol.u)[1], λ⃗_predict)
 # Plot the Results
-fig = Figure()
-ax = Makie.Axis(fig[1, 1], xlabel="Stretch", ylabel="Stress [MPa]")
+fig = Figure(font = "CMU Serif")
+ax = Makie.Axis(
+    fig[1, 1],
+    xlabel="Stretch",
+    ylabel="Stress [MPa]",
+    palette=(color=ColorSchemes.Egypt,),
+    )
 scatter!(
     ax,
     getindex.(data.λ⃗, 1),
     getindex.(data.s⃗, 1) ./ 1e6,
+    marker='◆',
+    markersize=25,
+    color=:black,
     label="Experimental"
 )
 
@@ -134,15 +143,17 @@ save("examples/" * string(ψ)[1:end-2] * ".png", current_figure()) #src
 # ![Neohookean Plot](../examples/NeoHookean.png)
 # ## Sussman-Bathe Model
 # $W(\vec{\lambda}) = \sum\limits_{i=1}^{3} w(\lambda_i)$
-s⃗ = NominalStressFunction(SussmanBathe(), (s⃗=data.s⃗, λ⃗=data.λ⃗, k=5))
-ŝ = s⃗.(λ⃗_predict)
-ŝ₁ = getindex.(ŝ, 1)
+ψ = SussmanBathe(data, 5, DataInterpolations.QuadraticSpline)
+ŝ₁ = map(λ -> ŝ(λ, ψ, sol.u)[1], λ⃗_predict)
 
-plot!(
+lines!(
+    ax,
     getindex.(λ⃗_predict, 1),
     ŝ₁ ./ 1e6,
-    label="Predicted Sussman-Bathe k = 4"
+    label="Predicted NeoHookean"
 )
+
+current_figure()
 
 savefig("examples/sussmanbathe.png") #src
 # ![Sussman Bathe Plot](../examples/sussmanbathe.png)

@@ -35,7 +35,6 @@ function HyperelasticProblem(
         return res[1:stress_provided, :]
     end
 
-
     f(p, _) = [value(loss, hcat(data.s⃗...), ŝ(p), agg)]
 
     cons = constraints(ψ, data)

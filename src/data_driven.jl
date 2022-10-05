@@ -1,53 +1,32 @@
-using DataInterpolations
-using QuadGK
-using LinearAlgebra
-using LossFunctions
 export SussmanBathe, LatoreeMontans, StabilitySmoothedSussmanBathe
 """
 Sussman Bathe[^1]
 
-Parameters: σ⃗, λ⃗, k
+Parameters: data, k, interpolant
 
-Model: See Sussman-Bathe paper for description. For implementation, use s⃗̂(..., adb = AD.FiniteDifferencesBackend()).
-See [link](https://github.com/JuliaDiff/ForwardDiff.jl/issues/510) and [link](https://github.com/SciML/Quadrature.jl/issues/56) for why Auto-diff does not work yet. Number of gausss points for SEF integration is specified by `k`
+`ψ = SussmanBathe(data, k, interpolant)`
+`W = StrainEnergyDensityFunction(ψ, λ⃗, ())`
 
 [^1]: > Sussman T, Bathe KJ. A model of incompressible isotropic hyperelastic material behavior using spline interpolations of tension–compression test data. Communications in numerical methods in engineering. 2009 Jan;25(1):53-63.
 """
-struct SussmanBathe end
-function StrainEnergyDensityFunction(ψ::SussmanBathe, p)
-    (; s⃗, λ⃗, k) = p
-    ∫(f, a, b) = quadgk(f, a, b, rtol=1e-8)[1]
-    σ = DataInterpolations.CubicSpline(getindex.(s⃗, 1) .* getindex.(λ⃗, 1), getindex.(λ⃗, 1))
-    f(i, λ) = (σ(λ^((4.0)^(-i))) + σ(λ^(-0.5 * (4.0^(-i))))) / λ
-    function w′(λ)
-        sum(Base.Fix2(f, λ), 0:k)
-    end
-    w(x⃗) = sum(x -> ∫(w′, 1.0, x), x⃗)
+struct SussmanBathe
+    w′::Function
 end
 
-function NominalStressFunction(ψ::SussmanBathe, p)
-    (; s⃗, λ⃗, k) = p
-    σ̂ = DataInterpolations.CubicSpline(getindex.(s⃗, 1) .* getindex.(λ⃗, 1), getindex.(λ⃗, 1))
+function SussmanBathe(data::AbstractHyperelasticData, k::Integer, interpolant)
+    σ̂ = interpolant(getindex.(data.s⃗) .* getindex.(data.λ⃗, 1), getindex.(data.λ⃗, 1))
     f(i, λ) = (σ̂(λ^((4.0)^(-i))) + σ̂(λ^(-0.5 * (4.0^(-i))))) / λ
-    function w′(λ)
-        sum(Base.Fix2(f, λ), 0:k)
-    end
-    s(λ⃗) = w′.(λ⃗)
+    w′(λ) = sum(Base.Fix2(f, λ), 0:k)
+    SussmanBathe(w′)
 end
 
-function TrueStressFunction(ψ::SussmanBathe, p)
-    (; s⃗, λ⃗, k) = p
-    σ̂ = DataInterpolations.CubicSpline(getindex.(s⃗, 1) .* getindex.(λ⃗, 1), getindex.(λ⃗, 1))
-    f(i, λ) = (σ̂(λ^((4.0)^(-i))) + σ̂(λ^(-0.5 * (4.0^(-i))))) / λ
-    function w′(λ)
-        sum(Base.Fix2(f, λ), 0:k)
-    end
-    σ(λ⃗) = w′.(λ⃗).*λ⃗
-end
+StrainEnergyDensityFunction(ψ::SussmanBathe, λ⃗, p) = sum(x -> quadgk(ψ.w′, 1.0, x)[1], λ⃗)
 
-function parameters(ψ::SussmanBathe)
-    return (:s⃗, :λ⃗, :k)
-end
+NominalStressFunction(ψ::SussmanBathe, λ⃗, p) = ψ.w′.(λ⃗)
+
+TrueStressFunction(ψ::SussmanBathe, λ⃗, p) = ψ.w′.(λ⃗).*λ⃗
+
+parameters(ψ::SussmanBathe) = ()
 
 """
 Smoothed Sussman Bathe[^1]
@@ -120,169 +99,169 @@ function N(t; k, i, t⃗)
     end
 end
 
-"""
-Latoree Montans [^1] - Incompressible Transversely isotropic
+# """
+# Latoree Montans [^1] - Incompressible Transversely isotropic
 
-Parameters:
+# Parameters:
 
-Optional Parameters:
+# Optional Parameters:
 
-Model:
-Type I - :TypeI - One Uniaxial Test in a transversely isotropic direction
-- Parameters: σ̃₁, Ẽ₁, Ẽ₂, k
-Type 2 - :TypeII - Two independent uniaxial tests in the isotropic and anisotropic directions where 3 is the preferred direction for a uniaxial tesnsion compression test.
+# Model:
+# Type I - :TypeI - One Uniaxial Test in a transversely isotropic direction
+# - Parameters: σ̃₁, Ẽ₁, Ẽ₂, k
+# Type 2 - :TypeII - Two independent uniaxial tests in the isotropic and anisotropic directions where 3 is the preferred direction for a uniaxial tesnsion compression test.
 
-[^1]: > Latorre M, Montáns FJ. Extension of the Sussman–Bathe spline-based hyperelastic model to incompressible transversely isotropic materials. Computers & Structures. 2013 Jun 1;122:13-26.
-"""
-function LatoreeMontans(uniaxial, shear)
-    if uniaxial.type == :T1
-        w₁, w₃, w₁′, w₃′ = LatoreeMontansT1(uniaxial)
-    elseif uniaxial.type == :T2A
-        w₁, w₃, w₁′, w₃′ = LatoreeMontansT2A(uniaxial)
-    elseif uniaxial.type == :T2B
-        w₁, w₃, w₁′, w₃′ = LatoreeMontansT2B(uniaxial)
-    end
-    if shear.type == :PureShear
-        w₁₃ = LatoreeMontansPS(shear)
-    elseif shear.type == :SimpleShear
-        w₁₃ = LatoreeMontansSS(shear, w₁′, w₃′)
-    else
-        w₁₃(x) = 0.0
-    end
+# [^1]: > Latorre M, Montáns FJ. Extension of the Sussman–Bathe spline-based hyperelastic model to incompressible transversely isotropic materials. Computers & Structures. 2013 Jun 1;122:13-26.
+# """
+# function LatoreeMontans(uniaxial, shear)
+#     if uniaxial.type == :T1
+#         w₁, w₃, w₁′, w₃′ = LatoreeMontansT1(uniaxial)
+#     elseif uniaxial.type == :T2A
+#         w₁, w₃, w₁′, w₃′ = LatoreeMontansT2A(uniaxial)
+#     elseif uniaxial.type == :T2B
+#         w₁, w₃, w₁′, w₃′ = LatoreeMontansT2B(uniaxial)
+#     end
+#     if shear.type == :PureShear
+#         w₁₃ = LatoreeMontansPS(shear)
+#     elseif shear.type == :SimpleShear
+#         w₁₃ = LatoreeMontansSS(shear, w₁′, w₃′)
+#     else
+#         w₁₃(x) = 0.0
+#     end
 
-    function W(E)
-        w₁(E[1]) + w₁(E[2]) + w₁(E[3]) + 2w₁₃((E[4] + E[5]) / 2) + 2w₁₃((E[6] + E[7]) / 2)
-    end
-end
+#     function W(E)
+#         w₁(E[1]) + w₁(E[2]) + w₁(E[3]) + 2w₁₃((E[4] + E[5]) / 2) + 2w₁₃((E[6] + E[7]) / 2)
+#     end
+# end
 
-function LatoreeMontansT1((; σ̃₁, Ẽ₁, Ẽ₂, k))
-    # Integration Helper
-    ∫(f, a, b) = quadgk(f, a, b)[1]
-    # Intepolated Relationships from Stress-Strain Data
-    σ₁ = DataInterpolations.CubicSpline(σ̃₁, Ẽ₁)
-    E₂ = DataInterpolations.CubicSpline(Ẽ₂, Ẽ₁)
-    Ẽ₃ = 0.0 .- Ẽ₂ .- Ẽ₁
-    E₃ = DataInterpolations.CubicSpline(Ẽ₃, Ẽ₁)
-    # Find w₁
-    # Equation 47
-    function f₁(E₁, k)
-        #k = 0
-        res = E₁
-        for _ in 1:k
-            res = E₂(res)
-        end
-        return res
-    end
-    display(f₁(1.0, 4))
-    w₁′(E₁) = sum(i -> σ₁(f₁(E₁, i)), 0:k)
-    w₁(E₁) = ∫(w₁′, 0.0, E₁)
-    # Find w₃
-    # From Equation 46
-    E₂̄ = E₂.(Ẽ₁)
-    w̃₃′ = w₁′.(E₂̄)
-    E₃̄ = E₃.(Ẽ₁)
-    w₃′ = DataInterpolations.CubicSpline(w̃₃′, E₃̄)
-    w₃(E₃) = ∫(w₃′, 0.0, E₃)
-    return w₁, w₃, w₁′, w₃′
-end
-function LatoreeMontansT2A((; σ̃₃, Ẽ₁, Ẽ₂, Ẽ₃, k))
-    # Integration
-    ∫(f, a, b) = quadgk(f, a, b)[1]
-    # interpolations
-    σ₃ = DataInterpolations.CubicSpline(σ̃₃, Ẽ₃)
-    E₂ = DataInterpolations.CubicSpline(Ẽ₂, Ẽ₁)
-    E₃ = DataInterpolations.CubicSpline(-Ẽ₂ - Ẽ₁, Ẽ₂)
-    # Find w₃′
-    E(E₃) = E₃(-E₃ / 2)
-    function f₃(k, E₃)
-        #k = 0
-        res = E₃
-        for _ in 1:k
-            res = E(E₃)
-        end
-        return res
-    end
-    w₃′(E₃) = sum(σ₃ ∘ Base.Fix2(f₃, E₃), 0:k)
-    w₃(E₃) = ∫(w₃′, 0, E₃)
-    # Find w₁′
-    w₁′ = DataInterpolations.CubicSpline(w₃′.(E₃(E₂)), E₂)
-    w₁(E₁) = ∫(w₁′, 0, E₁)
-    return w₁, w₃, w₁′, w₃′
-end
-function LatoreeMontansT2B((; σ̃₁, σ̃₃, Ẽ₃, Ẽ₁, Ê₂, k, p₀, solver))
-    # Ê₂(E₁, p) = ....
-    # integration Helper
-    ∫(f, a, b) = quadgk(f, a, b)[1]
-    # Data interpolations
-    σ₁ = DataInterpolations.CubicSpline(σ̃₁, Ẽ₁)
-    σ₃ = DataInterpolations.CubicSpline(σ̃₃, Ẽ₃)
-    # Function to optimize parameters of Ê₂
-    function f(p, _)
-        Ẽ₂ = map(Base.Fix2(Ê₂, p), Ẽ₁)
-        E₂ = DataInterpolations.CubicSpline(Ẽ₂, Ẽ₁)
-        function f₁(E₁, k)
-            # k = 0
-            res = E₁
-            for _ in 1:k
-                res = E₂(res)
-            end
-            return res
-        end
-        w₁′(E₁) = sum(i -> σ₁(f₁(E₁, i)), 0:k)
-        E₃ = DataInterpolations.CubicSpline(-Ẽ₂ - Ẽ₁, Ẽ₂)
-        # Find w₃′
-        E(E₃) = E₃(-E₃ / 2)
-        function f₃(k, E₃)
-            res = E₃
-            for _ in 1:k
-                res = E(E₃)
-            end
-            return res
-        end
-        w₃′(E₃) = sum(i -> σ₃(f₃(i, E₃)), 0:k)
-        return value(L2DistLoss(), w₁′(E₂(Ẽ₁)), w₃(E₃(Ẽ₁)), AggMode.Sum())
-    end
-    optfunc = OptimizationFunction(f, Optimization.AutoFiniteDiff())
-    optprob = OptimizationProblem(optfunc, p₀, [])
-    sol = solve(optprob, solver)
-    E₂(E₁) = Base.Fix2(Ê₂, sol.u)
-    Ẽ₂ = map(E₂, Ẽ₁)
-    function f₁(E₁, k)
-        if k - 1 > 0
-            f₁(E₂(E₁), k - 1)
-        else
-            return E₂(E₁)
-        end
-    end
-    w₁′(E₁) = sum(σ₁ ∘ Base.Fix1(f₁, E₁), 0:k)
-    E₃ = DataInterpolations.CubicSpline(-Ẽ₂ - Ẽ₁, Ẽ₂)
-    # Find w₃′
-    E(E₃) = E₃(-E₃ / 2)
-    function f₃(k, E₃)
-        res = E(E₃)
-        for _ in 1:k
-            res = E(E₃)
-        end
-        return res
-    end
-    w₃′(E₃) = sum(σ₃ ∘ Base.Fix2(f₃, E₃), 0:k)
-    w₁(E₁) = ∫(w₁′, 0, E₁)
-    w₃(E₃) = ∫(w₃′, 0, E₃)
-    return w₁, w₃, w₁′, w₃′
-end
-function LatoreeMontansPS((; σ̃, Ẽ))
-    σ = DataInterpolations.CubicSpline([-σ̃; σ̃], [-Ẽ; Ẽ])
-    w₁₃′(E₁₃) = σ(E₁₃)
-    w₁₃(E₁₃) = ∫(w₁₃′, 0, E₁₃)
-end
-function LatoreeMontansSS((; σ̃₁₃, γ̃), w₁′, w₃′)
-    # σ₁₃ = DataInterpolations.CubicSpline(σ̃₁₃, γ̃)
-    ψ̃ = @. 1 / 2 * atan(2 / γ̃)
-    Ẽ₁₃ = @. -log(tan(ψ̃)) * sin(2ψ̃)
-    σ₁₃ = DataInterpolations.CubicSpline([σ̃₁₃; -σ̃₁₃], [Ẽ₁₃; Ẽ₁₃])
-    ψ = DataInterpolations.CubicSpline([π / 2 - ψ̃, ψ̃], [-Ẽ₁₃, Ẽ₁₃])
-    E₁(ψ) = -log(tan(ψ)) * cos(2ψ)
-    E₃(ψ) = log(tan(ψ)) * cos(2ψ)
-    w₁₃′(E₁₃) = (σ₁₃(E₁₃) - 1 / 2 * (w₁′(E₁(ψ(E₁₃))) - w₃′(E₃(ψ(E₁₃)))) * (cos(2ψ(E₁₃)) + E₁₃ * sin(2ψ(E₁₃))) * sin(2ψ(E₁₃))) / (sin(2ψ(E₁₃))^2 * (1 - E₁(ψ(E₁₃))))
-    w₁₃(E₁₃) = ∫(w₁₃′, 0, E₁₃)
-end
+# function LatoreeMontansT1((; σ̃₁, Ẽ₁, Ẽ₂, k))
+#     # Integration Helper
+#     ∫(f, a, b) = quadgk(f, a, b)[1]
+#     # Intepolated Relationships from Stress-Strain Data
+#     σ₁ = DataInterpolations.CubicSpline(σ̃₁, Ẽ₁)
+#     E₂ = DataInterpolations.CubicSpline(Ẽ₂, Ẽ₁)
+#     Ẽ₃ = 0.0 .- Ẽ₂ .- Ẽ₁
+#     E₃ = DataInterpolations.CubicSpline(Ẽ₃, Ẽ₁)
+#     # Find w₁
+#     # Equation 47
+#     function f₁(E₁, k)
+#         #k = 0
+#         res = E₁
+#         for _ in 1:k
+#             res = E₂(res)
+#         end
+#         return res
+#     end
+#     display(f₁(1.0, 4))
+#     w₁′(E₁) = sum(i -> σ₁(f₁(E₁, i)), 0:k)
+#     w₁(E₁) = ∫(w₁′, 0.0, E₁)
+#     # Find w₃
+#     # From Equation 46
+#     E₂̄ = E₂.(Ẽ₁)
+#     w̃₃′ = w₁′.(E₂̄)
+#     E₃̄ = E₃.(Ẽ₁)
+#     w₃′ = DataInterpolations.CubicSpline(w̃₃′, E₃̄)
+#     w₃(E₃) = ∫(w₃′, 0.0, E₃)
+#     return w₁, w₃, w₁′, w₃′
+# end
+# function LatoreeMontansT2A((; σ̃₃, Ẽ₁, Ẽ₂, Ẽ₃, k))
+#     # Integration
+#     ∫(f, a, b) = quadgk(f, a, b)[1]
+#     # interpolations
+#     σ₃ = DataInterpolations.CubicSpline(σ̃₃, Ẽ₃)
+#     E₂ = DataInterpolations.CubicSpline(Ẽ₂, Ẽ₁)
+#     E₃ = DataInterpolations.CubicSpline(-Ẽ₂ - Ẽ₁, Ẽ₂)
+#     # Find w₃′
+#     E(E₃) = E₃(-E₃ / 2)
+#     function f₃(k, E₃)
+#         #k = 0
+#         res = E₃
+#         for _ in 1:k
+#             res = E(E₃)
+#         end
+#         return res
+#     end
+#     w₃′(E₃) = sum(σ₃ ∘ Base.Fix2(f₃, E₃), 0:k)
+#     w₃(E₃) = ∫(w₃′, 0, E₃)
+#     # Find w₁′
+#     w₁′ = DataInterpolations.CubicSpline(w₃′.(E₃(E₂)), E₂)
+#     w₁(E₁) = ∫(w₁′, 0, E₁)
+#     return w₁, w₃, w₁′, w₃′
+# end
+# function LatoreeMontansT2B((; σ̃₁, σ̃₃, Ẽ₃, Ẽ₁, Ê₂, k, p₀, solver))
+#     # Ê₂(E₁, p) = ....
+#     # integration Helper
+#     ∫(f, a, b) = quadgk(f, a, b)[1]
+#     # Data interpolations
+#     σ₁ = DataInterpolations.CubicSpline(σ̃₁, Ẽ₁)
+#     σ₃ = DataInterpolations.CubicSpline(σ̃₃, Ẽ₃)
+#     # Function to optimize parameters of Ê₂
+#     function f(p, _)
+#         Ẽ₂ = map(Base.Fix2(Ê₂, p), Ẽ₁)
+#         E₂ = DataInterpolations.CubicSpline(Ẽ₂, Ẽ₁)
+#         function f₁(E₁, k)
+#             # k = 0
+#             res = E₁
+#             for _ in 1:k
+#                 res = E₂(res)
+#             end
+#             return res
+#         end
+#         w₁′(E₁) = sum(i -> σ₁(f₁(E₁, i)), 0:k)
+#         E₃ = DataInterpolations.CubicSpline(-Ẽ₂ - Ẽ₁, Ẽ₂)
+#         # Find w₃′
+#         E(E₃) = E₃(-E₃ / 2)
+#         function f₃(k, E₃)
+#             res = E₃
+#             for _ in 1:k
+#                 res = E(E₃)
+#             end
+#             return res
+#         end
+#         w₃′(E₃) = sum(i -> σ₃(f₃(i, E₃)), 0:k)
+#         return value(L2DistLoss(), w₁′(E₂(Ẽ₁)), w₃(E₃(Ẽ₁)), AggMode.Sum())
+#     end
+#     optfunc = OptimizationFunction(f, Optimization.AutoFiniteDiff())
+#     optprob = OptimizationProblem(optfunc, p₀, [])
+#     sol = solve(optprob, solver)
+#     E₂(E₁) = Base.Fix2(Ê₂, sol.u)
+#     Ẽ₂ = map(E₂, Ẽ₁)
+#     function f₁(E₁, k)
+#         if k - 1 > 0
+#             f₁(E₂(E₁), k - 1)
+#         else
+#             return E₂(E₁)
+#         end
+#     end
+#     w₁′(E₁) = sum(σ₁ ∘ Base.Fix1(f₁, E₁), 0:k)
+#     E₃ = DataInterpolations.CubicSpline(-Ẽ₂ - Ẽ₁, Ẽ₂)
+#     # Find w₃′
+#     E(E₃) = E₃(-E₃ / 2)
+#     function f₃(k, E₃)
+#         res = E(E₃)
+#         for _ in 1:k
+#             res = E(E₃)
+#         end
+#         return res
+#     end
+#     w₃′(E₃) = sum(σ₃ ∘ Base.Fix2(f₃, E₃), 0:k)
+#     w₁(E₁) = ∫(w₁′, 0, E₁)
+#     w₃(E₃) = ∫(w₃′, 0, E₃)
+#     return w₁, w₃, w₁′, w₃′
+# end
+# function LatoreeMontansPS((; σ̃, Ẽ))
+#     σ = DataInterpolations.CubicSpline([-σ̃; σ̃], [-Ẽ; Ẽ])
+#     w₁₃′(E₁₃) = σ(E₁₃)
+#     w₁₃(E₁₃) = ∫(w₁₃′, 0, E₁₃)
+# end
+# function LatoreeMontansSS((; σ̃₁₃, γ̃), w₁′, w₃′)
+#     # σ₁₃ = DataInterpolations.CubicSpline(σ̃₁₃, γ̃)
+#     ψ̃ = @. 1 / 2 * atan(2 / γ̃)
+#     Ẽ₁₃ = @. -log(tan(ψ̃)) * sin(2ψ̃)
+#     σ₁₃ = DataInterpolations.CubicSpline([σ̃₁₃; -σ̃₁₃], [Ẽ₁₃; Ẽ₁₃])
+#     ψ = DataInterpolations.CubicSpline([π / 2 - ψ̃, ψ̃], [-Ẽ₁₃, Ẽ₁₃])
+#     E₁(ψ) = -log(tan(ψ)) * cos(2ψ)
+#     E₃(ψ) = log(tan(ψ)) * cos(2ψ)
+#     w₁₃′(E₁₃) = (σ₁₃(E₁₃) - 1 / 2 * (w₁′(E₁(ψ(E₁₃))) - w₃′(E₃(ψ(E₁₃)))) * (cos(2ψ(E₁₃)) + E₁₃ * sin(2ψ(E₁₃))) * sin(2ψ(E₁₃))) / (sin(2ψ(E₁₃))^2 * (1 - E₁(ψ(E₁₃))))
+#     w₁₃(E₁₃) = ∫(w₁₃′, 0, E₁₃)
+# end

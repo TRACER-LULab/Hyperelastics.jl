@@ -6,9 +6,10 @@ using Optimization
 using AbstractDifferentiation, ForwardDiff
 using Tullio
 using SpecialFunctions
+using DataInterpolations
+using QuadGK
 using ComponentArrays
-using SymbolicUtils
-using Bibliography
+using LinearAlgebra
 
 export AbstractHyperelasticData, UniaxialHyperelasticData, BiaxialHyperelasticData, HyperelasticProblem
 export I₁, I₂, I₃, J
@@ -23,6 +24,7 @@ include("invariants.jl")
 include("model_functions.jl")
 include("datasets.jl")
 include("isotropic_incompressible_models.jl")
+include("isotropic_compressible_models.jl")
 include("data_driven.jl")
 include("macro_micro_macro_model.jl")
 include("average_chain_behavior.jl")
