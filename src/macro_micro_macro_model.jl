@@ -19,7 +19,8 @@ Parameters:
 ---
 [^1]: > Amores VJ, Benítez JM, Montáns FJ. Data-driven, structure-based hyperelastic manifolds: A macro-micro-macro approach. arXiv preprint arXiv:1903.11545. 2019 Mar 27.
 """
-struct MacroMicroMacro end
+struct MacroMicroMacro <: AbstractDataDrivenHyperelasticModel end
+
 function StrainEnergyDensityFunction(ψ::MacroMicroMacro, (; Pchain, p₀, weights, coeff_loss, solver, data))
     λchain(λ⃗, r⃗) = dot(r⃗ .* r⃗, λ⃗)   # Eq. (1)
     ∂λchain∂λ(λ⃗, r⃗) = r⃗ .* r⃗         # In text below Eq. (8)

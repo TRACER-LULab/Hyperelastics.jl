@@ -14,7 +14,7 @@ function HyperelasticProblem(
     agg=AggMode.Mean(),
     ad=Optimization.AutoForwardDiff(),
     kwargs...
-)
+) <: AbstractHyperelasticProblem
 
     stress_provided = length(data.s⃗[1])
 

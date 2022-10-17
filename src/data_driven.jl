@@ -1,4 +1,4 @@
-export SussmanBathe, LatoreeMontans, StabilitySmoothedSussmanBathe
+export SussmanBathe, StabilitySmoothedSussmanBathe
 """
 Sussman Bathe[^1]
 
@@ -9,7 +9,7 @@ Parameters: data, k, interpolant
 
 [^1]: > Sussman T, Bathe KJ. A model of incompressible isotropic hyperelastic material behavior using spline interpolations of tension–compression test data. Communications in numerical methods in engineering. 2009 Jan;25(1):53-63.
 """
-struct SussmanBathe
+struct SussmanBathe <: AbstractDataDrivenHyperelasticModel
     w′::Function
 end
 
