@@ -56,7 +56,7 @@ Return a function for the nominal (2nd Piola Kirchoff) Stress Function  for the 
 > s = nominal_stress_function(Gent(), [2.0, 2.0, 1/4.0], (μ = 10, Jₘ = 100.0))
 """
 function ContinuumModels.SecondPiolaKirchoffStressTensor(ψ::AbstractHyperelasticModel, λ⃗::AbstractVector, p; adb=AD.ForwardDiffBackend())
-    W(λ⃗) = StrainEnergyDensit
+    W(λ⃗) = StrainEnergyDensity(ψ, λ⃗, p)
     ∂W∂λ = AD.gradient(adb, W, λ⃗)[1]
     return ∂W∂λ
 end
