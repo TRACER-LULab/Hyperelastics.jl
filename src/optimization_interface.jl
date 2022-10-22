@@ -19,7 +19,7 @@ function HyperelasticProblem(
     stress_provided = length(data.s⃗[1])
 
     function ŝ(p)
-        s⃗ = map(x -> NominalStressFunction(ψ, x, p), data.λ⃗)
+        s⃗ = map(x -> SecondPiolaKirchoffStressTensor(ψ, x, p), data.λ⃗)
         λ⃗ = data.λ⃗
 
         @tullio σ⃗[i, j] := s⃗[i][j] .* λ⃗[i][j]
@@ -87,7 +87,7 @@ function HyperelasticProblem(data::Vector{AbstractHyperelasticData}, model, u₀
     stresses_provided = size(s, 1)
 
     function ŝ(p)
-        s⃗ = map(x -> NominalStressFunction(ψ, x, p), collect.(data.λ⃗))
+        s⃗ = map(x -> SecondPiolaKirchoffStressTensor(ψ, x, p), collect.(data.λ⃗))
         Δs = [s⃗[1] - s⃗[3], s⃗[2] - s⃗[3], s⃗[1] - s⃗[2]]
         return hcat(Δs...)[1:stresses_provided, :]
     end

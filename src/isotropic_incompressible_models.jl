@@ -13,13 +13,13 @@ Model:
 """
 struct GeneralMooneyRivlin <: AbstractHyperelasticModel end
 
-function StrainEnergyDensityFunction(ψ::GeneralMooneyRivlin, λ⃗, (; C))
+function ContinuumModels.StrainEnergyDensity(ψ::GeneralMooneyRivlin, λ⃗::AbstractVector, (; C))
     I1 = I₁(λ⃗)
     I2 = I₂(λ⃗)
     @tullio W := C[j, i] * (I1 - 3)^(i - 1) * (I2 - 3)^(j - 1)
 end
 
-function StrainEnergyDensityFunction(ψ::GeneralMooneyRivlin, I⃗, (; C), I::InvariantForm)
+function ContinuumModels.StrainEnergyDensity(ψ::GeneralMooneyRivlin, I⃗, (; C), I::InvariantForm)
     @tullio W := C[j, i] * (I⃗[1] - 3)^(i - 1) * (I⃗[2] - 3)^(j - 1)
     return W
 end
@@ -39,7 +39,7 @@ Model: ``\\sum\\limits_{i = 1}{3}\\sum\\limits_{j=0}^{N} A_j (\\lambda_i^{m_j}-1
 """
 struct GeneralDarijaniNaghdabadi <: AbstractHyperelasticModel end
 
-function StrainEnergyDensityFunction(ψ::GeneralDarijaniNaghdabadi, λ⃗, (; A⃗, B⃗, m⃗, n⃗))
+function ContinuumModels.StrainEnergyDensity(ψ::GeneralDarijaniNaghdabadi, λ⃗::AbstractVector, (; A⃗, B⃗, m⃗, n⃗))
     @assert length(A⃗) == length(m⃗) "Length of A⃗ ≠ length of m⃗"
     @assert length(B⃗) == length(n⃗) "Length of B⃗ ≠ length of n⃗"
     sum(i -> sum(A⃗ .* (λ⃗[i] .^ m⃗ .- 1)) + sum(B⃗ .* (λ⃗[i] .^ (-1 .* n⃗) .- 1)), 1:3)
@@ -63,7 +63,7 @@ Model: ``\\sum\\limits_{i = 1}^{N}\\frac{C_i}{\\alpha_i}(I_1-3)^{\\alpha_i} + \\
 """
 struct GeneralBeda <: AbstractHyperelasticModel end
 
-function StrainEnergyDensityFunction(ψ::GeneralBeda, λ⃗, (; C, K, α, β))
+function ContinuumModels.StrainEnergyDensity(ψ::GeneralBeda, λ⃗::AbstractVector, (; C, K, α, β))
     @assert length(C) == length(α) "Vector C and Vector α are not the same length"
     @assert length(K) == length(β) "Vector K and Vector β are not the same length"
     W1 = C ./ α .* (I₁(λ⃗) - 3) .^ α |> sum
@@ -71,7 +71,7 @@ function StrainEnergyDensityFunction(ψ::GeneralBeda, λ⃗, (; C, K, α, β))
     return W1 + W2
 end
 
-function StrainEnergyDensityFunction(ψ::GeneralBeda, I⃗, (; C, K, α, β), I::InvariantForm)
+function ContinuumModels.StrainEnergyDensity(ψ::GeneralBeda, I⃗, (; C, K, α, β), I::InvariantForm)
     @assert length(C) == length(α) "Vector C and Vector α are not the same length"
     @assert length(K) == length(β) "Vector K and Vector β are not the same length"
     W1 = C ./ α .* (I⃗[1] - 3) .^ α |> sum
@@ -94,8 +94,8 @@ Model: ``C_{10}(I_1-3)+C_{01}(I_2-3)``
 """
 struct MooneyRivlin <: AbstractHyperelasticModel end
 
-function StrainEnergyDensityFunction(ψ::MooneyRivlin, λ⃗, (; C10, C01))
-    StrainEnergyDensityFunction(
+function ContinuumModels.StrainEnergyDensity(ψ::MooneyRivlin, λ⃗::AbstractVector, (; C10, C01))
+    ContinuumModels.StrainEnergyDensity(
         GeneralMooneyRivlin(),
         λ⃗,
         (C=[
@@ -106,8 +106,8 @@ function StrainEnergyDensityFunction(ψ::MooneyRivlin, λ⃗, (; C10, C01))
     )
 end
 
-function StrainEnergyDensityFunction(ψ::MooneyRivlin, I⃗, (; C10, C01), I::InvariantForm)
-    StrainEnergyDensityFunction(
+function ContinuumModels.StrainEnergyDensity(ψ::MooneyRivlin, I⃗, (; C10, C01), I::InvariantForm)
+    ContinuumModels.StrainEnergyDensity(
         GeneralMooneyRivlin(),
         I⃗,
         (C=[
@@ -134,11 +134,11 @@ Model: ``\\frac{\\mu}{2}(I_1-3)``
 """
 struct NeoHookean <: AbstractHyperelasticModel end
 
-function StrainEnergyDensityFunction(ψ::NeoHookean, λ⃗, (; μ))
+function ContinuumModels.StrainEnergyDensity(ψ::NeoHookean, λ⃗::AbstractVector, (; μ))
     μ / 2 * (I₁(λ⃗) - 3)
 end
 
-function StrainEnergyDensityFunction(ψ::NeoHookean, I⃗, (; μ), I::InvariantForm)
+function ContinuumModels.StrainEnergyDensity(ψ::NeoHookean, I⃗, (; μ), I::InvariantForm)
     μ / 2 * (I⃗[1] - 3)
 end
 
@@ -157,8 +157,8 @@ Model: ``\\sum\\limits_{i,j=0}^{2, 1}C_{i,j}(I_1-3)^i(I_2-3)^j``
 """
 struct Isihara <: AbstractHyperelasticModel end
 
-function StrainEnergyDensityFunction(ψ::Isihara, λ⃗, (; C10, C20, C01))
-    StrainEnergyDensityFunction(
+function ContinuumModels.StrainEnergyDensity(ψ::Isihara, λ⃗::AbstractVector, (; C10, C20, C01))
+    ContinuumModels.StrainEnergyDensity(
         GeneralMooneyRivlin(),
         λ⃗,
         (C=[
@@ -169,8 +169,8 @@ function StrainEnergyDensityFunction(ψ::Isihara, λ⃗, (; C10, C20, C01))
     )
 end
 
-function StrainEnergyDensityFunction(ψ::Isihara, I⃗, (; C10, C20, C01), I::InvariantForm)
-    StrainEnergyDensityFunction(
+function ContinuumModels.StrainEnergyDensity(ψ::Isihara, I⃗, (; C10, C20, C01), I::InvariantForm)
+    ContinuumModels.StrainEnergyDensity(
         GeneralMooneyRivlin(),
         I⃗,
         (C=[
@@ -197,8 +197,8 @@ Model: ``\\sum\\limits_{i,j=0}^{3, 1}C_{i,j}(I_1-3)^i(I_2-3)^j``
 """
 struct Biderman <: AbstractHyperelasticModel end
 
-function StrainEnergyDensityFunction(ψ::Biderman, λ⃗, (; C10, C01, C20, C30))
-    StrainEnergyDensityFunction(
+function ContinuumModels.StrainEnergyDensity(ψ::Biderman, λ⃗::AbstractVector, (; C10, C01, C20, C30))
+    ContinuumModels.StrainEnergyDensity(
         GeneralMooneyRivlin(),
         λ⃗,
         (C=[
@@ -209,8 +209,8 @@ function StrainEnergyDensityFunction(ψ::Biderman, λ⃗, (; C10, C01, C20, C30)
     )
 end
 
-function StrainEnergyDensityFunction(ψ::Biderman, I⃗, (; C10, C01, C20, C30), I::InvariantForm)
-    StrainEnergyDensityFunction(
+function ContinuumModels.StrainEnergyDensity(ψ::Biderman, I⃗, (; C10, C01, C20, C30), I::InvariantForm)
+    ContinuumModels.StrainEnergyDensity(
         GeneralMooneyRivlin(),
         I⃗,
         (C=[
@@ -237,8 +237,8 @@ Model: ``\\sum\\limits_{i,j=0}^{3, 1}C_{i,j}(I_1-3)^i(I_2-3)^j``
 """
 struct JamesGreenSimpson <: AbstractHyperelasticModel end
 
-function StrainEnergyDensityFunction(ψ::JamesGreenSimpson, λ⃗, (; C10, C01, C11, C20, C30))
-    StrainEnergyDensityFunction(
+function ContinuumModels.StrainEnergyDensity(ψ::JamesGreenSimpson, λ⃗::AbstractVector, (; C10, C01, C11, C20, C30))
+    ContinuumModels.StrainEnergyDensity(
         GeneralMooneyRivlin(),
         λ⃗,
         (C=[
@@ -249,8 +249,8 @@ function StrainEnergyDensityFunction(ψ::JamesGreenSimpson, λ⃗, (; C10, C01, 
     )
 end
 
-function StrainEnergyDensityFunction(ψ::JamesGreenSimpson, I⃗, (; C10, C01, C11, C20, C30), I::InvariantForm)
-    StrainEnergyDensityFunction(
+function ContinuumModels.StrainEnergyDensity(ψ::JamesGreenSimpson, I⃗, (; C10, C01, C11, C20, C30), I::InvariantForm)
+    ContinuumModels.StrainEnergyDensity(
         GeneralMooneyRivlin(),
         I⃗,
         (C=[
@@ -277,8 +277,8 @@ Model: ``\\sum\\limits_{i,j=0}^{3, 2}C_{i,j}(I_1-3)^i(I_2-3)^j``
 """
 struct HainesWilson <: AbstractHyperelasticModel end
 
-function StrainEnergyDensityFunction(ψ::HainesWilson, λ⃗, (; C10, C01, C11, C02, C20, C30))
-    StrainEnergyDensityFunction(
+function ContinuumModels.StrainEnergyDensity(ψ::HainesWilson, λ⃗::AbstractVector, (; C10, C01, C11, C02, C20, C30))
+    ContinuumModels.StrainEnergyDensity(
         GeneralMooneyRivlin(),
         λ⃗,
         (C=[
@@ -290,8 +290,8 @@ function StrainEnergyDensityFunction(ψ::HainesWilson, λ⃗, (; C10, C01, C11, 
     )
 end
 
-function StrainEnergyDensityFunction(ψ::HainesWilson, I⃗, (; C10, C01, C11, C02, C20, C30), I::InvariantForm)
-    StrainEnergyDensityFunction(
+function ContinuumModels.StrainEnergyDensity(ψ::HainesWilson, I⃗, (; C10, C01, C11, C02, C20, C30), I::InvariantForm)
+    ContinuumModels.StrainEnergyDensity(
         GeneralMooneyRivlin(),
         I⃗,
         (C=[
@@ -319,16 +319,16 @@ Model: ``\\sum\\limits_{i,j=0}^{3, 0}C_{i,j}(I_1-3)^i(I_2-3)^j``
 """
 struct Yeoh <: AbstractHyperelasticModel end
 
-function StrainEnergyDensityFunction(ψ::Yeoh, λ⃗, (; C10, C20, C30))
-    StrainEnergyDensityFunction(
+function ContinuumModels.StrainEnergyDensity(ψ::Yeoh, λ⃗::AbstractVector, (; C10, C20, C30))
+    ContinuumModels.StrainEnergyDensity(
         GeneralMooneyRivlin(),
         λ⃗,
         (C=[0 C10 C20 C30],)
     )
 end
 
-function StrainEnergyDensityFunction(ψ::Yeoh, I⃗, (; C10, C20, C30), I::InvariantForm)
-    StrainEnergyDensityFunction(
+function ContinuumModels.StrainEnergyDensity(ψ::Yeoh, I⃗, (; C10, C20, C30), I::InvariantForm)
+    ContinuumModels.StrainEnergyDensity(
         GeneralMooneyRivlin(),
         I⃗,
         (C=[0 C10 C20 C30],),
@@ -351,8 +351,8 @@ Model: ``\\sum\\limits_{i,j=0}^{5,1}C_{i,j}(I_1-3)^i(I_2-3)^j``
 """
 struct Lion <: AbstractHyperelasticModel end
 
-function StrainEnergyDensityFunction(ψ::Lion, λ⃗, (; C10, C01, C50))
-    StrainEnergyDensityFunction(
+function ContinuumModels.StrainEnergyDensity(ψ::Lion, λ⃗::AbstractVector, (; C10, C01, C50))
+    ContinuumModels.StrainEnergyDensity(
         GeneralMooneyRivlin(),
         λ⃗,
         (C=[
@@ -362,8 +362,8 @@ function StrainEnergyDensityFunction(ψ::Lion, λ⃗, (; C10, C01, C50))
     )
 end
 
-function StrainEnergyDensityFunction(ψ::Lion, I⃗, (; C10, C01, C50), I::InvariantForm)
-    StrainEnergyDensityFunction(
+function ContinuumModels.StrainEnergyDensity(ψ::Lion, I⃗, (; C10, C01, C50), I::InvariantForm)
+    ContinuumModels.StrainEnergyDensity(
         GeneralMooneyRivlin(),
         I⃗,
         (C=[
@@ -391,8 +391,8 @@ Model:
 """
 struct HauptSedlan <: AbstractHyperelasticModel end
 
-function StrainEnergyDensityFunction(ψ::HauptSedlan, λ⃗, (; C10, C01, C11, C02, C30))
-    StrainEnergyDensityFunction(
+function ContinuumModels.StrainEnergyDensity(ψ::HauptSedlan, λ⃗::AbstractVector, (; C10, C01, C11, C02, C30))
+    ContinuumModels.StrainEnergyDensity(
         GeneralMooneyRivlin(),
         λ⃗,
         (C=[
@@ -403,8 +403,8 @@ function StrainEnergyDensityFunction(ψ::HauptSedlan, λ⃗, (; C10, C01, C11, C
     )
 end
 
-function StrainEnergyDensityFunction(ψ::HauptSedlan, I⃗, (; C10, C01, C11, C02, C30), I::InvariantForm)
-    StrainEnergyDensityFunction(
+function ContinuumModels.StrainEnergyDensity(ψ::HauptSedlan, I⃗, (; C10, C01, C11, C02, C30), I::InvariantForm)
+    ContinuumModels.StrainEnergyDensity(
         GeneralMooneyRivlin(),
         I⃗,
         (C=[
@@ -431,13 +431,13 @@ Model: ``\\sum\\limits_{i,j=0}^{M,N}C_{i,0}(I_1-3)^i -3\\sqrt{3}^j+\\alpha(I_1-3
 """
 struct HartmannNeff <: AbstractHyperelasticModel end
 
-function StrainEnergyDensityFunction(ψ::HartmannNeff, λ⃗, (; α, Ci⃗0, C0j⃗))
+function ContinuumModels.StrainEnergyDensity(ψ::HartmannNeff, λ⃗::AbstractVector, (; α, Ci⃗0, C0j⃗))
     @tullio W1 := Ci⃗0[i] * (I₁(λ⃗) - 3)^i
     @tullio W2 := C0j⃗[j] * (I₂(λ⃗)^(3 / 2) - 3sqrt(3))^j
     return W1 + W2 + α * (I₁(λ⃗)^3 - 3^3)
 end
 
-function StrainEnergyDensityFunction(ψ::HartmannNeff, I⃗, (; α, Ci⃗0, C0j⃗), I::InvariantForm)
+function ContinuumModels.StrainEnergyDensity(ψ::HartmannNeff, I⃗, (; α, Ci⃗0, C0j⃗), I::InvariantForm)
     @tullio W1 := Ci⃗0[i] * (I⃗[1] - 3)^i
     @tullio W2 := C0j⃗[j] * (I⃗[2]^(3 / 2) - 3sqrt(3))^j
     return W1 + W2 + α * (I⃗[1]^3 - 3^3)
@@ -458,11 +458,11 @@ Model: ``AI_1+BI_1^4+C\\sqrt{I_2}``
 """
 struct Carroll <: AbstractHyperelasticModel end
 
-function StrainEnergyDensityFunction(ψ::Carroll, λ⃗, (; A, B, C))
+function ContinuumModels.StrainEnergyDensity(ψ::Carroll, λ⃗::AbstractVector, (; A, B, C))
     A * I₁(λ⃗) + B * I₁(λ⃗)^4 + C * I₂(λ⃗)^(1 / 2)
 end
 
-function StrainEnergyDensityFunction(ψ::Carroll, I⃗, (; A, B, C), I::InvariantForm)
+function ContinuumModels.StrainEnergyDensity(ψ::Carroll, I⃗, (; A, B, C), I::InvariantForm)
     A * I⃗[1] + B * I⃗[1]^4 + C * I⃗[2]^(1 / 2)
 end
 
@@ -482,8 +482,8 @@ Model:
 """
 struct BahremanDarijani <: AbstractHyperelasticModel end
 
-function StrainEnergyDensityFunction(ψ::BahremanDarijani, λ⃗, (; A2, B2, A4, A6))
-    StrainEnergyDensityFunction(
+function ContinuumModels.StrainEnergyDensity(ψ::BahremanDarijani, λ⃗::AbstractVector, (; A2, B2, A4, A6))
+    ContinuumModels.StrainEnergyDensity(
         GeneralDarijaniNaghdabadi(),
         λ⃗,
         (
@@ -509,11 +509,11 @@ Model: ``C_{-1}^1*(I_2-3)+C_{1}^{1}(I_1-3)+C_{2}^{1}(I_1^2-2I_2-3)+C_{2}^{2}(I_1
 """
 struct Zhao <: AbstractHyperelasticModel end
 
-function StrainEnergyDensityFunction(ψ::Zhao, λ⃗, (; C₋₁¹, C₁¹, C₂¹, C₂²))
+function ContinuumModels.StrainEnergyDensity(ψ::Zhao, λ⃗::AbstractVector, (; C₋₁¹, C₁¹, C₂¹, C₂²))
     C₋₁¹ * (I₂(λ⃗) - 3) + C₁¹ * (I₁(λ⃗) - 3) + C₂¹ * (I₁(λ⃗)^2 - 2I₂(λ⃗) - 3) + C₂² * (I₁(λ⃗)^2 - 2I₂(λ⃗) - 3)^2
 end
 
-function StrainEnergyDensityFunction(ψ::Zhao, (; C₋₁¹, C₁¹, C₂¹, C₂²), I::InvariantForm)
+function ContinuumModels.StrainEnergyDensity(ψ::Zhao, (; C₋₁¹, C₁¹, C₂¹, C₂²), I::InvariantForm)
     C₋₁¹ * (I⃗[2] - 3) + C₁¹ * (I⃗[1] - 3) + C₂¹ * (I⃗[1]^2 - 2I⃗[2] - 3) + C₂² * (I⃗[1]^2 - 2I⃗[2] - 3)^2
 end
 
@@ -532,11 +532,11 @@ Model: ``\\frac{\\mu}{2b}((1+\\frac{b}{n}(I_1-3))^n-1)``
 """
 struct Knowles <: AbstractHyperelasticModel end
 
-function StrainEnergyDensityFunction(ψ::Knowles, λ⃗, (; μ, b, n))
+function ContinuumModels.StrainEnergyDensity(ψ::Knowles, λ⃗::AbstractVector, (; μ, b, n))
     μ / (2b) * ((1 + (b / n) * (I₁(λ⃗) - 3))^n - 1)
 end
 
-function StrainEnergyDensityFunction(ψ::Knowles, I⃗, (; μ, b, n), I::InvariantForm)
+function ContinuumModels.StrainEnergyDensity(ψ::Knowles, I⃗, (; μ, b, n), I::InvariantForm)
     μ / (2b) * ((1 + (b / n) * (I⃗[1] - 3))^n - 1)
 end
 
@@ -562,12 +562,12 @@ Model: ``\\sum\\limits_{i=1}^{N} \\frac{3}{2}(\\frac{A_i}{1+\\alpha_i}(\\frac{I_
 """
 struct Swanson <: AbstractHyperelasticModel end
 
-function StrainEnergyDensityFunction(ψ::Swanson, λ⃗, (; A⃗, α⃗, B⃗, β⃗))
+function ContinuumModels.StrainEnergyDensity(ψ::Swanson, λ⃗::AbstractVector, (; A⃗, α⃗, B⃗, β⃗))
     @assert length(A⃗) == length(α⃗) == length(B⃗) == length(β⃗) "The vectors are not the same length"
     @tullio _ := 3 / 2 * (A⃗[i] / (1 + α⃗[i]) * (I₁(λ⃗) / 3)^(1 + α⃗[i]) + B⃗[i] / (1 + β⃗[i]) * (I₂(λ⃗) / 3)^(1 + β⃗[i]))
 end
 
-function StrainEnergyDensityFunction(ψ::Swanson, I⃗, (; A⃗, α⃗, B⃗, β⃗), I::InvariantForm)
+function ContinuumModels.StrainEnergyDensity(ψ::Swanson, I⃗, (; A⃗, α⃗, B⃗, β⃗), I::InvariantForm)
     @assert length(A⃗) == length(α⃗) == length(B⃗) == length(β⃗) "The vectors are not the same length"
     @tullio _ := 3 / 2 * (A⃗[i] / (1 + α⃗[i]) * (I⃗[1] / 3)^(1 + α⃗[i]) + B⃗[i] / (1 + β⃗[i]) * (I⃗[2] / 3)^(1 + β⃗[i]))
 end
@@ -587,11 +587,11 @@ Model: ``C_1(I_1-3)+C_2(I_2-3)+\\frac{C_3}{N+1}(I_1-3)^{N+1}``
 """
 struct YamashitaKawabata <: AbstractHyperelasticModel end
 
-function StrainEnergyDensityFunction(ψ::YamashitaKawabata, λ⃗, (; C1, C2, C3, N))
+function ContinuumModels.StrainEnergyDensity(ψ::YamashitaKawabata, λ⃗::AbstractVector, (; C1, C2, C3, N))
     C1 * (I₁(λ⃗) - 3) + C2 * (I₂(λ⃗) - 3) + C3 / (N + 1) * (I₁(λ⃗) - 3)^(N + 1)
 end
 
-function StrainEnergyDensityFunction(ψ::YamashitaKawabata, I⃗, (; C1, C2, C3, N), I::InvariantForm)
+function ContinuumModels.StrainEnergyDensity(ψ::YamashitaKawabata, I⃗, (; C1, C2, C3, N), I::InvariantForm)
     1 * (I⃗[1] - 3) + C2 * (I⃗[2] - 3) + C3 / (N + 1) * (I⃗[1] - 3)^(N + 1)
 end
 
@@ -610,11 +610,11 @@ Model: ``\\frac{A}{2(1-\\frac{n}{2})}(I_1-3+C^2)^{1-\\frac{n}{2}}+k(I_1-3)^2``
 """
 struct DavisDeThomas <: AbstractHyperelasticModel end
 
-function StrainEnergyDensityFunction(ψ::DavisDeThomas, λ⃗, (; A, n, C, k))
+function ContinuumModels.StrainEnergyDensity(ψ::DavisDeThomas, λ⃗::AbstractVector, (; A, n, C, k))
     A / (2 * (1 - n / 2)) * (I₁(λ⃗) - 3 + C^2)^(1 - n / 2) + k * (I₁(λ⃗) - 3)^2
 end
 
-function StrainEnergyDensityFunction(ψ::DavisDeThomas, I⃗, (; A, n, C, k), I::InvariantForm)
+function ContinuumModels.StrainEnergyDensity(ψ::DavisDeThomas, I⃗, (; A, n, C, k), I::InvariantForm)
     A / (2 * (1 - n / 2)) * (I⃗[1] - 3 + C^2)^(1 - n / 2) + k * (I⃗[1] - 3)^2
 end
 
@@ -633,11 +633,11 @@ Model: ``\\frac{A}{2-n}(I_1-3+C^2)^{1-\\frac{n}{2}}+\\frac{B}{2+m}(I_1-3+C^2)^{1
 """
 struct Gregory <: AbstractHyperelasticModel end
 
-function StrainEnergyDensityFunction(ψ::Gregory, λ⃗, (; A, B, C, m, n))
+function ContinuumModels.StrainEnergyDensity(ψ::Gregory, λ⃗::AbstractVector, (; A, B, C, m, n))
     A / (2 - n) * (I₁(λ⃗) - 3 + C^2)^(1 - n / 2) + B / (2 + m) * (I₁(λ⃗) - 3 + C^2)^(1 + m / 2)
 end
 
-function StrainEnergyDensityFunction(ψ::Gregory, I⃗, (; A, B, C, m, n), I::InvariantForm)
+function ContinuumModels.StrainEnergyDensity(ψ::Gregory, I⃗, (; A, B, C, m, n), I::InvariantForm)
     A / (2 - n) * (I⃗[1] - 3 + C^2)^(1 - n / 2) + B / (2 + m) * (I⃗[1] - 3 + C^2)^(1 + m / 2)
 end
 
@@ -656,11 +656,11 @@ Model: ``\\frac{A}{1+\\alpha}(I_1-3+M^2)^{1+\\alpha}+\\frac{B}{1+\\beta}(I_1-3+N
 """
 struct ModifiedGregory <: AbstractHyperelasticModel end
 
-function StrainEnergyDensityFunction(ψ::ModifiedGregory, λ⃗, (; A, α, M, B, β, N))
+function ContinuumModels.StrainEnergyDensity(ψ::ModifiedGregory, λ⃗::AbstractVector, (; A, α, M, B, β, N))
     A / (1 + α) * (I₁(λ⃗) - 3 + M^2)^(1 + α) + B / (1 + β) * (I₁(λ⃗) - 3 + N^2)^(1 + β)
 end
 
-function StrainEnergyDensityFunction(ψ::ModifiedGregory, I⃗, (; A, α, M, B, β, N), I::InvariantForm)
+function ContinuumModels.StrainEnergyDensity(ψ::ModifiedGregory, I⃗, (; A, α, M, B, β, N), I::InvariantForm)
     A / (1 + α) * (I⃗[1] - 3 + M^2)^(1 + α) + B / (1 + β) * (I⃗[1] - 3 + N^2)^(1 + β)
 end
 
@@ -679,8 +679,8 @@ Model: ``\\frac{C_1}{\\alpha}(I_1-3)^{\\alpha}+C_2(I_1-3)+\\frac{C_3}{\\zeta}(I_
 """
 struct Beda <: AbstractHyperelasticModel end
 
-function StrainEnergyDensityFunction(ψ::Beda, λ⃗, (; C1, C2, C3, K1, α, β, ζ))
-    StrainEnergyDensityFunction(
+function ContinuumModels.StrainEnergyDensity(ψ::Beda, λ⃗::AbstractVector, (; C1, C2, C3, K1, α, β, ζ))
+    ContinuumModels.StrainEnergyDensity(
         GeneralBeda(),
         λ⃗,
         (
@@ -692,8 +692,8 @@ function StrainEnergyDensityFunction(ψ::Beda, λ⃗, (; C1, C2, C3, K1, α, β,
     )
 end
 
-function StrainEnergyDensityFunction(ψ::Beda, I⃗, (; C1, C2, C3, K1, α, β, ζ), I::InvariantForm)
-    StrainEnergyDensityFunction(
+function ContinuumModels.StrainEnergyDensity(ψ::Beda, I⃗, (; C1, C2, C3, K1, α, β, ζ), I::InvariantForm)
+    ContinuumModels.StrainEnergyDensity(
         GeneralBeda(),
         I⃗,
         (
@@ -721,11 +721,11 @@ Model:``C_1 (I_1 - 3) + \\frac{C_2}{N + 1} (I_1 - 3)^{N + 1} + \\frac{C_3}{M + 1
 """
 struct Amin <: AbstractHyperelasticModel end
 
-function StrainEnergyDensityFunction(ψ::Amin, λ⃗, (; C1, C2, C3, C4, N, M))
+function ContinuumModels.StrainEnergyDensity(ψ::Amin, λ⃗::AbstractVector, (; C1, C2, C3, C4, N, M))
     C1 * (I₁(λ⃗) - 3) + C2 / (N + 1) * (I₁(λ⃗) - 3)^(N + 1) + C3 / (M + 1) * (I₁(λ⃗) - 3)^(M + 1) + C4 * (I₂(λ⃗) - 3)
 end
 
-function StrainEnergyDensityFunction(ψ::Amin, I⃗, (; C1, C2, C3, C4, N, M), I::InvariantForm)
+function ContinuumModels.StrainEnergyDensity(ψ::Amin, I⃗, (; C1, C2, C3, C4, N, M), I::InvariantForm)
     C1 * (I⃗[1] - 3) + C2 / (N + 1) * (I⃗[1] - 3)^(N + 1) + C3 / (M + 1) * (I⃗[1] - 3)^(M + 1) + C4 * (I⃗[2] - 3)
 end
 
@@ -744,12 +744,12 @@ Model: ``\\frac{3^{1 - \\alpha_i}}{2\\alpha_i} \\mu_i (I_1^{\\alpha_i} - 3^{\\al
 """
 struct LopezPamies <: AbstractHyperelasticModel end
 
-function StrainEnergyDensityFunction(ψ::LopezPamies, λ⃗, (; α⃗, μ⃗))
+function ContinuumModels.StrainEnergyDensity(ψ::LopezPamies, λ⃗::AbstractVector, (; α⃗, μ⃗))
     @assert length(α⃗) == length(μ⃗) "length of α⃗ is not equal to length of μ⃗"
     @tullio _ := (3^(1 - α⃗[i])) / (2α⃗[i]) * μ⃗[i] * (I₁(λ⃗)^(α⃗[i]) - 3^(α⃗[i]))
 end
 
-function StrainEnergyDensityFunction(ψ::LopezPamies, I⃗, (; α⃗, μ⃗), I::InvariantForm)
+function ContinuumModels.StrainEnergyDensity(ψ::LopezPamies, I⃗, (; α⃗, μ⃗), I::InvariantForm)
     @assert length(α⃗) == length(μ⃗) "length of α⃗ is not equal to length of μ⃗"
     @tullio _ := (3^(1 - α⃗[i])) / (2α⃗[i]) * μ⃗[i] * (I⃗[1]^(α⃗[i]) - 3^(α⃗[i]))
 end
@@ -769,11 +769,11 @@ Model: ``K_1 (I_1 - 3)^m + K_2 * (I_1 - 3)^p + K_3 * (I_1 - 3)^q``
 """
 struct GenYeoh <: AbstractHyperelasticModel end
 
-function StrainEnergyDensityFunction(ψ::GenYeoh, λ⃗, (; K1, K2, K3, m, p, q))
+function ContinuumModels.StrainEnergyDensity(ψ::GenYeoh, λ⃗::AbstractVector, (; K1, K2, K3, m, p, q))
     K1 * (I₁(λ⃗) - 3)^m + K2 * (I₁(λ⃗) - 3)^p + K3 * (I₁(λ⃗) - 3)^q
 end
 
-function StrainEnergyDensityFunction(ψ::GenYeoh, I⃗, (; K1, K2, K3, m, p, q), I::InvariantForm)
+function ContinuumModels.StrainEnergyDensity(ψ::GenYeoh, I⃗, (; K1, K2, K3, m, p, q), I::InvariantForm)
     K1 * (I⃗[1] - 3)^m + K2 * (I⃗[1] - 3)^p + K3 * (I⃗[1] - 3)^q
 end
 
@@ -792,11 +792,11 @@ Model: ``\\frac{G\\exp{(-9k_1+k_1I_1)}}{k_1}+Gk_2\\log{I_2}``
 """
 struct HartSmith <: AbstractHyperelasticModel end
 
-function StrainEnergyDensityFunction(ψ::HartSmith, λ⃗, (; G, k₁, k₂))
+function ContinuumModels.StrainEnergyDensity(ψ::HartSmith, λ⃗::AbstractVector, (; G, k₁, k₂))
     G * exp(-9k₁ + k₁ * I₁(λ⃗)) / k₁ + G * k₂ * log(I₂(λ⃗))
 end
 
-function StrainEnergyDensityFunction(ψ::HartSmith, I⃗, (; G, k₁, k₂), I::InvariantForm)
+function ContinuumModels.StrainEnergyDensity(ψ::HartSmith, I⃗, (; G, k₁, k₂), I::InvariantForm)
     G * exp(-9k₁ + k₁ * I⃗[1]) / k₁ + G * k₂ * log(I⃗[2])
 end
 
@@ -815,11 +815,11 @@ Model: ``C_1 (\\exp(\\alpha(I_1 - 3)) - 1) + C_2 (I_2 - 3)``
 """
 struct VerondaWestmann <: AbstractHyperelasticModel end
 
-function StrainEnergyDensityFunction(ψ::VerondaWestmann, λ⃗, (; C1, C2, α))
+function ContinuumModels.StrainEnergyDensity(ψ::VerondaWestmann, λ⃗::AbstractVector, (; C1, C2, α))
     C1 * (exp(α * (I₁(λ⃗) - 3)) - 1) + C2 * (I₂(λ⃗) - 3)
 end
 
-function StrainEnergyDensityFunction(ψ::VerondaWestmann, I⃗, (; C1, C2, α), I::InvariantForm)
+function ContinuumModels.StrainEnergyDensity(ψ::VerondaWestmann, I⃗, (; C1, C2, α), I::InvariantForm)
     C1 * (exp(α * (I⃗[1] - 3)) - 1) + C2 * (I⃗[2] - 3)
 end
 
@@ -839,11 +839,11 @@ Model: ``\\frac{\\mu}{2 * b} (\\exp(b(I_1 - 3)) - 1)``
 """
 struct FungDemiray <: AbstractHyperelasticModel end
 
-function StrainEnergyDensityFunction(ψ::FungDemiray, λ⃗, (; μ, b))
+function ContinuumModels.StrainEnergyDensity(ψ::FungDemiray, λ⃗::AbstractVector, (; μ, b))
     μ / (2 * b) * (exp(b * (I₁(λ⃗) - 3)) - 1)
 end
 
-function StrainEnergyDensityFunction(ψ::FungDemiray, I⃗, (; μ, b), I::InvariantForm)
+function ContinuumModels.StrainEnergyDensity(ψ::FungDemiray, I⃗, (; μ, b), I::InvariantForm)
     μ / (2 * b) * (exp(b * (I⃗[1] - 3)) - 1)
 end
 
@@ -862,11 +862,11 @@ Model: ``\\alpha (\\exp\\bigg(\\beta (I_1 - 3)\\bigg) + \\gamma  (I_2 - 3)) - 1)
 """
 struct Vito <: AbstractHyperelasticModel end
 
-function StrainEnergyDensityFunction(ψ::Vito, λ⃗, (; α, β, γ))
+function ContinuumModels.StrainEnergyDensity(ψ::Vito, λ⃗::AbstractVector, (; α, β, γ))
     α * (exp(β * (I₁(λ⃗) - 3) + γ * (I₂(λ⃗) - 3)) - 1)
 end
 
-function StrainEnergyDensityFunction(ψ::Vito, I⃗, (; α, β, γ), I::InvariantForm)
+function ContinuumModels.StrainEnergyDensity(ψ::Vito, I⃗, (; α, β, γ), I::InvariantForm)
     α * (exp(β * (I⃗[1] - 3) + γ * (I⃗[2] - 3)) - 1)
 end
 
@@ -885,11 +885,11 @@ Model: ``C_{10} * (I_1 - 3) + C_{20} * (I_1 - 3)^2 + C_{30} * (I_1 - 3)^3 + \\al
 """
 struct ModifiedYeoh <: AbstractHyperelasticModel end
 
-function StrainEnergyDensityFunction(ψ::ModifiedYeoh, λ⃗, (; C10, C20, C30, α, β))
+function ContinuumModels.StrainEnergyDensity(ψ::ModifiedYeoh, λ⃗::AbstractVector, (; C10, C20, C30, α, β))
     C10 * (I₁(λ⃗) - 3) + C20 * (I₁(λ⃗) - 3)^2 + C30 * (I₁(λ⃗) - 3)^3 + α / β * (1 - exp(-β * (I₁(λ⃗) - 3)))
 end
 
-function StrainEnergyDensityFunction(ψ::ModifiedYeoh, I⃗, (; C10, C20, C30, α, β), I::InvariantForm)
+function ContinuumModels.StrainEnergyDensity(ψ::ModifiedYeoh, I⃗, (; C10, C20, C30, α, β), I::InvariantForm)
     C10 * (I⃗[1] - 3) + C20 * (I⃗[1] - 3)^2 + C30 * (I⃗[1] - 3)^3 + α / β * (1 - exp(-β * (I⃗[1] - 3)))
 end
 
@@ -910,19 +910,19 @@ Model: ``W = \\int\\limits_{3}^{I_1(\\vec\\lambda)} \\exp\\bigg(\\sum\\limits_{i
 """
 struct ChevalierMarco <: AbstractHyperelasticModel end
 
-function StrainEnergyDensityFunction(ψ::ChevalierMarco, λ⃗, (; a⃗, b⃗))
+function ContinuumModels.StrainEnergyDensity(ψ::ChevalierMarco, λ⃗::AbstractVector, (; a⃗, b⃗))
     ∂W∂I1(I₁) = exp(sum(@tullio _ := a⃗[i] * (I₁ - 3)^(i - 1)))
     ∂W∂I2(I₂) = @tullio _ := b⃗[i] / I₂^(i - 1)
     quadgk(∂W∂I1, 3, I₁(λ⃗))[1] + quadgk(∂W∂I2, 3, I₂(λ⃗))[1]
 end
 
-function StrainEnergyDensityFunction(ψ::ChevalierMarco, I⃗, (; a⃗, b⃗), I::InvariantForm)
+function ContinuumModels.StrainEnergyDensity(ψ::ChevalierMarco, I⃗, (; a⃗, b⃗), I::InvariantForm)
     ∂W∂I1(I₁) = exp(sum(@tullio _ := a⃗[i] * (I₁ - 3)^(i - 1)))
     ∂W∂I2(I₂) = @tullio _ := b⃗[i] / I₂^(i - 1)
     quadgk(∂W∂I1, 3, I⃗[1])[1] + quadgk(∂W∂I2, 3, I⃗[2])[1]
 end
 
-function NominalStressFunction(ψ::ChevalierMarco, λ⃗, (; a⃗, b⃗))
+function NominalStressFunction(ψ::ChevalierMarco, λ⃗::AbstractVector, (; a⃗, b⃗))
     ∂W∂I1(λ⃗) = exp(sum(@tullio _ := a⃗[i] * (I₁(λ⃗) - 3)^(i - 1)))
     ∂W∂I2(λ⃗) = @tullio _ := b⃗[i] / I₂(λ⃗)^(i - 1)
     𝐒 = 2 * (I(3) * ∂W∂I1 - diagm(λ⃗ .^ 2)^(-2) * ∂W∂I2)
@@ -931,7 +931,7 @@ function NominalStressFunction(ψ::ChevalierMarco, λ⃗, (; a⃗, b⃗))
     return sᵢ
 end
 
-function TrueStressFunction(ψ::ChevalierMarco, (; a⃗, b⃗))
+function true_stress(ψ::ChevalierMarco, (; a⃗, b⃗))
     ∂W∂I1(λ⃗) = exp(sum(@tullio _ := a⃗[i] * (I₁(λ⃗) - 3)^(i - 1)))
     ∂W∂I2(λ⃗) = @tullio _ := b⃗[i] / I₂(λ⃗)^(i - 1)
     s(λ⃗) = NominalStressFunction(ψ, λ⃗, (a⃗=a⃗, b⃗=b⃗))
@@ -956,11 +956,11 @@ Model: ``W = h_1\\int\\exp{h_3(I_1-3)^2}\\text{d}I_1+3h_2\\int\\frac{1}{\\sqrt{I
 """
 struct GornetDesmorat <: AbstractHyperelasticModel end
 
-function StrainEnergyDensityFunction(ψ::GornetDesmorat, λ⃗, (; h₁, h₂, h₃))
+function ContinuumModels.StrainEnergyDensity(ψ::GornetDesmorat, λ⃗::AbstractVector, (; h₁, h₂, h₃))
     h₁ * √π * erfi(√h₃ * (I₁(λ⃗) - 3)^2) / 2 / √h₃ + 6 * h₂ * √(I₂(λ⃗))
 end
 
-function StrainEnergyDensityFunction(ψ::GornetDesmorat, I⃗, (; h₁, h₂, h₃), I::InvariantForm)
+function ContinuumModels.StrainEnergyDensity(ψ::GornetDesmorat, I⃗, (; h₁, h₂, h₃), I::InvariantForm)
     h₁ * √π * erfi(√h₃ * (I⃗[1] - 3)^2) / 2 / √h₃ + 6 * h₂ * √(I⃗[2])
 end
 
@@ -979,11 +979,11 @@ Model: ``A_1\\exp{m_1(I_1-3)-1}+B_1\\exp{n_1(I_2-3)-1}``
 """
 struct MansouriDarijani <: AbstractHyperelasticModel end
 
-function StrainEnergyDensityFunction(ψ::MansouriDarijani, λ⃗, (; A1, m1, B1, n1))
+function ContinuumModels.StrainEnergyDensity(ψ::MansouriDarijani, λ⃗::AbstractVector, (; A1, m1, B1, n1))
     A1 * (exp(m1 * (I₁(λ⃗) - 3)) - 1) + B1 * (exp(n1 * (I₂(λ⃗) - 3)) - 1)
 end
 
-function StrainEnergyDensityFunction(ψ::MansouriDarijani, I⃗, (; A1, m1, B1, n1), I::InvariantForm)
+function ContinuumModels.StrainEnergyDensity(ψ::MansouriDarijani, I⃗, (; A1, m1, B1, n1), I::InvariantForm)
     A1 * (exp(m1 * (I⃗[1] - 3)) - 1) + B1 * (exp(n1 * (I⃗[2] - 3)) - 1)
 end
 
@@ -1002,11 +1002,11 @@ Model: ``C_1(I_1-3)+C_2\\log(\\frac{I_2}{3})``
 """
 struct GentThomas <: AbstractHyperelasticModel end
 
-function StrainEnergyDensityFunction(ψ::GentThomas, λ⃗, (; C1, C2))
+function ContinuumModels.StrainEnergyDensity(ψ::GentThomas, λ⃗::AbstractVector, (; C1, C2))
     C1 * (I₁(λ⃗) - 3) + C2 * log(I₂(λ⃗) / 3)
 end
 
-function StrainEnergyDensityFunction(ψ::GentThomas, I⃗, (; C1, C2), I::InvariantForm)
+function ContinuumModels.StrainEnergyDensity(ψ::GentThomas, I⃗, (; C1, C2), I::InvariantForm)
     C1 * (I⃗[1] - 3) + C2 * log(I⃗[2] / 3)
 end
 
@@ -1025,11 +1025,11 @@ Model: ``\\frac{C_1 \\sqrt{\\pi}\\text{erfi}\\big(\\sqrt{k}(I_1-3)\\big)}{2\\sqr
 """
 struct Alexander <: AbstractHyperelasticModel end
 
-function StrainEnergyDensityFunction(ψ::Alexander, λ⃗, (; C₁, C₂, C₃, k, γ))
+function ContinuumModels.StrainEnergyDensity(ψ::Alexander, λ⃗::AbstractVector, (; C₁, C₂, C₃, k, γ))
     C₁ * √π * erfi(√k * (I₁(λ⃗) - 3)) / 2 / √k + C₂ * log((I₂(λ⃗) - 3 + γ) / γ) + C₃ * (I₂(λ⃗) - 3)
 end
 
-function StrainEnergyDensityFunction(ψ::Alexander, I⃗, (; C₁, C₂, C₃, k, γ), I::InvariantForm)
+function ContinuumModels.StrainEnergyDensity(ψ::Alexander, I⃗, (; C₁, C₂, C₃, k, γ), I::InvariantForm)
     C₁ * √π * erfi(√k * (I⃗[1] - 3)) / 2 / √k + C₂ * log((I⃗[2] - 3 + γ) / γ) + C₃ * (I⃗[2] - 3)
 end
 
@@ -1048,20 +1048,20 @@ Model: ``\\int\\limits_{3}^{I_1}\\exp\\bigg(\\sum\\limits_{i=0}^{n}a_i(I_1-3)^i\
 """
 struct LambertDianiRey <: AbstractHyperelasticModel end
 
-function StrainEnergyDensityFunction(ψ::LambertDianiRey, λ⃗, (; a⃗, b⃗))
+function ContinuumModels.StrainEnergyDensity(ψ::LambertDianiRey, λ⃗::AbstractVector, (; a⃗, b⃗))
     ∂W∂I₁(I₁) = exp(@tullio _ := a⃗[i] .* (I₁ .- 3) .^ i)
     ∂W∂I₂(I₂) = exp(@tullio _ := b⃗[i] .* log(I₂) .^ i)
     quadgk(∂W∂I₁, 3, I₁(λ⃗))[1] + quadgk(∂W∂I₂, 3, I₂(λ⃗))[1]
 end
 
-function StrainEnergyDensityFunction(ψ::LambertDianiRey, I⃗, (; a⃗, b⃗), I::InvariantForm)
+function ContinuumModels.StrainEnergyDensity(ψ::LambertDianiRey, I⃗, (; a⃗, b⃗), I::InvariantForm)
     ∂W∂I₁(I₁) = exp(@tullio _ := a⃗[i] .* (I₁ .- 3) .^ i)
     ∂W∂I₂(I₂) = exp(@tullio _ := b⃗[i] .* log(I₂) .^ i)
     quadgk(∂W∂I₁, 3, I⃗[1])[1] + quadgk(∂W∂I₂, 3, I⃗[2])[1]
 end
 
 
-function NominalStressFunction(ψ::LambertDianiRey, λ⃗, (; a⃗, b⃗))
+function NominalStressFunction(ψ::LambertDianiRey, λ⃗::AbstractVector, (; a⃗, b⃗))
     ∂W∂I₁ = exp(@tullio _ := a⃗[i] .* (I₁(λ⃗) .- 3) .^ i)
     ∂W∂I₂ = exp(@tullio _ := b⃗[i] .* log(I₂(λ⃗)) .^ i)
     𝐒 = 2 * (I * ∂W∂I₁ - diagm(λ⃗ .^ 2)^(-2) * ∂W∂I₂)
@@ -1070,7 +1070,7 @@ function NominalStressFunction(ψ::LambertDianiRey, λ⃗, (; a⃗, b⃗))
     return sᵢ
 end
 
-function TrueStressFunction(ψ::LambertDianiRey, λ⃗, (; a⃗, b⃗))
+function true_stress(ψ::LambertDianiRey, λ⃗::AbstractVector, (; a⃗, b⃗))
     s(λ⃗) = NominalStressFunction(ψ, λ⃗, (a⃗=a⃗, b⃗=b⃗))
     σᵢ = map(λ⃗ᵢ -> λ⃗ᵢ .* s(λ⃗ᵢ), λ⃗)
     return σᵢ
@@ -1093,11 +1093,11 @@ Model: ``\\frac{\\alpha}{\\beta}(1-\\exp{-\\beta(I_1-3)})+\\frac{\\mu}{2b}\\bigg
 """
 struct HossMarczakI <: AbstractHyperelasticModel end
 
-function StrainEnergyDensityFunction(ψ::HossMarczakI, λ⃗, (; α, β, μ, b, n))
+function ContinuumModels.StrainEnergyDensity(ψ::HossMarczakI, λ⃗::AbstractVector, (; α, β, μ, b, n))
     α / β * (1 - exp(-β * (I₁(λ⃗) - 3))) + μ / (2b) * ((1 + b / n * (I₁(λ⃗) - 3))^n - 1)
 end
 
-function StrainEnergyDensityFunction(ψ::HossMarczakI, I⃗, (; α, β, μ, b, n), I::InvariantForm)
+function ContinuumModels.StrainEnergyDensity(ψ::HossMarczakI, I⃗, (; α, β, μ, b, n), I::InvariantForm)
     α / β * (1 - exp(-β * (I⃗[1] - 3))) + μ / (2b) * ((1 + b / n * (I⃗[1] - 3))^n - 1)
 end
 
@@ -1124,11 +1124,11 @@ Model: ``\\frac{\\alpha}{\\beta}(1-\\exp{-\\beta(I_1-3)})+\\frac{\\mu}{2b}\\bigg
 """
 struct HossMarczakII <: AbstractHyperelasticModel end
 
-function StrainEnergyDensityFunction(ψ::HossMarczakII, λ⃗, (; α, β, μ, b, n, C2))
+function ContinuumModels.StrainEnergyDensity(ψ::HossMarczakII, λ⃗::AbstractVector, (; α, β, μ, b, n, C2))
     α / β * (1 - exp(-β * (I₁(λ⃗) - 3))) + μ / (2b) * ((1 + b / n * (I₁(λ⃗) - 3))^n - 1) + C2 * log(I₂(λ⃗) / 3)
 end
 
-function StrainEnergyDensityFunction(ψ::HossMarczakII, I⃗, (; α, β, μ, b, n, C2), I::InvariantForm)
+function ContinuumModels.StrainEnergyDensity(ψ::HossMarczakII, I⃗, (; α, β, μ, b, n, C2), I::InvariantForm)
     α / β * (1 - exp(-β * (I⃗[1] - 3))) + μ / (2b) * ((1 + b / n * (I⃗[1] - 3))^n - 1) + C2 * log(I⃗[2] / 3)
 end
 
@@ -1154,11 +1154,11 @@ Model: ``A\\bigg[\\frac{1}{a}\\exp{(a(I_1-3))}+b(I_1-2)(1-\\log{I_1-2})-\\frac{1
 """
 struct ExpLn <: AbstractHyperelasticModel end
 
-function StrainEnergyDensityFunction(ψ::ExpLn, λ⃗, (; A, a, b))
+function ContinuumModels.StrainEnergyDensity(ψ::ExpLn, λ⃗::AbstractVector, (; A, a, b))
     A * (1 / a * exp(a * (I₁(λ⃗) - 3)) + b * (I₁(λ⃗) - 2) * (1 - log(I₁(λ⃗) - 2)) - 1 / a - b)
 end
 
-function StrainEnergyDensityFunction(ψ::ExpLn, I⃗, (; A, a, b), I::InvariantForm)
+function ContinuumModels.StrainEnergyDensity(ψ::ExpLn, I⃗, (; A, a, b), I::InvariantForm)
     A * (1 / a * exp(a * (I⃗[1] - 3)) + b * (I⃗[1] - 2) * (1 - log(I⃗[1] - 2)) - 1 / a - b)
 end
 
@@ -1183,13 +1183,13 @@ Model:
 """
 struct VanDerWaals <: AbstractHyperelasticModel end
 
-function StrainEnergyDensityFunction(ψ::VanDerWaals, λ⃗, (; μ, λm, β, α))
+function ContinuumModels.StrainEnergyDensity(ψ::VanDerWaals, λ⃗::AbstractVector, (; μ, λm, β, α))
     I = β * I₁(λ⃗) + (1 - β) * I₂(λ⃗)
     θ = (I - 3) / (λm^2 - 3)
     μ * (-(λm^2 - 3) * log(1 - θ) + θ) - 2 / 3 * α * ((I - 3) / 2)^(3 / 2)
 end
 
-function StrainEnergyDensityFunction(ψ::VanDerWaals, I⃗, (; μ, λm, β, α), I::InvariantForm)
+function ContinuumModels.StrainEnergyDensity(ψ::VanDerWaals, I⃗, (; μ, λm, β, α), I::InvariantForm)
     I = β * I⃗[1] + (1 - β) * I⃗[2]
     θ = (I - 3) / (λm^2 - 3)
     μ * (-(λm^2 - 3) * log(1 - θ) + θ) - 2 / 3 * α * ((I - 3) / 2)^(3 / 2)
@@ -1222,11 +1222,11 @@ Model: ``-\\frac{\\mu J_m}{2}\\log{\\bigg(1-\\frac{I_1-3}{J_m}\\bigg)}``
 """
 struct Gent <: AbstractHyperelasticModel end
 
-function StrainEnergyDensityFunction(ψ::Gent, λ⃗, (; μ, Jₘ))
+function ContinuumModels.StrainEnergyDensity(ψ::Gent, λ⃗::AbstractVector, (; μ, Jₘ))
     -(μ * Jₘ) / 2 * log(1 - (I₁(λ⃗) - 3) / Jₘ)
 end
 
-function StrainEnergyDensityFunction(ψ::Gent, I⃗, (; μ, Jₘ), I::InvariantForm)
+function ContinuumModels.StrainEnergyDensity(ψ::Gent, I⃗, (; μ, Jₘ), I::InvariantForm)
     -(μ * Jₘ) / 2 * log(1 - (I⃗[1] - 3) / Jₘ)
 end
 
@@ -1254,11 +1254,11 @@ Model: ``-c\\log{1-\\big(\\frac{I_1-3}{J_m}\\big)^2}``
 """
 struct TakamizawaHayashi <: AbstractHyperelasticModel end
 
-function StrainEnergyDensityFunction(ψ::TakamizawaHayashi, λ⃗, (; c, Jₘ))
+function ContinuumModels.StrainEnergyDensity(ψ::TakamizawaHayashi, λ⃗::AbstractVector, (; c, Jₘ))
     -c * log(1 - ((I₁(λ⃗) - 3) / Jₘ)^2)
 end
 
-function StrainEnergyDensityFunction(ψ::TakamizawaHayashi, I⃗, (; c, Jₘ), I::InvariantForm)
+function ContinuumModels.StrainEnergyDensity(ψ::TakamizawaHayashi, I⃗, (; c, Jₘ), I::InvariantForm)
     -c * log(1 - ((I⃗[1] - 3) / Jₘ)^2)
 end
 
@@ -1285,11 +1285,11 @@ Model: ``\\frac{A}{B}(1-\\exp{-B(I_1-3)}) - C_{10}(I_m-3)\\log{1-\\frac{I_1-3}{I
 """
 struct YeohFleming <: AbstractHyperelasticModel end
 
-function StrainEnergyDensityFunction(ψ::YeohFleming, λ⃗, (; A, B, C10, Im))
+function ContinuumModels.StrainEnergyDensity(ψ::YeohFleming, λ⃗::AbstractVector, (; A, B, C10, Im))
     A / B * (1 - exp(-B * (I₁(λ⃗) - 3))) - C10 * (Im - 3) * log(1 - ((I₁(λ⃗) - 3) / (Im - 3)))
 end
 
-function StrainEnergyDensityFunction(ψ::YeohFleming, I⃗, (; A, B, C10, Im), I::InvariantForm)
+function ContinuumModels.StrainEnergyDensity(ψ::YeohFleming, I⃗, (; A, B, C10, Im), I::InvariantForm)
     A / B * (1 - exp(-B * (I⃗[1] - 3))) - C10 * (Im - 3) * log(1 - ((I⃗[1] - 3) / (Im - 3)))
 end
 
@@ -1308,11 +1308,11 @@ Model ``K\\log{\\frac{I_2}{3}}-\\frac{\\mu J_m}{2}\\log{1-\\frac{I_1-3}{J-m}}``
 """
 struct PucciSaccomandi <: AbstractHyperelasticModel end
 
-function StrainEnergyDensityFunction(ψ::PucciSaccomandi, λ⃗, (; K, μ, Jₘ))
+function ContinuumModels.StrainEnergyDensity(ψ::PucciSaccomandi, λ⃗::AbstractVector, (; K, μ, Jₘ))
     K * log(I₂(λ⃗) / 3) - μ * Jₘ / 2 * log(1 - (I₁(λ⃗) - 3) / Jₘ)
 end
 
-function StrainEnergyDensityFunction(ψ::PucciSaccomandi, I⃗, (; K, μ, Jₘ), I::InvariantForm)
+function ContinuumModels.StrainEnergyDensity(ψ::PucciSaccomandi, I⃗, (; K, μ, Jₘ), I::InvariantForm)
     K * log(I⃗[2] / 3) - μ * Jₘ / 2 * log(1 - (I⃗[1] - 3) / Jₘ)
 end
 
@@ -1340,11 +1340,11 @@ Model: ``-\\frac{\\mu J}{2}\\log\\bigg(\\frac{J^3-J^2I_1+JI_2-1}{(J-1)^3}\\bigg)
 """
 struct HorganSaccomandi <: AbstractHyperelasticModel end
 
-function StrainEnergyDensityFunction(ψ::HorganSaccomandi, λ⃗, (; μ, J))
+function ContinuumModels.StrainEnergyDensity(ψ::HorganSaccomandi, λ⃗::AbstractVector, (; μ, J))
     -μ * J / 2 * log((J^3 - J^2 * I₁(λ⃗) + J * I₂(λ⃗) - 1) / (J - 1)^3)
 end
 
-function StrainEnergyDensityFunction(ψ::HorganSaccomandi, I⃗, (; μ, J), I::InvariantForm)
+function ContinuumModels.StrainEnergyDensity(ψ::HorganSaccomandi, I⃗, (; μ, J), I::InvariantForm)
     -μ * J / 2 * log((J^3 - J^2 * I⃗[1] + J * I⃗[2] - 1) / (J - 1)^3)
 end
 
@@ -1378,11 +1378,11 @@ Model: ``-\\frac{G_0 I_m(I_m-3)}{2(2I_m-3)}\\log\\bigg(\\frac{1-\\frac{I_1-3}{I_
 """
 struct Beatty <: AbstractHyperelasticModel end
 
-function StrainEnergyDensityFunction(ψ::Beatty, λ⃗, (; G₀, Iₘ))
+function ContinuumModels.StrainEnergyDensity(ψ::Beatty, λ⃗::AbstractVector, (; G₀, Iₘ))
     -G₀ * Iₘ * (Iₘ - 3) / 2 / (2Iₘ - 3) * log((1 - (I₁(λ⃗) - 3) / (Iₘ - 3)) / (1 + (I₁(λ⃗) - 3) / (Iₘ)))
 end
 
-function StrainEnergyDensityFunction(ψ::Beatty, I⃗, (; G₀, Iₘ), I::InvariantForm)
+function ContinuumModels.StrainEnergyDensity(ψ::Beatty, I⃗, (; G₀, Iₘ), I::InvariantForm)
     -G₀ * Iₘ * (Iₘ - 3) / 2 / (2Iₘ - 3) * log((1 - (I⃗[1] - 3) / (Iₘ - 3)) / (1 + (I⃗[1] - 3) / (Iₘ)))
 end
 
@@ -1401,7 +1401,7 @@ Model: ``-\\frac{2\\mu J_m}{c^2}\\log\\bigg(1-\\frac{\\lambda_1^c+\\lambda_2^c+\
 """
 struct HorganMurphy <: AbstractHyperelasticModel end
 
-function StrainEnergyDensityFunction(ψ::HorganMurphy, λ⃗, (; μ, Jₘ, c))
+function ContinuumModels.StrainEnergyDensity(ψ::HorganMurphy, λ⃗::AbstractVector, (; μ, Jₘ, c))
     -2 * μ * Jₘ / c^2 * log(1 - (sum(λ⃗ .^ c) - 3) / Jₘ)
 end
 
@@ -1434,7 +1434,7 @@ Model: ``2\\mu\\sum\\limits_{1}^{3}(\\lambda_i(\\log\\lambda_i -1))``
 """
 struct ValanisLandel <: AbstractHyperelasticModel end
 
-function StrainEnergyDensityFunction(ψ::ValanisLandel, λ⃗, (; μ))
+function ContinuumModels.StrainEnergyDensity(ψ::ValanisLandel, λ⃗::AbstractVector, (; μ))
     2 * μ * sum(λ⃗ .* (log.(λ⃗) .- 1))
 end
 
@@ -1453,7 +1453,7 @@ Model: ``E\\sum\\limits_{i=1}^{3}\\bigg[\\lambda_i - 1 - \\log(\\lambda_i) - \\f
 """
 struct PengLandel <: AbstractHyperelasticModel end
 
-function StrainEnergyDensityFunction(ψ::PengLandel, λ⃗, (; E))
+function ContinuumModels.StrainEnergyDensity(ψ::PengLandel, λ⃗::AbstractVector, (; E))
     @tullio _ := (λ⃗[i] - 1 - log(λ⃗[i]) - 1 / 6 * log(λ⃗[i])^2 + 1 / 18 * log(λ⃗[i])^3 - 1 / 216 * log(λ⃗[i])^4) * E
 end
 
@@ -1472,7 +1472,7 @@ Model: ``\\sum\\limits_{i=1}^{N}\\frac{\\mu_i}{\\alpha_i}(\\lambda_1^{\\alpha_i}
 """
 struct Ogden <: AbstractHyperelasticModel end
 
-function StrainEnergyDensityFunction(ψ::Ogden, λ⃗, (; μ⃗, α⃗))
+function ContinuumModels.StrainEnergyDensity(ψ::Ogden, λ⃗::AbstractVector, (; μ⃗, α⃗))
     @tullio _ := μ⃗[i] / α⃗[i] * (sum(λ⃗ .^ α⃗[i]) - 3)
 end
 
@@ -1491,7 +1491,7 @@ Model: ``\\sum\\limits_{i=1}^N\\frac{A_i}{2i}(\\lambda_1^{2i}+\\lambda_2^{2i}+\\
 """
 struct Attard <: AbstractHyperelasticModel end
 
-function StrainEnergyDensityFunction(ψ::Attard, λ⃗, (; A⃗, B⃗))
+function ContinuumModels.StrainEnergyDensity(ψ::Attard, λ⃗::AbstractVector, (; A⃗, B⃗))
     @assert length(A⃗) == length(B⃗) "Length of A and B are not equal"
     @tullio _ := A⃗[i] / 2 / i * (sum(λ⃗ .^ (2i)) - 3) + B⃗[i] / 2 / i * (sum(λ⃗ .^ (-2i)) - 3)
 end
@@ -1512,7 +1512,7 @@ Model:
 """
 struct Shariff <: AbstractHyperelasticModel end
 
-function StrainEnergyDensityFunction(ψ::Shariff, λ⃗, (; E, α⃗))
+function ContinuumModels.StrainEnergyDensity(ψ::Shariff, λ⃗::AbstractVector, (; E, α⃗))
     ϕ = []
     c(j, r) = factorial(j) / factorial(r) / factorial(j - r)
     for j in eachindex(α⃗)
@@ -1546,7 +1546,7 @@ Model: ``\\sum\\limits_{i=1}^{N} A_i\\big[\\exp{m_i(\\lambda_1^{\\alpha_i}+\\lam
 """
 struct ArmanNarooei <: AbstractHyperelasticModel end
 
-function StrainEnergyDensityFunction(ψ::ArmanNarooei, λ⃗, (; A⃗, B⃗, m⃗, n⃗, α⃗, β⃗))
+function ContinuumModels.StrainEnergyDensity(ψ::ArmanNarooei, λ⃗::AbstractVector, (; A⃗, B⃗, m⃗, n⃗, α⃗, β⃗))
     @assert length(A⃗) == length(B⃗) == length(m⃗) == length(n⃗) == length(α⃗) == length(β⃗) "Length of A, B, m, n, α and β are not equal"
     @tullio _ := A⃗[i] * (exp(m⃗[i] * (sum(λ⃗ .^ α⃗[i]) - 3)) - 1) + B⃗[i] * (exp(n⃗[i] * (sum(λ⃗ .^ (-β⃗[i])) - 3)) - 1)
 end
@@ -1566,7 +1566,7 @@ Model: ``K_1(I_1-3)+K_2\\log\\frac{I_2}{3}+\\frac{\\mu}{\\alpha}(\\lambda_1^\\al
 """
 struct ContinuumHybrid <: AbstractHyperelasticModel end
 
-function StrainEnergyDensityFunction(ψ::ContinuumHybrid, λ⃗, (; K₁, K₂, α, μ))
+function ContinuumModels.StrainEnergyDensity(ψ::ContinuumHybrid, λ⃗::AbstractVector, (; K₁, K₂, α, μ))
     K₁ * (I₁(λ⃗) - 3) + K₂ * log(I₂(λ⃗) / 3) + μ / α * (sum(λ⃗ .^ α) - 3)
 end
 
@@ -1585,7 +1585,7 @@ Model: ``C_1^1(I_1-3)+\\sum\\limits_{n=1}^{2}\\sum\\limits_{r=1}^{2}C_n^{r}(\\la
 """
 struct Bechir4Term <: AbstractHyperelasticModel end
 
-function StrainEnergyDensityFunction(ψ::Bechir4Term, λ⃗, (; C11, C12, C21, C22))
+function ContinuumModels.StrainEnergyDensity(ψ::Bechir4Term, λ⃗::AbstractVector, (; C11, C12, C21, C22))
     C = [C11 C12; C21 C22]
     C[1, 1] * (I₁(λ⃗) - 3) + sum(n -> sum(r -> C[n, r] * (sum(λ⃗ .^ (2n))), 1:2), 1:2)
 end
@@ -1606,7 +1606,7 @@ Model: ``G_c (I_1-3)+ \\frac{\\nu k T}{2}(\\sum\\limits_{i=1}^{3}\\kappa\\frac{\
 """
 struct ConstrainedJunction <: AbstractHyperelasticModel end
 
-function StrainEnergyDensityFunction(ψ::ConstrainedJunction, λ⃗, (; Gc, μkT, κ))
+function ContinuumModels.StrainEnergyDensity(ψ::ConstrainedJunction, λ⃗::AbstractVector, (; Gc, μkT, κ))
     Gc * (I₁(λ⃗) - 3) + μkT / 2 * sum(i -> κ * (λ⃗[i] - 1) / (λ⃗[i]^2 + κ) + log((λ⃗[i]^2 + κ) / (1 + κ)) - log(λ⃗[i]^2), 1:3)
 end
 
@@ -1632,7 +1632,7 @@ Model: ``\\frac{1}{2}N_C\\Bigg[\\frac{(1-\\alpha^2)I_1}{1-\\alpha^2I_1}+\\log(1-
 """
 struct EdwardVilgis <: AbstractHyperelasticModel end
 
-function StrainEnergyDensityFunction(ψ::EdwardVilgis, λ⃗, (; Ns, Nc, α, η))
+function ContinuumModels.StrainEnergyDensity(ψ::EdwardVilgis, λ⃗::AbstractVector, (; Ns, Nc, α, η))
     0.5 * Nc * ((1 - α^2) * I₁(λ⃗) / (1 - α^2 * I₁(λ⃗)) + log(1 - α^2 * I₁(λ⃗))) + 0.5 * Ns * ((1 + η) * (1 - α^2) * λ⃗[1] / (1 + η * λ⃗[1]^2) / (1 - α^2 * I₁(λ⃗)) + log(1 + η * λ⃗[1]^2) + (1 + η) * (1 - α^2) * λ⃗[2] / (1 + η * λ⃗[2]^2) / (1 - α^2 * I₁(λ⃗)) + log(1 + η * λ⃗[2]^2) + (1 + η) * (1 - α^2) * λ⃗[3] / (1 + η * λ⃗[3]^2) / (1 - α^2 * I₁(λ⃗)) + log(1 + η * λ⃗[3]^2) + log(1 - α^2 * I₁(λ⃗)))
 end
 
@@ -1666,7 +1666,7 @@ Model:
 """
 struct MCC <: AbstractHyperelasticModel end
 
-function StrainEnergyDensityFunction(ψ::MCC, λ⃗, (; ζkT, μkT, κ))
+function ContinuumModels.StrainEnergyDensity(ψ::MCC, λ⃗::AbstractVector, (; ζkT, μkT, κ))
     @tullio B[i] := κ^2 * (λ⃗[i]^2 - 1) * (λ⃗[i]^2 + κ)^(-2)
     @tullio D[i] := λ⃗[i]^2 * B[i] / κ
     @tullio W1 := λ⃗[i]^2 - 1
@@ -1697,7 +1697,7 @@ Model: ``\\sum\\limits_{i=1}^{3}\\frac{G_c}{2}(\\lambda_i^2-1)+\\frac{2Ge}{\\bet
 """
 struct Tube <: AbstractHyperelasticModel end
 
-function StrainEnergyDensityFunction(ψ::Tube, λ⃗, (; Gc, Ge, β))
+function ContinuumModels.StrainEnergyDensity(ψ::Tube, λ⃗::AbstractVector, (; Gc, Ge, β))
     @tullio _ := Gc / 2 * (λ⃗[i]^2 - 1) + 2Ge / β^2 * (λ⃗[i]^(-β) - 1)
 end
 
@@ -1716,7 +1716,7 @@ Model: ``G_c \\sum\\limits_{i=1}^{3}\\frac{\\lambda_i^2}{2}+G_e\\sum\\limits_{i=
 """
 struct NonaffineTube <: AbstractHyperelasticModel end
 
-function StrainEnergyDensityFunction(ψ::NonaffineTube, λ⃗, (; Gc, Ge))
+function ContinuumModels.StrainEnergyDensity(ψ::NonaffineTube, λ⃗::AbstractVector, (; Gc, Ge))
     Gc * sum(λ⃗ .^ 2 ./ 2) + Ge * sum(λ⃗ .+ 1 ./ λ⃗)
 end
 
@@ -1742,7 +1742,7 @@ struct ThreeChainModel <: AbstractHyperelasticModel
     ThreeChainModel(; ℒinv::Function=TreloarApproximation) = new(ℒinv)
 end
 
-function StrainEnergyDensityFunction(ψ::ThreeChainModel, λ⃗, (; μ, N))
+function ContinuumModels.StrainEnergyDensity(ψ::ThreeChainModel, λ⃗::AbstractVector, (; μ, N))
     μ * sqrt(N) / 3 * sum(λ⃗ .* ψ.ℒinv.(λ⃗ ./ sqrt(N)) .+ sqrt(N) .* log.((ψ.ℒinv.(λ⃗ ./ sqrt(N))) ./ (sinh.(ψ.ℒinv.(λ⃗ ./ sqrt(N))))))
 end
 
@@ -1777,19 +1777,19 @@ struct ArrudaBoyce <: AbstractHyperelasticModel
     ArrudaBoyce(; ℒinv::Function=TreloarApproximation) = new(ℒinv)
 end
 
-function StrainEnergyDensityFunction(ψ::ArrudaBoyce, λ⃗, (; μ, N))
+function ContinuumModels.StrainEnergyDensity(ψ::ArrudaBoyce, λ⃗::AbstractVector, (; μ, N))
     rchain_Nl = √(I₁(λ⃗) / 3 / N)
     β = ψ.ℒinv(rchain_Nl)
     μ * N * (rchain_Nl * β + log(β / sinh(β)))
 end
 
-# function TrueStressFunction(ψ::ArrudaBoyce, λ⃗, (; μ, N))
+# function true_stress(ψ::ArrudaBoyce, λ⃗, (; μ, N))
 #     λch = sqrt(I₁(λ⃗)/3)
 #     @tullio σ[i] := μ * √(N) * (λ⃗[i]^2 - λch^2)/(λch)*ψ.ℒinv(λch/sqrt(N))
 #     return σ
 # end
 
-# function StrainEnergyDensityFunction(ψ::ArrudaBoyce, I⃗, (; μ, N), I::InvariantForm)
+# function ContinuumModels.StrainEnergyDensity(ψ::ArrudaBoyce, I⃗, (; μ, N), I::InvariantForm)
 #     rchain_Nl = √(I⃗[1] / 3 / N)
 #     β = ψ.ℒinv(rchain_Nl)
 #     μ * N * (rchain_Nl * β + log(β / sinh(β)))
@@ -1822,8 +1822,8 @@ struct ModifiedFloryErman <: AbstractHyperelasticModel
     ModifiedFloryErman(; ℒinv::Function=TreloarApproximation) = new(ℒinv)
 end
 
-function StrainEnergyDensityFunction(ψ::ModifiedFloryErman, λ⃗, (; μ, N, κ))
-    WAB = StrainEnergyDensityFunction(ArrudaBoyce(ℒinv=ψ.ℒinv), λ⃗, (μ=μ, N=N))
+function ContinuumModels.StrainEnergyDensity(ψ::ModifiedFloryErman, λ⃗::AbstractVector, (; μ, N, κ))
+    WAB = ContinuumModels.StrainEnergyDensity(ArrudaBoyce(ℒinv=ψ.ℒinv), λ⃗, (μ=μ, N=N))
     @tullio B[i] := κ^2 * (λ⃗[i]^2 - 1) / (λ⃗[i]^2 + κ)^2
     @tullio D[i] := λ⃗[i]^2 * B[i] / κ
     @tullio W2 := B[i] + D[i] - log(B[i] + 1) - log(D[i] + 1)
@@ -1854,7 +1854,7 @@ Model: ``\\frac{G_c}{2}\\bigg[\\frac{(1-\\delta^2)(I_1-3)}{1-\\delta^2(I_1-3)}+\
 """
 struct ExtendedTubeModel <: AbstractHyperelasticModel end
 
-function StrainEnergyDensityFunction(ψ::ExtendedTubeModel, λ⃗, (; Gc, Ge, δ, β))
+function ContinuumModels.StrainEnergyDensity(ψ::ExtendedTubeModel, λ⃗::AbstractVector, (; Gc, Ge, δ, β))
     Gc / 2 * ((1 - δ^2) * (I₁(λ⃗) - 3) / (1 - δ^2 * (I₁(λ⃗) - 3)) + log(1 - δ^2 * (I₁(λ⃗) - 3))) + 2 * Ge / β^2 * sum(λ⃗ .^ (-β) .- 1)
 end
 
@@ -1885,8 +1885,8 @@ struct ABGI <: AbstractHyperelasticModel
     ABGI(; ℒinv::Function=TreloarApproximation) = new(ℒinv)
 end
 
-function StrainEnergyDensityFunction(ψ::ABGI, λ⃗, (; μ, N, Ge, n))
-    WAB = StrainEnergyDensityFunction(ArrudaBoyce(ℒinv=ψ.ℒinv), λ⃗, (μ=μ, N=N))
+function ContinuumModels.StrainEnergyDensity(ψ::ABGI, λ⃗::AbstractVector, (; μ, N, Ge, n))
+    WAB = ContinuumModels.StrainEnergyDensity(ArrudaBoyce(ℒinv=ψ.ℒinv), λ⃗::AbstractVector, (μ=μ, N=N))
     WAB + Ge * (sum(λ⃗ .^ n) - 3) / n
 end
 
@@ -1918,7 +1918,7 @@ struct NonaffineMicroSphere <: AbstractHyperelasticModel
     NonaffineMicroSphere(; ℒinv::Function=TreloarApproximation) = new(ℒinv)
 end
 
-function StrainEnergyDensityFunction(ψ::NonaffineMicroSphere, λ⃗, (; μ, N, p, U, q))
+function ContinuumModels.StrainEnergyDensity(ψ::NonaffineMicroSphere, λ⃗::AbstractVector, (; μ, N, p, U, q))
     a = √(2) / 2
     b = 0.836095596749
     c = 0.387907304067
@@ -1990,7 +1990,7 @@ struct AffineMicroSphere <: AbstractHyperelasticModel
     AffineMicroSphere(; ℒinv::Function=TreloarApproximation) = new(ℒinv)
 end
 
-function StrainEnergyDensityFunction(ψ::AffineMicroSphere, λ⃗, (; μ, N, p, U, q))
+function ContinuumModels.StrainEnergyDensity(ψ::AffineMicroSphere, λ⃗::AbstractVector, (; μ, N, p, U, q))
     a = √(2) / 2
     b = 0.836095596749
     c = 0.387907304067
@@ -2061,7 +2061,7 @@ struct Bootstrapped8Chain <: AbstractHyperelasticModel
     Bootstrapped8Chain(; ℒinv::Function=TreloarApproximation) = new(ℒinv)
 end
 
-function StrainEnergyDensityFunction(ψ::Bootstrapped8Chain, λ⃗, (; μ, N))
+function ContinuumModels.StrainEnergyDensity(ψ::Bootstrapped8Chain, λ⃗::AbstractVector, (; μ, N))
     function W8(x)
         β = ψ.ℒinv(x)
         μ * N * (x * β + log(β / sinh(β)))
@@ -2093,7 +2093,7 @@ Model: ``\\frac{G_c}{6}I_1-G_c\\lambda_{max}\\log\\bigg(3\\lambda_{max}^2-I_1\\b
 """
 struct DavidsonGoulbourne <: AbstractHyperelasticModel end
 
-function StrainEnergyDensityFunction(ψ::DavidsonGoulbourne, λ⃗, (; Gc, Ge, λmax))
+function ContinuumModels.StrainEnergyDensity(ψ::DavidsonGoulbourne, λ⃗::AbstractVector, (; Gc, Ge, λmax))
     1 / 6 * Gc * I₁(λ⃗) - Gc * λmax^2 * log(3*λmax^2 - I₁(λ⃗)) + Ge * (λ⃗[1] + 1 / λ⃗[1] + λ⃗[2] + 1 / λ⃗[2] + λ⃗[3] + 1 / λ⃗[3])
 end
 
@@ -2120,11 +2120,11 @@ Model: ``\\mu_c \\kappa n \\log\\bigg(\\frac{\\sin(\\frac{\\pi}{\\sqrt{n}})(\\fr
 """
 struct KhiemItskov <: AbstractHyperelasticModel end
 
-function StrainEnergyDensityFunction(ψ::KhiemItskov, λ⃗, (; μcκ, n, q, μt))
+function ContinuumModels.StrainEnergyDensity(ψ::KhiemItskov, λ⃗::AbstractVector, (; μcκ, n, q, μt))
     μcκ * n * log((sin(π / sqrt(n)) * (I₁(λ⃗) / 3)^(q / 2)) / (sin(π / sqrt(n) * (I₁(λ⃗) / 3)^(q / 2)))) + μt * ((I₂(λ⃗) / 3)^(1 / 2) - 1)
 end
 
-function StrainEnergyDensityFunction(ψ::KhiemItskov, I⃗, (; μcκ, n, q, μt), I::InvariantForm)
+function ContinuumModels.StrainEnergyDensity(ψ::KhiemItskov, I⃗, (; μcκ, n, q, μt), I::InvariantForm)
     num = (sin(π / sqrt(n)) * (I⃗[1] / 3)^(q / 2))
     denom = (sin(π / sqrt(n) * (I⃗[1] / 3)^(q / 2)))
     @assert num ≥ denom "Parameters are not feasible"
@@ -2145,7 +2145,7 @@ end
 
 struct GeneralConstitutiveModel_Network <: AbstractHyperelasticModel end
 
-function StrainEnergyDensityFunction(ψ::GeneralConstitutiveModel_Network, λ⃗, (; Gc, N))
+function ContinuumModels.StrainEnergyDensity(ψ::GeneralConstitutiveModel_Network, λ⃗::AbstractVector, (; Gc, N))
     I1 = I₁(λ⃗)
     Gc * N * log((3 * N + 0.5 * I1) / (3 * N - I1))
 end
@@ -2164,7 +2164,7 @@ end
 
 struct GeneralConstitutiveModel_Tube <: AbstractHyperelasticModel end
 
-function StrainEnergyDensityFunction(ψ::GeneralConstitutiveModel_Tube, λ⃗, (; Ge))
+function ContinuumModels.StrainEnergyDensity(ψ::GeneralConstitutiveModel_Tube, λ⃗::AbstractVector, (; Ge))
     @tullio W := Ge / λ⃗[i]
 end
 
@@ -2189,8 +2189,8 @@ Model: ``G_c N \\log\\bigg(\\frac{3N+\\frac{1}{2}I_1}{3N-I_1}\\bigg)+G_e\\sum\\l
 """
 struct GeneralConstitutiveModel <: AbstractHyperelasticModel end
 
-function StrainEnergyDensityFunction(ψ::GeneralConstitutiveModel, λ⃗, ps)
-    StrainEnergyDensityFunction(GeneralConstitutiveModel_Network(), λ⃗, ps) + StrainEnergyDensityFunction(GeneralConstitutiveModel_Tube(), λ⃗, ps)
+function ContinuumModels.StrainEnergyDensity(ψ::GeneralConstitutiveModel, λ⃗::AbstractVector, ps)
+    ContinuumModels.StrainEnergyDensity(GeneralConstitutiveModel_Network(), λ⃗, ps) + ContinuumModels.StrainEnergyDensity(GeneralConstitutiveModel_Tube(), λ⃗, ps)
 end
 
 function parameters(ψ::GeneralConstitutiveModel)
@@ -2222,9 +2222,9 @@ struct FullNetwork <: AbstractHyperelasticModel
     FullNetwork(; ℒinv::Function=TreloarApproximation) = new(ℒinv)
 end
 
-function StrainEnergyDensityFunction(ψ::FullNetwork, λ⃗, (; μ, N, ρ))
-    W3 = StrainEnergyDensityFunction(ThreeChainModel(ℒinv=ψ.ℒinv), λ⃗, (μ=μ, N=N))
-    W8 = StrainEnergyDensityFunction(ArrudaBoyce(ℒinv=ψ.ℒinv), λ⃗, (μ=μ, N=N))
+function ContinuumModels.StrainEnergyDensity(ψ::FullNetwork, λ⃗::AbstractVector, (; μ, N, ρ))
+    W3 = ContinuumModels.StrainEnergyDensity(ThreeChainModel(ℒinv=ψ.ℒinv), λ⃗, (μ=μ, N=N))
+    W8 = ContinuumModels.StrainEnergyDensity(ArrudaBoyce(ℒinv=ψ.ℒinv), λ⃗, (μ=μ, N=N))
     (1 - ρ) * W3 + ρ * W8
 end
 
@@ -2257,11 +2257,11 @@ struct ZunigaBeatty <: AbstractHyperelasticModel
     ZunigaBeatty(; ℒinv::Function=TreloarApproximation) = new(ℒinv)
 end
 
-function StrainEnergyDensityFunction(ψ::ZunigaBeatty, λ⃗, (; μ, N₃, N₈))
+function ContinuumModels.StrainEnergyDensity(ψ::ZunigaBeatty, λ⃗::AbstractVector, (; μ, N₃, N₈))
     ΛL = √((N₃ + N₈) / 2)
     ρ₃ = ΛL / √(N₃)
-    W3 = StrainEnergyDensityFunction(ThreeChainModel(ℒinv=ψ.ℒinv), λ⃗, (μ=μ, N=N₃))
-    W8 = StrainEnergyDensityFunction(ArrudaBoyce(ℒinv=ψ.ℒinv), λ⃗, (μ=μ, N=N₈))
+    W3 = ContinuumModels.StrainEnergyDensity(ThreeChainModel(ℒinv=ψ.ℒinv), λ⃗, (μ=μ, N=N₃))
+    W8 = ContinuumModels.StrainEnergyDensity(ArrudaBoyce(ℒinv=ψ.ℒinv), λ⃗, (μ=μ, N=N₈))
     Λch = 1 / √(3) * √(I₁(λ⃗))
     ρ₈ = Λch / √(N₈)
     return ρ₃ * W3 + ρ₈ * W8
@@ -2294,17 +2294,17 @@ struct Lim <: AbstractHyperelasticModel
     Lim(; ℒinv::Function=TreloarApproximation) = new(ℒinv)
 end
 
-function StrainEnergyDensityFunction(ψ::Lim, λ⃗, (; μ₁, μ₂, N, Î₁))
-    Wg = StrainEnergyDensityFunction(NeoHookean(), λ⃗, (μ=μ₁,))
-    W8 = StrainEnergyDensityFunction(ArrudaBoyce(ℒinv=ψ.ℒinv), λ⃗, (μ=μ₂, N=N))
+function ContinuumModels.StrainEnergyDensity(ψ::Lim, λ⃗::AbstractVector, (; μ₁, μ₂, N, Î₁))
+    Wg = ContinuumModels.StrainEnergyDensity(NeoHookean(), λ⃗, (μ=μ₁,))
+    W8 = ContinuumModels.StrainEnergyDensity(ArrudaBoyce(ℒinv=ψ.ℒinv), λ⃗, (μ=μ₂, N=N))
     f(x) = x^3 * (10 - 15x + 6x^2)
     ζ = (I₁(λ⃗) - 3) / (Î₁ - 3)
     (1 - f(ζ)) * Wg + f(ζ) * W8
 end
 
-function StrainEnergyDensityFunction(ψ::Lim, I⃗, (; μ₁, μ₂, N, Î₁), I::InvariantForm)
-    Wg = StrainEnergyDensityFunction(NeoHookean(), I⃗, (μ = μ₁), I)
-    W8 = StrainEnergyDensityFunction(ArrudaBoyce(ℒinv=ψ.ℒinv), I⃗, (μ=μ₂, N=N), I)
+function ContinuumModels.StrainEnergyDensity(ψ::Lim, I⃗, (; μ₁, μ₂, N, Î₁), I::InvariantForm)
+    Wg = ContinuumModels.StrainEnergyDensity(NeoHookean(), I⃗, (μ = μ₁), I)
+    W8 = ContinuumModels.StrainEnergyDensity(ArrudaBoyce(ℒinv=ψ.ℒinv), I⃗, (μ=μ₂, N=N), I)
     f(x) = x^3 * (10 - 15x + 6x^2)
     ζ = (I⃗[1] - 3) / (Î₁ - 3)
     (1 - f(ζ)) * Wg + f(ζ) * W8
@@ -2344,12 +2344,12 @@ struct BechirChevalier <: AbstractHyperelasticModel
     BechirChevalier(; ℒinv::Function=TreloarApproximation) = new(ℒinv)
 end
 
-function StrainEnergyDensityFunction(ψ::BechirChevalier, λ⃗, (; μ₀, η, ρ, N₃, N₈))
+function ContinuumModels.StrainEnergyDensity(ψ::BechirChevalier, λ⃗::AbstractVector, (; μ₀, η, ρ, N₃, N₈))
     μf = ρ * √(I₁(λ⃗) / 3 / N₈)
-    W3 = StrainEnergyDensityFunction(ThreeChainModel(ℒinv=ψ.ℒinv), λ⃗, (μ=μf, N=N₃))
+    W3 = ContinuumModels.StrainEnergyDensity(ThreeChainModel(ℒinv=ψ.ℒinv), λ⃗, (μ=μf, N=N₃))
     α = maximum(λ⃗)
     μc = (1 - η * α / √(N₃)) * μ₀
-    W8 = StrainEnergyDensityFunction(ArrudaBoyce(ℒinv=ψ.ℒinv), λ⃗, (μ=μc / 3, N=N₈))
+    W8 = ContinuumModels.StrainEnergyDensity(ArrudaBoyce(ℒinv=ψ.ℒinv), λ⃗, (μ=μc / 3, N=N₈))
     W3 + W8
 end
 

@@ -5,33 +5,25 @@ First stretch invariant - Currently requires the addition of 5 times the machine
 
 ``I_1(\\vec{\\lambda}) = \\lambda_1^2+\\lambda_2^2+\\lambda_3^2 + 5\\varepsilon``
 """
-function I₁(λ⃗)
-    sum(λ⃗ .^ 2)# + 10eps(Float64)
-end
+ContinuumModels.I₁(λ⃗::AbstractVector) = sum(λ⃗ .^ 2)
 
 """
 Second Stretch invariant
 
 ``I_2(\\vec{\\lambda}) = \\lambda_1^{-2}+\\lambda_2^{-2}+\\lambda_3^{-2}``
 """
-function I₂(λ⃗)
-    sum(λ⃗ .^ (-2))
-end
+ContinuumModels.I₂(λ⃗::AbstractVector) = sum(λ⃗ .^ (-2))
 
 """
 Third Stretch invariant
 
 ``I_3(\\vec{\\lambda}) = (\\lambda_1\\lambda_2\\lambda_3)^2``
 """
-function I₃(λ⃗)
-    prod(λ⃗)^2
-end
+ContinuumModels.I₃(λ⃗::AbstractVector) = prod(λ⃗)^2
 
 """
 Volumetric Stretch
 
 ``J(\\vec{\\lambda}) = \\lambda_1\\lambda_2\\lambda_3``
 """
-function J(λ⃗)
-    prod(λ⃗)
-end
+ContinuumModels.J(λ⃗::AbstractVector) = prod(λ⃗)

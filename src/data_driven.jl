@@ -24,7 +24,7 @@ StrainEnergyDensityFunction(ψ::SussmanBathe, λ⃗, p) = sum(x -> quadgk(ψ.w�
 
 NominalStressFunction(ψ::SussmanBathe, λ⃗, p) = ψ.w′.(λ⃗)
 
-TrueStressFunction(ψ::SussmanBathe, λ⃗, p) = ψ.w′.(λ⃗).*λ⃗
+true_stress(ψ::SussmanBathe, λ⃗, p) = ψ.w′.(λ⃗).*λ⃗
 
 parameters(ψ::SussmanBathe) = ()
 
