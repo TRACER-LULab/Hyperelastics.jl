@@ -1,6 +1,8 @@
 module Hyperelastics
 
-using InverseLangevinApproximations, ContinuumModels
+using Reexport
+using InverseLangevinApproximations
+@reexport using  ContinuumModels
 using LossFunctions, Optimization
 using AbstractDifferentiation, ForwardDiff
 using Tullio
