@@ -5,7 +5,7 @@ strain_energy_density(ψ, λ⃗, p)
 Returns a function for the strain energy density function for the hyperelastic model `ψ` with parameters `p`.
 > ψ = strain_energy_density(Gent(), (μ = 10, Jₘ = 100.0))
 """
-function ContinuumModels.StrainEnergyDensity(ψ::AbstractHyperelasticModel, λ⃗::AbstractVector, p)
+function NonlinearContinua.StrainEnergyDensity(ψ::AbstractHyperelasticModel, λ⃗::AbstractVector, p)
     @error "$(typeof(ψ)) does not have a Strain Energy Density Function implemented"
 end
 
@@ -19,7 +19,7 @@ Returns a function for the strain energy density function for the hyperelastic m
 ``\\vec{\\lambda} = diag(U)``
 
 """
-function ContinuumModels.StrainEnergyDensity(ψ::AbstractHyperelasticModel, F::AbstractMatrix, p)
+function NonlinearContinua.StrainEnergyDensity(ψ::AbstractHyperelasticModel, F::AbstractMatrix, p)
     C = transpose(F) * F
     a = eigvecs(C)'
     C_prin = Diagonal(a * C * a')
@@ -34,7 +34,7 @@ strain_energy_density(ψ, λ⃗, p, InvariantForm())
 Returns a function for the strain energy density function for the hyperelastic model `ψ` with parameters `p`.
 > ψ = strain_energy_density(Gent(), (μ = 10, Jₘ = 100.0), InvariantForm())
 """
-function ContinuumModels.StrainEnergyDensity(ψ::AbstractHyperelasticModel, I⃗::AbstractVector, p, I::InvariantForm)
+function NonlinearContinua.StrainEnergyDensity(ψ::AbstractHyperelasticModel, I⃗::AbstractVector, p, I::InvariantForm)
     @error "$(typeof(ψ)) does not have a stretch Invariant Form of Strain Energy Density Function implemented"
 end
 
@@ -44,8 +44,8 @@ strain_energy_density(ψ, F, p, InvariantForm())
 Returns a function for the strain energy density function for the hyperelastic model `ψ` with parameters `p` given a deformation gradient, `F` where the invariants are calculated.
 > ψ = strain_energy_density(Gent(), (μ = 10, Jₘ = 100.0), InvariantForm())
 """
-function ContinuumModels.StrainEnergyDensity(ψ::AbstractHyperelasticModel, F::AbstractMatrix, p, I::InvariantForm)
-    ContinuumModels.StrainEnergyDensity(ψ, [I₁(F), I₂(F), I₃(F)], p, I)
+function NonlinearContinua.StrainEnergyDensity(ψ::AbstractHyperelasticModel, F::AbstractMatrix, p, I::InvariantForm)
+    NonlinearContinua.StrainEnergyDensity(ψ, [I₁(F), I₂(F), I₃(F)], p, I)
 end
 
 """
@@ -55,7 +55,7 @@ Return a function for the nominal (2nd Piola Kirchoff) Stress Function  for the 
 
 > s = nominal_stress_function(Gent(), [2.0, 2.0, 1/4.0], (μ = 10, Jₘ = 100.0))
 """
-function ContinuumModels.SecondPiolaKirchoffStressTensor(ψ::AbstractHyperelasticModel, λ⃗::AbstractVector, p; adb=AD.ForwardDiffBackend())
+function NonlinearContinua.SecondPiolaKirchoffStressTensor(ψ::AbstractHyperelasticModel, λ⃗::AbstractVector, p; adb=AD.ForwardDiffBackend())
     W(λ⃗) = StrainEnergyDensity(ψ, λ⃗, p)
     ∂W∂λ = AD.gradient(adb, W, λ⃗)[1]
     return ∂W∂λ
@@ -66,7 +66,7 @@ Return a function for the nominal (2nd Piola Kirchoff) Stress Function  for the 
 
 > s = nominal_stress_function(Gent(), [2 -2 0; 1 1 0; 0 0 1], (μ = 10, Jₘ = 100.0))
 """
-function ContinuumModels.SecondPiolaKirchoffStressTensor(ψ::AbstractHyperelasticModel, F::AbstractMatrix, p; adb=AD.ForwardDiffBackend())
+function NonlinearContinua.SecondPiolaKirchoffStressTensor(ψ::AbstractHyperelasticModel, F::AbstractMatrix, p; adb=AD.ForwardDiffBackend())
     σ = CauchyStressTensor(ψ, F, p)
     S = sqrt(det(F'*F)) * inv(F) * σ
     return S
@@ -78,7 +78,7 @@ true_stress(ψ, p; adb = AD.ForwardDiffBackend())
 Return a function for the true (Cauchy) Stress Function  for the hyperelastic model `ψ` with parameters `p`.
 > σ = true_stress(Gent(), (μ = 10, Jₘ = 100.0))
 """
-function ContinuumModels.CauchyStressTensor(ψ::AbstractHyperelasticModel, λ⃗::AbstractVector, p; adb=AD.ForwardDiffBackend())
+function NonlinearContinua.CauchyStressTensor(ψ::AbstractHyperelasticModel, λ⃗::AbstractVector, p; adb=AD.ForwardDiffBackend())
     W(λ⃗) = StrainEnergyDensity(ψ, λ⃗, p)
     ∂W∂λ = AD.gradient(adb, W, λ⃗)[1]
     σ = ∂W∂λ .* λ⃗ ./ J(λ⃗)
@@ -92,7 +92,7 @@ Return a function for the true (Cauchy) Stress Function  for the hyperelastic mo
 
 > s = true_stress(Gent(), [2 -2 0; 1 1 0; 0 0 1], (μ = 10, Jₘ = 100.0))
 """
-function ContinuumModels.CauchyStressTensor(ψ::AbstractHyperelasticModel, F::AbstractMatrix, p; adb=AD.ForwardDiffBackend())
+function NonlinearContinua.CauchyStressTensor(ψ::AbstractHyperelasticModel, F::AbstractMatrix, p; adb=AD.ForwardDiffBackend())
     B = F * F'
     a = eigvecs(B)'
     B_prin = Diagonal(a * B * a')

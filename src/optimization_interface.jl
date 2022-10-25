@@ -53,8 +53,8 @@ function HyperelasticProblem(
         # println("Has Bounds")
         ax = Axis(Hyperelastics.parameters(ψ))
         if !isnothing(lb) && !isnothing(ub)
-            lb = ComponentVector(lb)
-            ub = ComponentVector(ub)
+            lb = LVector(lb)
+
         elseif !isnothing(lb)
             lb = ComponentVector(lb)
             ub = ComponentVector(ones(length(lb)) * Inf, ax)

@@ -21,7 +21,7 @@ Parameters:
 """
 struct MacroMicroMacro <: AbstractDataDrivenHyperelasticModel end
 
-function ContinuumModels.StrainEnergyDensity(ψ::MacroMicroMacro, (; Pchain, p₀, weights, coeff_loss, solver, data))
+function NonlinearContinua.StrainEnergyDensity(ψ::MacroMicroMacro, (; Pchain, p₀, weights, coeff_loss, solver, data))
     λchain(λ⃗, r⃗) = dot(r⃗ .* r⃗, λ⃗)   # Eq. (1)
     ∂λchain∂λ(λ⃗, r⃗) = r⃗ .* r⃗         # In text below Eq. (8)
     # 1b. Spherical quadrature from  `A micro-macro approach to rubber-like materials—Part I: the non-affine micro-sphere model of rubber elasticity`
