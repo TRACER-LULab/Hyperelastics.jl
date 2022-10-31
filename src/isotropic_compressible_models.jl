@@ -1,4 +1,4 @@
-export GeneralCompressible
+export GeneralCompressible, LogarithmicCompressible
 """
 Generic Compressible Model
 
