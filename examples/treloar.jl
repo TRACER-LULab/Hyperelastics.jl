@@ -1,5 +1,6 @@
 # # Package Imports
 using Hyperelastics
+using IntervalArithmetic, IntervalOptimisation, LossFunctions
 using Optimization, OptimizationOptimJL, ComponentArrays, DataInterpolations
 using CairoMakie, ColorSchemes
 using MKL
@@ -15,7 +16,7 @@ data = UniaxialHyperelasticData(s₁, λ₁)
 #
 # Initial guess for the parameters
 ψ = Gent()
-p₀ = ComponentVector(μ=240e3, Jₘ=80.0)
+p₀ = ComponentVector(μ=240e3, Jₘ=30.0)
 # Create the optimization problem and solve
 HEProblem = HyperelasticProblem(
     data,

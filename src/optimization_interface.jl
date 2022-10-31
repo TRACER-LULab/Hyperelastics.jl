@@ -8,7 +8,7 @@ Returns an `OptimizationProblem` for solving with GalacticOptim.jl. `data` is th
 function HyperelasticProblem(
     data::AbstractHyperelasticData,
     ψ::AbstractHyperelasticModel,
-    u₀,
+    u₀::AbstractVector,
     ps;
     loss=L2DistLoss(),
     agg=AggMode.Mean(),
@@ -39,18 +39,24 @@ function HyperelasticProblem(
 
     cons = constraints(ψ, data)
     lb, ub = parameter_bounds(ψ, data)
+    ps = parameters(ψ)
+    for p in ps
+        if !isnothing(lb)
+            (u₀[p] < lb[p]) ? (error("Parameter $p is less than lower bound of $(lb[p])")) : ()
+        elseif !isnothing(ub)
+            (u₀[p] > ub[p]) ? (error("Parameter $p is greater than upper bound of $(ub[p])")) : ()
+        end
+    end
     func = OptimizationFunction(f, ad)
     prob = OptimizationProblem(func, u₀, ps)
     # Check for Constraints
     if !isnothing(cons)
-        # println("Has Constraints")
         num_cons = length(cons(u₀, ps))
         func = OptimizationFunction(f, ad, cons=cons)
         prob = OptimizationProblem(func, u₀, ps, lcons=zeros(num_cons))
     end
     # Check for Bounds
     if !isnothing(lb) || !isnothing(ub)
-        # println("Has Bounds")
         ax = Axis(Hyperelastics.parameters(ψ))
         if !isnothing(lb) && !isnothing(ub)
             lb = LVector(lb)
