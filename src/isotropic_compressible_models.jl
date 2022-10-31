@@ -15,8 +15,8 @@ struct GeneralCompressible <: AbstractHyperelasticModel
     incompressible::AbstractHyperelasticModel
 end
 
-function NonlinearContinua.StrainEnergyDensityFunction(ψ::GeneralCompressible, λ⃗, p)
-    StrainEnergyDensityFunction(ψ.incompressible, λ⃗, p.ψ) + p.κ / 2 * (prod(λ⃗) - 1)^2
+function NonlinearContinua.StrainEnergyDensity(ψ::GeneralCompressible, λ⃗, p)
+    StrainEnergyDensity(ψ.incompressible, λ⃗, p.ψ) + p.κ / 2 * (prod(λ⃗) - 1)^2
 end
 
 function NonlinearContinua.CauchyStressTensor(ψ::GeneralCompressible, λ⃗::Vector, p; adb=AD.ForwardDiffBackend())
@@ -57,8 +57,8 @@ struct LogarithmicCompressible <: AbstractHyperelasticModel
     incompressible::AbstractHyperelasticModel
 end
 
-function NonlinearContinua.StrainEnergyDensityFunction(ψ::LogarithmicCompressible, λ⃗, p)
-    StrainEnergyDensityFunction(ψ.incompressible, λ⃗, p.ψ) + p.κ * (J * log(J) - J)
+function NonlinearContinua.StrainEnergyDensity(ψ::LogarithmicCompressible, λ⃗, p)
+    StrainEnergyDensity(ψ.incompressible, λ⃗, p.ψ) + p.κ * (J * log(J) - J)
 end
 
 function NonlinearContinua.CauchyStressTensor(ψ::LogarithmicCompressible, λ⃗::Vector, p; adb=AD.ForwardDiffBackend())
