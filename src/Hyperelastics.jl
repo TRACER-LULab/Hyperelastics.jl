@@ -10,13 +10,14 @@ using Tullio
 using SpecialFunctions
 using DataInterpolations
 using QuadGK
-using ComponentArrays, LabelledArrays
-using LinearAlgebra
+using ComponentArrays, LabelledArrays, StructArrays
+using LinearAlgebra, Statistics
 
-export UniaxialHyperelasticData, BiaxialHyperelasticData, HyperelasticProblem
+export HyperelasticUniaxialTest, HyperelasticBiaxialTest, HyperelasticProblem
+export predict
 export citation, parameters, parameter_bounds
 
-abstract type AbstractHyperelasticData end
+abstract type AbstractHyperelasticTest <: NonlinearContinua.AbstractMaterialTest end
 abstract type AbstractHyperelasticModel <: NonlinearContinua.AbstractMaterialModel end
 abstract type AbstractDataDrivenHyperelasticModel <: AbstractHyperelasticModel end
 abstract type AbstractHyperelasticProblem end
@@ -32,8 +33,8 @@ include("isotropic_compressible_models.jl")
 include("data_driven.jl")
 include("macro_micro_macro_model.jl")
 include("average_chain_behavior.jl")
-include("optimization_interface.jl")
-
+# include("optimization_interface.jl")
+include("material_tests.jl")
 # using SnoopPrecompile
 # @precompile_setup begin
 #     λ₁ = 2.0

@@ -111,15 +111,16 @@ Model: ``C_{10}(I_1-3)+C_{01}(I_2-3)``
 struct MooneyRivlin <: AbstractHyperelasticModel end
 
 function NonlinearContinua.StrainEnergyDensity(ψ::MooneyRivlin, λ⃗::AbstractVector, (; C10, C01))
-    NonlinearContinua.StrainEnergyDensity(
-        GeneralMooneyRivlin(),
-        λ⃗,
-        (C=[
-            0 C10
-            C01 0
-        ],
-        )
-    )
+    return C10*(I₁(λ⃗) - 3)+C01*(I₂(λ⃗) - 3)
+    # NonlinearContinua.StrainEnergyDensity(
+    #     GeneralMooneyRivlin(),
+    #     λ⃗,
+    #     (C=[
+    #         0 C10
+    #         C01 0
+    #     ],
+    #     )
+    # )
 end
 
 function NonlinearContinua.StrainEnergyDensity(ψ::MooneyRivlin, I⃗::AbstractVector, (; C10, C01), I::InvariantForm)
@@ -559,7 +560,7 @@ end
 
 parameters(ψ::Knowles) = (:μ, :b, :n)
 
-function parameter_bounds(ψ::Knowles, data::AbstractHyperelasticData)
+function parameter_bounds(ψ::Knowles, data::AbstractHyperelasticTest)
     lb = (μ=-Inf, b=0, n=0)
     ub = nothing
     return (lb=lb, ub=ub)
@@ -1119,7 +1120,7 @@ function parameters(ψ::HossMarczakI)
     return (:α, :β, :μ, :b, :n)
 end
 
-function parameter_bounds(ψ::HossMarczakI, data::AbstractHyperelasticData)
+function parameter_bounds(ψ::HossMarczakI, data::AbstractHyperelasticTest)
     lb = (α=-Inf, β=0, μ=-Inf, b=0, n=0)
     ub = nothing
     return (lb=lb, ub=ub)
@@ -1150,7 +1151,7 @@ function parameters(ψ::HossMarczakII)
     return (:α, :β, :μ, :b, :n, :C2)
 end
 
-function parameter_bounds(ψ::HossMarczakII, data::AbstractHyperelasticData)
+function parameter_bounds(ψ::HossMarczakII, data::AbstractHyperelasticTest)
     lb = (α=-Inf, β=0, μ=-Inf, b=0, n=0, C2=-Inf)
     ub = nothing
     return (lb=lb, ub=ub)
@@ -1209,7 +1210,7 @@ function NonlinearContinua.StrainEnergyDensity(ψ::VanDerWaals, I⃗::AbstractVe
     μ * (-(λm^2 - 3) * log(1 - θ) + θ) - 2 / 3 * α * ((I - 3) / 2)^(3 / 2)
 end
 
-function parameter_bounds(ψ::VanDerWaals, data::AbstractHyperelasticData)
+function parameter_bounds(ψ::VanDerWaals, data::AbstractHyperelasticTest)
     lb = (μ = 0.0, λm = sqrt(3), β = 0.0, α = 0.0)
     ub = (μ = Inf, λm = Inf, β = 1.0, α = Inf)
     return (ub = ub, lb = lb)
@@ -1219,9 +1220,9 @@ function parameters(ψ::VanDerWaals)
     return (:μ, :λm, :β, :α)
 end
 
-function constraints(ψ::VanDerWaals, data::AbstractHyperelasticData)
-    I₁_max = maximum(I₁.(data.λ⃗))
-    I₂_max = maximum(I₂.(data.λ⃗))
+function constraints(ψ::VanDerWaals, data::AbstractHyperelasticTest)
+    I₁_max = maximum(I₁.(data.data.λ))
+    I₂_max = maximum(I₂.(data.data.λ))
     return f(u, p) = [1 - (u.β * I₁_max + (1 - u.β) * I₂_max - 3) / (u.λm^2 - 3)]
 end
 
@@ -1248,8 +1249,8 @@ function parameters(ψ::Gent)
     return (:μ, :Jₘ)
 end
 
-function parameter_bounds(ψ::Gent, data::AbstractHyperelasticData)
-    I₁_max = maximum(I₁.(collect.(data.λ⃗)))
+function parameter_bounds(ψ::Gent, test::AbstractHyperelasticTest)
+    I₁_max = maximum(I₁.(test.data.λ))
     Jₘ_min = I₁_max - 3
     lb = (μ=0, Jₘ=Jₘ_min)
     ub = nothing
@@ -1280,8 +1281,8 @@ function parameters(ψ::TakamizawaHayashi)
     return (:c, :Jₘ)
 end
 
-function parameter_bounds(ψ::TakamizawaHayashi, data::AbstractHyperelasticData)
-    I₁_max = maximum(I₁.(collect.(data.λ⃗)))
+function parameter_bounds(ψ::TakamizawaHayashi, data::AbstractHyperelasticTest)
+    I₁_max = maximum(I₁.(data.data.λ))
     Jₘ_min = I₁_max - 3
     lb = (c=-Inf, Jₘ=Jₘ_min)
     ub = nothing
@@ -1334,8 +1335,8 @@ function parameters(ψ::PucciSaccomandi)
     return (:K, :μ, :Jₘ)
 end
 
-function parameter_bounds(ψ::PucciSaccomandi, data::AbstractHyperelasticData)
-    I₁_max = maximum(I₁.(collect.(data.λ⃗)))
+function parameter_bounds(ψ::PucciSaccomandi, data::AbstractHyperelasticTest)
+    I₁_max = maximum(I₁.(data.data.λ))
     Jₘ_min = I₁_max - 3
     lb = (K=-Inf, μ=-Inf, Jₘ=Jₘ_min)
     ub = nothing
@@ -1366,14 +1367,14 @@ function parameters(ψ::HorganSaccomandi)
     return (:μ, :J)
 end
 
-function parameter_bounds(ψ::HorganSaccomandi, data::AbstractHyperelasticData)
-    J_min = maximum(maximum.(map(x->x.^2,data.λ⃗)))
+function parameter_bounds(ψ::HorganSaccomandi, data::AbstractHyperelasticTest)
+    J_min = maximum(maximum.(map(x->x.^2,data.data.λ)))
     lb = (μ=-Inf, J=J_min)
     ub = nothing
     return (lb=lb, ub=ub)
 end
 
-# function constraints(ψ::HorganSaccomandi, data::AbstractHyperelasticData)
+# function constraints(ψ::HorganSaccomandi, data::AbstractHyperelasticTest)
 #     I₁_max = maximum(I₁.(data.λ⃗))
 #     I₂_max = maximum(I₂.(data.λ⃗))
 #     f(u, p) = [(u.J^3 - u.J^2 * I₁_max + u.J * I₂_max - 1) / (u.J - 1)^3]
@@ -1423,15 +1424,15 @@ function parameters(ψ::HorganMurphy)
     return (:μ, :Jₘ, :c)
 end
 
-function parameter_bounds(ψ::HorganMurphy, data::AbstractHyperelasticData)
+function parameter_bounds(ψ::HorganMurphy, data::AbstractHyperelasticTest)
     lb = (μ=-Inf, Jₘ=0, c=0)
     ub = (μ=Inf, Jₘ=Inf, c=Inf)
     return (lb=lb, ub=ub)
 end
 
-function constraints(ψ::HorganMurphy, data::AbstractHyperelasticData)
+function constraints(ψ::HorganMurphy, data::AbstractHyperelasticTest)
     function f(u, p)
-        max_sum = maximum(λ⃗ -> sum(λ⃗ .^ u.c), data.λ⃗)
+        max_sum = maximum(λ⃗ -> sum(λ⃗ .^ u.c), data.data.λ)
         [1 - (max_sum - 3) / u.Jₘ]
     end
     return f
@@ -1628,8 +1629,8 @@ function parameters(ψ::ConstrainedJunction)
     return (:Gc, :μkT, :κ)
 end
 
-function parameter_bounds(ψ::ConstrainedJunction, data::AbstractHyperelasticData)
-    λ_min = minimum(minimum.(collect.(data.λ⃗)))
+function parameter_bounds(ψ::ConstrainedJunction, data::AbstractHyperelasticTest)
+    λ_min = minimum(minimum.(collect.(data.data.λ)))
     κ_min = -λ_min^2
     lb = (Gc=-Inf, μkT=-Inf, κ=κ_min)
     ub = nothing
@@ -1647,22 +1648,26 @@ Model: ``\\frac{1}{2}N_C\\Bigg[\\frac{(1-\\alpha^2)I_1}{1-\\alpha^2I_1}+\\log(1-
 struct EdwardVilgis <: AbstractHyperelasticModel end
 
 function NonlinearContinua.StrainEnergyDensity(ψ::EdwardVilgis, λ⃗::AbstractVector, (; Ns, Nc, α, η))
-    0.5 * Nc * ((1 - α^2) * I₁(λ⃗) / (1 - α^2 * I₁(λ⃗)) + log(1 - α^2 * I₁(λ⃗))) + 0.5 * Ns * ((1 + η) * (1 - α^2) * λ⃗[1] / (1 + η * λ⃗[1]^2) / (1 - α^2 * I₁(λ⃗)) + log(1 + η * λ⃗[1]^2) + (1 + η) * (1 - α^2) * λ⃗[2] / (1 + η * λ⃗[2]^2) / (1 - α^2 * I₁(λ⃗)) + log(1 + η * λ⃗[2]^2) + (1 + η) * (1 - α^2) * λ⃗[3] / (1 + η * λ⃗[3]^2) / (1 - α^2 * I₁(λ⃗)) + log(1 + η * λ⃗[3]^2) + log(1 - α^2 * I₁(λ⃗)))
+    W_Nc = 0.5 * Nc * ((1 - α^2) * I₁(λ⃗) / (1 - α^2 * I₁(λ⃗)) + log(1 - α^2 * I₁(λ⃗)))
+    W_Ns = 0.5 * Ns * ((1 + η) * (1 - α^2) * λ⃗[1] / (1 + η * λ⃗[1]^2) / (1 - α^2 * I₁(λ⃗)) + log(1 + η * λ⃗[1]^2) + (1 + η) * (1 - α^2) * λ⃗[2] / (1 + η * λ⃗[2]^2) / (1 - α^2 * I₁(λ⃗)) + log(1 + η * λ⃗[2]^2) + (1 + η) * (1 - α^2) * λ⃗[3] / (1 + η * λ⃗[3]^2) / (1 - α^2 * I₁(λ⃗)) + log(1 + η * λ⃗[3]^2) + log(1 - α^2 * I₁(λ⃗)))
+    W = W_Nc + W_Ns
+    return W
 end
 
 function parameters(ψ::EdwardVilgis)
     return (:Ns, :Nc, :α, :η)
 end
 
-function parameter_bounds(ψ::EdwardVilgis, data::AbstractHyperelasticData)
-    I₁_max = maximum(I₁.(collect.(data.λ⃗)))
-    λ_max = maximum(maximum.(data.λ⃗))
+function parameter_bounds(ψ::EdwardVilgis, data::AbstractHyperelasticTest)
+    # I₁_max = maximum()
+    λ_max = maximum(maximum.(data.data.λ))
     η_min = -1 / λ_max^2
-    α_max = sqrt(1 / I₁_max)
-    lb = (Ns=-Inf, Nc=-Inf, α=-α_max, η=η_min)
+    α_max = minimum(@. sqrt(1 / I₁(data.data.λ)))
+    lb = (Ns=-Inf, Nc=-Inf, α=0.0, η=0.0)
     ub = (Ns=Inf, Nc=Inf, α=α_max, η=Inf)
     return (lb=lb, ub=ub)
 end
+
 """
 MCC (modified constrained chain) [^1]
 
@@ -1694,7 +1699,7 @@ function parameters(ψ::MCC)
     return (:ζkT, :μkT, :κ)
 end
 
-function parameter_bounds(ψ::MCC, data::AbstractHyperelasticData)
+function parameter_bounds(ψ::MCC, data::AbstractHyperelasticTest)
     lb = (ζkT=-Inf, μkT=-Inf, κ=0)
     ub = nothing
     return (lb=lb, ub=ub)
@@ -1764,8 +1769,8 @@ function parameters(ψ::ThreeChainModel)
     return (:μ, :N)
 end
 
-function parameter_bounds(ψ::ThreeChainModel, data::AbstractHyperelasticData)
-    λ_max = maximum(maximum.(collect.(data.λ⃗)))
+function parameter_bounds(ψ::ThreeChainModel, data::AbstractHyperelasticTest)
+    λ_max = maximum(maximum.(collect.(data.data.λ)))
     N_min = λ_max^2
     lb = (μ=-Inf, N=N_min)
     ub = nothing
@@ -1797,24 +1802,12 @@ function NonlinearContinua.StrainEnergyDensity(ψ::ArrudaBoyce, λ⃗::AbstractV
     μ * N * (rchain_Nl * β + log(β / sinh(β)))
 end
 
-# function true_stress(ψ::ArrudaBoyce, λ⃗, (; μ, N))
-#     λch = sqrt(I₁(λ⃗)/3)
-#     @tullio σ[i] := μ * √(N) * (λ⃗[i]^2 - λch^2)/(λch)*ψ.ℒinv(λch/sqrt(N))
-#     return σ
-# end
-
-# function NonlinearContinua.StrainEnergyDensity(ψ::ArrudaBoyce, I⃗::AbstractVector, (; μ, N), I::InvariantForm)
-#     rchain_Nl = √(I⃗[1] / 3 / N)
-#     β = ψ.ℒinv(rchain_Nl)
-#     μ * N * (rchain_Nl * β + log(β / sinh(β)))
-# end
-
 function parameters(ψ::ArrudaBoyce)
     return (:μ, :N)
 end
 
-function parameter_bounds(ψ::ArrudaBoyce, data::AbstractHyperelasticData)
-    I₁_max = maximum(I₁.(collect.(data.λ⃗)))
+function parameter_bounds(ψ::ArrudaBoyce, data::AbstractHyperelasticTest)
+    I₁_max = maximum(I₁.(data.data.λ))
     N_max = 11 / 35 * I₁_max # old
     N_max = I₁_max / 3
     lb = (μ=-Inf, N=N_max)
@@ -1822,6 +1815,10 @@ function parameter_bounds(ψ::ArrudaBoyce, data::AbstractHyperelasticData)
     return (lb=lb, ub=ub)
 end
 
+function Base.show(io::IO, ψ::ArrudaBoyce)
+    println(io, "Arruda-Boyce")
+    println(io, "\t Inverse Langevin = ", ψ.ℒinv)
+end
 """
 Modified Flory Erman [^1]
 
@@ -1837,7 +1834,7 @@ struct ModifiedFloryErman <: AbstractHyperelasticModel
 end
 
 function NonlinearContinua.StrainEnergyDensity(ψ::ModifiedFloryErman, λ⃗::AbstractVector, (; μ, N, κ))
-    WAB = NonlinearContinua.StrainEnergyDensity(ArrudaBoyce(ℒinv=ψ.ℒinv), λ⃗, (μ=μ, N=N))
+    WAB = StrainEnergyDensity(ArrudaBoyce(ℒinv=ψ.ℒinv), λ⃗, (μ=μ, N=N))
     @tullio B[i] := κ^2 * (λ⃗[i]^2 - 1) / (λ⃗[i]^2 + κ)^2
     @tullio D[i] := λ⃗[i]^2 * B[i] / κ
     @tullio W2 := B[i] + D[i] - log(B[i] + 1) - log(D[i] + 1)
@@ -1848,9 +1845,9 @@ function parameters(ψ::ModifiedFloryErman)
     return (:μ, :N, :κ)
 end
 
-function parameter_bounds(ψ::ModifiedFloryErman, data::AbstractHyperelasticData)
-    I₁_max = maximum(I₁.(collect.(data.λ⃗)))
-    N_max = 11 / 35 * I₁_max # old
+function parameter_bounds(ψ::ModifiedFloryErman, data::AbstractHyperelasticTest)
+    I₁_max = maximum(I₁.(data.data.λ))
+    # N_max = 11 / 35 * I₁_max # old
     N_max = I₁_max / 3
     lb = (μ=-Inf, N=N_max, κ=0)
     ub = nothing
@@ -1876,8 +1873,9 @@ function parameters(ψ::ExtendedTubeModel)
     return (:Gc, :Ge, :δ, :β)
 end
 
-function parameter_bounds(ψ::ExtendedTubeModel, data::AbstractHyperelasticData)
-    I₁_max = maximum(I₁.(collect.(data.λ⃗)))
+function parameter_bounds(ψ::ExtendedTubeModel, data::AbstractHyperelasticTest)
+    I₁_max = maximum(I₁.(data.data.λ))
+
     δ_max = sqrt(1 / (I₁_max - 3))
     lb = (Gc=-Inf, Ge=-Inf, δ=-δ_max, β=0)
     ub = (Gc=Inf, Ge=Inf, δ=δ_max, β=Inf)
@@ -1908,8 +1906,8 @@ function parameters(ψ::ABGI)
     return (:μ, :N, :Ge, :n)
 end
 
-function parameter_bounds(ψ::ABGI, data::AbstractHyperelasticData)
-    I₁_max = maximum(I₁.(collect.(data.λ⃗)))
+function parameter_bounds(ψ::ABGI, data::AbstractHyperelasticTest)
+    I₁_max = maximum(I₁.(data.data.λ))
     lb = (μ=-Inf, N=11 / 35 * I₁_max, Ge=-Inf, n=0)
     ub = nothing
     return (lb=lb, ub=ub)
@@ -1980,7 +1978,7 @@ function parameters(ψ::NonaffineMicroSphere)
     return (:μ, :N, :p, :U, :q)
 end
 
-function parameter_bounds(ψ::NonaffineMicroSphere, data::AbstractHyperelasticData)
+function parameter_bounds(ψ::NonaffineMicroSphere, data::AbstractHyperelasticTest)
     lb = (μ=-Inf, N=0, p=0, U=0, q=0)
     ub = nothing
     return (lb=lb, ub=ub)
@@ -2088,8 +2086,8 @@ function parameters(ψ::Bootstrapped8Chain)
     return (:μ, :N)
 end
 
-function parameter_bounds(ψ::Bootstrapped8Chain, data::AbstractHyperelasticData)
-    I₁_max = maximum(I₁.(collect.(data.λ⃗)))
+function parameter_bounds(ψ::Bootstrapped8Chain, data::AbstractHyperelasticTest)
+    I₁_max = maximum(I₁.(data.data.λ))
     N_min = I₁_max / 3
     lb = (μ=-Inf, N=N_min)
     ub = nothing
@@ -2115,8 +2113,8 @@ function parameters(ψ::DavidsonGoulbourne)
     return (:Gc, :Ge, :λmax)
 end
 
-function parameter_bounds(ψ::DavidsonGoulbourne, data::AbstractHyperelasticData)
-    I₁_max = maximum(I₁.(collect.(data.λ⃗)))
+function parameter_bounds(ψ::DavidsonGoulbourne, data::AbstractHyperelasticTest)
+    I₁_max = maximum(I₁.(data.data.λ))
     λmax_min = sqrt(I₁_max / 3)
     lb = (Gc=0, Ge=0, λmax=λmax_min)
     ub = nothing
@@ -2150,8 +2148,8 @@ function parameters(ψ::KhiemItskov)
 end
 
 
-function constraints(ψ::KhiemItskov, data::AbstractHyperelasticData)
-    I₁_max = maximum(I₁.(data.λ⃗))
+function constraints(ψ::KhiemItskov, data::AbstractHyperelasticTest)
+    I₁_max = maximum(I₁.(data.data.λ))
     f(u, p) = [(sin(π / sqrt(u.n)) * (I₁_max / 3)^(u.q / 2)) / (sin(π / sqrt(u.n) * (I₁_max / 3)^(u.q / 2)))]
     return f
 end
@@ -2168,8 +2166,8 @@ function parameters(ψ::GeneralConstitutiveModel_Network)
     return (:Gc, :N)
 end
 
-function parameter_bounds(ψ::GeneralConstitutiveModel_Network, data::AbstractHyperelasticData)
-    I₁_max = maximum(I₁.(collect.(data.λ⃗)))
+function parameter_bounds(ψ::GeneralConstitutiveModel_Network, data::AbstractHyperelasticTest)
+    I₁_max = maximum(I₁.(data.data.λ))
     N_min = I₁_max / 3
     lb = (Gc=-Inf, N=N_min)
     ub = nothing
@@ -2186,7 +2184,7 @@ function parameters(ψ::GeneralConstitutiveModel_Tube)
     return (:Ge,)
 end
 
-function parameter_bounds(ψ::GeneralConstitutiveModel_Tube, data::AbstractHyperelasticData)
+function parameter_bounds(ψ::GeneralConstitutiveModel_Tube, data::AbstractHyperelasticTest)
     lb = nothing
     ub = nothing
     return (lb=lb, ub=ub)
@@ -2211,8 +2209,8 @@ function parameters(ψ::GeneralConstitutiveModel)
     return (:Gc, :Ge, :N)
 end
 
-function parameter_bounds(ψ::GeneralConstitutiveModel, data::AbstractHyperelasticData)
-    I₁_max = maximum(I₁.(collect.(data.λ⃗)))
+function parameter_bounds(ψ::GeneralConstitutiveModel, data::AbstractHyperelasticTest)
+    I₁_max = maximum(I₁.(data.data.λ))
     N_min = I₁_max / 3
     lb = (Gc=-Inf, Ge=-Inf, N=N_min)
     ub = nothing
@@ -2246,9 +2244,9 @@ function parameters(ψ::FullNetwork)
     return (:μ, :N, :ρ)
 end
 
-function parameter_bounds(ψ::FullNetwork, data::AbstractHyperelasticData)
-    I₁_max = maximum(I₁.(collect.(data.λ⃗)))
-    λ_max = maximum(maximum.(collect.(data.λ⃗)))
+function parameter_bounds(ψ::FullNetwork, data::AbstractHyperelasticTest)
+    I₁_max = maximum(I₁.(data.data.λ))
+    λ_max = maximum(maximum.(data.data.λ))
     N₁ = λ_max^2
     N₂ = I₁_max / 3
     N_min = (N₁ > N₂) ? N₁ : N₂
@@ -2285,9 +2283,9 @@ function parameters(ψ::ZunigaBeatty)
     return (:μ, :N₃, :N₈)
 end
 
-function parameter_bounds(ψ::ZunigaBeatty, data::AbstractHyperelasticData)
-    λ_max = maximum(maximum.(collect.(data.λ⃗)))
-    I₁_max = maximum(I₁.(collect.(data.λ⃗)))
+function parameter_bounds(ψ::ZunigaBeatty, data::AbstractHyperelasticTest)
+    λ_max = maximum(maximum.(data.data.λ))
+    I₁_max = maximum(I₁.(data.data.λ))
     N₃_min = λ_max^2
     N₈_min = I₁_max / 3
     lb = (μ=-Inf, N₃=N₃_min, N₈=N₈_min)
@@ -2328,8 +2326,8 @@ function parameters(ψ::Lim)
     return (:μ₁, :μ₂, :N, :Î₁)
 end
 
-function parameter_bounds(ψ::Lim, data::AbstractHyperelasticData)
-    I₁_max = maximum(I₁.(collect.(data.λ⃗)))
+function parameter_bounds(ψ::Lim, data::AbstractHyperelasticTest)
+    I₁_max = maximum(I₁.(data.data.λ))
     N_min = I₁_max / 3
     lb = (μ₁=-Inf, μ₂=-Inf, N=N_min, Î₁=3)
     ub = nothing
@@ -2371,7 +2369,7 @@ function parameters(ψ::BechirChevalier)
     return (:μ₀, :η, :ρ, :N₃, :N₈)
 end
 
-function parameter_bounds(ψ::BechirChevalier, data::AbstractHyperelasticData)
+function parameter_bounds(ψ::BechirChevalier, data::AbstractHyperelasticTest)
     lb = (μ₀=-Inf, η=-Inf, ρ=-Inf, N₃=0, N₈=0)
     ub = nothing
     return (lb=lb, ub=ub)

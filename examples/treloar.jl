@@ -1,59 +1,53 @@
 # # Package Imports
 using Hyperelastics
 using IntervalArithmetic, IntervalOptimisation, LossFunctions
-using Optimization, OptimizationOptimJL, ComponentArrays, DataInterpolations
+using Optimization, OptimizationOptimJL, ComponentArrays
+using DataInterpolations
 using CairoMakie, ColorSchemes
-using MKL
 # # Treloar's UnPiaxial Data
-s₁ = [0.0, 0.2856, 0.3833, 0.4658, 0.5935, 0.6609, 0.8409, 1.006, 1.2087, 1.5617, 1.915, 2.2985, 2.6519, 3.0205, 3.3816, 3.7351, 4.0812, 4.4501, 4.8414, 5.2026, 5.5639] * 1e6
+s₁ = [0.0, 0.2856, 0.3833, 0.4658, 0.5935, 0.6609, 0.8409, 1.006, 1.2087, 1.5617, 1.915, 2.2985, 2.6519, 3.0205, 3.3816, 3.7351, 4.0812, 4.4501, 4.8414, 5.2026, 5.5639]
 λ₁ = [1.0, 1.4273, 1.6163, 1.882, 2.1596, 2.4383, 3.0585, 3.6153, 4.1206, 4.852, 5.4053, 5.7925, 6.1803, 6.4787, 6.6627, 6.936, 7.133, 7.1769, 7.2712, 7.4425, 7.512]
 λ⃗_predict = collect(map(x -> [x, 1 / √x, 1 / √x], range(minimum(λ₁), maximum(λ₁), length=30)))
 # # Create a Uniaxaial Test Results Object
-data = UniaxialHyperelasticData(s₁, λ₁)
+data = HyperelasticUniaxialTest(λ₁, s₁, name="treloar")
+# data = UniaxialHyperelasticData(s₁, λ₁)
 
 # ## Fit the Gent Model
 # $W(\vec{\lambda}) = -\frac{\mu J_m}{2}\log{\bigg(1-\frac{I_1-3}{J_m}\bigg)}$
 #
 # Initial guess for the parameters
 ψ = Gent()
-p₀ = ComponentVector(μ=240e3, Jₘ=30.0)
+p₀ = ComponentVector(μ=240e-3, Jₘ=80.0)
 # Create the optimization problem and solve
-HEProblem = HyperelasticProblem(
-    data,
-    ψ,
-    p₀,
-    [],
-)
-sol = solve(HEProblem, LBFGS())
-# $\mu$ = 240kPa, $J_m$ = 79.97
+prob = HyperelasticProblem(ψ, data, p₀)
+sol = solve(prob, LBFGS())
+# Create the optimization problem and solve
+# $\mu$ = 240kPa, $J_m$ = 79.98
 # Predict the new stresses
-function ŝ(λ⃗, ψ, p)
-    s⃗ = NominalStressFunction(ψ, λ⃗, p)
-    return s⃗ .- s⃗[3] .* λ⃗[3] ./ λ⃗
-end
-ŝ₁ = map(λ -> ŝ(λ, ψ, sol.u)[1], λ⃗_predict)
+uniaxial_results = predict(ψ, data, sol.u)
+ŝ₁ = getindex.(uniaxial_results.data.s, 1)
 # Plot the Results
-fig = Figure(font = "CMU Serif")
+fig = Figure(font="CMU Serif")
 ax = Makie.Axis(
     fig[1, 1],
     xlabel="Stretch",
     ylabel="Stress [MPa]",
     palette=(color=ColorSchemes.Egypt,),
-    )
+)
 scatter!(
     ax,
-    getindex.(data.λ⃗, 1),
-    getindex.(data.s⃗, 1) ./ 1e6,
+    getindex.(data.data.λ, 1),
+    getindex.(data.data.s, 1),
     marker='◆',
-    markersize=25,
+    markersize=20,
     color=:black,
     label="Experimental"
 )
 
 lines!(
     ax,
-    getindex.(λ⃗_predict, 1),
-    ŝ₁ ./ 1e6,
+    getindex.(data.data.λ, 1),
+    ŝ₁,
     label="Predicted $(string(ψ)[1:end-2])"
 )
 current_figure()
@@ -62,82 +56,75 @@ save("examples/" * string(ψ)[1:end-2] * ".png", current_figure()) #src
 
 # ## Using the EdwardVilgis Model
 ψ = EdwardVilgis()
-p₀ = ComponentVector(Ns=20e3, Nc=20e3, α=0.05, η=0.05)
-HEProblem = HyperelasticProblem(
-    data,
-    ψ,
-    p₀,
-    []
-)
-sol = solve(HEProblem, LBFGS())
+p₀ = ComponentVector(Ns=0.10, Nc=0.20, α=0.001, η=0.001)
+predict(ψ, data, (Ns=-0.0516550250094933, Nc=0.22452716772880485, α=0.08843116023934991, η=0.11887281294929823))
+prob = HyperelasticProblem(ψ, data, p₀)
+sol = solve(prob, LBFGS())
 #
 # Plot and compare the stresses
-ŝ₁ = map(λ -> ŝ(λ, ψ, sol.u)[1], λ⃗_predict)
+uniaxial_results = predict(ψ, data, sol.u)
+ŝ₁ = getindex.(uniaxial_results.data.s, 1)
 lines!(
     ax,
-    getindex.(λ⃗_predict, 1),
-    ŝ₁ ./ 1e6,
+    getindex.(data.data.λ, 1),
+    ŝ₁,
     label="Predicted $(string(ψ))"
 )
 current_figure()
 # ## Using the ModifiedFloryErman Model
 ψ = ModifiedFloryErman()
-p₀ = ComponentVector(μ=240e3, N=60.0, κ=100.0)
-HEProblem = HyperelasticProblem(
-    data,
-    ψ,
-    p₀,
-    []
-)
+p₀ = ComponentVector(μ=240e-3, N=60.0, κ=100.0)
+HEProblem = HyperelasticProblem(ψ, data, p₀)
 sol = solve(HEProblem, LBFGS())
 #
 # Plot and compare the stresses
-ŝ₁ = map(λ -> ŝ(λ, ψ, sol.u)[1], λ⃗_predict)
+uniaxial_results = predict(ψ, data, sol.u)
+ŝ₁ = getindex.(uniaxial_results.data.s, 1)
 lines!(
-    getindex.(λ⃗_predict, 1),
-    ŝ₁ ./ 1e6,
+    getindex.(data.data.λ, 1),
+    ŝ₁,
     label="Predicted ModifiedFloryErman"
 )
 current_figure()
 # ## Using the MCC Model
 ψ = MCC()
-p₀ = ComponentVector(κ=100000000.0, μkT=10e3, ζkT=10e3)
+p₀ = ComponentVector(κ=100000000.0, μkT=10e-3, ζkT=10e-3)
 HEProblem = HyperelasticProblem(
-    data,
     ψ,
-    p₀,
-    []
+    data,
+    p₀
 )
 sol = solve(HEProblem, LBFGS())
 #
 # Plot and compare the stresses
-ŝ₁ = map(λ -> ŝ(λ, ψ, sol.u)[1], λ⃗_predict)
+uniaxial_results = predict(ψ, data, sol.u)
+ŝ₁ = getindex.(uniaxial_results.data.s, 1)
 lines!(
     ax,
-    getindex.(λ⃗_predict, 1),
-    ŝ₁ ./ 1e6,
+    getindex.(data.data.λ, 1),
+    ŝ₁,
     label="Predicted $(string(ψ))"
 )
 current_figure()
 # ## Using the NeoHookean Model
 # $W(\vec{\lambda}) = \frac{\mu}{2}(I_1-3)$
 ψ = NeoHookean()
-p₀ = ComponentVector(μ=200e3)
+p₀ = ComponentVector(μ=200e-3)
 HEProblem = HyperelasticProblem(
-    data,
     NeoHookean(),
+    data,
     p₀,
-    []
 )
 sol = solve(HEProblem, LBFGS())
 # $\mu$ = 534kPa
 #
 # Plot and compare the stresses
-ŝ₁ = map(λ -> ŝ(λ, ψ, sol.u)[1], λ⃗_predict)
+uniaxial_results = predict(ψ, data, sol.u)
+ŝ₁ = getindex.(uniaxial_results.data.s, 1)
 lines!(
     ax,
-    getindex.(λ⃗_predict, 1),
-    ŝ₁ ./ 1e6,
+    getindex.(data.data.λ, 1),
+    ŝ₁,
     label="Predicted NeoHookean"
 )
 save("examples/" * string(ψ)[1:end-2] * ".png", current_figure()) #src
@@ -162,7 +149,6 @@ plot!() #src
 # # Using Turing.jl for Parameter Estimation
 using Turing, Distributions, LinearAlgebra
 using MCMCChains, SciMLExpectations, KernelDensity
-using Cuba
 Turing.setadbackend(:forwarddiff)
 function Makie.plot(ch::Chains)
     fig = Figure()
@@ -186,19 +172,21 @@ struct ps{T}
     μ::T
     Jₘ::T
 end
-Jₘ_min = maximum(I₁.(collect.(data.λ⃗))) - 3
-function ŝ(λ⃗, ψ, p)
-    s⃗ = NominalStressFunction(ψ, λ⃗, p)
-    return s⃗ .- s⃗[3] .* λ⃗[3] ./ λ⃗
+Jₘ_min = maximum(I₁.(data.data.λ)) - 3
+function ŝ(ψ, test, p)
+    ŷ = predict(ψ, test, p)
+    s = getindex.(ŷ.data.s)
+    return s
 end
 @model function fitHE(s₁, data)
     ## Prior Distributions
     σ ~ InverseGamma(1, 2) # noise in the measurement data
-    μ ~ truncated(Normal(2.4e5, 0.5e5), 2.2e5, 2.6e5) # Normal for μ
-    Jₘ ~ truncated(Normal(300.0, 30.0), lower=Jₘ_min) # Truncated Normal for Jₘ with lower bound
+    μ ~ truncated(Normal(0.24, 0.05), 0.2, 0.3) # Normal for μ
+    Jₘ ~ truncated(Normal(80.0, 10.0), lower=Jₘ_min) # Truncated Normal for Jₘ with lower bound
 
     ## Simulate the data
-    ŝ₁ = map(λ -> ŝ(λ, Gent(), ps(μ, Jₘ))[1], data.λ⃗)
+    ŝ₁ = ŝ(Gent(), data, ps(μ, Jₘ))
+    # ŝ₁ = map(λ -> ŝ(λ, Gent(), ps(μ, Jₘ))[1], data.λ⃗)
 
     ## Observations
     for (index, ŝ) in enumerate(ŝ₁)
@@ -234,7 +222,7 @@ posterior_samples = sample(chain[[:μ, :Jₘ]], 2000; replace=false)
 μ_dist = kde(vec(Array(chain[:μ])))
 Jₘ_dist = kde(vec(Array(chain[:Jₘ])))
 s(x) = ŝ(λ⃗_predict[end], Gent(), ps(μ_dist(1), x[2]))[1]
-s₁_values = map(x-> s(x), eachrow(Array(posterior_samples)))
+s₁_values = map(x -> s(x), eachrow(Array(posterior_samples)))
 density!(ax, s₁_values, color=(:slategray, 0.4))
 current_figure()
 # # Generating partial derivatives of the SEF with Symbolics.jl

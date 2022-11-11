@@ -6,7 +6,7 @@ Returns an `OptimizationProblem` for solving with GalacticOptim.jl. `data` is th
 
 """
 function HyperelasticProblem(
-    data::AbstractHyperelasticData,
+    data::AbstractHyperelasticTest,
     ψ::AbstractHyperelasticModel,
     u₀::AbstractVector,
     ps;
@@ -85,7 +85,7 @@ HyperelasticProblem(data::Vector{HyperelasticData}, model, u₀, ps; loss=L2Dist
 Returns an `OptimizationProblem` for solving with GalacticOptim.jl. `data` is a vector of hyperelastic data and fits to all sets equally, `model` is the strain energy density as a function of the parameters (i.e. `f(p) = W(p)(λ⃗)`). `ps` is any hyperparameters for the model (currently not supported). `loss` defines the loss function to be used in the optimization. Currently defaults to the ``L^2``-norm between the predicted and experimental data. `agg` defines the aggregration mode of the errors, defaults to the mean of the errors. `cons` define any constrain equations involving the parameters of the model. `kwargs` are passed to `OptimizationProblem`. To set parameter bounds, use the keywords `lb` and `ub` respectively.
 
 """
-function HyperelasticProblem(data::Vector{AbstractHyperelasticData}, model, u₀, ps; loss=L2DistLoss(), agg=AggMode.Mean(), cons=(x, p) -> [true], kwargs...)
+function HyperelasticProblem(data::Vector{AbstractHyperelasticTest}, model, u₀, ps; loss=L2DistLoss(), agg=AggMode.Mean(), cons=(x, p) -> [true], kwargs...)
 
     s = getindex.(vcat(collect.(zip(getfield.(data, :s⃗)...))...), 1) |> transpose
     λ = collect.(vcat(collect.(zip(getfield.(data, :λ⃗)...))...))

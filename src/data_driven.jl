@@ -13,7 +13,7 @@ struct SussmanBathe <: AbstractDataDrivenHyperelasticModel
     w′::Function
 end
 
-function SussmanBathe(data::AbstractHyperelasticData, k::Integer, interpolant)
+function SussmanBathe(data::AbstractHyperelasticTest, k::Integer, interpolant)
     σ̂ = interpolant(getindex.(data.s⃗) .* getindex.(data.λ⃗, 1), getindex.(data.λ⃗, 1))
     f(i, λ) = (σ̂(λ^((4.0)^(-i))) + σ̂(λ^(-0.5 * (4.0^(-i))))) / λ
     w′(λ) = sum(Base.Fix2(f, λ), 0:k)
