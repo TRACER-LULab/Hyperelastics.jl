@@ -1,17 +1,17 @@
 module Hyperelastics
 
 using Reexport
-using InverseLangevinApproximations
 @reexport using NonlinearContinua
+using InverseLangevinApproximations
 using LossFunctions, Optimization
-using AbstractDifferentiation
-using ForwardDiff
+using AbstractDifferentiation, ForwardDiff
 using Tullio
 using SpecialFunctions
 using DataInterpolations
 using QuadGK
 using ComponentArrays, LabelledArrays, StructArrays
 using LinearAlgebra, Statistics
+using Term
 
 export HyperelasticUniaxialTest, HyperelasticBiaxialTest, HyperelasticProblem
 export predict

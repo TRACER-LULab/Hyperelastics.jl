@@ -31,6 +31,17 @@ struct HyperelasticUniaxialTest <: AbstractHyperelasticTest
     end
 end
 
+function Base.show(io::IO, test::HyperelasticUniaxialTest)
+    print(io, Term.RenderableText("Uniaxial Test: {bold} $(test.name)"))
+    print(io,
+        Term.Table(
+            hcat(getindex.(test.data.λ, 1), getindex.(test.data.s, 1)),
+            header=["λ₁", "s₁"],
+            box=:ROUNDED,
+        )
+    )
+end
+
 struct HyperelasticBiaxialTest <: AbstractHyperelasticTest
     data::StructVector
     name::String
@@ -61,6 +72,17 @@ struct HyperelasticBiaxialTest <: AbstractHyperelasticTest
     end
 end
 
+function Base.show(io::IO, test::HyperelasticBiaxialTest)
+    print(io, Term.RenderableText("Biaxial Test: {bold} $(test.name)"))
+    print(io,
+        Term.Table(
+            hcat(getindex.(test.data.λ, 1),getindex.(test.data.λ, 2), getindex.(test.data.s, 1), getindex.(test.data.s, 2)),
+            header=["λ₁", "λ₂", "s₁", "s₂"],
+            box=:ROUNDED,
+        )
+    )
+end
+
 function NonlinearContinua.predict(ψ::AbstractHyperelasticModel, test::HyperelasticUniaxialTest, p)
     f(λ) = SecondPiolaKirchoffStressTensor(ψ, λ, p)
     λ = test.data.λ
@@ -69,7 +91,7 @@ function NonlinearContinua.predict(ψ::AbstractHyperelasticModel, test::Hyperela
     s₃ = getindex.(s, 3)
     λ₁ = getindex.(λ, 1)
     λ₃ = getindex.(λ, 3)
-    Δs₁₃ = @. s₁ - s₃ * λ₃/λ₁
+    Δs₁₃ = @. s₁ - s₃ * λ₃ / λ₁
     HyperelasticUniaxialTest(λ₁, Δs₁₃, name=test.name)
 end
 
@@ -102,7 +124,7 @@ function HyperelasticProblem(ψ::AbstractHyperelasticModel, test::AbstractHypere
     cons = constraints(ψ, test)
     lb, ub = parameter_bounds(ψ, test)
     model_ps = parameters(ψ)
-    ps = (ψ = ψ, test = test)
+    ps = (ψ=ψ, test=test)
 
     for p in model_ps
         if !isnothing(lb)

@@ -5,14 +5,14 @@ First stretch invariant - Currently requires the addition of 5 times the machine
 
 ``I_1(\\vec{\\lambda}) = \\lambda_1^2+\\lambda_2^2+\\lambda_3^2 + 5\\varepsilon``
 """
-NonlinearContinua.I₁(λ⃗::AbstractVector) = sum(λ⃗ .^ 2)
+NonlinearContinua.I₁(λ⃗::AbstractVector) = sum(Base.Fix2(^, 2), λ⃗)
 
 """
 Second Stretch invariant
 
 ``I_2(\\vec{\\lambda}) = \\lambda_1^{-2}+\\lambda_2^{-2}+\\lambda_3^{-2}``
 """
-NonlinearContinua.I₂(λ⃗::AbstractVector) = sum(λ⃗ .^ (-2))
+NonlinearContinua.I₂(λ⃗::AbstractVector) = sum(Base.Fix2(^, -2), λ⃗)
 
 """
 Third Stretch invariant

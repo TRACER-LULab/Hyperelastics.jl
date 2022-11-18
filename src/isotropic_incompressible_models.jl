@@ -11,8 +11,8 @@ Model:
 """
 struct LinearElastic <: AbstractHyperelasticModel end
 
-function NonlinearContinua.StrainEnergyDensity(ψ::LinearElastic, λ⃗::AbstractVector, (;E, ν))
-    return @tullio _ := (E)/(2*(1+ν))*(λ⃗[i] - 1)^2
+function NonlinearContinua.StrainEnergyDensity(ψ::LinearElastic, λ⃗::AbstractVector, (; E, ν))
+    return @tullio _ := (E) / (2 * (1 + ν)) * (λ⃗[i] - 1)^2
 end
 
 parameters(ψ::LinearElastic) = (:E, :ν)
@@ -32,7 +32,10 @@ struct GeneralMooneyRivlin <: AbstractHyperelasticModel end
 function NonlinearContinua.StrainEnergyDensity(ψ::GeneralMooneyRivlin, λ⃗::AbstractVector, (; C))
     I1 = I₁(λ⃗)
     I2 = I₂(λ⃗)
-    @tullio W := C[j, i] * (I1 - 3)^(i - 1) * (I2 - 3)^(j - 1)
+    I1_vec = map(Base.Fix1(^, I1), range(0, size(C, 2) - 1))
+    I2_vec = map(Base.Fix1(^, I2), range(0, size(C, 1) - 1))
+    W = I2_vec' * C * I1_vec
+    # @tullio W := C[j, i] * (I1 - 3)^(i - 1) * (I2 - 3)^(j - 1)
 end
 
 function NonlinearContinua.StrainEnergyDensity(ψ::GeneralMooneyRivlin, I⃗::AbstractVector, (; C), I::InvariantForm)
@@ -82,9 +85,10 @@ struct GeneralBeda <: AbstractHyperelasticModel end
 function NonlinearContinua.StrainEnergyDensity(ψ::GeneralBeda, λ⃗::AbstractVector, (; C, K, α, β))
     @assert length(C) == length(α) "Vector C and Vector α are not the same length"
     @assert length(K) == length(β) "Vector K and Vector β are not the same length"
-    W1 = C ./ α .* (I₁(λ⃗) - 3) .^ α |> sum
-    W2 = K ./ β .* (I₂(λ⃗) - 3) .^ β |> sum
-    return W1 + W2
+    @tullio W1 := C[i] / α[i] * (I₁(λ⃗) - 3)^α[i]# |> sum
+    @tullio W2 := K[i] / β[i] * (I₂(λ⃗) - 3)^β[i]# |> sum
+    W = W1 + W2
+    return W
 end
 
 function NonlinearContinua.StrainEnergyDensity(ψ::GeneralBeda, I⃗::AbstractVector, (; C, K, α, β), I::InvariantForm)
@@ -111,7 +115,7 @@ Model: ``C_{10}(I_1-3)+C_{01}(I_2-3)``
 struct MooneyRivlin <: AbstractHyperelasticModel end
 
 function NonlinearContinua.StrainEnergyDensity(ψ::MooneyRivlin, λ⃗::AbstractVector, (; C10, C01))
-    return C10*(I₁(λ⃗) - 3)+C01*(I₂(λ⃗) - 3)
+    return C10 * (I₁(λ⃗) - 3) + C01 * (I₂(λ⃗) - 3)
     # NonlinearContinua.StrainEnergyDensity(
     #     GeneralMooneyRivlin(),
     #     λ⃗,
@@ -697,16 +701,9 @@ Model: ``\\frac{C_1}{\\alpha}(I_1-3)^{\\alpha}+C_2(I_1-3)+\\frac{C_3}{\\zeta}(I_
 struct Beda <: AbstractHyperelasticModel end
 
 function NonlinearContinua.StrainEnergyDensity(ψ::Beda, λ⃗::AbstractVector, (; C1, C2, C3, K1, α, β, ζ))
-    NonlinearContinua.StrainEnergyDensity(
-        GeneralBeda(),
-        λ⃗,
-        (
-            C=[C1, C2, C3],
-            K=[K1],
-            α=[α, 1, ζ],
-            β=[β]
-        )
-    )
+    _I1 = sum(Base.Fix2(^, 2), λ⃗)
+    _I2 = sum(Base.Fix2(^, -2), λ⃗)
+    K1 / β * (_I2 - 3)^β + C1 / α * (_I1 - 3)^α + C2 * (_I1 - 3) + C3 / ζ * (_I1 - 3)^ζ
 end
 
 function NonlinearContinua.StrainEnergyDensity(ψ::Beda, I⃗::AbstractVector, (; C1, C2, C3, K1, α, β, ζ), I::InvariantForm)
@@ -727,6 +724,11 @@ function parameters(ψ::Beda)
     return (:C1, :C2, :C3, :K1, :α, :β, :ζ)
 end
 
+function parameter_bounds(::Beda, data::AbstractHyperelasticTest)
+    lb = (C1=-Inf, C2=-Inf, C3=-Inf, K1=-Inf, α=0.0, β=0.0, ζ=1.0)
+    ub = (C1=Inf, C2=Inf, C3=Inf, K1=Inf, α=1.0, β=1.0, ζ=Inf)
+    return (lb=lb, ub=ub)
+end
 """
 Amin [^1]
 
@@ -944,11 +946,11 @@ function NonlinearContinua.SecondPiolaKirchoffStressTensor(ψ::ChevalierMarco, �
     ∂W∂I2 = @tullio _ := b⃗[i] / I₂(λ⃗)^(i - 1)
     𝐒 = 2 * (I(3) * ∂W∂I1 - diagm(λ⃗ .^ 2)^(-2) * ∂W∂I2)
     sᵢ = diag(𝐒)
-    sᵢ = sᵢ .- sᵢ[3] .* λ⃗[3] / λ⃗[1]
+    sᵢ = sᵢ
     return sᵢ
 end
 
-function NonlinearContinua.CauchyStressTensor(ψ::ChevalierMarco,λ⃗::AbstractVector, (; a⃗, b⃗))
+function NonlinearContinua.CauchyStressTensor(ψ::ChevalierMarco, λ⃗::AbstractVector, (; a⃗, b⃗))
     s = NonlinearContinua.SecondPiolaKirchoffStressTensor(ψ, λ⃗, (a⃗=a⃗, b⃗=b⃗))
     σ = λ⃗ .* s
     return σ
@@ -977,6 +979,22 @@ end
 
 function NonlinearContinua.StrainEnergyDensity(ψ::GornetDesmorat, I⃗::AbstractVector, (; h₁, h₂, h₃), I::InvariantForm)
     h₁ * √π * erfi(√h₃ * (I⃗[1] - 3)^2) / 2 / √h₃ + 6 * h₂ * √(I⃗[2])
+end
+
+function NonlinearContinua.CauchyStressTensor(ψ::GornetDesmorat, λ⃗::AbstractVector, (; h₁, h₂, h₃))
+    B = λ⃗ .^ 2
+    _I₁ = I₁(λ⃗)
+    _I₂ = I₂(λ⃗)
+    ∂W∂I₁ = h₁ * exp(h₃ * (_I₁ - 3)^2)
+    ∂W∂I₂ = 3 * h₂ * exp(1 / sqrt(_I₂))
+    σ = 2 * (∂W∂I₁ + _I₁ * ∂W∂I₂) * B - 2 * ∂W∂I₂ * (B .^ 2)
+    return σ
+end
+
+function NonlinearContinua.SecondPiolaKirchoffStressTensor(ψ::GornetDesmorat, λ⃗::AbstractVector, ps)
+    σ = CauchyStressTensor(ψ, λ⃗, ps)
+    s = σ ./ λ⃗
+    return s
 end
 
 function parameters(ψ::GornetDesmorat)
@@ -1032,7 +1050,7 @@ end
 """
 Alexander [^1]
 
-Parameters: C₁, C₂, C₃, k, γ
+Parameters: μ, C₁, C₂, C₃, k, γ
 
 Model: ``\\frac{C_1 \\sqrt{\\pi}\\text{erfi}\\big(\\sqrt{k}(I_1-3)\\big)}{2\\sqrt{k}}+C_2\\log{\\frac{I_2-3+\\gamma}{\\gamma}}+C_3(I_2-3)``
 
@@ -1040,12 +1058,22 @@ Model: ``\\frac{C_1 \\sqrt{\\pi}\\text{erfi}\\big(\\sqrt{k}(I_1-3)\\big)}{2\\sqr
 """
 struct Alexander <: AbstractHyperelasticModel end
 
-function NonlinearContinua.StrainEnergyDensity(ψ::Alexander, λ⃗::AbstractVector, (; C₁, C₂, C₃, k, γ))
-    C₁ * √π * erfi(√k * (I₁(λ⃗) - 3)) / 2 / √k + C₂ * log((I₂(λ⃗) - 3 + γ) / γ) + C₃ * (I₂(λ⃗) - 3)
+function NonlinearContinua.StrainEnergyDensity(ψ::Alexander, λ⃗::AbstractVector, (; μ, C₁, C₂, C₃, k, γ))
+    μ / 3 * (C₁ * √π * erfi(√k * (I₁(λ⃗) - 3)) / 2 / √k + C₂ * log((I₂(λ⃗) - 3 + γ) / γ) + C₃ * (I₂(λ⃗) - 3))
 end
 
-function NonlinearContinua.StrainEnergyDensity(ψ::Alexander, I⃗::AbstractVector, (; C₁, C₂, C₃, k, γ), I::InvariantForm)
-    C₁ * √π * erfi(√k * (I⃗[1] - 3)) / 2 / √k + C₂ * log((I⃗[2] - 3 + γ) / γ) + C₃ * (I⃗[2] - 3)
+function NonlinearContinua.StrainEnergyDensity(ψ::Alexander, I⃗::AbstractVector, (; μ, C₁, C₂, C₃, k, γ), I::InvariantForm)
+    μ / 3 * (C₁ * √π * erfi(√k * (I⃗[1] - 3)) / 2 / √k + C₂ * log((I⃗[2] - 3 + γ) / γ) + C₃ * (I⃗[2] - 3))
+end
+
+function NonlinearContinua.SecondPiolaKirchoffStressTensor(::Alexander, λ⃗::AbstractVector, (; μ, C₁, C₂, C₃, k, γ))
+    @tullio s[i] := μ / 3 * ((3 * λ⃗[i]^2 - I₁(λ⃗)) * C₁ * exp(k * (I₁(λ⃗) - 3)^2) + (I₂(λ⃗) - 3 * λ⃗[i]^2) * (C₂ / (I₂(λ⃗) - 3 + γ) + C₃))
+end
+
+function NonlinearContinua.CauchyStressTensor(ψ::Alexander, λ⃗::AbstractVector, p)
+    s = SecondPiolaKirchoffStressTe(ψ, λ⃗, p)
+    σ = s .* λ⃗
+    return σ
 end
 
 function parameters(ψ::Alexander)
@@ -1211,9 +1239,9 @@ function NonlinearContinua.StrainEnergyDensity(ψ::VanDerWaals, I⃗::AbstractVe
 end
 
 function parameter_bounds(ψ::VanDerWaals, data::AbstractHyperelasticTest)
-    lb = (μ = 0.0, λm = sqrt(3), β = 0.0, α = 0.0)
-    ub = (μ = Inf, λm = Inf, β = 1.0, α = Inf)
-    return (ub = ub, lb = lb)
+    lb = (μ=0.0, λm=sqrt(3), β=0.0, α=0.0)
+    ub = (μ=Inf, λm=Inf, β=1.0, α=Inf)
+    return (ub=ub, lb=lb)
 end
 
 function parameters(ψ::VanDerWaals)
@@ -1312,6 +1340,13 @@ function parameters(ψ::YeohFleming)
     return (:A, :B, :C10, :Im)
 end
 
+function parameter_bounds(ψ::YeohFleming, data::AbstractHyperelasticTest)
+    Iₘ_min = maximum(I₁, data.data.λ)
+    lb = (A=-Inf, B=-Inf, C10=-Inf, Im=Iₘ_min)
+    ub = nothing
+    return (lb=lb, ub=ub)
+end
+
 """
 Pucci-Saccomandi [^1]
 
@@ -1368,7 +1403,10 @@ function parameters(ψ::HorganSaccomandi)
 end
 
 function parameter_bounds(ψ::HorganSaccomandi, data::AbstractHyperelasticTest)
-    J_min = maximum(maximum.(map(x->x.^2,data.data.λ)))
+    _I1 = @. I₁(data.data.λ)
+    _I2 = @. I₂(data.data.λ)
+    Js = @. _I1 / 3 - (cbrt(2) * (3_I2 - _I1^2)) / (3 * cbrt(27 + 2 * _I1^3 - 9 * _I1 * _I2 + 3 * sqrt(3) * sqrt(27 + 4 * _I1^3 - 18 * _I1 * _I2 - _I1^2 * _I2^2 + 4 * _I2^3))) + (cbrt(27 + 2 * _I1^3 - 9 * _I1 * _I2 + 3 * sqrt(3) * sqrt(27 + 4 * _I1^3 - 18 * _I1 * _I2 - _I1^2 * _I2^2 + 4 * _I2^3))) / (3 * cbrt(2))
+    J_min = maximum(Js)
     lb = (μ=-Inf, J=J_min)
     ub = nothing
     return (lb=lb, ub=ub)
@@ -1405,6 +1443,12 @@ function parameters(ψ::Beatty)
     return (:G₀, :Iₘ)
 end
 
+function parameter_bounds(::Beatty, data::AbstractHyperelasticTest)
+    Iₘ_min = maximum(I₁, data.data.λ)
+    lb = (G₀=-Inf, Iₘ=Iₘ_min)
+    ub = nothing
+    return (lb=lb, ub=ub)
+end
 """
 Horgan Murphy Model [^1]
 
@@ -1543,7 +1587,7 @@ function NonlinearContinua.StrainEnergyDensity(ψ::Shariff, λ⃗::AbstractVecto
             push!(ϕ, x -> (-1)^(j - 1) * log(x) + (-1)^(j - 1) * sum(r -> (-1)^r * c(j - 1, r) * x^r / r, range(1, j - 1)) - (-1)^(j - 1) * sum(r -> (-1)^r * c(j - 1, r) / r, range(1, j - 1)))
         end
     end
-    E * (@tullio _ := ϕ[i](λ⃗[j]).*α⃗[i])
+    E * (@tullio _ := ϕ[i](λ⃗[j]) .* α⃗[i])
 end
 
 function parameters(ψ::Shariff)
@@ -1925,53 +1969,60 @@ Model: See Paper
 [^1]: > Miehe C, Göktepe S, Lulei F. A micro-macro approach to rubber-like materials—part I: the non-affine micro-sphere model of rubber elasticity. Journal of the Mechanics and Physics of Solids. 2004 Nov 1;52(11):2617-60.
 [^2]: > Cohen A. A Padé approximant to the inverse Langevin function. Rheologica acta. 1991 May;30(3):270-3.
 """
-struct NonaffineMicroSphere <: AbstractHyperelasticModel
+struct NonaffineMicroSphere{T,S} <: AbstractHyperelasticModel
     ℒinv::Function
-    NonaffineMicroSphere(; ℒinv::Function=TreloarApproximation) = new(ℒinv)
+    r⃗::Vector{T}
+    w::Vector{S}
+    function NonaffineMicroSphere(; ℒinv::Function=CohenRounded3_2, n=21)
+        if n == 21
+            a = √(2) / 2
+            b = 0.836095596749
+            c = 0.387907304067
+            r⃗ = [
+                [0, 0, 1],
+                [0, 1, 0],
+                [1, 0, 0],
+                [0, a, a],
+                [0, -a, a],
+                [a, 0, a],
+                [-a, 0, a],
+                [a, a, 0],
+                [-a, a, 0],
+                [b, c, c],
+                [-b, c, c],
+                [b, -c, c],
+                [-b, -c, c],
+                [c, b, c],
+                [-c, b, c],
+                [c, -b, c],
+                [-c, -b, c],
+                [c, c, b],
+                [-c, c, b],
+                [c, -c, b],
+                [-c, -c, b],
+            ]
+            w1 = 0.02652142440932
+            w2 = 0.0199301476312
+            w3 = 0.0250712367487
+
+            w = 2 .* [fill(w1, 3); fill(w2, 6); fill(w3, 12)] # Multiply by two since integration is over the half-sphere
+        else
+            @error "Method not implemented for n = $(n)"
+        end
+        new{eltype(r⃗), eltype(w)}(ℒinv, r⃗, w)
+    end
 end
 
 function NonlinearContinua.StrainEnergyDensity(ψ::NonaffineMicroSphere, λ⃗::AbstractVector, (; μ, N, p, U, q))
-    a = √(2) / 2
-    b = 0.836095596749
-    c = 0.387907304067
-    r⃗ = [
-        [0, 0, 1],
-        [0, 1, 0],
-        [1, 0, 0],
-        [0, a, a],
-        [0, -a, a],
-        [a, 0, a],
-        [-a, 0, a],
-        [a, a, 0],
-        [-a, a, 0],
-        [b, c, c],
-        [-b, c, c],
-        [b, -c, c],
-        [-b, -c, c],
-        [c, b, c],
-        [-c, b, c],
-        [c, -b, c],
-        [-c, -b, c],
-        [c, c, b],
-        [-c, c, b],
-        [c, -c, b],
-        [-c, -c, b],
-    ]
-    w1 = 0.02652142440932
-    w2 = 0.0199301476312
-    w3 = 0.0250712367487
 
-    w = 2 .* [fill(w1, 3); fill(w2, 6); fill(w3, 12)] # Multiply by two since integration is over the half-sphere
-    F = diagm(λ⃗)
-    @tullio t⃗[i] := F * r⃗[i]
-    @tullio n⃗[i] := inv(F') * r⃗[i]
-    @tullio λ̄[i] := norm(t⃗[i])
-    @tullio ν̄[i] := norm(n⃗[i])
-    @tullio λ := (λ̄[i]^p) * w[i]# |> Base.Fix2(^, (1 / p))
+    @tullio λ := sqrt(sum(λ⃗ .^ 2 .* ψ.r⃗[i] .^ 2))^p * ψ.w[i]
     λr = λ^(1 / p) / √N
     β = ψ.ℒinv(λr)
-    @tullio ν := ν̄[i]^q * w[i]# |> Base.Fix2(^, 1 / q)
-    return N * U * μ * ν^(1 / q) + N * μ * (λr * β + log(β / sinh(β)))
+    ψf = μ * N * (λr * β + log(β / sinh(β)))
+
+    @tullio ν := sqrt(sum(λ⃗ .^ -2 .* ψ.r⃗[i] .^ 2))^q * ψ.w[i]
+    ψc = U * μ * N * (ν)
+    return ψf + ψc
 end
 
 function parameters(ψ::NonaffineMicroSphere)
@@ -1997,58 +2048,61 @@ Model: See Paper
 [^1]: > Miehe C, Göktepe S, Lulei F. A micro-macro approach to rubber-like materials—part I: the non-affine micro-sphere model of rubber elasticity. Journal of the Mechanics and Physics of Solids. 2004 Nov 1;52(11):2617-60.
 [^2]: > Cohen A. A Padé approximant to the inverse Langevin function. Rheologica acta. 1991 May;30(3):270-3.
 """
-struct AffineMicroSphere <: AbstractHyperelasticModel
+struct AffineMicroSphere{T,S} <: AbstractHyperelasticModel
     ℒinv::Function
-    AffineMicroSphere(; ℒinv::Function=TreloarApproximation) = new(ℒinv)
+    r⃗::Vector{T}
+    w::Vector{S}
+    function AffineMicroSphere(; ℒinv::Function=TreloarApproximation, n=21)
+        if n == 21
+            a = √(2) / 2
+            b = 0.836095596749
+            c = 0.387907304067
+            r⃗ = [
+                [0, 0, 1],
+                [0, 1, 0],
+                [1, 0, 0],
+                [0, a, a],
+                [0, -a, a],
+                [a, 0, a],
+                [-a, 0, a],
+                [a, a, 0],
+                [-a, a, 0],
+                [b, c, c],
+                [-b, c, c],
+                [b, -c, c],
+                [-b, -c, c],
+                [c, b, c],
+                [-c, b, c],
+                [c, -b, c],
+                [-c, -b, c],
+                [c, c, b],
+                [-c, c, b],
+                [c, -c, b],
+                [-c, -c, b],
+            ]
+            w1 = 0.02652142440932
+            w2 = 0.0199301476312
+            w3 = 0.0250712367487
+
+            w = 2 .* [fill(w1, 3); fill(w2, 6); fill(w3, 12)] # Multiply by two since integration is over the half-sphere
+        else
+            @error "Method for n = $(n) is not implemented"
+        end
+        new{eltype(r⃗), eltype(w)}(ℒinv, r⃗, w)
+    end
 end
 
-function NonlinearContinua.StrainEnergyDensity(ψ::AffineMicroSphere, λ⃗::AbstractVector, (; μ, N, p, U, q))
-    a = √(2) / 2
-    b = 0.836095596749
-    c = 0.387907304067
-    r⃗ = [
-        [0, 0, 1],
-        [0, 1, 0],
-        [1, 0, 0],
-        [0, a, a],
-        [0, -a, a],
-        [a, 0, a],
-        [-a, 0, a],
-        [a, a, 0],
-        [-a, a, 0],
-        [b, c, c],
-        [-b, c, c],
-        [b, -c, c],
-        [-b, -c, c],
-        [c, b, c],
-        [-c, b, c],
-        [c, -b, c],
-        [-c, -b, c],
-        [c, c, b],
-        [-c, c, b],
-        [c, -c, b],
-        [-c, -c, b],
-    ]
-    w1 = 0.0265214244093
-    w2 = 0.0199301476312
-    w3 = 0.0250712367487
+function NonlinearContinua.StrainEnergyDensity(ψ::AffineMicroSphere, λ⃗::AbstractVector, (; μ, N))
 
-    w = 2 .* [fill(w1, 3); fill(w2, 6); fill(w3, 12)] # Multiply by two since integration is over the half-sphere
+    @tullio λr[i] := sqrt(sum(λ⃗ .^ 2 .* ψ.r⃗[i] .^ 2)) / √N
+    @tullio β[i] := ψ.ℒinv(λr[i])
+    @tullio ψf := μ * N * (λr[i] * β[i] + log(β[i] / sinh(β[i]))) * ψ.w[i]
 
-    F = diagm(λ⃗)
-    @tullio t⃗[i] := F * r⃗[i]
-    @tullio n⃗[i] := inv(F') * r⃗[i]
-    @tullio λ̄[i] := norm(t⃗[i])
-    @tullio ν̄[i] := norm(n⃗[i])
-    @tullio λ := (λ̄[i]) * w[i]# |> Base.Fix2(^, (1 / p))
-    λr = λ^(1 / p) / √N
-    β = ψ.ℒinv(λr)
-    @tullio ν := ν̄[i]^q * w[i]# |> Base.Fix2(^, 1 / q)
-    return N * U * μ * ν^(1 / q) + N * μ * (λr * β + log(β / sinh(β)))
+    return ψf
 end
 
 function parameters(ψ::AffineMicroSphere)
-    return (:μ, :N, :p, :U, :q)
+    return (:μ, :N)
 end
 
 """
@@ -2106,7 +2160,7 @@ Model: ``\\frac{G_c}{6}I_1-G_c\\lambda_{max}\\log\\bigg(3\\lambda_{max}^2-I_1\\b
 struct DavidsonGoulbourne <: AbstractHyperelasticModel end
 
 function NonlinearContinua.StrainEnergyDensity(ψ::DavidsonGoulbourne, λ⃗::AbstractVector, (; Gc, Ge, λmax))
-    1 / 6 * Gc * I₁(λ⃗) - Gc * λmax^2 * log(3*λmax^2 - I₁(λ⃗)) + Ge * (λ⃗[1] + 1 / λ⃗[1] + λ⃗[2] + 1 / λ⃗[2] + λ⃗[3] + 1 / λ⃗[3])
+    1 / 6 * Gc * I₁(λ⃗) - Gc * λmax^2 * log(3 * λmax^2 - I₁(λ⃗)) + Ge * (λ⃗[1] + 1 / λ⃗[1] + λ⃗[2] + 1 / λ⃗[2] + λ⃗[3] + 1 / λ⃗[3])
 end
 
 function parameters(ψ::DavidsonGoulbourne)
@@ -2250,8 +2304,8 @@ function parameter_bounds(ψ::FullNetwork, data::AbstractHyperelasticTest)
     N₁ = λ_max^2
     N₂ = I₁_max / 3
     N_min = (N₁ > N₂) ? N₁ : N₂
-    lb = (μ=-Inf, N=N_min, ρ=-Inf)
-    ub = nothing
+    lb = (μ=-Inf, N=N_min, ρ=0.0)
+    ub = (μ=Inf, N=Inf, ρ=1.0)
     return (lb=lb, ub=ub)
 end
 

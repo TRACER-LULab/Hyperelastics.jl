@@ -12,6 +12,7 @@ function HyperelasticProblem(
     ps;
     loss=L2DistLoss(),
     agg=AggMode.Mean(),
+    adb = AD.ForwardDiffBackend
     ad=Optimization.AutoForwardDiff(),
     kwargs...
 )
