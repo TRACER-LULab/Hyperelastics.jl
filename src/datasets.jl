@@ -101,7 +101,7 @@ function Kawabata1981(λ₁)
         s₁ = [1.117, 1.102, 1.136]
         s₂ = [0.000, 0.628, 0.789]
     end
-    return biaxial_data(s₁ .* 1e6, s₂ .* 1e6, λ₁, λ₂)
+    return HyperelasticBiaxialTest(λ₁, λ₂, s₁, s₂, name = "Kawabata1981")
 end
 
 function Treloar1944Uniaxial()

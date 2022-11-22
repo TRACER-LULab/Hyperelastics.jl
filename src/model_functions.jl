@@ -21,10 +21,6 @@ Returns a function for the strain energy density function for the hyperelastic m
 """
 function NonlinearContinua.StrainEnergyDensity(ψ::AbstractHyperelasticModel, F::AbstractMatrix, p)
     C = transpose(F) * F
-    # a = eigvecs(C)'
-    # C_prin = Diagonal(a * C * a')
-    # U_prin = sqrt.(C_prin)
-    # λ⃗ = diag(U_prin)
     λ⃗² = eigvals(C)
     λ⃗ = sqrt.(abs.(λ⃗²))
     return StrainEnergyDensity(ψ::AbstractHyperelasticModel, λ⃗, p)

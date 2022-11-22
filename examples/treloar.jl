@@ -1,21 +1,21 @@
 # # Package Imports
 using Hyperelastics
-using Optimization, OptimizationOptimJL, OptimizationMOI, Ipopt
+using Optimization, OptimizationOptimJL
 using ComponentArrays
 using CairoMakie, MakiePublication
 set_theme!(theme_web(width = 800))
 # # Load the Treloar 1994 Uniaxial Dataset
-data = Treloar1944Uniaxial()
-
+treloar_data = Treloar1944Uniaxial()
+λ₁ = getindex.(treloar_data.data.λ, 1)
+s₁ = getindex.(treloar_data.data.s, 1)
 # ## Fit the Gent Model
 # $W(\vec{\lambda}) = -\frac{\mu J_m}{2}\log{\bigg(1-\frac{I_1-3}{J_m}\bigg)}$
 #
 # Initial guess for the parameters
 models = Dict(
-    Gent => ComponentVector(μ=behavior240e-3, Jₘ=80.0),
+    Gent => ComponentVector(μ=240e-3, Jₘ=80.0),
     EdwardVilgis => ComponentVector(Ns=0.10, Nc=0.20, α=0.001, η=0.001),
     ModifiedFloryErman => ComponentVector(μ=0.24, N=50.0, κ=10.0),
-    MCC => ComponentVector(κ=100000000.0, μkT=10e-3, ζkT=10e-3),
     NeoHookean => ComponentVector(μ=200e-3),
     NonaffineMicroSphere => ComponentVector(μ=0.292, N=22.5, p=1.471, U=0.744, q=0.1086),
     Beda => ComponentVector(C1=0.1237, C2=0.0424, C3=7.84e-5, K1=0.0168, α=0.9, β=0.68, ζ=3.015)
@@ -23,11 +23,12 @@ models = Dict(
 
 f = Figure()
 ax = Makie.Axis(f[1, 1], xlabel="Stretch", ylabel="Stress [MPa]")
-scatter!(ax, λ₁, s₁, label="Treloar Data")
+scatter!(ax, λ₁, getindex.(treloar_data.data.s, 1), label="Treloar Data")
 for (ψ, p₀) in models
-    HEProblem = HyperelasticProblem(ψ(), data, p₀)
+    @show ψ,p₀
+    HEProblem = HyperelasticProblem(ψ(), [treloar_data, treloar_data], p₀)
     sol = solve(HEProblem, NelderMead())
-    pred = predict(ψ(), data, sol.u)
+    pred = predict(ψ(), treloar_data, sol.u)
     lines!(ax, λ₁, getindex.(pred.data.s, 1), label=string(ψ))
 end
 # axislegend(position=:lt)
@@ -36,8 +37,8 @@ save("model_examples.png", f)
 # ## Sussman-Bathe Model
 using DataInterpolations
 # $W(\vec{\lambda}) = \sum\limits_{i=1}^{3} w(\lambda_i)$
-ψ = SussmanBathe(data, 5, DataInterpolations.QuadraticSpline)
-pred = predict(ψ, data, [])
+ψ = SussmanBathe(treloar_data, 5, DataInterpolations.QuadraticSpline)
+ pred = predict(ψ, treloar_data, [])
 ŝ₁ = getindex.(pred.data.s, 1)
 lines!(
     ax,
