@@ -14,17 +14,17 @@ struct SussmanBathe <: AbstractDataDrivenHyperelasticModel
 end
 
 function SussmanBathe(data::AbstractHyperelasticTest, k::Integer, interpolant)
-    σ̂ = interpolant(getindex.(data.s⃗) .* getindex.(data.λ⃗, 1), getindex.(data.λ⃗, 1))
+    σ̂ = interpolant(getindex.(data.data.s, 1) .* getindex.(data.data.λ, 1), getindex.(data.data.λ, 1))
     f(i, λ) = (σ̂(λ^((4.0)^(-i))) + σ̂(λ^(-0.5 * (4.0^(-i))))) / λ
     w′(λ) = sum(Base.Fix2(f, λ), 0:k)
     SussmanBathe(w′)
 end
 
-StrainEnergyDensityFunction(ψ::SussmanBathe, λ⃗, p) = sum(x -> quadgk(ψ.w′, 1.0, x)[1], λ⃗)
+NonlinearContinua.StrainEnergyDensity(ψ::SussmanBathe, λ⃗::AbstractVector, p) = sum(x -> quadgk(ψ.w′, 1.0, x)[1], λ⃗)
 
-NominalStressFunction(ψ::SussmanBathe, λ⃗, p) = ψ.w′.(λ⃗)
+NonlinearContinua.SecondPiolaKirchoffStressTensor(ψ::SussmanBathe, λ⃗::AbstractVector, p) = ψ.w′.(λ⃗)
 
-true_stress(ψ::SussmanBathe, λ⃗, p) = ψ.w′.(λ⃗).*λ⃗
+NonlinearContinua.CauchyStressTensor(ψ::SussmanBathe, λ⃗::AbstractVector, p) = ψ.w′.(λ⃗).*λ⃗
 
 parameters(ψ::SussmanBathe) = ()
 

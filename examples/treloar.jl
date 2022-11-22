@@ -1,157 +1,53 @@
 # # Package Imports
 using Hyperelastics
-using Optimization, OptimizationOptimJL, ComponentArrays
-using CairoMakie
-using FiniteDifferences, AbstractDifferentiation
-# # Treloar's Uniaxial Data
-s₁ = [0.0, 0.2856, 0.3833, 0.4658, 0.5935, 0.6609, 0.8409, 1.006, 1.2087, 1.5617, 1.915, 2.2985, 2.6519, 3.0205, 3.3816, 3.7351, 4.0812, 4.4501, 4.8414, 5.2026, 5.5639]
-λ₁ = [1.0, 1.4273, 1.6163, 1.882, 2.1596, 2.4383, 3.0585, 3.6153, 4.1206, 4.852, 5.4053, 5.7925, 6.1803, 6.4787, 6.6627, 6.936, 7.133, 7.1769, 7.2712, 7.4425, 7.512]
-# # Create a Uniaxaial Test Results Object
-data = HyperelasticUniaxialTest(λ₁, s₁, name="treloar")
-# data = UniaxialHyperelasticData(s₁, λ₁)
+using Optimization, OptimizationOptimJL, OptimizationMOI, Ipopt
+using ComponentArrays
+using CairoMakie, MakiePublication
+set_theme!(theme_web(width = 800))
+# # Load the Treloar 1994 Uniaxial Dataset
+data = Treloar1944Uniaxial()
 
 # ## Fit the Gent Model
 # $W(\vec{\lambda}) = -\frac{\mu J_m}{2}\log{\bigg(1-\frac{I_1-3}{J_m}\bigg)}$
 #
 # Initial guess for the parameters
-ψ = Gent()
-p₀ = ComponentVector(μ=240e-3, Jₘ=80.0)
-# Create the optimization problem and solve
-prob = HyperelasticProblem(ψ, data, p₀)
-sol = solve(prob, LBFGS())
-# Create the optimization problem and solve
-# $\mu$ = 240kPa, $J_m$ = 79.98
-# Predict the new stresses
-uniaxial_results = predict(ψ, data, sol.u)
-ŝ₁ = getindex.(uniaxial_results.data.s, 1)
-# Plot the Results
-fig = Figure(font="CMU Serif")
-ax = Makie.Axis(
-    fig[1, 1],
-    xlabel="Stretch",
-    ylabel="Stress [MPa]")
-scatter!(
-    ax,
-    data,
-    marker='◆',
-    markersize=20,
-    color=:black,
-    label="Experimental"
+models = Dict(
+    Gent => ComponentVector(μ=behavior240e-3, Jₘ=80.0),
+    EdwardVilgis => ComponentVector(Ns=0.10, Nc=0.20, α=0.001, η=0.001),
+    ModifiedFloryErman => ComponentVector(μ=0.24, N=50.0, κ=10.0),
+    MCC => ComponentVector(κ=100000000.0, μkT=10e-3, ζkT=10e-3),
+    NeoHookean => ComponentVector(μ=200e-3),
+    NonaffineMicroSphere => ComponentVector(μ=0.292, N=22.5, p=1.471, U=0.744, q=0.1086),
+    Beda => ComponentVector(C1=0.1237, C2=0.0424, C3=7.84e-5, K1=0.0168, α=0.9, β=0.68, ζ=3.015)
 )
 
-lines!(
-    ax,
-    getindex.(data.data.λ, 1),
-    ŝ₁,
-    label="Predicted $(string(ψ)[1:end-2])"
-)
-current_figure()
-save("examples/" * string(ψ)[1:end-2] * ".png", current_figure()) #src
-# ![Gent Plot](../examples/gent.png)
-
-# ## Using the EdwardVilgis Model
-ψ = EdwardVilgis()
-p₀ = ComponentVector(Ns=0.10, Nc=0.20, α=0.001, η=0.001)
-predict(ψ, data, (Ns=-0.0516550250094933, Nc=0.22452716772880485, α=0.08843116023934991, η=0.11887281294929823))
-prob = HyperelasticProblem(ψ, data, p₀)
-sol = solve(prob, LBFGS())
-#
-# Plot and compare the stresses
-uniaxial_results = predict(ψ, data, sol.u)
-ŝ₁ = getindex.(uniaxial_results.data.s, 1)
-lines!(
-    ax,
-    getindex.(data.data.λ, 1),
-    ŝ₁,
-    label="Predicted $(string(ψ))"
-)
-current_figure()
-# ## Using the ModifiedFloryErman Model
-ψ = ModifiedFloryErman()
-p₀ = ComponentVector(μ=240e-3, N=60.0, κ=100.0)
-HEProblem = HyperelasticProblem(ψ, data, p₀)
-sol = solve(HEProblem, LBFGS())
-#
-# Plot and compare the stresses
-uniaxial_results = predict(ψ, data, sol.u)
-ŝ₁ = getindex.(uniaxial_results.data.s, 1)
-lines!(
-    getindex.(data.data.λ, 1),
-    ŝ₁,
-    label="Predicted ModifiedFloryErman"
-)
-current_figure()
-# ## Using the MCC Model
-ψ = MCC()
-p₀ = ComponentVector(κ=100000000.0, μkT=10e-3, ζkT=10e-3)
-HEProblem = HyperelasticProblem(
-    ψ,
-    data,
-    p₀
-)
-sol = solve(HEProblem, LBFGS())
-#
-# Plot and compare the stresses
-uniaxial_results = predict(ψ, data, sol.u)
-ŝ₁ = getindex.(uniaxial_results.data.s, 1)
-lines!(
-    ax,
-    getindex.(data.data.λ, 1),
-    ŝ₁,
-    label="Predicted $(string(ψ))"
-)
-current_figure()
-# ## Using the NeoHookean Model
-# $W(\vec{\lambda}) = \frac{\mu}{2}(I_1-3)$
-ψ = NeoHookean()
-p₀ = ComponentVector(μ=200e-3)
-HEProblem = HyperelasticProblem(
-    NeoHookean(),
-    data,
-    p₀,
-)
-sol = solve(HEProblem, LBFGS())
-# $\mu$ = 534kPa
-#
-# Plot and compare the stresses
-uniaxial_results = predict(ψ, data, sol.u)
-ŝ₁ = getindex.(uniaxial_results.data.s, 1)
-lines!(
-    ax,
-    getindex.(data.data.λ, 1),
-    ŝ₁,
-    label="Predicted NeoHookean"
-)
-save("examples/" * string(ψ)[1:end-2] * ".png", current_figure()) #src
-# ![Neohookean Plot](../examples/NeoHookean.png)
-# ## Alexander
-ψ = NonaffineMicroSphere()
-p₀ = ComponentVector(
-     μ = 0.292, N = 22.5, p = 1.471, U = 0.744, q = 0.1086
-     )
-HEProblem = HyperelasticProblem(
-    ψ,
-    data,
-    p₀,
-)
-sol = solve(HEProblem, LBFGS())
-pred = predict(ψ, data, sol.u)
-lines!(pred)
-fig
+f = Figure()
+ax = Makie.Axis(f[1, 1], xlabel="Stretch", ylabel="Stress [MPa]")
+scatter!(ax, λ₁, s₁, label="Treloar Data")
+for (ψ, p₀) in models
+    HEProblem = HyperelasticProblem(ψ(), data, p₀)
+    sol = solve(HEProblem, NelderMead())
+    pred = predict(ψ(), data, sol.u)
+    lines!(ax, λ₁, getindex.(pred.data.s, 1), label=string(ψ))
+end
+# axislegend(position=:lt)
+f
+save("model_examples.png", f)
 # ## Sussman-Bathe Model
+using DataInterpolations
 # $W(\vec{\lambda}) = \sum\limits_{i=1}^{3} w(\lambda_i)$
-7ψ = SussmanBathe(data, 5, DataInterpolations.QuadraticSpline)
-ŝ₁ = map(λ -> ŝ(λ, ψ, sol.u)[1], λ⃗_predict)
-
+ψ = SussmanBathe(data, 5, DataInterpolations.QuadraticSpline)
+pred = predict(ψ, data, [])
+ŝ₁ = getindex.(pred.data.s, 1)
 lines!(
     ax,
-    getindex.(λ⃗_predict, 1),
-    ŝ₁ ./ 1e6,
-    label="Predicted NeoHookean"
+    λ₁,
+    ŝ₁,
+    label="Sussmanbathe"
 )
-
 current_figure()
-
+axislegend(position = :lt)
+f
 savefig("examples/sussmanbathe.png") #src
 # ![Sussman Bathe Plot](../examples/sussmanbathe.png)
 plot!() #src
@@ -168,7 +64,6 @@ function Makie.plot(ch::Chains)
             colors = Makie.current_default_theme().attributes[:palette][][:color][]
             Makie.density!(ax, datavec, color=(:black, 0.0),
                 strokearound=true,
-                strokewidth=2,
                 strokecolor=colors[ind2%length(colors)]
             )
         end
@@ -217,7 +112,7 @@ fig = Figure()
 ax = Makie.Axis(fig[1, 1], xlabel="Stretch", ylabel="Stress [MPa]")
 posterior_samples = sample(chain[[:μ, :Jₘ]], 1000; replace=false)
 for p in eachrow(Array(posterior_samples))
-    ŝ₁ = map(λ -> ŝ(λ, Gent(), (μ=p[1], Jₘ=p[2]))[1], λ⃗_predict)
+    ŝ₁ = map(λ -> ŝ(λ, Gent(), (μ=p[1], Jₘ=NelderMeadp[2]))[1], λ⃗_predict)
     lines!(ax, getindex.(λ⃗_predict, 1), ŝ₁ ./ 1e6, alpha=0.1, color="#BBBBBB")
 end
 scatter!(ax, λ₁, s₁ ./ 1e6, color=:black)

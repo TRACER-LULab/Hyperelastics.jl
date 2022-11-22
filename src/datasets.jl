@@ -1,4 +1,4 @@
-export Kawabata1981
+export Kawabata1981, Treloar1944Uniaxial
 
 """
 Biaxial Experimental Data from Kawabata et al. [^1]
@@ -102,4 +102,12 @@ function Kawabata1981(λ₁)
         s₂ = [0.000, 0.628, 0.789]
     end
     return biaxial_data(s₁ .* 1e6, s₂ .* 1e6, λ₁, λ₂)
+end
+
+function Treloar1944Uniaxial()
+    # # Treloar's Uniaxial Data
+    s₁ = [0.0, 0.2856, 0.3833, 0.4658, 0.5935, 0.6609, 0.8409, 1.006, 1.2087, 1.5617, 1.915, 2.2985, 2.6519, 3.0205, 3.3816, 3.7351, 4.0812, 4.4501, 4.8414, 5.2026, 5.5639]
+    λ₁ = [1.0 + 1e-6, 1.4273, 1.6163, 1.882, 2.1596, 2.4383, 3.0585, 3.6153, 4.1206, 4.852, 5.4053, 5.7925, 6.1803, 6.4787, 6.6627, 6.936, 7.133, 7.1769, 7.2712, 7.4425, 7.512]
+    # # Create a Uniaxaial Test Results Object
+    data = HyperelasticUniaxialTest(λ₁, s₁, name="treloar")
 end

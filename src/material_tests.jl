@@ -137,16 +137,16 @@ function HyperelasticProblem(ψ::AbstractHyperelasticModel, test::AbstractHypere
     prob = OptimizationProblem(func, u₀, ps)
     # Check for Constraints
     if !isnothing(cons)
-        num_cons = length(cons(u₀, ps))
-        func = OptimizationFunction(f, adtype, cons=cons)
-        prob = OptimizationProblem(func, u₀, ps, lcons=zeros(num_cons))
+        num_cons = length(cons.ucons)
+        func = OptimizationFunction(f, adtype, cons=cons.cons)
+        prob = OptimizationProblem(func, u₀, ps, lcons=cons.lcons,ucons = cons.ucons)
     end
     # Check for Bounds
     if !isnothing(lb) || !isnothing(ub)
         ax = Axis(Hyperelastics.parameters(ψ))
         if !isnothing(lb) && !isnothing(ub)
-            lb = LVector(lb)
-            ub = LVector(ub)
+            lb = ComponentVector(lb)
+            ub = ComponentVector(ub)
         elseif !isnothing(lb)
             lb = ComponentVector(lb)
             ub = ComponentVector(ones(length(lb)) * Inf, ax)
@@ -158,7 +158,7 @@ function HyperelasticProblem(ψ::AbstractHyperelasticModel, test::AbstractHypere
             prob = OptimizationProblem(func, u₀, ps, lb=lb, ub=ub)
         else
             num_cons = length(cons(u₀, ps))
-            prob = OptimizationProblem(func, u₀, ps, lcons=zeros(num_cons), lb=lb, ub=ub)
+            prob = OptimizationProblem(func, u₀, ps, lcons=cons.lcons,ucons = cons.ucons, lb=lb, ub=ub)
         end
     end
     return prob
