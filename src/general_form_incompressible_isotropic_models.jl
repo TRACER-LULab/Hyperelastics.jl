@@ -1,4 +1,4 @@
-export GeneralMooneyRivlin, GeneralDarijaniNaghdabadi, GeneralBeda,
+export GeneralMooneyRivlin, GeneralDarijaniNaghdabadi, GeneralBeda
 
 """
 General Mooney Rivlin[^1]
