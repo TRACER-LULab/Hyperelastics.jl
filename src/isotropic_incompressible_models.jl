@@ -175,7 +175,8 @@ parameters(ψ::MooneyRivlin) = (:C10, :C01)
 """
 NeoHookean [^1]
 
-Parameters: μ
+Parameters:
+- μ: Small strain shear modulus
 
 Model:
 
@@ -976,7 +977,7 @@ end
 """
 Chevalier-Marco [^1]
 
-Parameters: aᵢ, bᵢ
+Parameters: a⃗, b⃗
 
 Model:
 
@@ -985,6 +986,7 @@ Model:
 ``[\\mathbf{S}] = 2(I-\\frac{\\partial W}{\\partial I_1} - C^{-2}\\frac{\\partial W}{\\partial I_2})``
 
 ``[\\mathbf{\\sigma}] = \\mathbf{F} \\cdot \\mathbf{S}``
+
 Note: Model is not compatible with AD. A method for accessing the Second Piola Kirchoff Tensor and Cauchy Stress Tensor have been implemented.
 
 [^1]: > Chevalier L, Marco Y. Tools for multiaxial validation of behavior laws chosen for modeling hyper‐elasticity of rubber‐like materials. Polymer Engineering & Science. 2002 Feb;42(2):280-98.
@@ -1298,11 +1300,14 @@ end
 """
 Gent [^1]
 
-Parameters: μ, Jₘ
+Parameters:
+- μ:  Small strain shear modulus
+- Jₘ: Limiting stretch invariant
 
 Model:
 
 ``W = -\\frac{\\mu J_m}{2}\\log{\\bigg(1-\\frac{I_1-3}{J_m}\\bigg)}``
+
 
 [^1]: > Gent AN. A new constitutive relation for rubber. Rubber chemistry and technology. 1996 Mar;69(1):59-61.
 """
@@ -1784,8 +1789,13 @@ end
 """
 Edward-Vilgis [^1]
 
-Parameters: Ns, Nc, α, η
+Parameters:
+- Ns: Number of sliplinks
+- Nc: Number of crosslinks
+- α: A measure of chain inextensibility
+- η: A measure of the amount of chain slippage
 
+Note: Since α and η result from the same mechanism, they should be of approximately the same order of magnitude. Large differences between the two may indicate an issue with the optimizer or initial guess.
 Model:
 
 ``W = \\frac{1}{2}N_C\\Bigg[\\frac{(1-\\alpha^2)I_1}{1-\\alpha^2I_1}+\\log(1-\\alpha^2I_1)\\Bigg]+\\frac{1}{2}N_S\\Bigg[\\sum_{i=1}^{3}\\Big\\{\\frac{(1+\\eta)(1-\\alpha^2)\\lambda_i^2}{( 1+\\eta\\lambda_i^2)(1-\\alpha^2I_1)}+\\log(1+\\eta\\lambda_i^2)\\Big\\}+\\log(1-\\alpha^2I_1)\\Bigg]``
@@ -1897,7 +1907,9 @@ Three Chain Model [^1]
 
 Note: The field `ℒinv` can be set to change the inverse Langevin function approximation used. Currently, the default choice is the Pade 3/2 Approximation from Cohen 1991 [^2]
 
-Parameters: μ, N
+Parameters:
+- μ: Small strain shear modulus
+- N: Square of the locking stretch of the network.
 
 Model:
 
@@ -1933,7 +1945,9 @@ Arruda Boyce [^1]
 
 Note: The field `ℒinv` can be set to change the inverse Langevin function approximation used.
 
-Parameters: μ, N
+Parameters:
+- μ: Small strain shear modulus
+- N: Square of the locking stretch of the network.
 
 Model:
 
@@ -2043,7 +2057,12 @@ Non-Affine Micro-Sphere [^1]
 
 Note: The field `ℒinv` can be set to change the inverse Langevin function approximation used. Currently, the default choice is the Pade 3/2 Approximation from Cohen 1991 [^2]
 
-Parameters: μ, N, p, U, q
+Parameters:
+- μ: Small strain shear modulus
+- N: Number of chain segments
+- p: Non-affine stretch parameter
+- U: Tube geometry parameter
+- q: Non-affine tube parameter
 
 Model: See Paper
 
