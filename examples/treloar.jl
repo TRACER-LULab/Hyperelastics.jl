@@ -3,11 +3,10 @@ using Hyperelastics
 using Optimization, OptimizationOptimJL
 using ComponentArrays
 using CairoMakie, MakiePublication
-set_theme!(theme_web(width = 800))
+set_theme!(theme_web(width=800))
 # # Load the Treloar 1994 Uniaxial Dataset
 treloar_data = Treloar1944Uniaxial()
-λ₁ = getindex.(treloar_data.data.λ, 1)
-s₁ = getindex.(treloar_data.data.s, 1)
+
 # ## Fit the Gent Model
 # $W(\vec{\lambda}) = -\frac{\mu J_m}{2}\log{\bigg(1-\frac{I_1-3}{J_m}\bigg)}$
 #
@@ -21,24 +20,37 @@ models = Dict(
     Beda => ComponentVector(C1=0.1237, C2=0.0424, C3=7.84e-5, K1=0.0168, α=0.9, β=0.68, ζ=3.015)
 )
 
+##
 f = Figure()
 ax = Makie.Axis(f[1, 1], xlabel="Stretch", ylabel="Stress [MPa]")
-scatter!(ax, λ₁, getindex.(treloar_data.data.s, 1), label="Treloar Data")
+scatter!(ax, getindex.(pred.data.λ, 1), getindex.(treloar_data.data.s, 1), label="Treloar Data")
 for (ψ, p₀) in models
-    @show ψ,p₀
-    HEProblem = HyperelasticProblem(ψ(), [treloar_data, treloar_data], p₀)
+    @show ψ, p₀
+    HEProblem = HyperelasticProblem(ψ(), treloar_data, p₀)
     sol = solve(HEProblem, NelderMead())
     pred = predict(ψ(), treloar_data, sol.u)
-    lines!(ax, λ₁, getindex.(pred.data.s, 1), label=string(ψ))
+    lines!(ax, getindex.(pred.data.λ, 1), getindex.(pred.data.s, 1), label=string(ψ))
 end
 # axislegend(position=:lt)
+f
+# # For multiple tests
+f = Figure()
+ax = Makie.Axis(f[1, 1], xlabel="Stretch", ylabel="Stress [MPa]")
+kawabata_data = map(λ₁ -> Kawabata1981(λ₁), [1.040, 1.060, 1.080, 1.100, 1.120, 1.14, 1.16, 1.2, 1.24, 1.3, 1.6, 1.9, 2.2, 2.5, 2.8, 3.1, 3.4, 3.7])
+scatter!(ax, getindex.(kawabata_data[1].data.λ, 2), getindex.(kawabata_data[1].data.s, 1), label="Treloar Data")
+for (ψ, p₀) in models
+    HEProblem = HyperelasticProblem(ψ(), kawabata_data, p₀)
+    sol = solve(HEProblem, LBFGS())
+    pred = predict(ψ(), kawabata_data, sol.u)
+    lines!(ax, getindex.(pred[1].data.λ, 2), getindex.(pred[1].data.s, 1), label=string(ψ))
+end
 f
 save("model_examples.png", f)
 # ## Sussman-Bathe Model
 using DataInterpolations
 # $W(\vec{\lambda}) = \sum\limits_{i=1}^{3} w(\lambda_i)$
 ψ = SussmanBathe(treloar_data, 5, DataInterpolations.QuadraticSpline)
- pred = predict(ψ, treloar_data, [])
+pred = predict(ψ, treloar_data, [])
 ŝ₁ = getindex.(pred.data.s, 1)
 lines!(
     ax,
@@ -47,7 +59,7 @@ lines!(
     label="Sussmanbathe"
 )
 current_figure()
-axislegend(position = :lt)
+axislegend(position=:lt)
 f
 savefig("examples/sussmanbathe.png") #src
 # ![Sussman Bathe Plot](../examples/sussmanbathe.png)
@@ -130,30 +142,3 @@ s(x) = ŝ(λ⃗_predict[end], Gent(), ps(μ_dist(1), x[2]))[1]
 s₁_values = map(x -> s(x), eachrow(Array(posterior_samples)))
 density!(ax, s₁_values, color=(:slategray, 0.4))
 current_figure()
-# # Generating partial derivatives of the SEF with Symbolics.jl
-using Symbolics
-# ## Create the symbolic variables required
-@syms μ Jₘ
-@syms λ₁ λ₂ λ₃
-# ## Make the symbolic model
-W = StrainEnergyDensityFunction(Gent(), [λ₁, λ₂, λ₃], (μ=μ, Jₘ=Jₘ))
-# ## Create the partial derivative operators for the principal stretches
-∂λ = Differential.([λ₁, λ₂, λ₃])
-# ## Differentiate the SEF with respect to the principal stretches
-∂W∂λ = map(∂ -> ∂(W), ∂λ)
-∂W∂λ = expand_derivatives.(∂W∂λ)
-# ## Create a function from the symbolic expression for each partial derivative
-# Using the mean values from the Bayesian Parameter Estimation as the material properties
-∂W∂λ = substitute.(∂W∂λ, (Dict(μ => mean(chain[:μ]), Jₘ => mean(chain[:Jₘ])),))
-∂W∂λ = simplify.(∂W∂λ)
-∂W∂λ = map(∂ -> build_function(∂, [λ₁, λ₂, λ₃], expression=Val{false}), ∂W∂λ)
-# Predict the results
-s⃗_predict = map(λ -> map(∂ -> ∂(λ), ∂W∂λ), λ⃗_predict)
-σ⃗_predict = map(x -> x[1] .* x[2], zip(s⃗_predict, λ⃗_predict))
-σ₁ = getindex.(σ⃗_predict, 1) - getindex.(σ⃗_predict, 3)
-s1 = σ₁ ./ getindex.(λ⃗_predict, 1)
-# Plot the results
-lines!(ax, getindex.(λ⃗_predict, 1), s1 ./ 1e6, color=:red, label="Symbolic mean")
-current_figure()
-save("examples/symbolic_plot.png", current_figure()) #src
-# ![symbolic](../examples/symbolic_plot.png)
