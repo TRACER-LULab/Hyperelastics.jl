@@ -1,5 +1,8 @@
 {
     "README": "/doc/README.md",
+    "Examples":{
+        "Treloar Data": "/examples/treloar.jl"
+    },
     "Reference": {
         "Module": "/ref/Hyperelastics"
     }
