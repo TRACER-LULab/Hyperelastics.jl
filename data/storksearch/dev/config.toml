@@ -4,19 +4,19 @@ url_prefix = ""
 
     [[input.files]]
     title = "ABGI"
-    contents = "ABGI\nParameters: μ, N, Ge, n\nModel:\nW = W_{Arruda-Boyce} + G_e\\frac{\\lambda_1^n+\\lambda_2^2+\\lambda_3^2-3}{n}\nMeissner B, Matějka L. A Langevin-elasticity-theory-based constitutive equation for rubberlike networks and its comparison with biaxial stress–strain data. Part I. Polymer. 2003 Jul 1;44(16):4599-610.\n\n\n"
+    contents = "ABGI\nModel:\nW = W_{Arruda-Boyce} + \\frac{G_e}{n}\\left(\\sum\\limits_{i=1}^{3}\\lambda_i^n-3\\right)\nParameters:\nμ\n\nN\n\nGe\n\nn\n\n\nMeissner B, Matějka L. A Langevin-elasticity-theory-based constitutive equation for rubberlike networks and its comparison with biaxial stress–strain data. Part I. Polymer. 2003 Jul 1;44(16):4599-610.\n\n\n"
     url = "Hyperelastics@dev/ref/Hyperelastics.ABGI"
     [[input.files]]
     title = "Bootstrapped8Chain"
-    contents = "Bootstrapped 8Chain Model\nNote: The field ℒinv can be set to change the inverse Langevin function approximation used.\nParameters: μ, N\nModel:\nW = W_8(\\frac{\\sum\\lambda}{\\sqrt{3N}}-\\frac{\\lambda_{chain}}{\\sqrt{N}})+W_{8}(\\frac{\\lambda_{chain}}{\\sqrt{N}})\nwhere:\nW_8(x) = \\mu N (x \\mathcal{L}^{-1}(x) + \\log\\frac{\\mathcal{L}^{-1}(x)}{\\sinh\\mathcal{L}^{-1}(x)})\n\\lambda_{chain} = \\sqrt{\\frac{I_1}{3}}\nMiroshnychenko D, Green WA, Turner DM. Composite and filament models for the mechanical behaviour of elastomeric materials. Journal of the Mechanics and Physics of Solids. 2005 Apr 1;53(4):748-70. Miroshnychenko D, Green WA. Heuristic search for a predictive strain-energy function in nonlinear elasticity. International Journal of Solids and Structures. 2009 Jan 15;46(2):271-86.\n\n\n"
+    contents = "Bootstrapped 8Chain Model\nModel:\nW = W_8(\\frac{\\sum\\lambda}{\\sqrt{3N}}-\\frac{\\lambda_{chain}}{\\sqrt{N}})+W_{8}(\\frac{\\lambda_{chain}}{\\sqrt{N}})\nwhere:\nW_8(x) = \\mu N (x \\mathcal{L}^{-1}(x) + \\log\\frac{\\mathcal{L}^{-1}(x)}{\\sinh\\mathcal{L}^{-1}(x)})\nand\n\\lambda_{chain} = \\sqrt{\\frac{I_1}{3}}\nParameters:\nμ\n\nN\n\n\nFields:\nℒinv: Sets the inverse Langevin approximation used.\n\n\nMiroshnychenko D, Green WA, Turner DM. Composite and filament models for the mechanical behaviour of elastomeric materials. Journal of the Mechanics and Physics of Solids. 2005 Apr 1;53(4):748-70. Miroshnychenko D, Green WA. Heuristic search for a predictive strain-energy function in nonlinear elasticity. International Journal of Solids and Structures. 2009 Jan 15;46(2):271-86.\n\n\n"
     url = "Hyperelastics@dev/ref/Hyperelastics.Bootstrapped8Chain"
     [[input.files]]
     title = "Gregory"
-    contents = "Gregory\nParameters: A, B, C, m, n\nModel:\nW = \\frac{A}{2-n}(I_1-3+C^2)^{1-\\frac{n}{2}}+\\frac{B}{2+m}(I_1-3+C^2)^{1+\\frac{m}{2}}\nGregory IH, Muhr AH, Stephens IJ. Engineering applications of rubber in simple extension. Plastics rubber and composites processing and applications. 1997;26(3):118-22.\n\n\n"
+    contents = "Gregory\nModel:\nW = \\frac{A}{2-n}(I_1-3+C^2)^{1-\\frac{n}{2}}+\\frac{B}{2+m}(I_1-3+C^2)^{1+\\frac{m}{2}}\nParameters:\nA\n\nB\n\nC\n\nm\n\nn\n\n\nGregory IH, Muhr AH, Stephens IJ. Engineering applications of rubber in simple extension. Plastics rubber and composites processing and applications. 1997;26(3):118-22.\n\n\n"
     url = "Hyperelastics@dev/ref/Hyperelastics.Gregory"
     [[input.files]]
     title = "HartSmith"
-    contents = "Hart-Smith\nParameters: G, k₁, k₂\nModel:\nW = \\frac{G\\exp{(-9k_1+k_1I_1)}}{k_1}+Gk_2\\log{I_2}\nHart-Smith LJ. Elasticity parameters for finite deformations of rubber-like materials. Zeitschrift für angewandte Mathematik und Physik ZAMP. 1966 Sep;17(5):608-26.\n\n\n"
+    contents = "Hart-Smith\nModel:\nW = \\frac{G\\exp{(-9k_1+k_1I_1)}}{k_1}+Gk_2\\log{I_2}\nParameters:\nG\n\nk₁\n\nk₂\n\n\nHart-Smith LJ. Elasticity parameters for finite deformations of rubber-like materials. Zeitschrift für angewandte Mathematik und Physik ZAMP. 1966 Sep;17(5):608-26.\n\n\n"
     url = "Hyperelastics@dev/ref/Hyperelastics.HartSmith"
     [[input.files]]
     title = "Hyperelastics"
@@ -24,7 +24,7 @@ url_prefix = ""
     url = "Hyperelastics@dev/ref/Hyperelastics"
     [[input.files]]
     title = "Zhao"
-    contents = "Zhao\nParameters: C₋₁¹,, C₁¹, C₂¹, C₂²\nModel:\nW = C_{-1}^1*(I_2-3)+C_{1}^{1}(I_1-3)+C_{2}^{1}(I_1^2-2I_2-3)+C_{2}^{2}(I_1^2-2I_2-3)^2\nZhao Z, Mu X, Du F. Modeling and verification of a new hyperelastic model for rubber-like materials. Mathematical Problems in Engineering. 2019 May 2;2019.\n\n\n"
+    contents = "Zhao\nModel:\nW = C_{-1}^1*(I_2-3)+C_{1}^{1}(I_1-3)+C_{2}^{1}(I_1^2-2I_2-3)+C_{2}^{2}(I_1^2-2I_2-3)^2\nParameters:\nC₋₁¹\n\nC₁¹\n\nC₂¹\n\nC₂²\n\n\nZhao Z, Mu X, Du F. Modeling and verification of a new hyperelastic model for rubber-like materials. Mathematical Problems in Engineering. 2019 May 2;2019.\n\n\n"
     url = "Hyperelastics@dev/ref/Hyperelastics.Zhao"
     [[input.files]]
     title = "DataDrivenAverageChainBehavior"
@@ -32,43 +32,43 @@ url_prefix = ""
     url = "Hyperelastics@dev/ref/Hyperelastics.DataDrivenAverageChainBehavior"
     [[input.files]]
     title = "ExpLn"
-    contents = "Exp-Ln\nParameters: A, a, b\nModel:\nW = A\\bigg[\\frac{1}{a}\\exp{(a(I_1-3))}+b(I_1-2)(1-\\log{I_1-2})-\\frac{1}{a}-b\\bigg]\nKhajehsaeid H, Arghavani J, Naghdabadi R. A hyperelastic constitutive model for rubber-like materials. European Journal of Mechanics-A/Solids. 2013 Mar 1;38:144-51.\n\n\n"
+    contents = "Exp-Ln\nModel:\nW = A\\bigg[\\frac{1}{a}\\exp{(a(I_1-3))}+b(I_1-2)(1-\\log{I_1-2})-\\frac{1}{a}-b\\bigg]\nParameters:\nA\n\na\n\nb\n\n\nKhajehsaeid H, Arghavani J, Naghdabadi R. A hyperelastic constitutive model for rubber-like materials. European Journal of Mechanics-A/Solids. 2013 Mar 1;38:144-51.\n\n\n"
     url = "Hyperelastics@dev/ref/Hyperelastics.ExpLn"
     [[input.files]]
     title = "PengLandel"
-    contents = "Peng - Landel\nParameters: E\nModel:\nW = E\\sum\\limits_{i=1}^{3}\\bigg[\\lambda_i - 1 - \\log(\\lambda_i) - \\frac{1}{6}\\log(\\lambda_i)^2 + \\frac{1}{18}\\log(\\lambda_i)^3-\\frac{1}{216}\\log(\\lambda_i)^4\\bigg]\nPeng TJ, Landel RF. Stored energy function of rubberlike materials derived from simple tensile data. Journal of Applied Physics. 1972 Jul;43(7):3064-7.\n\n\n"
+    contents = "Peng - Landel\nModel:\nW = E\\sum\\limits_{i=1}^{3}\\bigg[\\lambda_i - 1 - \\log(\\lambda_i) - \\frac{1}{6}\\log(\\lambda_i)^2 + \\frac{1}{18}\\log(\\lambda_i)^3-\\frac{1}{216}\\log(\\lambda_i)^4\\bigg]\nParameters:\nE\n\n\nPeng TJ, Landel RF. Stored energy function of rubberlike materials derived from simple tensile data. Journal of Applied Physics. 1972 Jul;43(7):3064-7.\n\n\n"
     url = "Hyperelastics@dev/ref/Hyperelastics.PengLandel"
     [[input.files]]
     title = "Lim"
-    contents = "Lim\nParameters: μ₁, μ₂, N, Î₁\nModel:\nW = (1-f(\\frac{I_1-3}{\\hat{I_1}-3}))W_{NeoHookean}(μ₁)+fW_{ArrudaBoyce}(μ₂, N)\nLim GT. Scratch behavior of polymers. Texas A&M University; 2005.\n\n\n"
+    contents = "Lim\nModel:\nW = (1-f(\\frac{I_1-3}{\\hat{I_1}-3}))W_{NeoHookean}(μ₁)+fW_{ArrudaBoyce}(μ₂, N)\nParameters:\nμ₁\n\nμ₂\n\nN\n\nÎ₁\n\n\nLim GT. Scratch behavior of polymers. Texas A&M University; 2005.\n\n\n"
     url = "Hyperelastics@dev/ref/Hyperelastics.Lim"
     [[input.files]]
     title = "Biderman"
-    contents = "Biderman\nParameters: C10, C01, C20, C30\nModel:\nW = \\sum\\limits_{i,j=0}^{3, 1}C_{i,j}(I_1-3)^i(I_2-3)^j\nBiderman VL. Calculation of rubber parts. Rascheti na prochnost. 1958;40.\n\n\n"
+    contents = "Biderman\nModel:\nW = \\sum\\limits_{i,j=0}^{3, 1}C_{i,j}(I_1-3)^i(I_2-3)^j\nParameters:\nC10\n\nC01\n\nC20\n\nC30\n\n\nBiderman VL. Calculation of rubber parts. Rascheti na prochnost. 1958;40.\n\n\n"
     url = "Hyperelastics@dev/ref/Hyperelastics.Biderman"
     [[input.files]]
     title = "ModifiedGregory"
-    contents = "Modified Gregory\nParameters: A, α, M, B, β, N\nModel:\nW = \\frac{A}{1+\\alpha}(I_1-3+M^2)^{1+\\alpha}+\\frac{B}{1+\\beta}(I_1-3+N^2)^{1+\\beta}\nHe H, Zhang Q, Zhang Y, Chen J, Zhang L, Li F. A comparative study of 85 hyperelastic constitutive models for both unfilled rubber and highly filled rubber nanocomposite material. Nano Materials Science. 2021 Jul 16.\n\n\n"
+    contents = "Modified Gregory\nModel:\nW = \\frac{A}{1+\\alpha}(I_1-3+M^2)^{1+\\alpha}+\\frac{B}{1+\\beta}(I_1-3+N^2)^{1+\\beta}\nParameters:\nA\n\nα\n\nM\n\nB\n\nβ\n\nN\n\n\nHe H, Zhang Q, Zhang Y, Chen J, Zhang L, Li F. A comparative study of 85 hyperelastic constitutive models for both unfilled rubber and highly filled rubber nanocomposite material. Nano Materials Science. 2021 Jul 16.\n\n\n"
     url = "Hyperelastics@dev/ref/Hyperelastics.ModifiedGregory"
     [[input.files]]
     title = "MansouriDarijani"
-    contents = "Mansouri-Darijani\nParameters: A1, m1, B1, n1\nModel:\nW = A_1\\exp{m_1(I_1-3)-1}+B_1\\exp{n_1(I_2-3)-1}\nMansouri MR, Darijani H. Constitutive modeling of isotropic hyperelastic materials in an exponential framework using a self-contained approach. International Journal of Solids and Structures. 2014 Dec 1;51(25-26):4316-26.\n\n\n"
+    contents = "Mansouri-Darijani\nModel:\nW = A_1\\exp{m_1(I_1-3)-1}+B_1\\exp{n_1(I_2-3)-1}\nParameters:\nA1\n\nm1\n\nB1\n\nn1\n\n\nMansouri MR, Darijani H. Constitutive modeling of isotropic hyperelastic materials in an exponential framework using a self-contained approach. International Journal of Solids and Structures. 2014 Dec 1;51(25-26):4316-26.\n\n\n"
     url = "Hyperelastics@dev/ref/Hyperelastics.MansouriDarijani"
     [[input.files]]
     title = "FungDemiray"
-    contents = "Fung-Demiray\nParameters: μ, b\nModel:\nW = \\frac{\\mu}{2 * b} (\\exp(b(I_1 - 3)) - 1)\nFung YC. Elasticity of soft tissues in simple elongation. American Journal of Physiology-Legacy Content. 1967 Dec 1;213(6):1532-44. Demiray H. A note on the elasticity of soft biological tissues. Journal of biomechanics. 1972 May 1;5(3):309-11.\n\n\n"
+    contents = "Fung-Demiray\nModel:\nW = \\frac{\\mu}{2 * b} (\\exp(b(I_1 - 3)) - 1)\nParameters:\nμ\n\nb\n\n\nFung YC. Elasticity of soft tissues in simple elongation. American Journal of Physiology-Legacy Content. 1967 Dec 1;213(6):1532-44. Demiray H. A note on the elasticity of soft biological tissues. Journal of biomechanics. 1972 May 1;5(3):309-11.\n\n\n"
     url = "Hyperelastics@dev/ref/Hyperelastics.FungDemiray"
     [[input.files]]
     title = "GeneralConstitutiveModel"
-    contents = "General Constitutive Model\nParameters: Gc, Ge, N\nModel:\nW = G_c N \\log\\bigg(\\frac{3N+\\frac{1}{2}I_1}{3N-I_1}\\bigg)+G_e\\sum\\limits_{i=1}^{3}\\frac{1}{\\lambda_I}\nXiang Y, Zhong D, Wang P, Mao G, Yu H, Qu S. A general constitutive model of soft elastomers. Journal of the Mechanics and Physics of Solids. 2018 Aug 1;117:110-22.\n\n\n"
+    contents = "General Constitutive Model\nModel:\nW = G_c N \\log\\bigg(\\frac{3N+\\frac{1}{2}I_1}{3N-I_1}\\bigg)+G_e\\sum\\limits_{i=1}^{3}\\frac{1}{\\lambda_I}\nParameters:\nGc\n\nGe\n\nN\n\n\nXiang Y, Zhong D, Wang P, Mao G, Yu H, Qu S. A general constitutive model of soft elastomers. Journal of the Mechanics and Physics of Solids. 2018 Aug 1;117:110-22.\n\n\n"
     url = "Hyperelastics@dev/ref/Hyperelastics.GeneralConstitutiveModel"
     [[input.files]]
     title = "ExtendedTubeModel"
-    contents = "Extended Tube Model\nParameters: Gc, Ge, δ, β\nModel:\nW = \\frac{G_c}{2}\\bigg[\\frac{(1-\\delta^2)(I_1-3)}{1-\\delta^2(I_1-3)}+\\log{(1-\\delta^2(I_1-3))}\\bigg]+\\frac{2G_e}{\\beta^2}\\sum\\limits_{i=1}^{3}(\\lambda_i^{-\\beta}-1)\nKaliske M, Heinrich G. An extended tube-model for rubber elasticity: statistical-mechanical theory and finite element implementation. Rubber Chemistry and Technology. 1999 Sep;72(4):602-32.\n\n\n"
+    contents = "Extended Tube Model\nModel:\nW = \\frac{G_c}{2}\\bigg[\\frac{(1-\\delta^2)(I_1-3)}{1-\\delta^2(I_1-3)}+\\log{(1-\\delta^2(I_1-3))}\\bigg]+\\frac{2G_e}{\\beta^2}\\sum\\limits_{i=1}^{3}(\\lambda_i^{-\\beta}-1)\nParameters:\nGc\n\nGe\n\nδ\n\nβ\n\n\nKaliske M, Heinrich G. An extended tube-model for rubber elasticity: statistical-mechanical theory and finite element implementation. Rubber Chemistry and Technology. 1999 Sep;72(4):602-32.\n\n\n"
     url = "Hyperelastics@dev/ref/Hyperelastics.ExtendedTubeModel"
     [[input.files]]
     title = "DavisDeThomas"
-    contents = "Davis-DeThomas\nParameters: A, n, C, k\nModel:\nW = \\frac{A}{2(1-\\frac{n}{2})}(I_1-3+C^2)^{1-\\frac{n}{2}}+k(I_1-3)^2\nDavies CK, De DK, Thomas AG. Characterization of the behavior of rubber for engineering design purposes. 1. Stress-strain relations. Rubber chemistry and technology. 1994 Sep;67(4):716-28.\n\n\n"
+    contents = "Davis-DeThomas\nModel:\nW = \\frac{A}{2(1-\\frac{n}{2})}(I_1-3+C^2)^{1-\\frac{n}{2}}+k(I_1-3)^2\nParameters:\nA\n\nn\n\nC\n\nk\n\n\nDavies CK, De DK, Thomas AG. Characterization of the behavior of rubber for engineering design purposes. 1. Stress-strain relations. Rubber chemistry and technology. 1994 Sep;67(4):716-28.\n\n\n"
     url = "Hyperelastics@dev/ref/Hyperelastics.DavisDeThomas"
     [[input.files]]
     title = "ContinuumModels"
@@ -76,23 +76,23 @@ url_prefix = ""
     url = "Hyperelastics@dev/doc/NonlinearContinua/README.md"
     [[input.files]]
     title = "AffineMicroSphere"
-    contents = "Affine Micro-Sphere\nNote: The field ℒinv can be set to change the inverse Langevin function approximation used\nParameters: μ, N, p, U, q\nModel: See Paper\n\nMiehe C, Göktepe S, Lulei F. A micro-macro approach to rubber-like materials—part I: the non-affine micro-sphere model of rubber elasticity. Journal of the Mechanics and Physics of Solids. 2004 Nov 1;52(11):2617-60.\n\n\n"
+    contents = "Affine Micro-Sphere\nModel:\nSee Paper\n\n\nParameters:\nμ\n\nN\n\n\nNote:\nThe field ℒinv can be set to change the inverse Langevin function approximation used\n\n\n\nMiehe C, Göktepe S, Lulei F. A micro-macro approach to rubber-like materials—part I: the non-affine micro-sphere model of rubber elasticity. Journal of the Mechanics and Physics of Solids. 2004 Nov 1;52(11):2617-60.\n\n\n"
     url = "Hyperelastics@dev/ref/Hyperelastics.AffineMicroSphere"
     [[input.files]]
     title = "ModifiedYeoh"
-    contents = "Modified Yeoh\nParameters: C10, C20, C30, α, β\nModel:\nW = C_{10} * (I_1 - 3) + C_{20} * (I_1 - 3)^2 + C_{30} * (I_1 - 3)^3 + \\alpha / \\beta * (1 - \\exp{-\\beta * (I_1 - 3)})\nHe H, Zhang Q, Zhang Y, Chen J, Zhang L, Li F. A comparative study of 85 hyperelastic constitutive models for both unfilled rubber and highly filled rubber nanocomposite material. Nano Materials Science. 2021 Jul 16.\n\n\n"
+    contents = "Modified Yeoh\nModel:\nW = C_{10} * (I_1 - 3) + C_{20} * (I_1 - 3)^2 + C_{30} * (I_1 - 3)^3 + \\alpha / \\beta * (1 - \\exp{-\\beta * (I_1 - 3)})\nParameters:\nC10\n\nC20\n\nC30\n\nα\n\nβ\n\n\nHe H, Zhang Q, Zhang Y, Chen J, Zhang L, Li F. A comparative study of 85 hyperelastic constitutive models for both unfilled rubber and highly filled rubber nanocomposite material. Nano Materials Science. 2021 Jul 16.\n\n\n"
     url = "Hyperelastics@dev/ref/Hyperelastics.ModifiedYeoh"
     [[input.files]]
     title = "MCC"
-    contents = "MCC (modified constrained chain)\nParameters:\nModel:\nW = \\frac{1}{2}\\zeta k T \\sum\\limits_{i=1}^{3}(\\lambda_i^2-1)+\\frac{1}{2}\\mu k T\\sum\\limits_{i=1}^{3}[B_i+D_i-\\log{(1+B_i)}-\\log{(1+D_i)}]\nB_i = \\frac{\\kappa^2(\\lambda_i^2-1)}{(\\lambda_i^2+\\kappa)^2}\nD_i = \\frac{\\lambda_i^2 B_i}{\\kappa}\nErman B, Monnerie L. Theory of elasticity of amorphous networks: effect of constraints along chains. Macromolecules. 1989 Aug;22(8):3342-8.\n\n\n"
+    contents = "MCC (modified constrained chain)\nModel:\nW = \\frac{1}{2}\\zeta k T \\sum\\limits_{i=1}^{3}(\\lambda_i^2-1)+\\frac{1}{2}\\mu k T\\sum\\limits_{i=1}^{3}[B_i+D_i-\\log{(1+B_i)}-\\log{(1+D_i)}]\nwhere:\nB_i = \\frac{\\kappa^2(\\lambda_i^2-1)}{(\\lambda_i^2+\\kappa)^2}\nand\nD_i = \\frac{\\lambda_i^2 B_i}{\\kappa}\nParameters:\nζkT\n\nμkT\n\nκ\n\n\nErman B, Monnerie L. Theory of elasticity of amorphous networks: effect of constraints along chains. Macromolecules. 1989 Aug;22(8):3342-8.\n\n\n"
     url = "Hyperelastics@dev/ref/Hyperelastics.MCC"
     [[input.files]]
     title = "NonaffineTube"
-    contents = "Nonaffine - Tube\nParameters: Gc, Ge\nModel: G_c \\sum\\limits_{i=1}^{3}\\frac{\\lambda_i^2}{2}+G_e\\sum\\limits_{i=1}^{3}\\lambda_i+\\frac{1}{\\lambda_i}\nRubinstein M, Panyukov S. Nonaffine deformation and elasticity of polymer networks. Macromolecules. 1997 Dec 15;30(25):8036-44.\n\n\n"
+    contents = "Nonaffine - Tube\nModel:\nW = G_c \\sum\\limits_{i=1}^{3}\\frac{\\lambda_i^2}{2}+G_e\\sum\\limits_{i=1}^{3}\\lambda_i+\\frac{1}{\\lambda_i}\nParameters:\nGc\n\nGe\n\n\nRubinstein M, Panyukov S. Nonaffine deformation and elasticity of polymer networks. Macromolecules. 1997 Dec 15;30(25):8036-44.\n\n\n"
     url = "Hyperelastics@dev/ref/Hyperelastics.NonaffineTube"
     [[input.files]]
     title = "HossMarczakI"
-    contents = "Hoss Marczak I\nParameters: α, β, μ, b, n\nModel:\nW = \\frac{\\alpha}{\\beta}(1-\\exp{-\\beta(I_1-3)})+\\frac{\\mu}{2b}\\bigg((1+\\frac{b}{n}(I_1-3))^n -1\\bigg)\nNote: The authors suggested this model for low strains.\n\n\nHoss L, Marczak RJ. A new constitutive model for rubber-like materials. Mecánica Computacional. 2010;29(28):2759-73.\n\n\n"
+    contents = "Hoss Marczak I\nModel:\nW = \\frac{\\alpha}{\\beta}(1-\\exp{-\\beta(I_1-3)})+\\frac{\\mu}{2b}\\bigg((1+\\frac{b}{n}(I_1-3))^n -1\\bigg)\nParameters:\nα\n\nβ\n\nμ\n\nb\n\nn\n\n\nNote:\nThe authors suggested this model for low strains.\n\n\nHoss L, Marczak RJ. A new constitutive model for rubber-like materials. Mecánica Computacional. 2010;29(28):2759-73.\n\n\n"
     url = "Hyperelastics@dev/ref/Hyperelastics.HossMarczakI"
     [[input.files]]
     title = "GeneralConstitutiveModel_Network"
@@ -112,19 +112,19 @@ url_prefix = ""
     url = "Hyperelastics@dev/doc/LICENSE.md"
     [[input.files]]
     title = "Hyperelastics"
-    contents = "Hyperelastics\nStable Dev\nA hyperelastic model library and fitting toolkit developed by TRACER Lab at Liberty University. A constructor is provided for GalacticOptim.jl for parameter fitting based on experimental data.\nCitations\nAll relevant citations are located in CITATIONS.bib You should have access to the available recordings.\n\n"
+    contents = "Hyperelastics\nStable Dev\nA hyperelastic model library and fitting toolkit developed by TRACER Lab at Liberty University. A constructor is provided for Optimization.jl for parameter fitting based on experimental data.\n\\alpha = 2+2\nCitations\nAll relevant citations are located in CITATIONS.bib\n\n"
     url = "Hyperelastics@dev/doc/README.md"
     [[input.files]]
     title = "Bechir4Term"
-    contents = "Bechir-4 Term\nParameters: C11, C12, C21, C22\nModel:\nW = C_1^1(I_1-3)+\\sum\\limits_{n=1}^{2}\\sum\\limits_{r=1}^{2}C_n^{r}(\\lambda_1^{2n}+\\lambda_2^{2n}+\\lambda_3^{2n}-3)^r\nKhajehsaeid H, Arghavani J, Naghdabadi R. A hyperelastic constitutive model for rubber-like materials. European Journal of Mechanics-A/Solids. 2013 Mar 1;38:144-51.\n\n\n"
+    contents = "Bechir-4 Term\nModel:\nW = C_1^1(I_1-3)+\\sum\\limits_{n=1}^{2}\\sum\\limits_{r=1}^{2}C_n^{r}(\\lambda_1^{2n}+\\lambda_2^{2n}+\\lambda_3^{2n}-3)^r\nParameters:\nC11\n\nC12\n\nC21\n\nC22\n\n\nKhajehsaeid H, Arghavani J, Naghdabadi R. A hyperelastic constitutive model for rubber-like materials. European Journal of Mechanics-A/Solids. 2013 Mar 1;38:144-51.\n\n\n"
     url = "Hyperelastics@dev/ref/Hyperelastics.Bechir4Term"
     [[input.files]]
     title = "Swanson"
-    contents = "Swanson\nParameters: A⃗, α⃗, B⃗, β⃗\nModel:\nW = \\sum\\limits_{i=1}^{N} \\frac{3}{2}(\\frac{A_i}{1+\\alpha_i}(\\frac{I_1}{3})^{1+\\alpha_i}+\\frac{B_i}{1+\\beta_i}(\\frac{I_2}{3})^{1+\\beta_i}\nSwanson SR. A constitutive model for high elongation elastic materials.\n\n\n"
+    contents = "Swanson\nModel:\nW = \\sum\\limits_{i=1}^{N} \\frac{3}{2}(\\frac{A_i}{1+\\alpha_i}(\\frac{I_1}{3})^{1+\\alpha_i}+\\frac{B_i}{1+\\beta_i}(\\frac{I_2}{3})^{1+\\beta_i}\nParameters:\nA⃗\n\nα⃗\n\nB⃗\n\nβ⃗\n\n\nSwanson SR. A constitutive model for high elongation elastic materials.\n\n\n"
     url = "Hyperelastics@dev/ref/Hyperelastics.Swanson"
     [[input.files]]
     title = "LambertDianiRey"
-    contents = "Lambert-Diani Rey\nParameters: aᵢ, bᵢ\nModel:\nW = \\int\\limits_{3}^{I_1}\\exp\\bigg(\\sum\\limits_{i=0}^{n}a_i(I_1-3)^i\\bigg)\\text{d}I_1+\\int\\limits_{3}^{I_2}\\sum\\limits_{j=0}^{m}b_i\\log(I_2)^i\\text{d}I_2\nLambert-Diani J, Rey C. New phenomenological behavior laws for rubbers and thermoplastic elastomers. European Journal of Mechanics-A/Solids. 1999 Nov 1;18(6):1027-43.\n\n\n"
+    contents = "Lambert-Diani Rey\nModel:\nW = \\int\\limits_{3}^{I_1}\\exp\\bigg(\\sum\\limits_{i=0}^{n}a_i(I_1-3)^i\\bigg)\\text{d}I_1+\\int\\limits_{3}^{I_2}\\sum\\limits_{j=0}^{m}b_i\\log(I_2)^i\\text{d}I_2\nParameters:\naᵢ\n\nbᵢ\n\n\nLambert-Diani J, Rey C. New phenomenological behavior laws for rubbers and thermoplastic elastomers. European Journal of Mechanics-A/Solids. 1999 Nov 1;18(6):1027-43.\n\n\n"
     url = "Hyperelastics@dev/ref/Hyperelastics.LambertDianiRey"
     [[input.files]]
     title = "test"
@@ -132,7 +132,7 @@ url_prefix = ""
     url = "Hyperelastics@dev/doc/test.md"
     [[input.files]]
     title = "GeneralMooneyRivlin"
-    contents = "General Mooney Rivlin\nParameters: [C]\nModel: W = \\sum\\limits_{i,j = 0}^{N,M} C_{i,j}(I_1-3)^i(I_2-3)^j\nMooney M. A theory of large elastic deformation. Journal of applied physics. 1940 Sep;11(9):582-92.\n\n\n"
+    contents = "General Mooney Rivlin\nModel:\nW = \\sum\\limits_{i,j = 0}^{N,M} C_{i,j}(I_1-3)^i(I_2-3)^j\nParameters:\nC: Matrix of coefficients for Cⱼᵢ coefficients\n\n\nMooney M. A theory of large elastic deformation. Journal of applied physics. 1940 Sep;11(9):582-92.\n\n\n"
     url = "Hyperelastics@dev/ref/Hyperelastics.GeneralMooneyRivlin"
     [[input.files]]
     title = "Hyperelastics/material_tests.jl"
@@ -148,15 +148,15 @@ url_prefix = ""
     url = "Hyperelastics@dev/ref/Hyperelastics.Kawabata1981"
     [[input.files]]
     title = "ChevalierMarco"
-    contents = "Chevalier-Marco\nParameters: a⃗, b⃗\nModel:\nW = \\int\\limits_{3}^{I_1(\\vec\\lambda)} \\exp\\bigg(\\sum\\limits_{i=0}^{N}a_i(I_1-3)^i\\bigg)\\text{d}I_1+ \\int\\limits_{3}^{I_2(\\vec\\lambda)} \\sum\\limits_{i=0}^{n}\\frac{b_i}{I_2^i}\\text{d}I_2\n[\\mathbf{S}] = 2(I-\\frac{\\partial W}{\\partial I_1} - C^{-2}\\frac{\\partial W}{\\partial I_2})\n[\\mathbf{\\sigma}] = \\mathbf{F} \\cdot \\mathbf{S}\nNote: Model is not compatible with AD. A method for accessing the Second Piola Kirchoff Tensor and Cauchy Stress Tensor have been implemented.\nChevalier L, Marco Y. Tools for multiaxial validation of behavior laws chosen for modeling hyper‐elasticity of rubber‐like materials. Polymer Engineering & Science. 2002 Feb;42(2):280-98.\n\n\n"
+    contents = "Chevalier-Marco\nModel:\nW = \\int\\limits_{3}^{I_1(\\vec\\lambda)} \\exp\\bigg(\\sum\\limits_{i=0}^{N}a_i(I_1-3)^i\\bigg)\\text{d}I_1+ \\int\\limits_{3}^{I_2(\\vec\\lambda)} \\sum\\limits_{i=0}^{n}\\frac{b_i}{I_2^i}\\text{d}I_2\n[\\mathbf{S}] = 2(I-\\frac{\\partial W}{\\partial I_1} - C^{-2}\\frac{\\partial W}{\\partial I_2})\n[\\mathbf{\\sigma}] = \\mathbf{F} \\cdot \\mathbf{S}\nParameters:\na⃗\n\nb⃗\n\n\nNote:\nModel is not compatible with AD. A method for accessing the Second Piola Kirchoff Tensor and Cauchy Stress Tensor have been implemented.\n\n\nChevalier L, Marco Y. Tools for multiaxial validation of behavior laws chosen for modeling hyper‐elasticity of rubber‐like materials. Polymer Engineering & Science. 2002 Feb;42(2):280-98.\n\n\n"
     url = "Hyperelastics@dev/ref/Hyperelastics.ChevalierMarco"
     [[input.files]]
     title = "FullNetwork"
-    contents = "Full Network - Wu Geisson\nParameters: μ, N, ρ\nModel:\nW = (1-\\rho)W_{3Chain}+\\rho W_{8chain}\nTreloar LR, Riding G. A non-Gaussian theory for rubber in biaxial strain. I. Mechanical properties. Proceedings of the Royal Society of London. A. Mathematical and Physical Sciences. 1979 Dec 31;369(1737):261-80. Wu PD, van der Giessen E. On improved 3-D non-Gaussian network models for rubber elasticity. Mechanics research communications. 1992 Sep 1;19(5):427-33. Wu PD, Van Der Giessen E. On improved network models for rubber elasticity and their applications to orientation hardening in glassy polymers. Journal of the Mechanics and Physics of Solids. 1993 Mar 1;41(3):427-56.\n\n\n"
+    contents = "Full Network - Wu Geisson\nModel:\nW = (1-\\rho)W_{3Chain}+\\rho W_{8chain}\nParameters:\nμ\n\nN\n\nρ\n\n\nTreloar LR, Riding G. A non-Gaussian theory for rubber in biaxial strain. I. Mechanical properties. Proceedings of the Royal Society of London. A. Mathematical and Physical Sciences. 1979 Dec 31;369(1737):261-80. Wu PD, van der Giessen E. On improved 3-D non-Gaussian network models for rubber elasticity. Mechanics research communications. 1992 Sep 1;19(5):427-33. Wu PD, Van Der Giessen E. On improved network models for rubber elasticity and their applications to orientation hardening in glassy polymers. Journal of the Mechanics and Physics of Solids. 1993 Mar 1;41(3):427-56.\n\n\n"
     url = "Hyperelastics@dev/ref/Hyperelastics.FullNetwork"
     [[input.files]]
     title = "HorganSaccomandi"
-    contents = "Horgan Saccomandi Model\nParameters: μ, J\nModel:\nW = -\\frac{\\mu J}{2}\\log\\bigg(\\frac{J^3-J^2I_1+JI_2-1}{(J-1)^3}\\bigg)\nHorgan CO, Saccomandi G. Constitutive models for compressible nonlinearly elastic materials with limiting chain extensibility. Journal of Elasticity. 2004 Nov;77(2):123-38.> Horgan CO, Saccomandi G. Constitutive models for atactic elastomers. InWaves And Stability In Continuous Media 2004 (pp. 281-294).\n\n\n"
+    contents = "Horgan Saccomandi Model\nModel:\nW = -\\frac{\\mu J}{2}\\log\\bigg(\\frac{J^3-J^2I_1+JI_2-1}{(J-1)^3}\\bigg)\nParameters:\nμ\n\nJ\n\n\nHorgan CO, Saccomandi G. Constitutive models for compressible nonlinearly elastic materials with limiting chain extensibility. Journal of Elasticity. 2004 Nov;77(2):123-38.> Horgan CO, Saccomandi G. Constitutive models for atactic elastomers. InWaves And Stability In Continuous Media 2004 (pp. 281-294).\n\n\n"
     url = "Hyperelastics@dev/ref/Hyperelastics.HorganSaccomandi"
     [[input.files]]
     title = "Hyperelastics/average_chain_behavior.jl"
@@ -168,19 +168,19 @@ url_prefix = ""
     url = "Hyperelastics@dev/ref/Hyperelastics.parameters"
     [[input.files]]
     title = "VanDerWaals"
-    contents = "Van der Waals\nParameters: μ, λm, β, α\nModel:\nW = -\\mu\\{(\\lambda_m^2-3)\\log(1-\\Theta)+\\Theta\\}-\\frac{2\\alpha}{3}\\bigg(\\frac{I-3}{2}\\bigg)^{3/2}\n\\Theta = \\frac{\\beta I_1 + (1-\\beta)I_2-3}{\\lambda_m^2-3)}\nKilian HG, Enderle HF, Unseld K. The use of the van der Waals model to elucidate universal aspects of structure-property relationships in simply extended dry and swollen rubbers. Colloid and Polymer Science. 1986 Oct;264(10):866-76. Ambacher H, Enderle HF, Kilian HG, Sauter A. Relaxation in permanent networks. InRelaxation in Polymers 1989 (pp. 209-220). Steinkopff. Kilian HG. A molecular interpretation of the parameters of the van der Waals equation of state for real networks. Polymer Bulletin. 1980 Sep;3(3):151-8.\n\n\n"
+    contents = "Van der Waals\nModel:\nW = -\\mu\\{(\\lambda_m^2-3)\\log(1-\\Theta)+\\Theta\\}-\\frac{2\\alpha}{3}\\bigg(\\frac{I-3}{2}\\bigg)^{3/2}\nwhere:\n\\Theta = \\frac{\\beta I_1 + (1-\\beta)I_2-3}{\\lambda_m^2-3)}\nParameters:\nμ\n\nλm\n\nβ\n\nα\n\n\nKilian HG, Enderle HF, Unseld K. The use of the van der Waals model to elucidate universal aspects of structure-property relationships in simply extended dry and swollen rubbers. Colloid and Polymer Science. 1986 Oct;264(10):866-76. Ambacher H, Enderle HF, Kilian HG, Sauter A. Relaxation in permanent networks. InRelaxation in Polymers 1989 (pp. 209-220). Steinkopff. Kilian HG. A molecular interpretation of the parameters of the van der Waals equation of state for real networks. Polymer Bulletin. 1980 Sep;3(3):151-8.\n\n\n"
     url = "Hyperelastics@dev/ref/Hyperelastics.VanDerWaals"
     [[input.files]]
     title = "HainesWilson"
-    contents = "Haines-Wilson\nParameters: C10, C01, C11, C02, C20, C30\nModel:\nW = \\sum\\limits_{i,j=0}^{3, 2}C_{i,j}(I_1-3)^i(I_2-3)^j\nHaines DW, Wilson WD. Strain-energy density function for rubberlike materials. Journal of the Mechanics and Physics of Solids. 1979 Aug 1;27(4):345-60.\n\n\n"
+    contents = "Haines-Wilson\nModel:\nW = \\sum\\limits_{i,j=0}^{3, 2}C_{i,j}(I_1-3)^i(I_2-3)^j\nParameters:\nC10\n\nC01\n\nC11\n\nC02\n\nC20\n\nC30\n\n\nHaines DW, Wilson WD. Strain-energy density function for rubberlike materials. Journal of the Mechanics and Physics of Solids. 1979 Aug 1;27(4):345-60.\n\n\n"
     url = "Hyperelastics@dev/ref/Hyperelastics.HainesWilson"
     [[input.files]]
     title = "JamesGreenSimpson"
-    contents = "James-Green-Simpson\nParameters: C10, C01, C11, C20, C30\nModel:\nW = \\sum\\limits_{i,j=0}^{3, 1}C_{i,j}(I_1-3)^i(I_2-3)^j\nJames AG, Green A, Simpson GM. Strain energy functions of rubber. I. Characterization of gum vulcanizates. Journal of Applied Polymer Science. 1975 Jul;19(7):2033-58.\n\n\n"
+    contents = "James-Green-Simpson\nModel:\nW = \\sum\\limits_{i,j=0}^{3, 1}C_{i,j}(I_1-3)^i(I_2-3)^j\nParameters:\nC10\n\nC01\n\nC11\n\nC20\n\nC30\n\n\nJames AG, Green A, Simpson GM. Strain energy functions of rubber. I. Characterization of gum vulcanizates. Journal of Applied Polymer Science. 1975 Jul;19(7):2033-58.\n\n\n"
     url = "Hyperelastics@dev/ref/Hyperelastics.JamesGreenSimpson"
     [[input.files]]
     title = "Vito"
-    contents = "Vito\nParameters: α, β, γ\nModel:\nW = \\alpha (\\exp\\bigg(\\beta (I_1 - 3)\\bigg) + \\gamma (I_2 - 3)) - 1)\nVito R. A note on arterial elasticity. Journal of Biomechanics. 1973 Sep 1;6(5):561-4.\n\n\n"
+    contents = "Vito\nModel:\nW = \\alpha (\\exp\\bigg(\\beta (I_1 - 3)\\bigg) + \\gamma  (I_2 - 3)) - 1)\nParameters:\nα\n\nβ\n\nγ\n\n\nVito R. A note on arterial elasticity. Journal of Biomechanics. 1973 Sep 1;6(5):561-4.\n\n\n"
     url = "Hyperelastics@dev/ref/Hyperelastics.Vito"
     [[input.files]]
     title = "MacroMicroMacro"
@@ -192,19 +192,19 @@ url_prefix = ""
     url = "Hyperelastics@dev/ref/Hyperelastics.constraints"
     [[input.files]]
     title = "HartmannNeff"
-    contents = "Hartmann-Neff\nParameters: α, Ci0, C0j\nModel:\nW = \\sum\\limits_{i,j=0}^{M,N}C_{i,0}(I_1-3)^i -3\\sqrt{3}^j+\\alpha(I_1-3)\nHartmann S, Neff P. Polyconvexity of generalized polynomial-type hyperelastic strain energy functions for near-incompressibility. International journal of solids and structures. 2003 Jun 1;40(11):2767-91.\n\n\n"
+    contents = "Hartmann-Neff\nModel:\nW = \\sum\\limits_{i,j=0}^{M,N}C_{i,0}(I_1-3)^i -3\\sqrt{3}^j+\\alpha(I_1-3)\nParameters:\nα\n\nCi⃗0\n\nC0j⃗\n\n\nHartmann S, Neff P. Polyconvexity of generalized polynomial-type hyperelastic strain energy functions for near-incompressibility. International journal of solids and structures. 2003 Jun 1;40(11):2767-91.\n\n\n"
     url = "Hyperelastics@dev/ref/Hyperelastics.HartmannNeff"
     [[input.files]]
     title = "GentThomas"
-    contents = "Gent Thomas\nParamters: C1, C2\nModel:\nW = C_1(I_1-3)+C_2\\log(\\frac{I_2}{3})\nGent AN, Thomas AG. Forms for the stored (strain) energy function for vulcanized rubber. Journal of Polymer Science. 1958 Apr;28(118):625-8.\n\n\n"
+    contents = "Gent Thomas\nModel:\nW = C_1(I_1-3)+C_2\\log(\\frac{I_2}{3})\nParamters:\nC1\n\nC2\n\n\nGent AN, Thomas AG. Forms for the stored (strain) energy function for vulcanized rubber. Journal of Polymer Science. 1958 Apr;28(118):625-8.\n\n\n"
     url = "Hyperelastics@dev/ref/Hyperelastics.GentThomas"
     [[input.files]]
     title = "KhiemItskov"
-    contents = "Khiêm-Itskov Model\nParameters: μcκ, n, q, μt\nModel:\nW = \\mu_c \\kappa n \\log\\bigg(\\frac{\\sin(\\frac{\\pi}{\\sqrt{n}})(\\frac{I_1}{3})^{\\frac{q}{2}}}{\\sin(\\frac{\\pi}{\\sqrt{n}}(\\frac{I_1}{3})^{\\frac{q}{2}}}\\bigg)+\\mu_t\\big[\\frac{I_2}{3}^{1/2} - 1 \\big]\nKhiêm VN, Itskov M. Analytical network-averaging of the tube model:: Rubber elasticity. Journal of the Mechanics and Physics of Solids. 2016 Oct 1;95:254-69.\n\n\n"
+    contents = "Khiêm-Itskov Model\nModel:\nW = \\mu_c \\kappa n \\log\\bigg(\\frac{\\sin(\\frac{\\pi}{\\sqrt{n}})(\\frac{I_1}{3})^{\\frac{q}{2}}}{\\sin(\\frac{\\pi}{\\sqrt{n}}(\\frac{I_1}{3})^{\\frac{q}{2}}}\\bigg)+\\mu_t\\big[\\frac{I_2}{3}^{1/2} - 1 \\big]\nParameters:\nμcκ\n\nn\n\nq\n\nμt\n\n\nKhiêm VN, Itskov M. Analytical network-averaging of the tube model:: Rubber elasticity. Journal of the Mechanics and Physics of Solids. 2016 Oct 1;95:254-69.\n\n\n"
     url = "Hyperelastics@dev/ref/Hyperelastics.KhiemItskov"
     [[input.files]]
     title = "Alexander"
-    contents = "Alexander\nParameters: μ, C₁, C₂, C₃, k, γ\nModel:\nW = \\frac{C_1 \\sqrt{\\pi}\\text{erfi}\\big(\\sqrt{k}(I_1-3)\\big)}{2\\sqrt{k}}+C_2\\log{\\frac{I_2-3+\\gamma}{\\gamma}}+C_3(I_2-3)\nAlexander H. A constitutive relation for rubber-like materials. International Journal of Engineering Science. 1968 Sep 1;6(9):549-63.\n\n\n"
+    contents = "Alexander\nModel:\nW = \\frac{C_1 \\sqrt{\\pi}\\text{erfi}\\big(\\sqrt{k}(I_1-3)\\big)}{2\\sqrt{k}}+C_2\\log{\\frac{I_2-3+\\gamma}{\\gamma}}+C_3(I_2-3)\nParameters:\nμ\n\nC₁\n\nC₂\n\nC₃\n\nk\n\nγ\n\n\nAlexander H. A constitutive relation for rubber-like materials. International Journal of Engineering Science. 1968 Sep 1;6(9):549-63.\n\n\n"
     url = "Hyperelastics@dev/ref/Hyperelastics.Alexander"
     [[input.files]]
     title = "parameter_bounds"
@@ -212,11 +212,11 @@ url_prefix = ""
     url = "Hyperelastics@dev/ref/Hyperelastics.parameter_bounds"
     [[input.files]]
     title = "VerondaWestmann"
-    contents = "Veronda-Westmann\nParameters: C1, C2, α\nModel:\nW = C_1 (\\exp(\\alpha(I_1 - 3)) - 1) + C_2 (I_2 - 3)\nVeronda DR, Westmann RA. Mechanical characterization of skin—finite deformations. Journal of biomechanics. 1970 Jan 1;3(1):111-24.\n\n\n"
+    contents = "Veronda-Westmann\nModel:\nW = C_1 (\\exp(\\alpha(I_1 - 3)) - 1) + C_2 (I_2 - 3)\nParameters:\nC1\n\nC2\n\nα\n\n\nVeronda DR, Westmann RA. Mechanical characterization of skin—finite deformations. Journal of biomechanics. 1970 Jan 1;3(1):111-24.\n\n\n"
     url = "Hyperelastics@dev/ref/Hyperelastics.VerondaWestmann"
     [[input.files]]
     title = "Yeoh"
-    contents = "Yeoh\nParameters: C10, C20, C30\nModel:\nW = \\sum\\limits_{i,j=0}^{3, 0}C_{i,j}(I_1-3)^i(I_2-3)^j\nYeoh OH. Characterization of elastic properties of carbon-black-filled rubber vulcanizates. Rubber chemistry and technology. 1990 Nov;63(5):792-805.\n\n\n"
+    contents = "Yeoh\nModel:\nW = \\sum\\limits_{i,j=0}^{3, 0}C_{i,j}(I_1-3)^i(I_2-3)^j\nParameters:\nC10\n\nC20\n\nC30\n\n\nYeoh OH. Characterization of elastic properties of carbon-black-filled rubber vulcanizates. Rubber chemistry and technology. 1990 Nov;63(5):792-805.\n\n\n"
     url = "Hyperelastics@dev/ref/Hyperelastics.Yeoh"
     [[input.files]]
     title = "Hyperelastics/precompile.jl"
@@ -228,7 +228,7 @@ url_prefix = ""
     url = "Hyperelastics@dev/src/isotropic_incompressible_models.jl"
     [[input.files]]
     title = "DavidsonGoulbourne"
-    contents = "Davidson - Goulbourne\nParameters: Gc, Ge, λmax\nModel:\nW = \\frac{G_c}{6}I_1-G_c\\lambda_{max}\\log\\bigg(3\\lambda_{max}^2-I_1\\bigg)+G_e\\sum\\limits_{i=1}^{3}\\big(\\lambda_i+\\frac{1}{\\lambda_i}\\big)\nDavidson JD, Goulbourne NC. A nonaffine network model for elastomers undergoing finite deformations. Journal of the Mechanics and Physics of Solids. 2013 Aug 1;61(8):1784-97.\n\n\n"
+    contents = "Davidson - Goulbourne\nModel:\nW = \\frac{G_c I_1}{6}-G_c\\lambda_{max}\\log\\left(3\\lambda_{max}^2-I_1\\right)+G_e\\sum\\limits_{i=1}^{3}\\left(\\lambda_i+\\frac{1}{\\lambda_i}\\right)\nParameters:\nGc\n\nGe\n\nλmax\n\n\nDavidson JD, Goulbourne NC. A nonaffine network model for elastomers undergoing finite deformations. Journal of the Mechanics and Physics of Solids. 2013 Aug 1;61(8):1784-97.\n\n\n"
     url = "Hyperelastics@dev/ref/Hyperelastics.DavidsonGoulbourne"
     [[input.files]]
     title = "AbstractHyperelasticModel"
@@ -236,7 +236,7 @@ url_prefix = ""
     url = "Hyperelastics@dev/ref/Hyperelastics.AbstractHyperelasticModel"
     [[input.files]]
     title = "ValanisLandel"
-    contents = "Valanis-Landel\nParameters: μ\nModel:\nW = 2\\mu\\sum\\limits_{1}^{3}(\\lambda_i(\\log\\lambda_i -1))\nValanis KC, Landel RF. The strain‐energy function of a hyperelastic material in terms of the extension ratios. Journal of Applied Physics. 1967 Jun;38(7):2997-3002.\n\n"
+    contents = "Valanis-Landel\nModel:\nW = 2\\mu\\sum\\limits_{1}^{3}(\\lambda_i(\\log\\lambda_i -1))\nParameters:\nμ\n\n\nValanis KC, Landel RF. The strain‐energy function of a hyperelastic material in terms of the extension ratios. Journal of Applied Physics. 1967 Jun;38(7):2997-3002.\n\n\n"
     url = "Hyperelastics@dev/ref/Hyperelastics.ValanisLandel"
     [[input.files]]
     title = "Hyperelastics/data_driven.jl"
@@ -248,31 +248,35 @@ url_prefix = ""
     url = "Hyperelastics@dev/src/general_form_incompressible_isotropic_models.jl"
     [[input.files]]
     title = "ModifiedFloryErman"
-    contents = "Modified Flory Erman\nParameters: μ, N, κ\nModel:\n``W = W_}+\\sum\\limits_^{3}\\frac{2}[B_i+D_i]\nEdwards SF. The statistical mechanics of polymerized material. Proceedings of the Physical Society (1958-1967). 1967 Sep 1;92(1):9.\n\n\n"
+    contents = "Modified Flory Erman\nModel:\nW = W_{\\text{Arruda-Boyce}}+\\sum\\limits_{i=1}^{3}\\frac{\\mu}{2}[B_i+D_i]\nParameters:\nμ\n\nN\n\nκ\n\n\nEdwards SF. The statistical mechanics of polymerized material. Proceedings of the Physical Society (1958-1967). 1967 Sep 1;92(1):9.\n\n\n"
     url = "Hyperelastics@dev/ref/Hyperelastics.ModifiedFloryErman"
     [[input.files]]
     title = "BahremanDarijani"
-    contents = "Bahreman Darijani\nParameters: A2, B2, A4, A6\nModel:\nW = \\sum\\limits_{i = 1}{3}\\sum\\limits_{j=0}^{N} A_j (\\lambda_i^{m_j}-1) + B_j(\\lambda_i^{-n_j}-1)\nBahreman M, Darijani H. New polynomial strain energy function; application to rubbery circular cylinders under finite extension and torsion. Journal of Applied Polymer Science. 2015 Apr 5;132(13).\n\n\n"
+    contents = "Bahreman Darijani\nModel:\nW = \\sum\\limits_{i = 1}{3}\\sum\\limits_{j=0}^{N} A_j (\\lambda_i^{m_j}-1) + B_j(\\lambda_i^{-n_j}-1)\nParameters:\nA2\n\nB2\n\nA4\n\nA6\n\n\nBahreman M, Darijani H. New polynomial strain energy function; application to rubbery circular cylinders under finite extension and torsion. Journal of Applied Polymer Science. 2015 Apr 5;132(13).\n\n\n"
     url = "Hyperelastics@dev/ref/Hyperelastics.BahremanDarijani"
     [[input.files]]
     title = "GeneralDarijaniNaghdabadi"
-    contents = "General Darijani Naghdabadi \nParameters: A⃗, B⃗, m⃗, n⃗\nModel:\nW = \\sum\\limits_{i = 1}{3}\\sum\\limits_{j=0}^{N} A_j (\\lambda_i^{m_j}-1) + B_j(\\lambda_i^{-n_j}-1)\nBahreman M, Darijani H. New polynomial strain energy function; application to rubbery circular cylinders under finite extension and torsion. Journal of Applied Polymer Science. 2015 Apr 5;132(13).\n\n\n"
+    contents = "General Darijani Naghdabadi\nModel:\nW = \\sum\\limits_{i = 1}^{3}\\sum\\limits_{j=0}^{N} A_j (\\lambda_i^{m_j}-1) + B_j(\\lambda_i^{-n_j}-1)\nParameters:\nA⃗\n\nB⃗\n\nm⃗\n\nn⃗\n\n\nBahreman M, Darijani H. New polynomial strain energy function; application to rubbery circular cylinders under finite extension and torsion. Journal of Applied Polymer Science. 2015 Apr 5;132(13).\n\n\n"
     url = "Hyperelastics@dev/ref/Hyperelastics.GeneralDarijaniNaghdabadi"
     [[input.files]]
     title = "ArmanNarooei"
-    contents = "Arman - Narooei\nParameters: A⃗, B⃗, m⃗, n⃗, α⃗, β⃗\nModel:\nW = \\sum\\limits_{i=1}^{N} A_i\\big[\\exp{m_i(\\lambda_1^{\\alpha_i}+\\lambda_2^{\\alpha_i}+\\lambda_3^{\\alpha_i}-3)}-1] + B_i\\big[\\exp{n_i(\\lambda_1^{-\\beta_i}+\\lambda_2^{-\\beta_i}+\\lambda_3^{-\\beta_i}-3)}-1]\nNarooei K, Arman M. Modification of exponential based hyperelastic strain energy to consider free stress initial configuration and Constitutive modeling. Journal of Computational Applied Mechanics. 2018 Jun 1;49(1):189-96.\n\n\n"
+    contents = "Arman - Narooei\nModel:\nW = \\sum\\limits_{i=1}^{N} A_i\\big[\\exp{m_i(\\lambda_1^{\\alpha_i}+\\lambda_2^{\\alpha_i}+\\lambda_3^{\\alpha_i}-3)}-1] + B_i\\big[\\exp{n_i(\\lambda_1^{-\\beta_i}+\\lambda_2^{-\\beta_i}+\\lambda_3^{-\\beta_i}-3)}-1]\nParameters:\nA⃗\n\nB⃗\n\nm⃗\n\nn⃗\n\nα⃗\n\nβ⃗\n\n\nNarooei K, Arman M. Modification of exponential based hyperelastic strain energy to consider free stress initial configuration and Constitutive modeling. Journal of Computational Applied Mechanics. 2018 Jun 1;49(1):189-96.\n\n\n"
     url = "Hyperelastics@dev/ref/Hyperelastics.ArmanNarooei"
     [[input.files]]
     title = "Hyperelastics/invariants.jl"
     contents = "NonlinearContinua I₁ λ⃗ AbstractVector sum Base Fix2 λ⃗ NonlinearContinua I₂ λ⃗ AbstractVector sum Base Fix2 λ⃗ NonlinearContinua I₃ λ⃗ AbstractVector prod λ⃗ NonlinearContinua J λ⃗ AbstractVector prod λ⃗ \n"
     url = "Hyperelastics@dev/src/invariants.jl"
     [[input.files]]
+    title = "model_list"
+    contents = "\n"
+    url = "Hyperelastics@dev/doc/docs/model_list.md"
+    [[input.files]]
     title = "ArrudaBoyce"
-    contents = "Arruda Boyce\nNote: The field ℒinv can be set to change the inverse Langevin function approximation used.\nParameters:\nμ: Small strain shear modulus\n\nN: Square of the locking stretch of the network.\n\n\nModel:\nW = \\mu\\bigg(\\frac{1}{2}(I_1-3)+\\frac{I_1^2-9}{20N}+\\frac{11(I_1^3-27)}{1050N^2}+\\frac{19(I_1^4-81)}{7000N^3}+\\frac{519(I_1^5-243)}{673750N^4}\\bigg)\nArruda EM, Boyce MC. A three-dimensional constitutive model for the large stretch behavior of rubber elastic materials. Journal of the Mechanics and Physics of Solids. 1993 Feb 1;41(2):389-412.\n\n\n"
+    contents = "Arruda Boyce\nModel:\nW = \\mu N \\left( \\frac{\\lambda_{chain}}{\\sqrt{N}} \\beta + \\log\\left(\\frac{\\beta}{\\sinh\\beta}\\right) \\right)\nwhere\n\\beta = \\mathcal{L}^{-1}\\left(\\frac{\\lambda_{chain}}{\\sqrt{N}}\\right)\nand\n\\lambda_{chain} = \\sqrt{\\frac{I_1}{3}}\nParameters:\nμ: Small strain shear modulus\n\nN: Square of the locking stretch of the network.\n\n\nFields\nℒinv: Sets the inverse Langevin approxamation used\n\n\nArruda EM, Boyce MC. A three-dimensional constitutive model for the large stretch behavior of rubber elastic materials. Journal of the Mechanics and Physics of Solids. 1993 Feb 1;41(2):389-412.\n\n\n"
     url = "Hyperelastics@dev/ref/Hyperelastics.ArrudaBoyce"
     [[input.files]]
     title = "NonaffineMicroSphere"
-    contents = "Non-Affine Micro-Sphere\nNote: The field ℒinv can be set to change the inverse Langevin function approximation used.\nParameters:\nμ: Small strain shear modulus\n\nN: Number of chain segments\n\np: Non-affine stretch parameter\n\nU: Tube geometry parameter\n\nq: Non-affine tube parameter\n\n\nModel: See Paper\n\nMiehe C, Göktepe S, Lulei F. A micro-macro approach to rubber-like materials—part I: the non-affine micro-sphere model of rubber elasticity. Journal of the Mechanics and Physics of Solids. 2004 Nov 1;52(11):2617-60.\n\n\n"
+    contents = "Non-Affine Micro-Sphere\nModel: See Paper\nParameters:\nμ: Small strain shear modulus\n\nN: Number of chain segments\n\np: Non-affine stretch parameter\n\nU: Tube geometry parameter\n\nq: Non-affine tube parameter\n\n\nFields:\nℒinv: Sets the inverse Langevin approximation used.\n\n\nMiehe C, Göktepe S, Lulei F. A micro-macro approach to rubber-like materials—part I: the non-affine micro-sphere model of rubber elasticity. Journal of the Mechanics and Physics of Solids. 2004 Nov 1;52(11):2617-60.\n\n\n"
     url = "Hyperelastics@dev/ref/Hyperelastics.NonaffineMicroSphere"
     [[input.files]]
     title = "Hyperelastics/macro_micro_macro_model.jl"
@@ -280,11 +284,11 @@ url_prefix = ""
     url = "Hyperelastics@dev/src/macro_micro_macro_model.jl"
     [[input.files]]
     title = "MooneyRivlin"
-    contents = "Mooney Rivlin Model\nParameters: C01, C10\nModel:\nW = C_{10}(I_1-3)+C_{01}(I_2-3)\nMooney M. A theory of large elastic deformation. Journal of applied physics. 1940 Sep;11(9):582-92.\n\n\n"
+    contents = "Mooney Rivlin Model\nModel:\nW = C_{10}(I_1-3)+C_{01}(I_2-3)\nParameters:\nC01\n\nC10\n\n\nMooney M. A theory of large elastic deformation. Journal of applied physics. 1940 Sep;11(9):582-92.\n\n\n"
     url = "Hyperelastics@dev/ref/Hyperelastics.MooneyRivlin"
     [[input.files]]
     title = "NeoHookean"
-    contents = "NeoHookean\nParameters:\nμ: Small strain shear modulus\n\n\nModel:\nW = \\frac{\\mu}{2}(I_1-3)\nTreloar LR. The elasticity of a network of long-chain molecules—II. Transactions of the Faraday Society. 1943;39:241-6.\n\n\n"
+    contents = "NeoHookean\nModel:\nW = \\frac{\\mu}{2}(I_1-3)\nParameters:\nμ: Small strain shear modulus\n\n\nTreloar LR. The elasticity of a network of long-chain molecules—II. Transactions of the Faraday Society. 1943;39:241-6.\n\n\n"
     url = "Hyperelastics@dev/ref/Hyperelastics.NeoHookean"
     [[input.files]]
     title = "HyperelasticBiaxialTest"
@@ -292,11 +296,11 @@ url_prefix = ""
     url = "Hyperelastics@dev/ref/Hyperelastics.HyperelasticBiaxialTest"
     [[input.files]]
     title = "HauptSedlan"
-    contents = "Haupt Sedlan\nParameters: C10, C01, C11, C02, C30\nModel:\nW = \\sum\\limits_{i,j=0}^{3, 2}C_{i,j}(I_1-3)^i(I_2-3)^j\nHaupt P, Sedlan K. Viscoplasticity of elastomeric materials: experimental facts and constitutive modelling. Archive of Applied Mechanics. 2001 Mar;71(2):89-109.\n\n\n"
+    contents = "Haupt Sedlan\nModel:\nW = \\sum\\limits_{i,j=0}^{3, 2}C_{i,j}(I_1-3)^i(I_2-3)^j\nParameters:\nC10\n\nC01\n\nC11\n\nC02\n\nC30\n\n\nHaupt P, Sedlan K. Viscoplasticity of elastomeric materials: experimental facts and constitutive modelling. Archive of Applied Mechanics. 2001 Mar;71(2):89-109.\n\n\n"
     url = "Hyperelastics@dev/ref/Hyperelastics.HauptSedlan"
     [[input.files]]
     title = "BechirChevalier"
-    contents = "Bechir Chevalier\nParameters: μ₀, η, ρ, N₃, N₈\nModel:\nW = W_{3Chain}(\\mu_f, N_3)+W_{8Chain}(\\frac{\\mu_c}{3}, N_8)\nwhere:\n\\mu_f = \\rho\\sqrt{\\frac{I_1}{3N_8}}\n\\mu_c = \\bigg(1-\\frac{\\eta\\alpha}{\\sqrt{N_3}}\\bigg)\\mu_0\n\\alpha = \\max{\\lambda_1, \\lambda_2, \\lambda_3}\nBechir H, Chevalier L, Idjeri M. A three-dimensional network model for rubber elasticity: The effect of local entanglements constraints. International journal of engineering science. 2010 Mar 1;48(3):265-74.\n\n\n"
+    contents = "Bechir Chevalier\nModel:\nW = W_{3Chain}(\\mu_f, N_3)+W_{8Chain}(\\frac{\\mu_c}{3}, N_8)\nwhere:\n\\mu_f = \\rho\\sqrt{\\frac{I_1}{3N_8}}\n\\mu_c = \\bigg(1-\\frac{\\eta\\alpha}{\\sqrt{N_3}}\\bigg)\\mu_0\n\\alpha = \\max{\\lambda_1, \\lambda_2, \\lambda_3}\nParameters:\nμ₀\n\nη\n\nρ\n\nN₃\n\nN₈\n\n\nBechir H, Chevalier L, Idjeri M. A three-dimensional network model for rubber elasticity: The effect of local entanglements constraints. International journal of engineering science. 2010 Mar 1;48(3):265-74.\n\n\n"
     url = "Hyperelastics@dev/ref/Hyperelastics.BechirChevalier"
     [[input.files]]
     title = "InverseLangevinApproximations"
@@ -308,11 +312,11 @@ url_prefix = ""
     url = "Hyperelastics@dev/ref/Hyperelastics.AbstractHyperelasticTest"
     [[input.files]]
     title = "GenYeoh"
-    contents = "GenYeoh\nParameters: K1, K2, K3, m, p, q\nModel:\nW = K_1 (I_1 - 3)^m + K_2 * (I_1 - 3)^p + K_3 * (I_1 - 3)^q\nHohenberger TW, Windslow RJ, Pugno NM, Busfield JJ. A constitutive model for both low and high strain nonlinearities in highly filled elastomers and implementation with user-defined material subroutines in ABAQUS. Rubber Chemistry and Technology. 2019;92(4):653-86.\n\n\n"
+    contents = "GenYeoh\nModel:\nW = K_1 (I_1 - 3)^m + K_2 * (I_1 - 3)^p + K_3 * (I_1 - 3)^q\nParameters:\nK1\n\nK2\n\nK3\n\nm\n\np\n\nq\n\n\nHohenberger TW, Windslow RJ, Pugno NM, Busfield JJ. A constitutive model for both low and high strain nonlinearities in highly filled elastomers and implementation with user-defined material subroutines in ABAQUS. Rubber Chemistry and Technology. 2019;92(4):653-86.\n\n\n"
     url = "Hyperelastics@dev/ref/Hyperelastics.GenYeoh"
     [[input.files]]
     title = "YamashitaKawabata"
-    contents = "Yamashita-Kawabata\nParameters: C1, C2, C3, N\nModel:\nW = C_1(I_1-3)+C_2(I_2-3)+\\frac{C_3}{N+1}(I_1-3)^{N+1}\nYamashita Y, Kawabata S. Approximated form of the strain energy-density function of carbon-black filled rubbers for industrial applications. Nippon Gomu Kyokaishi(Journal of the Society of Rubber Industry, Japan)(Japan). 1992;65(9):517-28.\n\n\n"
+    contents = "Yamashita-Kawabata\nModel:\nW = C_1(I_1-3)+C_2(I_2-3)+\\frac{C_3}{N+1}(I_1-3)^{N+1}\nParameters:\nC1\n\nC2\n\nC3\n\nN\n\n\nYamashita Y, Kawabata S. Approximated form of the strain energy-density function of carbon-black filled rubbers for industrial applications. Nippon Gomu Kyokaishi(Journal of the Society of Rubber Industry, Japan)(Japan). 1992;65(9):517-28.\n\n\n"
     url = "Hyperelastics@dev/ref/Hyperelastics.YamashitaKawabata"
     [[input.files]]
     title = "HyperelasticDataEntry"
@@ -320,11 +324,11 @@ url_prefix = ""
     url = "Hyperelastics@dev/ref/Hyperelastics.HyperelasticDataEntry"
     [[input.files]]
     title = "ThreeChainModel"
-    contents = "Three Chain Model\nNote: The field ℒinv can be set to change the inverse Langevin function approximation used. Currently, the default choice is the Pade 3/2 Approximation from Cohen 1991 \nParameters:\nμ: Small strain shear modulus\n\nN: Square of the locking stretch of the network.\n\n\nModel:\nW = \\frac{\\mu\\sqrt{N}}{3}\\sum\\limits_{i=1}^{3}\\bigg(\\lambda_i\\beta_i+\\sqrt{N}\\log\\bigg(\\frac{\\beta_i}{\\sinh \\beta_i}\\bigg)\\bigg)\nJames HM, Guth E. Theory of the elastic properties of rubber. The Journal of Chemical Physics. 1943 Oct;11(10):455-81. Cohen A. A Padé approximant to the inverse Langevin function. Rheologica acta. 1991 May;30(3):270-3.\n\n\n"
+    contents = "Three Chain Model\nModel:\nW = \\frac{\\mu\\sqrt{N}}{3}\\sum\\limits_{i=1}^{3}\\bigg(\\lambda_i\\beta_i+\\sqrt{N}\\log\\bigg(\\frac{\\beta_i}{\\sinh \\beta_i}\\bigg)\\bigg)\nParameters:\nμ: Small strain shear modulus\n\nN: Square of the locking stretch of the network.\n\n\nNote:\nThe field ℒinv can be set to change the inverse Langevin function approximation used.\n\n\nJames HM, Guth E. Theory of the elastic properties of rubber. The Journal of Chemical Physics. 1943 Oct;11(10):455-81.\n\n\n"
     url = "Hyperelastics@dev/ref/Hyperelastics.ThreeChainModel"
     [[input.files]]
     title = "Amin"
-    contents = "Amin\nParameters: C1, C2, C3, C4, N, M\nModel:\nW = C_1 (I_1 - 3) + \\frac{C_2}{N + 1} (I_1 - 3)^{N + 1} + \\frac{C_3}{M + 1} (I_1 - 3)^{M + 1} + C_4 (I_2 - 3)\nAmin AF, Wiraguna SI, Bhuiyan AR, Okui Y. Hyperelasticity model for finite element analysis of natural and high damping rubbers in compression and shear. Journal of engineering mechanics. 2006 Jan;132(1):54-64.\n\n\n"
+    contents = "Amin\nModel:\nW = C_1 (I_1 - 3) + \\frac{C_2}{N + 1} (I_1 - 3)^{N + 1} + \\frac{C_3}{M + 1} (I_1 - 3)^{M + 1} + C_4 (I_2 - 3)\nParameters:\nC1\n\nC2\n\nC3\n\nC4\n\nN\n\nM\n\n\nAmin AF, Wiraguna SI, Bhuiyan AR, Okui Y. Hyperelasticity model for finite element analysis of natural and high damping rubbers in compression and shear. Journal of engineering mechanics. 2006 Jan;132(1):54-64.\n\n\n"
     url = "Hyperelastics@dev/ref/Hyperelastics.Amin"
     [[input.files]]
     title = "AbstractHyperelasticProblem"
@@ -332,11 +336,11 @@ url_prefix = ""
     url = "Hyperelastics@dev/ref/Hyperelastics.AbstractHyperelasticProblem"
     [[input.files]]
     title = "Ogden"
-    contents = "Ogden\nParameters: μ⃗, α⃗\nModel:\nW = \\sum\\limits_{i=1}^{N}\\frac{\\mu_i}{\\alpha_i}(\\lambda_1^{\\alpha_i}+\\lambda_2^{\\alpha_i}+\\lambda_3^{\\alpha_i}-3)\nOgden RW. Large deformation isotropic elasticity–on the correlation of theory and experiment for incompressible rubberlike solids. Proceedings of the Royal Society of London. A. Mathematical and Physical Sciences. 1972 Feb 1;326(1567):565-84.\n\n\n"
+    contents = "Ogden\nModel:\nW = \\sum\\limits_{i=1}^{N}\\frac{\\mu_i}{\\alpha_i}(\\lambda_1^{\\alpha_i}+\\lambda_2^{\\alpha_i}+\\lambda_3^{\\alpha_i}-3)\nParameters:\nμ⃗\n\nα⃗\n\n\nOgden RW. Large deformation isotropic elasticity–on the correlation of theory and experiment for incompressible rubberlike solids. Proceedings of the Royal Society of London. A. Mathematical and Physical Sciences. 1972 Feb 1;326(1567):565-84.\n\n\n"
     url = "Hyperelastics@dev/ref/Hyperelastics.Ogden"
     [[input.files]]
     title = "YeohFleming"
-    contents = "Yeoh-Fleming\nParameters: A, B, C10, Im\nModel:\nW = \\frac{A}{B}(1-\\exp{-B(I_1-3)}) - C_{10}(I_m-3)\\log{1-\\frac{I_1-3}{I_m-3}}\nYeoh OH, Fleming PD. A new attempt to reconcile the statistical and phenomenological theories of rubber elasticity. Journal of Polymer Science Part B: Polymer Physics. 1997 Sep 15;35(12):1919-31.\n\n\n"
+    contents = "Yeoh-Fleming\nModel:\nW = \\frac{A}{B}(1-\\exp{-B(I_1-3)}) - C_{10}(I_m-3)\\log{1-\\frac{I_1-3}{I_m-3}}\nParameters:\nA\n\nB\n\nC10\n\nIm\n\n\nYeoh OH, Fleming PD. A new attempt to reconcile the statistical and phenomenological theories of rubber elasticity. Journal of Polymer Science Part B: Polymer Physics. 1997 Sep 15;35(12):1919-31.\n\n\n"
     url = "Hyperelastics@dev/ref/Hyperelastics.YeohFleming"
     [[input.files]]
     title = "TODO"
@@ -356,11 +360,11 @@ url_prefix = ""
     url = "Hyperelastics@dev/ref/Hyperelastics.InvariantForm"
     [[input.files]]
     title = "TakamizawaHayashi"
-    contents = "Takamizawa-Hayashi From: A description of arterial wall mechanics using limiting chain extensibility constitutitive models by Horgan and Saccomandi\nParameters: c, Jₘ\nModel:\nW = -c\\log{1-\\big(\\frac{I_1-3}{J_m}\\big)^2}\nTakamizawa K, Hayashi K. Strain energy density function and uniform strain hypothesis for arterial mechanics. Journal of biomechanics. 1987 Jan 1;20(1):7-17.\n\n\n"
+    contents = "Takamizawa-Hayashi\nModel:\nW = -c\\log{1-\\big(\\frac{I_1-3}{J_m}\\big)^2}\nParameters:\nc\n\nJₘ\n\n\nTakamizawa K, Hayashi K. Strain energy density function and uniform strain hypothesis for arterial mechanics. Journal of biomechanics. 1987 Jan 1;20(1):7-17.\n\n\n"
     url = "Hyperelastics@dev/ref/Hyperelastics.TakamizawaHayashi"
     [[input.files]]
     title = "Gent"
-    contents = "Gent\nParameters:\nμ:  Small strain shear modulus\n\nJₘ: Limiting stretch invariant\n\n\nModel:\nW = -\\frac{\\mu J_m}{2}\\log{\\bigg(1-\\frac{I_1-3}{J_m}\\bigg)}\nGent AN. A new constitutive relation for rubber. Rubber chemistry and technology. 1996 Mar;69(1):59-61.\n\n\n"
+    contents = "Gent\nModel:\nW = -\\frac{\\mu J_m}{2}\\log{\\bigg(1-\\frac{I_1-3}{J_m}\\bigg)}\nParameters:\nμ:  Small strain shear modulus\n\nJₘ: Limiting stretch invariant\n\n\nGent AN. A new constitutive relation for rubber. Rubber chemistry and technology. 1996 Mar;69(1):59-61.\n\n\n"
     url = "Hyperelastics@dev/ref/Hyperelastics.Gent"
     [[input.files]]
     title = "Hyperelastics/isotropic_compressible_models.jl"
@@ -372,15 +376,15 @@ url_prefix = ""
     url = "Hyperelastics@dev/ref/Hyperelastics.GeneralConstitutiveModel_Tube"
     [[input.files]]
     title = "GornetDesmorat"
-    contents = "Gornet - Desmorat\nParameters: h₁, h₂, h₃\nModel: W = h_1\\int\\exp{h_3(I_1-3)^2}\\text{d}I_1+3h_2\\int\\frac{1}{\\sqrt{I_2}}\\text{d}I_2 = \\frac{h_1 \\sqrt{\\pi} \\text{erfi}(\\sqrt{h_3}(I_1-3)^2)}{2\\sqrt{h_3}}+6h_2\\sqrt{I_2}\nNote: the differential form was original form and the closed form SEF was determine via symbolic integration in Mathematica. The model is not compatible with AD and has methods for the Second Piola Kirchoff Stress Tensor and Cauchy Stress Tensor implemented.\n\n\nGornet L, Marckmann G, Desmorat R, Charrier P. A new isotropic hyperelastic strain energy function in terms of invariants and its derivation into a pseudo-elastic model for Mullins effect: application to finite element analysis. Constitutive Models for Rubbers VII. 2012:265-71.\n\n\n"
+    contents = "Gornet - Desmorat\nModel:\nW = h_1\\int\\exp{h_3(I_1-3)^2}\\text{d}I_1+3h_2\\int\\frac{1}{\\sqrt{I_2}}\\text{d}I_2 = \\frac{h_1 \\sqrt{\\pi} \\text{erfi}(\\sqrt{h_3}(I_1-3)^2)}{2\\sqrt{h_3}}+6h_2\\sqrt{I_2}\nParameters:\nh₁\n\nh₂\n\nh₃\n\n\nNote:\nThe differential form was original form and the closed form SEF was determine via symbolic integration in Mathematica. The model is not compatible with AD and has methods for the Second Piola Kirchoff Stress Tensor and Cauchy Stress Tensor implemented.\n\n\nGornet L, Marckmann G, Desmorat R, Charrier P. A new isotropic hyperelastic strain energy function in terms of invariants and its derivation into a pseudo-elastic model for Mullins effect: application to finite element analysis. Constitutive Models for Rubbers VII. 2012:265-71.\n\n\n"
     url = "Hyperelastics@dev/ref/Hyperelastics.GornetDesmorat"
     [[input.files]]
     title = "Beatty"
-    contents = "Beatty Model\nParameters: G₀, Iₘ\nModel:\nW = -\\frac{G_0 I_m(I_m-3)}{2(2I_m-3)}\\log\\bigg(\\frac{1-\\frac{I_1-3}{I_m-3}}{1+\\frac{I_1-3}{I_m}} \\bigg)\nBeatty MF. On constitutive models for limited elastic, molecular based materials. Mathematics and mechanics of solids. 2008 Jul;13(5):375-87.\n\n\n"
+    contents = "Beatty Model\nModel:\nW = -\\frac{G_0 I_m(I_m-3)}{2(2I_m-3)}\\log\\bigg(\\frac{1-\\frac{I_1-3}{I_m-3}}{1+\\frac{I_1-3}{I_m}} \\bigg)\nParameters:\nG₀\n\nIₘ\n\n\nBeatty MF. On constitutive models for limited elastic, molecular based materials. Mathematics and mechanics of solids. 2008 Jul;13(5):375-87.\n\n\n"
     url = "Hyperelastics@dev/ref/Hyperelastics.Beatty"
     [[input.files]]
     title = "Carroll"
-    contents = "Carroll\nParameters: A, B, C\nModel:\nW = AI_1+BI_1^4+C\\sqrt{I_2}\nCarroll M. A strain energy function for vulcanized rubbers. Journal of Elasticity. 2011 Apr;103(2):173-87.\n\n\n"
+    contents = "Carroll\nModel:\nW = AI_1+BI_1^4+C\\sqrt{I_2}\nParameters:\nA\n\nB\n\nC\n\n\nCarroll M. A strain energy function for vulcanized rubbers. Journal of Elasticity. 2011 Apr;103(2):173-87.\n\n\n"
     url = "Hyperelastics@dev/ref/Hyperelastics.Carroll"
     [[input.files]]
     title = "Hyperelastics/model_functions.jl"
@@ -388,11 +392,11 @@ url_prefix = ""
     url = "Hyperelastics@dev/src/model_functions.jl"
     [[input.files]]
     title = "Tube"
-    contents = "Tube\nParameters: Gc, Ge, β\nModel:\nW = \\sum\\limits_{i=1}^{3}\\frac{G_c}{2}(\\lambda_i^2-1)+\\frac{2Ge}{\\beta^2}(\\lambda_i^{-\\beta}-1)\nHeinrich G, Kaliske M. Theoretical and numerical formulation of a molecular based constitutive tube-model of rubber elasticity. Computational and Theoretical Polymer Science. 1997 Jan 1;7(3-4):227-41.\n\n\n"
+    contents = "Tube\nModel:\nW = \\sum\\limits_{i=1}^{3}\\frac{G_c}{2}(\\lambda_i^2-1)+\\frac{2Ge}{\\beta^2}(\\lambda_i^{-\\beta}-1)\nParameters:\nGc\n\nGe\n\nβ\n\n\nHeinrich G, Kaliske M. Theoretical and numerical formulation of a molecular based constitutive tube-model of rubber elasticity. Computational and Theoretical Polymer Science. 1997 Jan 1;7(3-4):227-41.\n\n\n"
     url = "Hyperelastics@dev/ref/Hyperelastics.Tube"
     [[input.files]]
     title = "Attard"
-    contents = "Attard\nParameters: A⃗, B⃗\nModel:\nW = \\sum\\limits_{i=1}^N\\frac{A_i}{2i}(\\lambda_1^{2i}+\\lambda_2^{2i}+\\lambda_3^{2i}-3) + \\frac{B_i}{2i}(\\lambda_1^{-2i}+\\lambda_2^{-2i}+\\lambda_3^{-2i}-3)\nAttard MM, Hunt GW. Hyperelastic constitutive modeling under finite strain. International Journal of Solids and Structures. 2004 Sep 1;41(18-19):5327-50.\n\n\n"
+    contents = "Attard\nModel:\nW = \\sum\\limits_{i=1}^N\\frac{A_i}{2i}(\\lambda_1^{2i}+\\lambda_2^{2i}+\\lambda_3^{2i}-3) + \\frac{B_i}{2i}(\\lambda_1^{-2i}+\\lambda_2^{-2i}+\\lambda_3^{-2i}-3)\nParameters:\nA⃗\n\nB⃗\n\n\nAttard MM, Hunt GW. Hyperelastic constitutive modeling under finite strain. International Journal of Solids and Structures. 2004 Sep 1;41(18-19):5327-50.\n\n\n"
     url = "Hyperelastics@dev/ref/Hyperelastics.Attard"
     [[input.files]]
     title = "toc_backup"
@@ -400,7 +404,7 @@ url_prefix = ""
     url = "Hyperelastics@dev/doc/toc_backup.md"
     [[input.files]]
     title = "ConstrainedJunction"
-    contents = "Constrained Junction \nParameters: Gc, νkT, κ\nModel:\nW = G_c (I_1-3)+ \\frac{\\nu k T}{2}(\\sum\\limits_{i=1}^{3}\\kappa\\frac{\\lambda_i-1}{\\lambda_i^2+\\kappa}+\\log{\\frac{\\lambda_i^2+\\kappa}{1+\\kappa}}-\\log{\\lambda_i^2})\nFlory PJ, Erman B. Theory of elasticity of polymer networks. 3. Macromolecules. 1982 May;15(3):800-6. Erman B, Flory PJ. Relationships between stress, strain, and molecular constitution of polymer networks. Comparison of theory with experiments. Macromolecules. 1982 May;15(3):806-11.\n\n\n"
+    contents = "Constrained Junction \nModel:\nW = G_c (I_1-3)+ \\frac{\\nu k T}{2}(\\sum\\limits_{i=1}^{3}\\kappa\\frac{\\lambda_i-1}{\\lambda_i^2+\\kappa}+\\log{\\frac{\\lambda_i^2+\\kappa}{1+\\kappa}}-\\log{\\lambda_i^2})\nParameters:\nGc\n\nνkT\n\nκ\n\n\nFlory PJ, Erman B. Theory of elasticity of polymer networks. 3. Macromolecules. 1982 May;15(3):800-6. Erman B, Flory PJ. Relationships between stress, strain, and molecular constitution of polymer networks. Comparison of theory with experiments. Macromolecules. 1982 May;15(3):806-11.\n\n\n"
     url = "Hyperelastics@dev/ref/Hyperelastics.ConstrainedJunction"
     [[input.files]]
     title = "Treloar1944Uniaxial"
@@ -408,23 +412,23 @@ url_prefix = ""
     url = "Hyperelastics@dev/ref/Hyperelastics.Treloar1944Uniaxial"
     [[input.files]]
     title = "Beda"
-    contents = "Beda\nParameters: C1, C2, C3, K1, α, β, ζ\nModel:\nW = \\frac{C_1}{\\alpha}(I_1-3)^{\\alpha}+C_2(I_1-3)+\\frac{C_3}{\\zeta}(I_1-3)^{\\zeta}+\\frac{K_1}{\\beta}(I_2-3)^\\beta\nBeda T. Reconciling the fundamental phenomenological expression of the strain energy of rubber with established experimental facts. Journal of Polymer Science Part B: Polymer Physics. 2005 Jan 15;43(2):125-34.\n\n\n"
+    contents = "Beda\nModel:\nW = \\frac{C_1}{\\alpha}(I_1-3)^{\\alpha}+C_2(I_1-3)+\\frac{C_3}{\\zeta}(I_1-3)^{\\zeta}+\\frac{K_1}{\\beta}(I_2-3)^\\beta\nParameters:\nC1\n\nC2\n\nC3\n\nK1\n\nα\n\nβ\n\nζ\n\n\nBeda T. Reconciling the fundamental phenomenological expression of the strain energy of rubber with established experimental facts. Journal of Polymer Science Part B: Polymer Physics. 2005 Jan 15;43(2):125-34.\n\n\n"
     url = "Hyperelastics@dev/ref/Hyperelastics.Beda"
     [[input.files]]
     title = "HossMarczakII"
-    contents = "Hoss Marczak II\nParameters: α, β, μ, b, n, C2\nModel:\nW = \\frac{\\alpha}{\\beta}(1-\\exp{-\\beta(I_1-3)})+\\frac{\\mu}{2b}\\bigg((1+\\frac{b}{n}(I_1-3))^n -1\\bigg)+C_2\\log(\\frac{I_2}{3})\nNote: The authors suggests this model for high strains.\n\n\nHoss L, Marczak RJ. A new constitutive model for rubber-like materials. Mecánica Computacional. 2010;29(28):2759-73.\n\n\n"
+    contents = "Hoss Marczak II\nModel:\nW = \\frac{\\alpha}{\\beta}(1-\\exp{-\\beta(I_1-3)})+\\frac{\\mu}{2b}\\bigg((1+\\frac{b}{n}(I_1-3))^n -1\\bigg)+C_2\\log(\\frac{I_2}{3})\nParameters:\nα\n\nβ\n\nμ\n\nb\n\nn\n\nC2\n\n\nNote:\nThe authors suggests this model for high strains.\n\n\nHoss L, Marczak RJ. A new constitutive model for rubber-like materials. Mecánica Computacional. 2010;29(28):2759-73.\n\n\n"
     url = "Hyperelastics@dev/ref/Hyperelastics.HossMarczakII"
     [[input.files]]
     title = "Isihara"
-    contents = "Isihara\nParameters: C10, C20, C01\nModel:\nW = \\sum\\limits_{i,j=0}^{2, 1}C_{i,j}(I_1-3)^i(I_2-3)^j\nIsihara A, Hashitsume N, Tatibana M. Statistical theory of rubber‐like elasticity. IV.(two‐dimensional stretching). The Journal of Chemical Physics. 1951 Dec;19(12):1508-12.\n\n\n"
+    contents = "Isihara\nModel:\nW = \\sum\\limits_{i,j=0}^{2, 1}C_{i,j}(I_1-3)^i(I_2-3)^j\nParameters:\nC10\n\nC20\n\nC01\n\n\nIsihara A, Hashitsume N, Tatibana M. Statistical theory of rubber‐like elasticity. IV.(two‐dimensional stretching). The Journal of Chemical Physics. 1951 Dec;19(12):1508-12.\n\n\n"
     url = "Hyperelastics@dev/ref/Hyperelastics.Isihara"
     [[input.files]]
     title = "Shariff"
-    contents = "Shariff\nParameters: E, α⃗\nModel:\nW = E\\sum\\limits_{i=1}^3\\sum\\limits_{j=1}^{N}|\\alpha_j| \\Phi_j(\\lambda_i)\nShariff MH. Strain energy function for filled and unfilled rubberlike material. Rubber chemistry and technology. 2000 Mar;73(1):1-8.\n\n\n"
+    contents = "Shariff\nModel:\nW = E\\sum\\limits_{i=1}^3\\sum\\limits_{j=1}^{N}|\\alpha_j| \\Phi_j(\\lambda_i)\nParameters:\nE\n\nα⃗\n\n\nShariff MH. Strain energy function for filled and unfilled rubberlike material. Rubber chemistry and technology. 2000 Mar;73(1):1-8.\n\n\n"
     url = "Hyperelastics@dev/ref/Hyperelastics.Shariff"
     [[input.files]]
     title = "GeneralBeda"
-    contents = "General Beda \nParameters: C, K, α, β\nModel:\nW = \\sum\\limits_{i = 1}^{N}\\frac{C_i}{\\alpha_i}(I_1-3)^{\\alpha_i} + \\sum\\limits_{j=1}^{M}\\frac{K_j}{\\beta_j}(I_2-3)^{\\beta_j}\nBeda T. Reconciling the fundamental phenomenological expression of the strain energy of rubber with established experimental facts. Journal of Polymer Science Part B: Polymer Physics. 2005 Jan 15;43(2):125-34.\n\n\n"
+    contents = "General Beda\nModel:\nW = \\sum\\limits_{i = 1}^{N}\\frac{C_i}{\\alpha_i}(I_1-3)^{\\alpha_i} + \\sum\\limits_{j=1}^{M}\\frac{K_j}{\\beta_j}(I_2-3)^{\\beta_j}\nParameters:\nC\n\nK\n\nα\n\nβ\n\n\nBeda T. Reconciling the fundamental phenomenological expression of the strain energy of rubber with established experimental facts. Journal of Polymer Science Part B: Polymer Physics. 2005 Jan 15;43(2):125-34.\n\n\n"
     url = "Hyperelastics@dev/ref/Hyperelastics.GeneralBeda"
     [[input.files]]
     title = "HyperelasticUniaxialTest"
@@ -432,7 +436,7 @@ url_prefix = ""
     url = "Hyperelastics@dev/ref/Hyperelastics.HyperelasticUniaxialTest"
     [[input.files]]
     title = "Lion"
-    contents = "Lion\nParameters: C10, C01, C50\nModel:\nW = \\sum\\limits_{i,j=0}^{5,1}C_{i,j}(I_1-3)^i(I_2-3)^j\nLion A. On the large deformation behaviour of reinforced rubber at different temperatures. Journal of the Mechanics and Physics of Solids. 1997 Nov 1;45(11-12):1805-34.\n\n\n"
+    contents = "Lion\nModel:\nW = \\sum\\limits_{i,j=0}^{5,1}C_{i,j}(I_1-3)^i(I_2-3)^j\nParameters:\nC10\n\nC01\n\nC50\n\n\nLion A. On the large deformation behaviour of reinforced rubber at different temperatures. Journal of the Mechanics and Physics of Solids. 1997 Nov 1;45(11-12):1805-34.\n\n\n"
     url = "Hyperelastics@dev/ref/Hyperelastics.Lion"
     [[input.files]]
     title = "AbstractDataDrivenHyperelasticModel"
@@ -444,19 +448,19 @@ url_prefix = ""
     url = "Hyperelastics@dev/ref/Hyperelastics.StrainEnergyDensityFunction"
     [[input.files]]
     title = "LopezPamies"
-    contents = "Lopez-Pamies\nParameters: α⃗, μ⃗\nModel:\nW = \\frac{3^{1 - \\alpha_i}}{2\\alpha_i} \\mu_i (I_1^{\\alpha_i} - 3^{\\alpha_i})\nLopez-Pamies O. A new I1-based hyperelastic model for rubber elastic materials. Comptes Rendus Mecanique. 2010 Jan 1;338(1):3-11.\n\n\n"
+    contents = "Lopez-Pamies\nModel:\nW = \\frac{3^{1 - \\alpha_i}}{2\\alpha_i} \\mu_i (I_1^{\\alpha_i} - 3^{\\alpha_i})\nParameters:\nα⃗\n\nμ⃗\n\n\nLopez-Pamies O. A new I1-based hyperelastic model for rubber elastic materials. Comptes Rendus Mecanique. 2010 Jan 1;338(1):3-11.\n\n\n"
     url = "Hyperelastics@dev/ref/Hyperelastics.LopezPamies"
     [[input.files]]
     title = "ContinuumHybrid"
-    contents = "Continuum Hybrid\nParameters: K₁, K₂, α, μ\nModel:\nW = K_1(I_1-3)+K_2\\log\\frac{I_2}{3}+\\frac{\\mu}{\\alpha}(\\lambda_1^\\alpha+\\lambda_2^\\alpha+\\lambda^\\alpha-3)\nBeda T, Chevalier Y. Hybrid continuum model for large elastic deformation of rubber. Journal of applied physics. 2003 Aug 15;94(4):2701-6.\n\n\n"
+    contents = "Continuum Hybrid\nModel:\nW = K_1(I_1-3)+K_2\\log\\frac{I_2}{3}+\\frac{\\mu}{\\alpha}(\\lambda_1^\\alpha+\\lambda_2^\\alpha+\\lambda^\\alpha-3)\nParameters:\nK₁\n\nK₂\n\nα\n\nμ\n\n\nBeda T, Chevalier Y. Hybrid continuum model for large elastic deformation of rubber. Journal of applied physics. 2003 Aug 15;94(4):2701-6.\n\n\n"
     url = "Hyperelastics@dev/ref/Hyperelastics.ContinuumHybrid"
     [[input.files]]
     title = "PucciSaccomandi"
-    contents = "Pucci-Saccomandi\nParameters: K, μ, Jₘ\nModel:\nW = K\\log{\\frac{I_2}{3}}-\\frac{\\mu J_m}{2}\\log{1-\\frac{I_1-3}{J-m}}\nPucci E, Saccomandi G. A note on the Gent model for rubber-like materials. Rubber chemistry and technology. 2002 Nov;75(5):839-52.\n\n\n"
+    contents = "Pucci-Saccomandi\nModel:\nW = K\\log{\\frac{I_2}{3}}-\\frac{\\mu J_m}{2}\\log{1-\\frac{I_1-3}{J-m}}\nParameters:\nK\n\nμ\n\nJₘ\n\n\nPucci E, Saccomandi G. A note on the Gent model for rubber-like materials. Rubber chemistry and technology. 2002 Nov;75(5):839-52.\n\n\n"
     url = "Hyperelastics@dev/ref/Hyperelastics.PucciSaccomandi"
     [[input.files]]
     title = "HorganMurphy"
-    contents = "Horgan Murphy Model\nParameters: μ, Jₘ, c\nModel: -\\frac{2\\mu J_m}{c^2}\\log\\bigg(1-\\frac{\\lambda_1^c+\\lambda_2^c+\\lambda_3^c-3}{J_m})\nHorgan CO, Murphy JG. Limiting chain extensibility constitutive models of Valanis–Landel type. Journal of Elasticity. 2007 Feb;86(2):101-11.\n\n\n"
+    contents = "Horgan Murphy Model\nModel:\nW = -\\frac{2\\mu J_m}{c^2}\\log\\bigg(1-\\frac{\\lambda_1^c+\\lambda_2^c+\\lambda_3^c-3}{J_m})\nParameters:\nμ\n\nJₘ\n\nc\n\n\nHorgan CO, Murphy JG. Limiting chain extensibility constitutive models of Valanis–Landel type. Journal of Elasticity. 2007 Feb;86(2):101-11.\n\n\n"
     url = "Hyperelastics@dev/ref/Hyperelastics.HorganMurphy"
     [[input.files]]
     title = "Hyperelastics/Hyperelastics.jl"
@@ -464,7 +468,7 @@ url_prefix = ""
     url = "Hyperelastics@dev/src/Hyperelastics.jl"
     [[input.files]]
     title = "EdwardVilgis"
-    contents = "Edward-Vilgis\nParameters:\nNs: Number of sliplinks\n\nNc: Number of crosslinks\n\nα: A measure of chain inextensibility\n\nη: A measure of the amount of chain slippage\n\n\nNote: Since α and η result from the same mechanism, they should be of approximately the same order of magnitude. Large differences between the two may indicate an issue with the optimizer or initial guess. Model:\nW = \\frac{1}{2}N_C\\Bigg[\\frac{(1-\\alpha^2)I_1}{1-\\alpha^2I_1}+\\log(1-\\alpha^2I_1)\\Bigg]+\\frac{1}{2}N_S\\Bigg[\\sum_{i=1}^{3}\\Big\\{\\frac{(1+\\eta)(1-\\alpha^2)\\lambda_i^2}{( 1+\\eta\\lambda_i^2)(1-\\alpha^2I_1)}+\\log(1+\\eta\\lambda_i^2)\\Big\\}+\\log(1-\\alpha^2I_1)\\Bigg]\nEdwards SF, Vilgis T. The effect of entanglements in rubber elasticity. Polymer. 1986 Apr 1;27(4):483-92.\n\n\n"
+    contents = "Edward-Vilgis\nModel:\nW = \\frac{1}{2}N_C\\Bigg[\\frac{(1-\\alpha^2)I_1}{1-\\alpha^2I_1}+\\log(1-\\alpha^2I_1)\\Bigg]+\\frac{1}{2}N_S\\Bigg[\\sum_{i=1}^{3}\\Big\\{\\frac{(1+\\eta)(1-\\alpha^2)\\lambda_i^2}{( 1+\\eta\\lambda_i^2)(1-\\alpha^2I_1)}+\\log(1+\\eta\\lambda_i^2)\\Big\\}+\\log(1-\\alpha^2I_1)\\Bigg]\nParameters:\nNs: Number of sliplinks\n\nNc: Number of crosslinks\n\nα: A measure of chain inextensibility\n\nη: A measure of the amount of chain slippage\n\n\nNote:\nSince α and η result from the same mechanism, they should be of approximately the same order of magnitude. Large differences between the two may indicate an issue with the optimizer or initial guess.\n\n\nEdwards SF, Vilgis T. The effect of entanglements in rubber elasticity. Polymer. 1986 Apr 1;27(4):483-92.\n\n\n"
     url = "Hyperelastics@dev/ref/Hyperelastics.EdwardVilgis"
     [[input.files]]
     title = "LogarithmicCompressible"
@@ -476,7 +480,7 @@ url_prefix = ""
     url = "Hyperelastics@dev/ref/Hyperelastics.HyperelasticProblem"
     [[input.files]]
     title = "Knowles"
-    contents = "Knowles\nParameters: μ, b, n\nModel:\nW = \\frac{\\mu}{2b}((1+\\frac{b}{n}(I_1-3))^n-1)\nKnowles JK. The finite anti-plane shear field near the tip of a crack for a class of incompressible elastic solids. International Journal of Fracture. 1977 Oct;13(5):611-39.\n\n\n"
+    contents = "Knowles\nModel:\nW = \\frac{\\mu}{2b}((1+\\frac{b}{n}(I_1-3))^n-1)\nParameters:\nμ\n\nb\n\nn\n\n\nKnowles JK. The finite anti-plane shear field near the tip of a crack for a class of incompressible elastic solids. International Journal of Fracture. 1977 Oct;13(5):611-39.\n\n\n"
     url = "Hyperelastics@dev/ref/Hyperelastics.Knowles"
     [[input.files]]
     title = "SussmanBathe"
@@ -484,7 +488,7 @@ url_prefix = ""
     url = "Hyperelastics@dev/ref/Hyperelastics.SussmanBathe"
     [[input.files]]
     title = "ZunigaBeatty"
-    contents = "Zuniga - Beatty\nParameters: μ, N₃, N₈\nModel:\nW = \\sqrt{\\frac{N_3+N_8}{2N_3}}W_{3Chain}+\\sqrt{\\frac{I_1}{3N_8}}W_{8Chain}\nElı́as-Zúñiga A, Beatty MF. Constitutive equations for amended non-Gaussian network models of rubber elasticity. International journal of engineering science. 2002 Dec 1;40(20):2265-94.\n\n\n"
+    contents = "Zuniga - Beatty\nModel:\nW = \\sqrt{\\frac{N_3+N_8}{2N_3}}W_{3Chain}+\\sqrt{\\frac{I_1}{3N_8}}W_{8Chain}\nParameters:\nμ\n\nN₃\n\nN₈\n\n\nElı́as-Zúñiga A, Beatty MF. Constitutive equations for amended non-Gaussian network models of rubber elasticity. International journal of engineering science. 2002 Dec 1;40(20):2265-94.\n\n\n"
     url = "Hyperelastics@dev/ref/Hyperelastics.ZunigaBeatty"
     [[input.files]]
     title = "StabilitySmoothedSussmanBathe"
