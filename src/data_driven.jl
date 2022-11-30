@@ -79,7 +79,6 @@ function StabilitySmoothedSussmanBathe(p)
 
     # Smoothing Function
     f(B, _) = [(1-q)*f̂(Ê, B)]#+ q * f̃_curve(B)]
-    # f(B, _) = [(1 - q) * f̂(σ⃗(Ê, B), B) + q * f̃_stability(B)]
     # Optimize the Control Point
     func = OptimizationFunction(f, Optimization.AutoForwardDiff())
     prob = OptimizationProblem(func, randn(n), [])

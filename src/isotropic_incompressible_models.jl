@@ -1470,14 +1470,6 @@ function parameter_bounds(ψ::HorganSaccomandi, data::AbstractHyperelasticTest)
     return (lb=lb, ub=ub)
 end
 
-# function constraints(ψ::HorganSaccomandi, data::AbstractHyperelasticTest)
-#     I₁_max = maximum(I₁.(data.λ⃗))
-#     I₂_max = maximum(I₂.(data.λ⃗))
-#     f(u, p) = [(u.J^3 - u.J^2 * I₁_max + u.J * I₂_max - 1) / (u.J - 1)^3]
-#     return f
-# end
-
-
 """
 Beatty Model
 
@@ -1529,16 +1521,9 @@ function parameters(ψ::HorganMurphy)
     return (:μ, :J, :c)
 end
 
-# function parameter_bounds(ψ::HorganMurphy, data::AbstractHyperelasticTest)
-#     lb = (μ = 0.0, J = 0.0, c = 1.0)
-#     ub = nothing
-#     return (lb = lb, ub = ub)
-# end
 function constraints(ψ::HorganMurphy, data::AbstractHyperelasticTest)
     function f(res, u, p)
         max_sum = minimum(λ⃗ -> (sum(λ⃗ .^ u[3]) - 3) / u[2], p.test.data.λ)
-        # max_sum = maximum(λ⃗ -> (sum(λ⃗ .^ u.c) - 3) / u.J, p.test.data.λ)
-        # display(max_sum)
         res .= [max_sum]
         res
     end
@@ -1847,7 +1832,6 @@ function NonlinearContinua.StrainEnergyDensity(ψ::MCC, λ⃗::AbstractVector, (
     @tullio W2 := B[i] - log(1 + B[i])
     @tullio W3 := D[i] - log(1 + D[i])
     return 1 / 2 * ζkT * W1 + 1 / 2 * μkT * (W2 + W3)
-    # W(λ⃗) = 1 / 2 * ζkT * sum(i -> λ⃗[i]^2 - 1, 1:3) + 1 / 2 * μkT * sum(i -> κ^2 * (λ⃗[i]^2 - 1) * (λ⃗[i]^2 + κ)^(-2) + (λ⃗[i]^2 * (κ^2 * (λ⃗[i]^2 - 1) * (λ⃗[i]^2 + κ)^(-2)) / κ) - log(1 + (κ^2 * (λ⃗[i]^2 - 1) * (λ⃗[i]^2 + κ)^(-2))) - log(1 + (λ⃗[i]^2 * (κ^2 * (λ⃗[i]^2 - 1) * (λ⃗[i]^2 + κ)^(-2)) / κ)), 1:3)
 end
 
 function parameters(ψ::MCC)

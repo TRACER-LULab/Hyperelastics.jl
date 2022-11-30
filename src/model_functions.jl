@@ -127,15 +127,3 @@ Returns a constraint equation for models were parameters bounds are interdepende
 function constraints(ψ::AbstractHyperelasticModel, data::AbstractHyperelasticTest)
     return nothing
 end
-
-"""
-returns the bibtex entry for the model
-"""
-function citation(ψ::AbstractHyperelasticModel)
-    @error "model $(ψ) does not have a citation defined in the bib file. Please file an issue to have the citation added"
-end
-
-function get_citation(s::AbstractString)
-    bib_file = import_bibtex("../CITATIONS.bib")
-    export_bibtex(bib_file[s])
-end

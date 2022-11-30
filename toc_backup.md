@@ -1,4 +1,4 @@
-[**Introduction**](README.md)
+<!-- [**Introduction**](README.md)
 
 ---
 **Examples**
@@ -8,4 +8,4 @@
 [**API Reference**](docstrings.md)
 
 ---
-[**LICENSE**](LICENSE.md)
+[**LICENSE**](LICENSE.md) -->
