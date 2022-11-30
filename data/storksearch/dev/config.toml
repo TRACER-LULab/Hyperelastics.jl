@@ -1,0 +1,492 @@
+[input]
+base_directory = "."
+url_prefix = ""
+
+    [[input.files]]
+    title = "ABGI"
+    contents = "ABGI\nParameters: μ, N, Ge, n\nModel:\nW = W_{Arruda-Boyce} + G_e\\frac{\\lambda_1^n+\\lambda_2^2+\\lambda_3^2-3}{n}\nMeissner B, Matějka L. A Langevin-elasticity-theory-based constitutive equation for rubberlike networks and its comparison with biaxial stress–strain data. Part I. Polymer. 2003 Jul 1;44(16):4599-610.\n\n\n"
+    url = "Hyperelastics@dev/ref/Hyperelastics.ABGI"
+    [[input.files]]
+    title = "Bootstrapped8Chain"
+    contents = "Bootstrapped 8Chain Model\nNote: The field ℒinv can be set to change the inverse Langevin function approximation used.\nParameters: μ, N\nModel:\nW = W_8(\\frac{\\sum\\lambda}{\\sqrt{3N}}-\\frac{\\lambda_{chain}}{\\sqrt{N}})+W_{8}(\\frac{\\lambda_{chain}}{\\sqrt{N}})\nwhere:\nW_8(x) = \\mu N (x \\mathcal{L}^{-1}(x) + \\log\\frac{\\mathcal{L}^{-1}(x)}{\\sinh\\mathcal{L}^{-1}(x)})\n\\lambda_{chain} = \\sqrt{\\frac{I_1}{3}}\nMiroshnychenko D, Green WA, Turner DM. Composite and filament models for the mechanical behaviour of elastomeric materials. Journal of the Mechanics and Physics of Solids. 2005 Apr 1;53(4):748-70. Miroshnychenko D, Green WA. Heuristic search for a predictive strain-energy function in nonlinear elasticity. International Journal of Solids and Structures. 2009 Jan 15;46(2):271-86.\n\n\n"
+    url = "Hyperelastics@dev/ref/Hyperelastics.Bootstrapped8Chain"
+    [[input.files]]
+    title = "Gregory"
+    contents = "Gregory\nParameters: A, B, C, m, n\nModel:\nW = \\frac{A}{2-n}(I_1-3+C^2)^{1-\\frac{n}{2}}+\\frac{B}{2+m}(I_1-3+C^2)^{1+\\frac{m}{2}}\nGregory IH, Muhr AH, Stephens IJ. Engineering applications of rubber in simple extension. Plastics rubber and composites processing and applications. 1997;26(3):118-22.\n\n\n"
+    url = "Hyperelastics@dev/ref/Hyperelastics.Gregory"
+    [[input.files]]
+    title = "HartSmith"
+    contents = "Hart-Smith\nParameters: G, k₁, k₂\nModel:\nW = \\frac{G\\exp{(-9k_1+k_1I_1)}}{k_1}+Gk_2\\log{I_2}\nHart-Smith LJ. Elasticity parameters for finite deformations of rubber-like materials. Zeitschrift für angewandte Mathematik und Physik ZAMP. 1966 Sep;17(5):608-26.\n\n\n"
+    url = "Hyperelastics@dev/ref/Hyperelastics.HartSmith"
+    [[input.files]]
+    title = "Hyperelastics"
+    contents = "Hyperelastics"
+    url = "Hyperelastics@dev/ref/Hyperelastics"
+    [[input.files]]
+    title = "Zhao"
+    contents = "Zhao\nParameters: C₋₁¹,, C₁¹, C₂¹, C₂²\nModel:\nW = C_{-1}^1*(I_2-3)+C_{1}^{1}(I_1-3)+C_{2}^{1}(I_1^2-2I_2-3)+C_{2}^{2}(I_1^2-2I_2-3)^2\nZhao Z, Mu X, Du F. Modeling and verification of a new hyperelastic model for rubber-like materials. Mathematical Problems in Engineering. 2019 May 2;2019.\n\n\n"
+    url = "Hyperelastics@dev/ref/Hyperelastics.Zhao"
+    [[input.files]]
+    title = "DataDrivenAverageChainBehavior"
+    contents = "Average Chain Behavior - Data-Driven \nAdapted from the code provided in the article's supplementary material\nParameters: data: Hyperelastic Data Object fchain(λch, pch): A function for interpolating the stress-stretch behavior of the chain\n > Amores VJ, Benítez JM, Montáns FJ. Average-chain behavior of isotropic incompressible polymers obtained from macroscopic experimental data. A simple structure-based WYPiWYG model in Julia language. Advances in Engineering Software. 2019 Apr 1;130:41-57.\n\n"
+    url = "Hyperelastics@dev/ref/Hyperelastics.DataDrivenAverageChainBehavior"
+    [[input.files]]
+    title = "ExpLn"
+    contents = "Exp-Ln\nParameters: A, a, b\nModel:\nW = A\\bigg[\\frac{1}{a}\\exp{(a(I_1-3))}+b(I_1-2)(1-\\log{I_1-2})-\\frac{1}{a}-b\\bigg]\nKhajehsaeid H, Arghavani J, Naghdabadi R. A hyperelastic constitutive model for rubber-like materials. European Journal of Mechanics-A/Solids. 2013 Mar 1;38:144-51.\n\n\n"
+    url = "Hyperelastics@dev/ref/Hyperelastics.ExpLn"
+    [[input.files]]
+    title = "PengLandel"
+    contents = "Peng - Landel\nParameters: E\nModel:\nW = E\\sum\\limits_{i=1}^{3}\\bigg[\\lambda_i - 1 - \\log(\\lambda_i) - \\frac{1}{6}\\log(\\lambda_i)^2 + \\frac{1}{18}\\log(\\lambda_i)^3-\\frac{1}{216}\\log(\\lambda_i)^4\\bigg]\nPeng TJ, Landel RF. Stored energy function of rubberlike materials derived from simple tensile data. Journal of Applied Physics. 1972 Jul;43(7):3064-7.\n\n\n"
+    url = "Hyperelastics@dev/ref/Hyperelastics.PengLandel"
+    [[input.files]]
+    title = "Lim"
+    contents = "Lim\nParameters: μ₁, μ₂, N, Î₁\nModel:\nW = (1-f(\\frac{I_1-3}{\\hat{I_1}-3}))W_{NeoHookean}(μ₁)+fW_{ArrudaBoyce}(μ₂, N)\nLim GT. Scratch behavior of polymers. Texas A&M University; 2005.\n\n\n"
+    url = "Hyperelastics@dev/ref/Hyperelastics.Lim"
+    [[input.files]]
+    title = "Biderman"
+    contents = "Biderman\nParameters: C10, C01, C20, C30\nModel:\nW = \\sum\\limits_{i,j=0}^{3, 1}C_{i,j}(I_1-3)^i(I_2-3)^j\nBiderman VL. Calculation of rubber parts. Rascheti na prochnost. 1958;40.\n\n\n"
+    url = "Hyperelastics@dev/ref/Hyperelastics.Biderman"
+    [[input.files]]
+    title = "ModifiedGregory"
+    contents = "Modified Gregory\nParameters: A, α, M, B, β, N\nModel:\nW = \\frac{A}{1+\\alpha}(I_1-3+M^2)^{1+\\alpha}+\\frac{B}{1+\\beta}(I_1-3+N^2)^{1+\\beta}\nHe H, Zhang Q, Zhang Y, Chen J, Zhang L, Li F. A comparative study of 85 hyperelastic constitutive models for both unfilled rubber and highly filled rubber nanocomposite material. Nano Materials Science. 2021 Jul 16.\n\n\n"
+    url = "Hyperelastics@dev/ref/Hyperelastics.ModifiedGregory"
+    [[input.files]]
+    title = "MansouriDarijani"
+    contents = "Mansouri-Darijani\nParameters: A1, m1, B1, n1\nModel:\nW = A_1\\exp{m_1(I_1-3)-1}+B_1\\exp{n_1(I_2-3)-1}\nMansouri MR, Darijani H. Constitutive modeling of isotropic hyperelastic materials in an exponential framework using a self-contained approach. International Journal of Solids and Structures. 2014 Dec 1;51(25-26):4316-26.\n\n\n"
+    url = "Hyperelastics@dev/ref/Hyperelastics.MansouriDarijani"
+    [[input.files]]
+    title = "FungDemiray"
+    contents = "Fung-Demiray\nParameters: μ, b\nModel:\nW = \\frac{\\mu}{2 * b} (\\exp(b(I_1 - 3)) - 1)\nFung YC. Elasticity of soft tissues in simple elongation. American Journal of Physiology-Legacy Content. 1967 Dec 1;213(6):1532-44. Demiray H. A note on the elasticity of soft biological tissues. Journal of biomechanics. 1972 May 1;5(3):309-11.\n\n\n"
+    url = "Hyperelastics@dev/ref/Hyperelastics.FungDemiray"
+    [[input.files]]
+    title = "GeneralConstitutiveModel"
+    contents = "General Constitutive Model\nParameters: Gc, Ge, N\nModel:\nW = G_c N \\log\\bigg(\\frac{3N+\\frac{1}{2}I_1}{3N-I_1}\\bigg)+G_e\\sum\\limits_{i=1}^{3}\\frac{1}{\\lambda_I}\nXiang Y, Zhong D, Wang P, Mao G, Yu H, Qu S. A general constitutive model of soft elastomers. Journal of the Mechanics and Physics of Solids. 2018 Aug 1;117:110-22.\n\n\n"
+    url = "Hyperelastics@dev/ref/Hyperelastics.GeneralConstitutiveModel"
+    [[input.files]]
+    title = "ExtendedTubeModel"
+    contents = "Extended Tube Model\nParameters: Gc, Ge, δ, β\nModel:\nW = \\frac{G_c}{2}\\bigg[\\frac{(1-\\delta^2)(I_1-3)}{1-\\delta^2(I_1-3)}+\\log{(1-\\delta^2(I_1-3))}\\bigg]+\\frac{2G_e}{\\beta^2}\\sum\\limits_{i=1}^{3}(\\lambda_i^{-\\beta}-1)\nKaliske M, Heinrich G. An extended tube-model for rubber elasticity: statistical-mechanical theory and finite element implementation. Rubber Chemistry and Technology. 1999 Sep;72(4):602-32.\n\n\n"
+    url = "Hyperelastics@dev/ref/Hyperelastics.ExtendedTubeModel"
+    [[input.files]]
+    title = "DavisDeThomas"
+    contents = "Davis-DeThomas\nParameters: A, n, C, k\nModel:\nW = \\frac{A}{2(1-\\frac{n}{2})}(I_1-3+C^2)^{1-\\frac{n}{2}}+k(I_1-3)^2\nDavies CK, De DK, Thomas AG. Characterization of the behavior of rubber for engineering design purposes. 1. Stress-strain relations. Rubber chemistry and technology. 1994 Sep;67(4):716-28.\n\n\n"
+    url = "Hyperelastics@dev/ref/Hyperelastics.DavisDeThomas"
+    [[input.files]]
+    title = "ContinuumModels"
+    contents = "ContinuumModels\n\n"
+    url = "Hyperelastics@dev/doc/NonlinearContinua/README.md"
+    [[input.files]]
+    title = "AffineMicroSphere"
+    contents = "Affine Micro-Sphere\nNote: The field ℒinv can be set to change the inverse Langevin function approximation used\nParameters: μ, N, p, U, q\nModel: See Paper\n\nMiehe C, Göktepe S, Lulei F. A micro-macro approach to rubber-like materials—part I: the non-affine micro-sphere model of rubber elasticity. Journal of the Mechanics and Physics of Solids. 2004 Nov 1;52(11):2617-60.\n\n\n"
+    url = "Hyperelastics@dev/ref/Hyperelastics.AffineMicroSphere"
+    [[input.files]]
+    title = "ModifiedYeoh"
+    contents = "Modified Yeoh\nParameters: C10, C20, C30, α, β\nModel:\nW = C_{10} * (I_1 - 3) + C_{20} * (I_1 - 3)^2 + C_{30} * (I_1 - 3)^3 + \\alpha / \\beta * (1 - \\exp{-\\beta * (I_1 - 3)})\nHe H, Zhang Q, Zhang Y, Chen J, Zhang L, Li F. A comparative study of 85 hyperelastic constitutive models for both unfilled rubber and highly filled rubber nanocomposite material. Nano Materials Science. 2021 Jul 16.\n\n\n"
+    url = "Hyperelastics@dev/ref/Hyperelastics.ModifiedYeoh"
+    [[input.files]]
+    title = "MCC"
+    contents = "MCC (modified constrained chain)\nParameters:\nModel:\nW = \\frac{1}{2}\\zeta k T \\sum\\limits_{i=1}^{3}(\\lambda_i^2-1)+\\frac{1}{2}\\mu k T\\sum\\limits_{i=1}^{3}[B_i+D_i-\\log{(1+B_i)}-\\log{(1+D_i)}]\nB_i = \\frac{\\kappa^2(\\lambda_i^2-1)}{(\\lambda_i^2+\\kappa)^2}\nD_i = \\frac{\\lambda_i^2 B_i}{\\kappa}\nErman B, Monnerie L. Theory of elasticity of amorphous networks: effect of constraints along chains. Macromolecules. 1989 Aug;22(8):3342-8.\n\n\n"
+    url = "Hyperelastics@dev/ref/Hyperelastics.MCC"
+    [[input.files]]
+    title = "NonaffineTube"
+    contents = "Nonaffine - Tube\nParameters: Gc, Ge\nModel: G_c \\sum\\limits_{i=1}^{3}\\frac{\\lambda_i^2}{2}+G_e\\sum\\limits_{i=1}^{3}\\lambda_i+\\frac{1}{\\lambda_i}\nRubinstein M, Panyukov S. Nonaffine deformation and elasticity of polymer networks. Macromolecules. 1997 Dec 15;30(25):8036-44.\n\n\n"
+    url = "Hyperelastics@dev/ref/Hyperelastics.NonaffineTube"
+    [[input.files]]
+    title = "HossMarczakI"
+    contents = "Hoss Marczak I\nParameters: α, β, μ, b, n\nModel:\nW = \\frac{\\alpha}{\\beta}(1-\\exp{-\\beta(I_1-3)})+\\frac{\\mu}{2b}\\bigg((1+\\frac{b}{n}(I_1-3))^n -1\\bigg)\nNote: The authors suggested this model for low strains.\n\n\nHoss L, Marczak RJ. A new constitutive model for rubber-like materials. Mecánica Computacional. 2010;29(28):2759-73.\n\n\n"
+    url = "Hyperelastics@dev/ref/Hyperelastics.HossMarczakI"
+    [[input.files]]
+    title = "GeneralConstitutiveModel_Network"
+    contents = "GeneralConstitutiveModel_Network"
+    url = "Hyperelastics@dev/ref/Hyperelastics.GeneralConstitutiveModel_Network"
+    [[input.files]]
+    title = "N"
+    contents = "N"
+    url = "Hyperelastics@dev/ref/Hyperelastics.N"
+    [[input.files]]
+    title = "Hyperelastics/datasets.jl"
+    contents = "λ₁ λ₁ λ₁ λ₂ λ₁ fill λ₁ length λ₂ s₁ s₂ λ₁ λ₂ λ₁ fill λ₁ length λ₂ s₁ s₂ λ₁ λ₂ λ₁ fill λ₁ length λ₂ s₁ s₂ λ₁ λ₂ λ₁ fill λ₁ length λ₂ s₁ s₂ λ₁ λ₂ λ₁ fill λ₁ length λ₂ s₁ s₂ λ₁ λ₂ λ₁ fill λ₁ length λ₂ s₁ s₂ λ₁ λ₂ λ₁ fill λ₁ length λ₂ s₁ s₂ λ₁ λ₂ λ₁ fill λ₁ length λ₂ s₁ s₂ λ₁ λ₂ λ₁ fill λ₁ length λ₂ s₁ s₂ λ₁ λ₂ λ₁ fill λ₁ length λ₂ s₁ s₂ λ₁ λ₂ λ₁ fill λ₁ length λ₂ s₁ s₂ λ₁ λ₂ λ₁ fill λ₁ length λ₂ s₁ s₂ λ₁ λ₂ λ₁ fill λ₁ length λ₂ s₁ s₂ λ₁ λ₂ λ₁ fill λ₁ length λ₂ s₁ s₂ λ₁ λ₂ λ₁ fill λ₁ length λ₂ s₁ s₂ λ₁ λ₂ λ₁ fill λ₁ length λ₂ s₁ s₂ λ₁ λ₂ λ₁ fill λ₁ length λ₂ s₁ s₂ λ₁ λ₂ λ₁ fill λ₁ length λ₂ s₁ s₂ λ₁ λ₂ s₁ s₂ name s₁ λ₁ data λ₁ s₁ name \n"
+    url = "Hyperelastics@dev/src/datasets.jl"
+    [[input.files]]
+    title = "LICENSE"
+    contents = "MIT License\nCopyright (c) 2022 TRACER Lab at Liberty University\nPermission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the \"Software\"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:\nThe above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.\n\n"
+    url = "Hyperelastics@dev/doc/LICENSE.md"
+    [[input.files]]
+    title = "Hyperelastics"
+    contents = "Hyperelastics\nStable Dev\nA hyperelastic model library and fitting toolkit developed by TRACER Lab at Liberty University. A constructor is provided for GalacticOptim.jl for parameter fitting based on experimental data.\nCitations\nAll relevant citations are located in CITATIONS.bib You should have access to the available recordings.\n\n"
+    url = "Hyperelastics@dev/doc/README.md"
+    [[input.files]]
+    title = "Bechir4Term"
+    contents = "Bechir-4 Term\nParameters: C11, C12, C21, C22\nModel:\nW = C_1^1(I_1-3)+\\sum\\limits_{n=1}^{2}\\sum\\limits_{r=1}^{2}C_n^{r}(\\lambda_1^{2n}+\\lambda_2^{2n}+\\lambda_3^{2n}-3)^r\nKhajehsaeid H, Arghavani J, Naghdabadi R. A hyperelastic constitutive model for rubber-like materials. European Journal of Mechanics-A/Solids. 2013 Mar 1;38:144-51.\n\n\n"
+    url = "Hyperelastics@dev/ref/Hyperelastics.Bechir4Term"
+    [[input.files]]
+    title = "Swanson"
+    contents = "Swanson\nParameters: A⃗, α⃗, B⃗, β⃗\nModel:\nW = \\sum\\limits_{i=1}^{N} \\frac{3}{2}(\\frac{A_i}{1+\\alpha_i}(\\frac{I_1}{3})^{1+\\alpha_i}+\\frac{B_i}{1+\\beta_i}(\\frac{I_2}{3})^{1+\\beta_i}\nSwanson SR. A constitutive model for high elongation elastic materials.\n\n\n"
+    url = "Hyperelastics@dev/ref/Hyperelastics.Swanson"
+    [[input.files]]
+    title = "LambertDianiRey"
+    contents = "Lambert-Diani Rey\nParameters: aᵢ, bᵢ\nModel:\nW = \\int\\limits_{3}^{I_1}\\exp\\bigg(\\sum\\limits_{i=0}^{n}a_i(I_1-3)^i\\bigg)\\text{d}I_1+\\int\\limits_{3}^{I_2}\\sum\\limits_{j=0}^{m}b_i\\log(I_2)^i\\text{d}I_2\nLambert-Diani J, Rey C. New phenomenological behavior laws for rubbers and thermoplastic elastomers. European Journal of Mechanics-A/Solids. 1999 Nov 1;18(6):1027-43.\n\n\n"
+    url = "Hyperelastics@dev/ref/Hyperelastics.LambertDianiRey"
+    [[input.files]]
+    title = "test"
+    contents = "\n"
+    url = "Hyperelastics@dev/doc/test.md"
+    [[input.files]]
+    title = "GeneralMooneyRivlin"
+    contents = "General Mooney Rivlin\nParameters: [C]\nModel: W = \\sum\\limits_{i,j = 0}^{N,M} C_{i,j}(I_1-3)^i(I_2-3)^j\nMooney M. A theory of large elastic deformation. Journal of applied physics. 1940 Sep;11(9):582-92.\n\n\n"
+    url = "Hyperelastics@dev/ref/Hyperelastics.GeneralMooneyRivlin"
+    [[input.files]]
+    title = "Hyperelastics/material_tests.jl"
+    contents = "T S λ Vector T s Vector S data StructVector name String λ₁ s₁ name incompressible length λ₁ length s₁ incompressible λ₂ λ₃ sqrt λ₁ λ₂ λ₃ Vector eltype λ₁ undef length λ₁ λ collect zip λ₁ λ₂ λ₃ s collect zip s₁ data StructArray λ s new data name λ₁ name incompressible incompressible λ₂ λ₃ sqrt λ₁ λ₂ λ₃ Vector eltype λ₁ undef length λ₁ λ collect zip λ₁ λ₂ λ₃ s collect zip Vector eltype λ₁ undef length λ₁ data StructArray λ s new data name Base show io IO test print io Term RenderableText test name print io Term Table hcat getindex test data λ getindex test data s header box ROUNDED data StructVector name String λ₁ λ₂ s₁ s₂ name incompressible length λ₁ length λ₂ length s₁ length s₂ incompressible λ₃ λ₁ λ₂ λ₃ Vector eltype λ₁ undef length λ₁ λ collect zip λ₁ λ₂ λ₃ s collect zip s₁ s₂ data StructArray λ s new data name λ₁ λ₂ name incompressible length λ₁ length λ₂ incompressible λ₃ λ₁ λ₂ λ₃ Vector eltype λ₁ undef length λ₁ s₁ s₂ Vector eltype λ₁ undef length λ₁ λ collect zip λ₁ λ₂ λ₃ s collect zip s₁ s₂ data StructArray λ s new data name Base show io IO test print io Term RenderableText test name print io Term Table hcat getindex test data λ getindex test data λ getindex test data s getindex test data s header box ROUNDED NonlinearContinua predict ψ test p adb AD ForwardDiffBackend f λ SecondPiolaKirchoffStressTensor ψ λ p λ test data λ s map f λ s₁ getindex s s₃ getindex s λ₁ getindex λ λ₃ getindex λ Δs₁₃ s₁ s₃ λ₃ λ₁ pred λ₁ Δs₁₃ name test name pred NonlinearContinua predict ψ test p adb AD ForwardDiffBackend f λ SecondPiolaKirchoffStressTensor ψ λ p adb adb λ test data λ s map f λ s₁ getindex s s₂ getindex s s₃ getindex s λ₁ getindex λ λ₂ getindex λ λ₃ getindex λ Δs₂₃ s₂ s₃ λ₃ λ₁ Δs₁₃ s₁ s₃ λ₃ λ₁ pred λ₁ λ₂ Δs₁₃ Δs₂₃ name test name pred ψ test u₀ ps Nothing adb AD ForwardDiffBackend loss L2DistLoss agg AggMode Mean adtype Optimization AutoForwardDiff f ps ψ test adb loss agg pred predict ψ test ps adb adb s hcat test data s ŝ hcat pred data s res mean value loss s ŝ agg ObsDim First res cons ψ test lb ub ψ test model_ps ψ ps ψ ψ test test loss loss adb adb agg agg p model_ps isnothing lb u₀ p lb p error p lb p isnothing ub u₀ p ub p error p ub p func OptimizationFunction f adtype prob OptimizationProblem func u₀ ps isnothing cons num_cons length cons ucons func OptimizationFunction f adtype cons cons cons prob OptimizationProblem func u₀ ps lcons cons lcons ucons cons ucons isnothing lb isnothing ub ax Axis Hyperelastics ψ isnothing lb isnothing ub lb ComponentVector lb ub ComponentVector ub isnothing lb lb ComponentVector lb ub ComponentVector ones length lb Inf ax isnothing ub ub ComponentVector ub lb ComponentVector ones length ub Inf ax isnothing prob lcons prob OptimizationProblem func u₀ ps lb lb ub ub num_cons length cons u₀ ps prob OptimizationProblem func u₀ ps lcons cons lcons ucons cons ucons lb lb ub ub prob ψ tests Vector u₀ ps Nothing adb AD ForwardDiffBackend loss L2DistLoss agg AggMode Mean adtype Optimization AutoForwardDiff get_s test hcat test data s f ps ψ tests adb loss agg preds predict ψ tests ps s get_s tests ŝ get_s preds res mean map i mean value loss s i ŝ i agg ObsDim First eachindex s res bounds map test ψ test tests lbs getfield bounds lb ubs getfield bounds ub model_ps ψ ps ψ ψ tests tests loss loss adb adb agg agg func OptimizationFunction f adtype lb_elem_type eltype lbs ub_elem_type eltype ubs lb_elem_type Nothing ub_elem_type Nothing ax Axis Hyperelastics ψ lb_elem_type Nothing ub_elem_type Nothing mins Float64 lb_ps fieldnames lb_elem_type field lb_ps field_vals getfield lbs field push! mins maximum field_vals lb NamedTuple lb_ps mins ub_ps fieldnames ub_elem_type maxs Float64 field ub_ps field_vals getfield ubs field push! maxs minimum field_vals ub NamedTuple ub_ps maxs lb ComponentVector lb ub ComponentVector ub lb_elem_type Nothing mins Float64 lb_ps fieldnames lb_elem_type field lb_ps field_vals getfield lbs field push! mins maximum field_vals lb NamedTuple lb_ps mins lb ComponentVector lb ub ComponentVector ones length lb Inf ax ub_elem_type Nothing ub_ps fieldnames ub_elem_type maxs Float64 field ub_ps field_vals getfield ubs field push! maxs minimum field_vals ub NamedTuple ub_ps maxs ub ComponentVector ub lb ComponentVector ones length ub Inf ax p model_ps isnothing lb u₀ p lb p error p lb p isnothing ub u₀ p ub p error p ub p prob OptimizationProblem func u₀ ps lb lb ub ub prob OptimizationProblem func u₀ ps prob \n"
+    url = "Hyperelastics@dev/src/material_tests.jl"
+    [[input.files]]
+    title = "GeneralCompressible"
+    contents = "Generic Compressible Model\nParameters:\nψ\nIncompressible model parameters (see model selected for parameter names)\n\n\n\nκ\n\n\nModel: \\psi_{compressible} = \\psi_{incompressible}(\\vec{\\lambda}_{incompressible})+\\kappa(J-1)^2\nExample Implementation: StrainEnergyDensityFunction(GeneralCompressible(NeoHookean()), λ⃗, (ψ = (μ=μ, ), κ = κ))\n\n"
+    url = "Hyperelastics@dev/ref/Hyperelastics.GeneralCompressible"
+    [[input.files]]
+    title = "Kawabata1981"
+    contents = "Biaxial Experimental Data from Kawabata et al. \nReturns the\nParameters: λ₁\nKawabata S, Matsuda M, Tei K, Kawai H. Experimental survey of the strain energy density function of isoprene rubber vulcanizate. Macromolecules. 1981 Jan;14(1):154-62.\n\n\n"
+    url = "Hyperelastics@dev/ref/Hyperelastics.Kawabata1981"
+    [[input.files]]
+    title = "ChevalierMarco"
+    contents = "Chevalier-Marco\nParameters: a⃗, b⃗\nModel:\nW = \\int\\limits_{3}^{I_1(\\vec\\lambda)} \\exp\\bigg(\\sum\\limits_{i=0}^{N}a_i(I_1-3)^i\\bigg)\\text{d}I_1+ \\int\\limits_{3}^{I_2(\\vec\\lambda)} \\sum\\limits_{i=0}^{n}\\frac{b_i}{I_2^i}\\text{d}I_2\n[\\mathbf{S}] = 2(I-\\frac{\\partial W}{\\partial I_1} - C^{-2}\\frac{\\partial W}{\\partial I_2})\n[\\mathbf{\\sigma}] = \\mathbf{F} \\cdot \\mathbf{S}\nNote: Model is not compatible with AD. A method for accessing the Second Piola Kirchoff Tensor and Cauchy Stress Tensor have been implemented.\nChevalier L, Marco Y. Tools for multiaxial validation of behavior laws chosen for modeling hyper‐elasticity of rubber‐like materials. Polymer Engineering & Science. 2002 Feb;42(2):280-98.\n\n\n"
+    url = "Hyperelastics@dev/ref/Hyperelastics.ChevalierMarco"
+    [[input.files]]
+    title = "FullNetwork"
+    contents = "Full Network - Wu Geisson\nParameters: μ, N, ρ\nModel:\nW = (1-\\rho)W_{3Chain}+\\rho W_{8chain}\nTreloar LR, Riding G. A non-Gaussian theory for rubber in biaxial strain. I. Mechanical properties. Proceedings of the Royal Society of London. A. Mathematical and Physical Sciences. 1979 Dec 31;369(1737):261-80. Wu PD, van der Giessen E. On improved 3-D non-Gaussian network models for rubber elasticity. Mechanics research communications. 1992 Sep 1;19(5):427-33. Wu PD, Van Der Giessen E. On improved network models for rubber elasticity and their applications to orientation hardening in glassy polymers. Journal of the Mechanics and Physics of Solids. 1993 Mar 1;41(3):427-56.\n\n\n"
+    url = "Hyperelastics@dev/ref/Hyperelastics.FullNetwork"
+    [[input.files]]
+    title = "HorganSaccomandi"
+    contents = "Horgan Saccomandi Model\nParameters: μ, J\nModel:\nW = -\\frac{\\mu J}{2}\\log\\bigg(\\frac{J^3-J^2I_1+JI_2-1}{(J-1)^3}\\bigg)\nHorgan CO, Saccomandi G. Constitutive models for compressible nonlinearly elastic materials with limiting chain extensibility. Journal of Elasticity. 2004 Nov;77(2):123-38.> Horgan CO, Saccomandi G. Constitutive models for atactic elastomers. InWaves And Stability In Continuous Media 2004 (pp. 281-294).\n\n\n"
+    url = "Hyperelastics@dev/ref/Hyperelastics.HorganSaccomandi"
+    [[input.files]]
+    title = "Hyperelastics/average_chain_behavior.jl"
+    contents = "ψ data pchain typeof data UniaxialHyperelasticData BiaxialHyperelasticData λchain λ⃗ sqrt I₁ λ⃗ λ₁ getindex data λ⃗ λ₃ getindex data λ⃗ s₁ getindex data s⃗ pch s₁ λ₁ λ₁ λ₃ λchain data λ⃗ pch pch _pnchain pchain λchain collect data λ⃗ pch wchain λch quadgk x _pnchain x λch W λ⃗ wchain λchain λ⃗ W ψ data pchain \n"
+    url = "Hyperelastics@dev/src/average_chain_behavior.jl"
+    [[input.files]]
+    title = "parameters"
+    contents = "Returns a tuple of the parameters required for the model\n\n"
+    url = "Hyperelastics@dev/ref/Hyperelastics.parameters"
+    [[input.files]]
+    title = "VanDerWaals"
+    contents = "Van der Waals\nParameters: μ, λm, β, α\nModel:\nW = -\\mu\\{(\\lambda_m^2-3)\\log(1-\\Theta)+\\Theta\\}-\\frac{2\\alpha}{3}\\bigg(\\frac{I-3}{2}\\bigg)^{3/2}\n\\Theta = \\frac{\\beta I_1 + (1-\\beta)I_2-3}{\\lambda_m^2-3)}\nKilian HG, Enderle HF, Unseld K. The use of the van der Waals model to elucidate universal aspects of structure-property relationships in simply extended dry and swollen rubbers. Colloid and Polymer Science. 1986 Oct;264(10):866-76. Ambacher H, Enderle HF, Kilian HG, Sauter A. Relaxation in permanent networks. InRelaxation in Polymers 1989 (pp. 209-220). Steinkopff. Kilian HG. A molecular interpretation of the parameters of the van der Waals equation of state for real networks. Polymer Bulletin. 1980 Sep;3(3):151-8.\n\n\n"
+    url = "Hyperelastics@dev/ref/Hyperelastics.VanDerWaals"
+    [[input.files]]
+    title = "HainesWilson"
+    contents = "Haines-Wilson\nParameters: C10, C01, C11, C02, C20, C30\nModel:\nW = \\sum\\limits_{i,j=0}^{3, 2}C_{i,j}(I_1-3)^i(I_2-3)^j\nHaines DW, Wilson WD. Strain-energy density function for rubberlike materials. Journal of the Mechanics and Physics of Solids. 1979 Aug 1;27(4):345-60.\n\n\n"
+    url = "Hyperelastics@dev/ref/Hyperelastics.HainesWilson"
+    [[input.files]]
+    title = "JamesGreenSimpson"
+    contents = "James-Green-Simpson\nParameters: C10, C01, C11, C20, C30\nModel:\nW = \\sum\\limits_{i,j=0}^{3, 1}C_{i,j}(I_1-3)^i(I_2-3)^j\nJames AG, Green A, Simpson GM. Strain energy functions of rubber. I. Characterization of gum vulcanizates. Journal of Applied Polymer Science. 1975 Jul;19(7):2033-58.\n\n\n"
+    url = "Hyperelastics@dev/ref/Hyperelastics.JamesGreenSimpson"
+    [[input.files]]
+    title = "Vito"
+    contents = "Vito\nParameters: α, β, γ\nModel:\nW = \\alpha (\\exp\\bigg(\\beta (I_1 - 3)\\bigg) + \\gamma (I_2 - 3)) - 1)\nVito R. A note on arterial elasticity. Journal of Biomechanics. 1973 Sep 1;6(5):561-4.\n\n\n"
+    url = "Hyperelastics@dev/ref/Hyperelastics.Vito"
+    [[input.files]]
+    title = "MacroMicroMacro"
+    contents = "Macro-Micro-Macro Model \nModel: See paper for description of data-driven model\nParameters: Pchain = f(p)(λchain): A higher-order function which returns the sets the parameters for the pchain function\np₀: Initial guess for Pchain parameters\nweights: Weights the errors\ncoeff_loss: Loss function relating to the parameters\nsolver: The optimizer used to find the parameters for Pchain from Optimization.jl\ndata: Hyperelastic data for a biaxial test\nAmores VJ, Benítez JM, Montáns FJ. Data-driven, structure-based hyperelastic manifolds: A macro-micro-macro approach. arXiv preprint arXiv:1903.11545. 2019 Mar 27.\n\n\n"
+    url = "Hyperelastics@dev/ref/Hyperelastics.MacroMicroMacro"
+    [[input.files]]
+    title = "constraints"
+    contents = "Returns a constraint equation for models were parameters bounds are interdependent\n\n"
+    url = "Hyperelastics@dev/ref/Hyperelastics.constraints"
+    [[input.files]]
+    title = "HartmannNeff"
+    contents = "Hartmann-Neff\nParameters: α, Ci0, C0j\nModel:\nW = \\sum\\limits_{i,j=0}^{M,N}C_{i,0}(I_1-3)^i -3\\sqrt{3}^j+\\alpha(I_1-3)\nHartmann S, Neff P. Polyconvexity of generalized polynomial-type hyperelastic strain energy functions for near-incompressibility. International journal of solids and structures. 2003 Jun 1;40(11):2767-91.\n\n\n"
+    url = "Hyperelastics@dev/ref/Hyperelastics.HartmannNeff"
+    [[input.files]]
+    title = "GentThomas"
+    contents = "Gent Thomas\nParamters: C1, C2\nModel:\nW = C_1(I_1-3)+C_2\\log(\\frac{I_2}{3})\nGent AN, Thomas AG. Forms for the stored (strain) energy function for vulcanized rubber. Journal of Polymer Science. 1958 Apr;28(118):625-8.\n\n\n"
+    url = "Hyperelastics@dev/ref/Hyperelastics.GentThomas"
+    [[input.files]]
+    title = "KhiemItskov"
+    contents = "Khiêm-Itskov Model\nParameters: μcκ, n, q, μt\nModel:\nW = \\mu_c \\kappa n \\log\\bigg(\\frac{\\sin(\\frac{\\pi}{\\sqrt{n}})(\\frac{I_1}{3})^{\\frac{q}{2}}}{\\sin(\\frac{\\pi}{\\sqrt{n}}(\\frac{I_1}{3})^{\\frac{q}{2}}}\\bigg)+\\mu_t\\big[\\frac{I_2}{3}^{1/2} - 1 \\big]\nKhiêm VN, Itskov M. Analytical network-averaging of the tube model:: Rubber elasticity. Journal of the Mechanics and Physics of Solids. 2016 Oct 1;95:254-69.\n\n\n"
+    url = "Hyperelastics@dev/ref/Hyperelastics.KhiemItskov"
+    [[input.files]]
+    title = "Alexander"
+    contents = "Alexander\nParameters: μ, C₁, C₂, C₃, k, γ\nModel:\nW = \\frac{C_1 \\sqrt{\\pi}\\text{erfi}\\big(\\sqrt{k}(I_1-3)\\big)}{2\\sqrt{k}}+C_2\\log{\\frac{I_2-3+\\gamma}{\\gamma}}+C_3(I_2-3)\nAlexander H. A constitutive relation for rubber-like materials. International Journal of Engineering Science. 1968 Sep 1;6(9):549-63.\n\n\n"
+    url = "Hyperelastics@dev/ref/Hyperelastics.Alexander"
+    [[input.files]]
+    title = "parameter_bounds"
+    contents = "Returns a tuple of the parameter bounds provided the experimental data and model\n\n"
+    url = "Hyperelastics@dev/ref/Hyperelastics.parameter_bounds"
+    [[input.files]]
+    title = "VerondaWestmann"
+    contents = "Veronda-Westmann\nParameters: C1, C2, α\nModel:\nW = C_1 (\\exp(\\alpha(I_1 - 3)) - 1) + C_2 (I_2 - 3)\nVeronda DR, Westmann RA. Mechanical characterization of skin—finite deformations. Journal of biomechanics. 1970 Jan 1;3(1):111-24.\n\n\n"
+    url = "Hyperelastics@dev/ref/Hyperelastics.VerondaWestmann"
+    [[input.files]]
+    title = "Yeoh"
+    contents = "Yeoh\nParameters: C10, C20, C30\nModel:\nW = \\sum\\limits_{i,j=0}^{3, 0}C_{i,j}(I_1-3)^i(I_2-3)^j\nYeoh OH. Characterization of elastic properties of carbon-black-filled rubber vulcanizates. Rubber chemistry and technology. 1990 Nov;63(5):792-805.\n\n\n"
+    url = "Hyperelastics@dev/ref/Hyperelastics.Yeoh"
+    [[input.files]]
+    title = "Hyperelastics/precompile.jl"
+    contents = "SnoopPrecompile λ₁ data UniaxialHyperelasticData λ₁ ψ⃗ filter x typeof x DataType Base Fix1 getfield Hyperelastics names Hyperelastics ψ⃗ filter x x x ψ⃗ bounds map ψ ψ data ψ⃗ p⃗ map ψ NamedTuple zip ψ ones length ψ ψ⃗ i eachindex p⃗ isnothing bounds i lb key value pairs bounds i lb p⃗ i key value dict_form Dict pairs p⃗ i dict_form key value p⃗ i NamedTuple dict_form isnothing bounds i ub key value pairs bounds i ub p⃗ i key value dict_form Dict pairs p⃗ i dict_form key value p⃗ i NamedTuple dict_form ψ⃗ i Hyperelastics p⃗ i C ones ψ⃗ i Hyperelastics p⃗ i μcκ n q μt ψ⃗ i Hyperelastics p⃗ i E α⃗ ones ψ⃗ i Hyperelastics p⃗ i μ λm sqrt β α p⃗_LabelledArrays map LVector p⃗ p⃗_ComponentArrays map ComponentVector p⃗ ψ p zip ψ⃗ p⃗ ψ data λ⃗ p ψ p zip ψ⃗ p⃗_LabelledArrays ψ data λ⃗ p ψ p zip ψ⃗ p⃗_ComponentArrays ψ data λ⃗ p \n"
+    url = "Hyperelastics@dev/src/precompile.jl"
+    [[input.files]]
+    title = "Hyperelastics/isotropic_incompressible_models.jl"
+    contents = "ℒinv Function ℒinv Function TreloarApproximation new ℒinv NonlinearContinua StrainEnergyDensity ψ λ⃗ AbstractVector μ Ge n WAB NonlinearContinua StrainEnergyDensity ℒinv ψ ℒinv λ⃗ AbstractVector μ μ WAB Ge sum λ⃗ n n ψ μ Ge n ψ data I₁_max maximum I₁ data data λ lb μ Inf I₁_max Ge Inf n ub nothing lb lb ub ub T S ℒinv Function r⃗ Vector T w Vector S ℒinv Function TreloarApproximation n n a b c r⃗ a a a a a a a a a a a a b c c b c c b c c b c c c b c c b c c b c c b c c c b c c b c c b c c b w1 w2 w3 w fill w1 fill w2 fill w3 n new eltype r⃗ eltype w ℒinv r⃗ w NonlinearContinua StrainEnergyDensity ψ λ⃗ AbstractVector μ λr i sqrt sum λ⃗ ψ r⃗ i β i ψ ℒinv λr i ψf μ λr i β i log β i sinh β i ψ w i ψf ψ μ NonlinearContinua StrainEnergyDensity ψ λ⃗ AbstractVector μ C₁ C₂ C₃ k γ μ C₁ π erfi k I₁ λ⃗ k C₂ log I₂ λ⃗ γ γ C₃ I₂ λ⃗ NonlinearContinua StrainEnergyDensity ψ I⃗ AbstractVector μ C₁ C₂ C₃ k γ I μ C₁ π erfi k I⃗ k C₂ log I⃗ γ γ C₃ I⃗ NonlinearContinua SecondPiolaKirchoffStressTensor λ⃗ AbstractVector μ C₁ C₂ C₃ k γ s i μ λ⃗ i I₁ λ⃗ C₁ exp k I₁ λ⃗ I₂ λ⃗ λ⃗ i C₂ I₂ λ⃗ γ C₃ NonlinearContinua CauchyStressTensor ψ λ⃗ AbstractVector p s SecondPiolaKirchoffStressTe ψ λ⃗ p σ s λ⃗ σ ψ C₁ C₂ C₃ k γ NonlinearContinua StrainEnergyDensity ψ λ⃗ AbstractVector C10 C01 C10 I₁ λ⃗ C01 I₂ λ⃗ NonlinearContinua StrainEnergyDensity ψ I⃗ AbstractVector C10 C01 I NonlinearContinua StrainEnergyDensity I⃗ C C10 C01 I ψ C10 C01 NonlinearContinua StrainEnergyDensity ψ λ⃗ AbstractVector μ μ I₁ λ⃗ NonlinearContinua StrainEnergyDensity ψ I⃗ AbstractVector μ I μ I⃗ ψ μ NonlinearContinua StrainEnergyDensity ψ λ⃗ AbstractVector C10 C20 C01 NonlinearContinua StrainEnergyDensity λ⃗ C C10 C20 C01 NonlinearContinua StrainEnergyDensity ψ I⃗ AbstractVector C10 C20 C01 I NonlinearContinua StrainEnergyDensity I⃗ C C10 C20 C01 I ψ C10 C20 C01 NonlinearContinua StrainEnergyDensity ψ λ⃗ AbstractVector C10 C01 C20 C30 NonlinearContinua StrainEnergyDensity λ⃗ C C10 C20 C30 C01 NonlinearContinua StrainEnergyDensity ψ I⃗ AbstractVector C10 C01 C20 C30 I NonlinearContinua StrainEnergyDensity I⃗ C C10 C20 C30 C01 I ψ C10 C01 C20 C30 NonlinearContinua StrainEnergyDensity ψ λ⃗ AbstractVector C10 C01 C11 C20 C30 NonlinearContinua StrainEnergyDensity λ⃗ C C10 C20 C30 C01 NonlinearContinua StrainEnergyDensity ψ I⃗ AbstractVector C10 C01 C11 C20 C30 I NonlinearContinua StrainEnergyDensity I⃗ C C10 C20 C30 C01 I ψ C10 C01 C11 C20 C30 NonlinearContinua StrainEnergyDensity ψ λ⃗ AbstractVector C10 C01 C11 C02 C20 C30 NonlinearContinua StrainEnergyDensity λ⃗ C C10 C20 C30 C01 C11 C02 NonlinearContinua StrainEnergyDensity ψ I⃗ AbstractVector C10 C01 C11 C02 C20 C30 I NonlinearContinua StrainEnergyDensity I⃗ C C10 C20 C30 C01 C11 C02 I ψ C10 C01 C11 C02 C20 C30 NonlinearContinua StrainEnergyDensity ψ λ⃗ AbstractVector C10 C20 C30 NonlinearContinua StrainEnergyDensity λ⃗ C C10 C20 C30 NonlinearContinua StrainEnergyDensity ψ I⃗ AbstractVector C10 C20 C30 I NonlinearContinua StrainEnergyDensity I⃗ C C10 C20 C30 I ψ C10 C20 C30 NonlinearContinua StrainEnergyDensity ψ λ⃗ AbstractVector C10 C01 C50 NonlinearContinua StrainEnergyDensity λ⃗ C C10 C50 C01 NonlinearContinua StrainEnergyDensity ψ I⃗ AbstractVector C10 C01 C50 I NonlinearContinua StrainEnergyDensity I⃗ C C10 C50 C01 I ψ C10 C01 C50 NonlinearContinua StrainEnergyDensity ψ λ⃗ AbstractVector C10 C01 C11 C02 C30 NonlinearContinua StrainEnergyDensity λ⃗ C C10 C30 C01 C11 C02 NonlinearContinua StrainEnergyDensity ψ I⃗ AbstractVector C10 C01 C11 C02 C30 I NonlinearContinua StrainEnergyDensity I⃗ C C10 C30 C01 C11 C02 I ψ C10 C01 C11 C02 C30 NonlinearContinua StrainEnergyDensity ψ λ⃗ AbstractVector α Ci⃗0 C0j⃗ W1 Ci⃗0 i I₁ λ⃗ i W2 C0j⃗ j I₂ λ⃗ sqrt j W1 W2 α I₁ λ⃗ NonlinearContinua StrainEnergyDensity ψ I⃗ AbstractVector α Ci⃗0 C0j⃗ I W1 Ci⃗0 i I⃗ i W2 C0j⃗ j I⃗ sqrt j W1 W2 α I⃗ ψ α Ci⃗0 C0j⃗ NonlinearContinua StrainEnergyDensity ψ λ⃗ AbstractVector A B C A I₁ λ⃗ B I₁ λ⃗ C I₂ λ⃗ NonlinearContinua StrainEnergyDensity ψ I⃗ AbstractVector A B C I A I⃗ B I⃗ C I⃗ ψ A B C NonlinearContinua StrainEnergyDensity ψ λ⃗ AbstractVector A2 B2 A4 A6 NonlinearContinua StrainEnergyDensity λ⃗ A⃗ A2 A4 A6 B⃗ B2 m⃗ n⃗ ψ A2 B2 A4 A6 NonlinearContinua StrainEnergyDensity ψ λ⃗ AbstractVector C₋₁¹ C₁¹ C₂¹ C₂² C₋₁¹ I₂ λ⃗ C₁¹ I₁ λ⃗ C₂¹ I₁ λ⃗ I₂ λ⃗ C₂² I₁ λ⃗ I₂ λ⃗ NonlinearContinua StrainEnergyDensity ψ C₋₁¹ C₁¹ C₂¹ C₂² I C₋₁¹ I⃗ C₁¹ I⃗ C₂¹ I⃗ I⃗ C₂² I⃗ I⃗ ψ C₋₁¹ C₁¹ C₂¹ C₂² NonlinearContinua StrainEnergyDensity ψ λ⃗ AbstractVector μ b n μ b b n I₁ λ⃗ n NonlinearContinua StrainEnergyDensity ψ I⃗ AbstractVector μ b n I μ b b n I⃗ n ψ μ b n ψ data lb μ Inf b n ub nothing lb lb ub ub NonlinearContinua StrainEnergyDensity ψ λ⃗ AbstractVector A⃗ α⃗ B⃗ β⃗ length A⃗ length α⃗ length B⃗ length β⃗ _ A⃗ i α⃗ i I₁ λ⃗ α⃗ i B⃗ i β⃗ i I₂ λ⃗ β⃗ i NonlinearContinua StrainEnergyDensity ψ I⃗ AbstractVector A⃗ α⃗ B⃗ β⃗ I length A⃗ length α⃗ length B⃗ length β⃗ _ A⃗ i α⃗ i I⃗ α⃗ i B⃗ i β⃗ i I⃗ β⃗ i ψ A⃗ α⃗ B⃗ β⃗ NonlinearContinua StrainEnergyDensity ψ λ⃗ AbstractVector C1 C2 C3 C1 I₁ λ⃗ C2 I₂ λ⃗ C3 I₁ λ⃗ NonlinearContinua StrainEnergyDensity ψ I⃗ AbstractVector C1 C2 C3 I I⃗ C2 I⃗ C3 I⃗ ψ C1 C2 C3 NonlinearContinua StrainEnergyDensity ψ λ⃗ AbstractVector A n C k A n I₁ λ⃗ C n k I₁ λ⃗ NonlinearContinua StrainEnergyDensity ψ I⃗ AbstractVector A n C k I A n I⃗ C n k I⃗ ψ A n C k NonlinearContinua StrainEnergyDensity ψ λ⃗ AbstractVector A B C m n A n I₁ λ⃗ C n B m I₁ λ⃗ C m NonlinearContinua StrainEnergyDensity ψ I⃗ AbstractVector A B C m n I A n I⃗ C n B m I⃗ C m ψ A B C m n NonlinearContinua StrainEnergyDensity ψ λ⃗ AbstractVector A α M B β A α I₁ λ⃗ M α B β I₁ λ⃗ β NonlinearContinua StrainEnergyDensity ψ I⃗ AbstractVector A α M B β I A α I⃗ M α B β I⃗ β ψ A α M B β NonlinearContinua StrainEnergyDensity ψ λ⃗ AbstractVector C1 C2 C3 K1 α β ζ NonlinearContinua StrainEnergyDensity λ⃗ C C1 C2 C3 K K1 α α ζ β β NonlinearContinua StrainEnergyDensity ψ I⃗ AbstractVector C1 C2 C3 K1 α β ζ I NonlinearContinua StrainEnergyDensity I⃗ C C1 C2 C3 K K1 α α ζ β β I ψ C1 C2 C3 K1 α β ζ data lb C1 Inf C2 Inf C3 Inf K1 Inf α β ζ ub C1 Inf C2 Inf C3 Inf K1 Inf α β ζ Inf lb lb ub ub NonlinearContinua StrainEnergyDensity ψ λ⃗ AbstractVector C1 C2 C3 C4 M C1 I₁ λ⃗ C2 I₁ λ⃗ C3 M I₁ λ⃗ M C4 I₂ λ⃗ NonlinearContinua StrainEnergyDensity ψ I⃗ AbstractVector C1 C2 C3 C4 M I C1 I⃗ C2 I⃗ C3 M I⃗ M C4 I⃗ ψ C1 C2 C3 C4 M NonlinearContinua StrainEnergyDensity ψ λ⃗ AbstractVector α⃗ μ⃗ length α⃗ length μ⃗ _ α⃗ i α⃗ i μ⃗ i I₁ λ⃗ α⃗ i α⃗ i NonlinearContinua StrainEnergyDensity ψ I⃗ AbstractVector α⃗ μ⃗ I length α⃗ length μ⃗ _ α⃗ i α⃗ i μ⃗ i I⃗ α⃗ i α⃗ i ψ α⃗ μ⃗ NonlinearContinua StrainEnergyDensity ψ λ⃗ AbstractVector K1 K2 K3 m p q K1 I₁ λ⃗ m K2 I₁ λ⃗ p K3 I₁ λ⃗ q NonlinearContinua StrainEnergyDensity ψ I⃗ AbstractVector K1 K2 K3 m p q I K1 I⃗ m K2 I⃗ p K3 I⃗ q ψ K1 K2 K3 m p q NonlinearContinua StrainEnergyDensity ψ λ⃗ AbstractVector G k₁ k₂ G exp k₁ k₁ I₁ λ⃗ k₁ G k₂ log I₂ λ⃗ NonlinearContinua StrainEnergyDensity ψ I⃗ AbstractVector G k₁ k₂ I G exp k₁ k₁ I⃗ k₁ G k₂ log I⃗ ψ G k₁ k₂ NonlinearContinua StrainEnergyDensity ψ λ⃗ AbstractVector C1 C2 α C1 exp α I₁ λ⃗ C2 I₂ λ⃗ NonlinearContinua StrainEnergyDensity ψ I⃗ AbstractVector C1 C2 α I C1 exp α I⃗ C2 I⃗ ψ C1 C2 α NonlinearContinua StrainEnergyDensity ψ λ⃗ AbstractVector μ b μ b exp b I₁ λ⃗ NonlinearContinua StrainEnergyDensity ψ I⃗ AbstractVector μ b I μ b exp b I⃗ ψ μ b NonlinearContinua StrainEnergyDensity ψ λ⃗ AbstractVector α β γ α exp β I₁ λ⃗ γ I₂ λ⃗ NonlinearContinua StrainEnergyDensity ψ I⃗ AbstractVector α β γ I α exp β I⃗ γ I⃗ ψ α β γ NonlinearContinua StrainEnergyDensity ψ λ⃗ AbstractVector C10 C20 C30 α β C10 I₁ λ⃗ C20 I₁ λ⃗ C30 I₁ λ⃗ α β exp β I₁ λ⃗ NonlinearContinua StrainEnergyDensity ψ I⃗ AbstractVector C10 C20 C30 α β I C10 I⃗ C20 I⃗ C30 I⃗ α β exp β I⃗ ψ C10 C20 C30 α β NonlinearContinua StrainEnergyDensity ψ λ⃗ AbstractVector a⃗ b⃗ ∂W∂I1 I₁ exp sum _ a⃗ i I₁ i ∂W∂I2 I₂ _ b⃗ i I₂ i quadgk ∂W∂I1 I₁ λ⃗ quadgk ∂W∂I2 I₂ λ⃗ NonlinearContinua StrainEnergyDensity ψ I⃗ AbstractVector a⃗ b⃗ I ∂W∂I1 I₁ exp sum _ a⃗ i I₁ i ∂W∂I2 I₂ _ b⃗ i I₂ i quadgk ∂W∂I1 I⃗ quadgk ∂W∂I2 I⃗ NonlinearContinua SecondPiolaKirchoffStressTensor ψ λ⃗ AbstractVector a⃗ b⃗ ∂W∂I1 exp sum _ a⃗ i I₁ λ⃗ i ∂W∂I2 _ b⃗ i I₂ λ⃗ i 𝐒 I ∂W∂I1 diagm λ⃗ ∂W∂I2 sᵢ diag 𝐒 sᵢ sᵢ sᵢ NonlinearContinua CauchyStressTensor ψ λ⃗ AbstractVector a⃗ b⃗ s NonlinearContinua SecondPiolaKirchoffStressTensor ψ λ⃗ a⃗ a⃗ b⃗ b⃗ σ λ⃗ s σ ψ a⃗ b⃗ NonlinearContinua StrainEnergyDensity ψ λ⃗ AbstractVector h₁ h₂ h₃ h₁ π erfi h₃ I₁ λ⃗ h₃ h₂ I₂ λ⃗ NonlinearContinua StrainEnergyDensity ψ I⃗ AbstractVector h₁ h₂ h₃ I h₁ π erfi h₃ I⃗ h₃ h₂ I⃗ NonlinearContinua CauchyStressTensor ψ λ⃗ AbstractVector h₁ h₂ h₃ B λ⃗ _I₁ I₁ λ⃗ _I₂ I₂ λ⃗ ∂W∂I₁ h₁ exp h₃ _I₁ ∂W∂I₂ h₂ exp sqrt _I₂ σ ∂W∂I₁ _I₁ ∂W∂I₂ B ∂W∂I₂ B σ NonlinearContinua SecondPiolaKirchoffStressTensor ψ λ⃗ AbstractVector ps σ CauchyStressTensor ψ λ⃗ ps s σ λ⃗ s ψ h₁ h₂ h₃ NonlinearContinua StrainEnergyDensity ψ λ⃗ AbstractVector A1 m1 B1 n1 A1 exp m1 I₁ λ⃗ B1 exp n1 I₂ λ⃗ NonlinearContinua StrainEnergyDensity ψ I⃗ AbstractVector A1 m1 B1 n1 I A1 exp m1 I⃗ B1 exp n1 I⃗ ψ A1 m1 B1 n1 NonlinearContinua StrainEnergyDensity ψ λ⃗ AbstractVector C1 C2 C1 I₁ λ⃗ C2 log I₂ λ⃗ NonlinearContinua StrainEnergyDensity ψ I⃗ AbstractVector C1 C2 I C1 I⃗ C2 log I⃗ ψ C1 C2 NonlinearContinua StrainEnergyDensity ψ λ⃗ AbstractVector a⃗ b⃗ ∂W∂I₁ I₁ exp _ a⃗ i I₁ i ∂W∂I₂ I₂ exp _ b⃗ i log I₂ i quadgk ∂W∂I₁ I₁ λ⃗ quadgk ∂W∂I₂ I₂ λ⃗ NonlinearContinua StrainEnergyDensity ψ I⃗ AbstractVector a⃗ b⃗ I ∂W∂I₁ I₁ exp _ a⃗ i I₁ i ∂W∂I₂ I₂ exp _ b⃗ i log I₂ i quadgk ∂W∂I₁ I⃗ quadgk ∂W∂I₂ I⃗ NonlinearContinua SecondPiolaKirchoffStressTensor ψ λ⃗ AbstractVector a⃗ b⃗ ∂W∂I₁ exp _ a⃗ i I₁ λ⃗ i ∂W∂I₂ exp _ b⃗ i log I₂ λ⃗ i 𝐒 I ∂W∂I₁ diagm λ⃗ ∂W∂I₂ sᵢ diag 𝐒 sᵢ sᵢ sᵢ λ⃗ λ⃗ sᵢ NonlinearContinua CauchyStressTensor ψ λ⃗ AbstractVector a⃗ b⃗ s λ⃗ NonlinearContinua SecondPiolaKirchoffStressTensor ψ λ⃗ a⃗ a⃗ b⃗ b⃗ σᵢ map λ⃗ᵢ λ⃗ᵢ s λ⃗ᵢ λ⃗ σᵢ ψ a⃗ b⃗ NonlinearContinua StrainEnergyDensity ψ λ⃗ AbstractVector α β μ b n α β exp β I₁ λ⃗ μ b b n I₁ λ⃗ n NonlinearContinua StrainEnergyDensity ψ I⃗ AbstractVector α β μ b n I α β exp β I⃗ μ b b n I⃗ n ψ α β μ b n ψ data lb α Inf β μ Inf b n ub nothing lb lb ub ub NonlinearContinua StrainEnergyDensity ψ λ⃗ AbstractVector α β μ b n C2 α β exp β I₁ λ⃗ μ b b n I₁ λ⃗ n C2 log I₂ λ⃗ NonlinearContinua StrainEnergyDensity ψ I⃗ AbstractVector α β μ b n C2 I α β exp β I⃗ μ b b n I⃗ n C2 log I⃗ ψ α β μ b n C2 ψ data lb α Inf β μ Inf b n C2 Inf ub nothing lb lb ub ub NonlinearContinua StrainEnergyDensity ψ λ⃗ AbstractVector A a b A a exp a I₁ λ⃗ b I₁ λ⃗ log I₁ λ⃗ a b NonlinearContinua StrainEnergyDensity ψ I⃗ AbstractVector A a b I A a exp a I⃗ b I⃗ log I⃗ a b ψ A a b NonlinearContinua StrainEnergyDensity ψ λ⃗ AbstractVector μ λm β α I β I₁ λ⃗ β I₂ λ⃗ θ I λm μ λm log θ θ α I NonlinearContinua StrainEnergyDensity ψ I⃗ AbstractVector μ λm β α I I β I⃗ β I⃗ θ I λm μ λm log θ θ α I ψ data lb μ λm sqrt β α ub μ Inf λm Inf β α Inf ub ub lb lb ψ μ λm β α ψ data I₁_max maximum I₁ data data λ I₂_max maximum I₂ data data λ f u p u β I₁_max u β I₂_max u λm NonlinearContinua StrainEnergyDensity ψ λ⃗ Vector T p T μ Jₘ p μ Jₘ log I₁ λ⃗ Jₘ NonlinearContinua StrainEnergyDensity ψ I⃗ AbstractVector μ Jₘ I μ Jₘ log I⃗ Jₘ ψ μ Jₘ ψ test I₁_max maximum I₁ test data λ Jₘ_min I₁_max lb μ Jₘ Jₘ_min ub nothing lb lb ub ub NonlinearContinua StrainEnergyDensity ψ λ⃗ AbstractVector c Jₘ c log I₁ λ⃗ Jₘ NonlinearContinua StrainEnergyDensity ψ I⃗ AbstractVector c Jₘ I c log I⃗ Jₘ ψ c Jₘ ψ data I₁_max maximum I₁ data data λ Jₘ_min I₁_max lb c Inf Jₘ Jₘ_min ub nothing lb lb ub ub NonlinearContinua StrainEnergyDensity ψ λ⃗ AbstractVector A B C10 Im A B exp B I₁ λ⃗ C10 Im log I₁ λ⃗ Im NonlinearContinua StrainEnergyDensity ψ I⃗ AbstractVector A B C10 Im I A B exp B I⃗ C10 Im log I⃗ Im ψ A B C10 Im ψ data Iₘ_min maximum I₁ data data λ lb A Inf B Inf C10 Inf Im Iₘ_min ub nothing lb lb ub ub NonlinearContinua StrainEnergyDensity ψ λ⃗ AbstractVector K μ Jₘ K log I₂ λ⃗ μ Jₘ log I₁ λ⃗ Jₘ NonlinearContinua StrainEnergyDensity ψ I⃗ AbstractVector K μ Jₘ I K log I⃗ μ Jₘ log I⃗ Jₘ ψ K μ Jₘ ψ data I₁_max maximum I₁ data data λ Jₘ_min I₁_max lb K Inf μ Inf Jₘ Jₘ_min ub nothing lb lb ub ub NonlinearContinua StrainEnergyDensity ψ λ⃗ AbstractVector μ J μ J log J J I₁ λ⃗ J I₂ λ⃗ J NonlinearContinua StrainEnergyDensity ψ I⃗ AbstractVector μ J I μ J log J J I⃗ J I⃗ J ψ μ J ψ data _I1 I₁ data data λ _I2 I₂ data data λ Js _I1 _I1 _I2 _I1 _I1 _I2 _I1 _I1 _I2 J_min maximum Js lb μ Inf J J_min ub nothing lb lb ub ub NonlinearContinua StrainEnergyDensity ψ λ⃗ AbstractVector G₀ Iₘ G₀ Iₘ Iₘ Iₘ log I₁ λ⃗ Iₘ I₁ λ⃗ Iₘ NonlinearContinua StrainEnergyDensity ψ I⃗ AbstractVector G₀ Iₘ I G₀ Iₘ Iₘ Iₘ log I⃗ Iₘ I⃗ Iₘ ψ G₀ Iₘ data Iₘ_min maximum I₁ data data λ lb G₀ Inf Iₘ Iₘ_min ub nothing lb lb ub ub NonlinearContinua StrainEnergyDensity ψ λ⃗ AbstractVector ps ps ps ps log sum λ⃗ ps ps ψ μ J c ψ data f res u p max_sum minimum λ⃗ sum λ⃗ u u p test data λ res max_sum res cons f lcons Inf ucons NonlinearContinua StrainEnergyDensity ψ λ⃗ AbstractVector μ μ sum λ⃗ log λ⃗ ψ μ NonlinearContinua StrainEnergyDensity ψ λ⃗ AbstractVector E _ λ⃗ i log λ⃗ i log λ⃗ i log λ⃗ i log λ⃗ i E ψ E NonlinearContinua StrainEnergyDensity ψ λ⃗ AbstractVector μ⃗ α⃗ _ μ⃗ i α⃗ i sum λ⃗ α⃗ i ψ μ⃗ α⃗ NonlinearContinua StrainEnergyDensity ψ λ⃗ AbstractVector A⃗ B⃗ length A⃗ length B⃗ _ A⃗ i i sum λ⃗ i B⃗ i i sum λ⃗ i ψ A⃗ B⃗ ϕ Vector Function Φ Vector Function ϕ1 x log x ϕ2 x exp x x ϕ3 x exp x x ϕ4 x x x ϕj x j x j ϕ ϕ1 ϕ2 ϕ3 ϕ4 ϕj c j r factorial j factorial r factorial j r Φ1 x log x Φ2 x exp expinti exp expinti x x Φ3 x expinti x expinti exp x Φ4 x x x x x Φj x j j log x j sum r r c j r x r r range j j sum r r c j r r range j Φ Φ1 Φ2 Φ3 Φ4 Φj new ϕ Φ NonlinearContinua StrainEnergyDensity ψ λ⃗ AbstractVector E α⃗ n length α⃗ W1 sum map i sum α⃗ i ψ Φ i λ⃗ minimum n W2 sum map i sum α⃗ i ψ Φ λ⃗ i minimum n n W W1 W2 E W NonlinearContinua CauchyStressTensor ψ λ⃗ AbstractVector E α⃗ n length α⃗ σ1 sum map i α⃗ i ψ ϕ i λ⃗ minimum n σ2 sum map i α⃗ i ψ ϕ λ⃗ i minimum n n σ σ1 σ2 E σ NonlinearContinua SecondPiolaKirchoffStressTensor ψ λ⃗ AbstractVector E α⃗ n length α⃗ s1 sum map i α⃗ i ψ ϕ i λ⃗ minimum n s2 sum map i α⃗ i ψ ϕ λ⃗ i minimum n n s s1 s2 E s λ⃗ ψ E α⃗ NonlinearContinua StrainEnergyDensity ψ λ⃗ AbstractVector A⃗ B⃗ m⃗ n⃗ α⃗ β⃗ length A⃗ length B⃗ length m⃗ length n⃗ length α⃗ length β⃗ _ A⃗ i exp m⃗ i sum λ⃗ α⃗ i B⃗ i exp n⃗ i sum λ⃗ β⃗ i ψ A⃗ B⃗ m⃗ n⃗ α⃗ β⃗ NonlinearContinua StrainEnergyDensity ψ λ⃗ AbstractVector K₁ K₂ α μ K₁ I₁ λ⃗ K₂ log I₂ λ⃗ μ α sum λ⃗ α ψ K₁ K₂ α μ NonlinearContinua StrainEnergyDensity ψ λ⃗ AbstractVector C11 C12 C21 C22 C C11 C12 C21 C22 C I₁ λ⃗ sum n sum r C n r sum λ⃗ n ψ C11 C12 C21 C22 NonlinearContinua StrainEnergyDensity ψ λ⃗ AbstractVector Gc μkT κ Gc I₁ λ⃗ μkT sum i κ λ⃗ i λ⃗ i κ log λ⃗ i κ κ log λ⃗ i ψ Gc μkT κ ψ data λ_min minimum minimum collect data data λ κ_min λ_min lb Gc Inf μkT Inf κ κ_min ub nothing lb lb ub ub NonlinearContinua StrainEnergyDensity ψ λ⃗ AbstractVector Ns Nc α η W_Nc Nc α I₁ λ⃗ α I₁ λ⃗ log α I₁ λ⃗ W_Ns Ns η α λ⃗ η λ⃗ α I₁ λ⃗ log η λ⃗ η α λ⃗ η λ⃗ α I₁ λ⃗ log η λ⃗ η α λ⃗ η λ⃗ α I₁ λ⃗ log η λ⃗ log α I₁ λ⃗ W W_Nc W_Ns W ψ Ns Nc α η ψ data λ_max maximum maximum data data λ η_min λ_max α_max minimum sqrt I₁ data data λ lb Ns Inf Nc Inf α η ub Ns Inf Nc Inf α α_max η Inf lb lb ub ub NonlinearContinua StrainEnergyDensity ψ λ⃗ AbstractVector ζkT μkT κ B i κ λ⃗ i λ⃗ i κ D i λ⃗ i B i κ W1 λ⃗ i W2 B i log B i W3 D i log D i ζkT W1 μkT W2 W3 ψ ζkT μkT κ ψ data lb ζkT Inf μkT Inf κ ub nothing lb lb ub ub NonlinearContinua StrainEnergyDensity ψ λ⃗ AbstractVector Gc Ge β _ Gc λ⃗ i Ge β λ⃗ i β ψ Gc Ge β NonlinearContinua StrainEnergyDensity ψ λ⃗ AbstractVector Gc Ge Gc sum λ⃗ Ge sum λ⃗ λ⃗ ψ Gc Ge ℒinv Function ℒinv Function TreloarApproximation new ℒinv NonlinearContinua StrainEnergyDensity ψ λ⃗ AbstractVector μ μ sqrt sum λ⃗ ψ ℒinv λ⃗ sqrt sqrt log ψ ℒinv λ⃗ sqrt sinh ψ ℒinv λ⃗ sqrt ψ μ ψ data λ_max maximum maximum collect data data λ N_min λ_max lb μ Inf N_min ub nothing lb lb ub ub ℒinv Function ℒinv Function TreloarApproximation new ℒinv NonlinearContinua StrainEnergyDensity ψ λ⃗ AbstractVector μ rchain_Nl I₁ λ⃗ β ψ ℒinv rchain_Nl μ rchain_Nl β log β sinh β ψ μ ψ data I₁_max maximum I₁ data data λ N_max I₁_max N_max I₁_max lb μ Inf N_max ub nothing lb lb ub ub Base show io IO ψ println io println io ψ ℒinv ℒinv Function ℒinv Function TreloarApproximation new ℒinv NonlinearContinua StrainEnergyDensity ψ λ⃗ AbstractVector μ κ WAB StrainEnergyDensity ℒinv ψ ℒinv λ⃗ μ μ B i κ λ⃗ i λ⃗ i κ D i λ⃗ i B i κ W2 B i D i log B i log D i WAB W2 ψ μ κ ψ data I₁_max maximum I₁ data data λ N_max I₁_max lb μ Inf N_max κ ub nothing lb lb ub ub NonlinearContinua StrainEnergyDensity ψ λ⃗ AbstractVector Gc Ge δ β Gc δ I₁ λ⃗ δ I₁ λ⃗ log δ I₁ λ⃗ Ge β sum λ⃗ β ψ Gc Ge δ β ψ data I₁_max maximum I₁ data data λ δ_max sqrt I₁_max lb Gc Inf Ge Inf δ δ_max β ub Gc Inf Ge Inf δ δ_max β Inf lb lb ub ub ℒinv Function r⃗ Vector Vector Float64 w Vector Float64 ℒinv Function CohenRounded3_2 n n a b c r⃗ a a a a a a a a a a a a b c c b c c b c c b c c c b c c b c c b c c b c c c b c c b c c b c c b w1 w2 w3 w fill w1 fill w2 fill w3 n new ℒinv r⃗ w NonlinearContinua StrainEnergyDensity ψ λ⃗ AbstractVector μ p U q λ sqrt sum λ⃗ ψ r⃗ i p ψ w i λr λ p β ψ ℒinv λr ψf μ λr β log β sinh β ν sqrt sum λ⃗ ψ r⃗ i q ψ w i ψc U μ ν ψf ψc ψ μ p U q ψ data lb μ Inf p U q ub nothing lb lb ub ub ℒinv Function ℒinv Function TreloarApproximation new ℒinv NonlinearContinua StrainEnergyDensity ψ λ⃗ AbstractVector μ W8 x β ψ ℒinv x μ x β log β sinh β λchain I₁ λ⃗ W8 sum λ⃗ λchain W8 λchain ψ μ ψ data I₁_max maximum I₁ data data λ N_min I₁_max lb μ Inf N_min ub nothing lb lb ub ub NonlinearContinua StrainEnergyDensity ψ λ⃗ AbstractVector Gc Ge λmax Gc I₁ λ⃗ Gc λmax log λmax I₁ λ⃗ Ge λ⃗ λ⃗ λ⃗ λ⃗ λ⃗ λ⃗ ψ Gc Ge λmax ψ data I₁_max maximum I₁ data data λ λmax_min sqrt I₁_max lb Gc Ge λmax λmax_min ub nothing lb lb ub ub NonlinearContinua StrainEnergyDensity ψ λ⃗ AbstractVector μcκ n q μt μcκ n log sin π sqrt n I₁ λ⃗ q sin π sqrt n I₁ λ⃗ q μt I₂ λ⃗ NonlinearContinua StrainEnergyDensity ψ I⃗ AbstractVector μcκ n q μt I num sin π sqrt n I⃗ q denom sin π sqrt n I⃗ q num denom μcκ n log num denom μt I⃗ ψ μcκ n q μt ψ data I₁_max maximum I₁ data data λ f u p sin π sqrt u n I₁_max u q sin π sqrt u n I₁_max u q f NonlinearContinua StrainEnergyDensity ψ λ⃗ AbstractVector Gc I1 I₁ λ⃗ Gc log I1 I1 ψ Gc ψ data I₁_max maximum I₁ data data λ N_min I₁_max lb Gc Inf N_min ub nothing lb lb ub ub NonlinearContinua StrainEnergyDensity ψ λ⃗ AbstractVector Ge W Ge λ⃗ i ψ Ge ψ data lb nothing ub nothing lb lb ub ub NonlinearContinua StrainEnergyDensity ψ λ⃗ AbstractVector ps NonlinearContinua StrainEnergyDensity λ⃗ ps NonlinearContinua StrainEnergyDensity λ⃗ ps ψ Gc Ge ψ data I₁_max maximum I₁ data data λ N_min I₁_max lb Gc Inf Ge Inf N_min ub nothing lb lb ub ub ℒinv Function ℒinv Function TreloarApproximation new ℒinv NonlinearContinua StrainEnergyDensity ψ λ⃗ AbstractVector μ ρ W3 NonlinearContinua StrainEnergyDensity ℒinv ψ ℒinv λ⃗ μ μ W8 NonlinearContinua StrainEnergyDensity ℒinv ψ ℒinv λ⃗ μ μ ρ W3 ρ W8 ψ μ ρ ψ data I₁_max maximum I₁ data data λ λ_max maximum maximum data data λ N₁ λ_max N₂ I₁_max N_min N₁ N₂ N₁ N₂ lb μ Inf N_min ρ ub μ Inf Inf ρ lb lb ub ub ℒinv Function ℒinv Function TreloarApproximation new ℒinv NonlinearContinua StrainEnergyDensity ψ λ⃗ AbstractVector μ N₃ N₈ ΛL N₃ N₈ ρ₃ ΛL N₃ W3 NonlinearContinua StrainEnergyDensity ℒinv ψ ℒinv λ⃗ μ μ N₃ W8 NonlinearContinua StrainEnergyDensity ℒinv ψ ℒinv λ⃗ μ μ N₈ Λch I₁ λ⃗ ρ₈ Λch N₈ ρ₃ W3 ρ₈ W8 ψ μ N₃ N₈ ψ data λ_max maximum maximum data data λ I₁_max maximum I₁ data data λ N₃_min λ_max N₈_min I₁_max lb μ Inf N₃ N₃_min N₈ N₈_min ub nothing lb lb ub ub ℒinv Function ℒinv Function TreloarApproximation new ℒinv NonlinearContinua StrainEnergyDensity ψ λ⃗ AbstractVector μ₁ μ₂ Î₁ Wg NonlinearContinua StrainEnergyDensity λ⃗ μ μ₁ W8 NonlinearContinua StrainEnergyDensity ℒinv ψ ℒinv λ⃗ μ μ₂ f x x x x ζ I₁ λ⃗ Î₁ f ζ Wg f ζ W8 NonlinearContinua StrainEnergyDensity ψ I⃗ AbstractVector μ₁ μ₂ Î₁ I Wg NonlinearContinua StrainEnergyDensity I⃗ μ μ₁ I W8 NonlinearContinua StrainEnergyDensity ℒinv ψ ℒinv I⃗ μ μ₂ I f x x x x ζ I⃗ Î₁ f ζ Wg f ζ W8 ψ μ₁ μ₂ Î₁ ψ data I₁_max maximum I₁ data data λ N_min I₁_max lb μ₁ Inf μ₂ Inf N_min Î₁ ub nothing lb lb ub ub ℒinv Function ℒinv Function TreloarApproximation new ℒinv NonlinearContinua StrainEnergyDensity ψ λ⃗ AbstractVector μ₀ η ρ N₃ N₈ μf ρ I₁ λ⃗ N₈ W3 NonlinearContinua StrainEnergyDensity ℒinv ψ ℒinv λ⃗ μ μf N₃ α maximum λ⃗ μc η α N₃ μ₀ W8 NonlinearContinua StrainEnergyDensity ℒinv ψ ℒinv λ⃗ μ μc N₈ W3 W8 ψ μ₀ η ρ N₃ N₈ ψ data lb μ₀ Inf η Inf ρ Inf N₃ N₈ ub nothing lb lb ub ub \n"
+    url = "Hyperelastics@dev/src/isotropic_incompressible_models.jl"
+    [[input.files]]
+    title = "DavidsonGoulbourne"
+    contents = "Davidson - Goulbourne\nParameters: Gc, Ge, λmax\nModel:\nW = \\frac{G_c}{6}I_1-G_c\\lambda_{max}\\log\\bigg(3\\lambda_{max}^2-I_1\\bigg)+G_e\\sum\\limits_{i=1}^{3}\\big(\\lambda_i+\\frac{1}{\\lambda_i}\\big)\nDavidson JD, Goulbourne NC. A nonaffine network model for elastomers undergoing finite deformations. Journal of the Mechanics and Physics of Solids. 2013 Aug 1;61(8):1784-97.\n\n\n"
+    url = "Hyperelastics@dev/ref/Hyperelastics.DavidsonGoulbourne"
+    [[input.files]]
+    title = "AbstractHyperelasticModel"
+    contents = "AbstractHyperelasticModel"
+    url = "Hyperelastics@dev/ref/Hyperelastics.AbstractHyperelasticModel"
+    [[input.files]]
+    title = "ValanisLandel"
+    contents = "Valanis-Landel\nParameters: μ\nModel:\nW = 2\\mu\\sum\\limits_{1}^{3}(\\lambda_i(\\log\\lambda_i -1))\nValanis KC, Landel RF. The strain‐energy function of a hyperelastic material in terms of the extension ratios. Journal of Applied Physics. 1967 Jun;38(7):2997-3002.\n\n"
+    url = "Hyperelastics@dev/ref/Hyperelastics.ValanisLandel"
+    [[input.files]]
+    title = "Hyperelastics/data_driven.jl"
+    contents = "w′ Function data k Integer interpolant σ̂ interpolant getindex data data s getindex data data λ getindex data data λ f i λ σ̂ λ i σ̂ λ i λ w′ λ sum Base Fix2 f λ k w′ NonlinearContinua StrainEnergyDensity ψ λ⃗ AbstractVector p sum x quadgk ψ w′ x λ⃗ NonlinearContinua SecondPiolaKirchoffStressTensor ψ λ⃗ AbstractVector p adb nothing ψ w′ λ⃗ NonlinearContinua CauchyStressTensor ψ λ⃗ AbstractVector p ψ w′ λ⃗ λ⃗ ψ p s⃗ λ⃗ k n q p ∫ f a b quadgk f a b Ê log getindex λ⃗ Emin Emax extrema Ê σ̂ getindex s⃗ getindex λ⃗ m n k t⃗ range extrema Ê length m N⃗ E map i E k k i i t⃗ t⃗ n N̂ E⃗ vcat N⃗ E⃗ σ E B N⃗ E B σ⃗ E⃗ B N̂ E⃗ B σ′ E B ForwardDiff derivative Base Fix2 σ B E σ′′ E B ForwardDiff derivative Base Fix2 σ′ B E σ′′2 E B σ′′ E B f̂ E⃗ B Wr I length E⃗ σ⃗ E⃗ B σ̂ Wr σ⃗ E⃗ B σ̂ f̃_curve B ∫ Base Fix2 σ′′2 B Emin Emax Emax Emin Cp E B σ′ E B σ E B Cm E B σ′ E B σ E B dCpdE E B ForwardDiff derivative Base Fix2 Cp B E dSpdE E B exp E Cp E B dCpdE E B dCmdE E B ForwardDiff derivative Base Fix2 Cp B E dSmdE E B exp E Cm E B dCmdE E B f̃_stability B ∫ x dSmdE x B Emin ∫ x dSpdE x B Emax Emax Emin f B _ q f̂ Ê B func OptimizationFunction f Optimization AutoForwardDiff prob OptimizationProblem func randn n sol solve prob LBFGS Base Fix2 σ sol u t k i t⃗ k t t⃗ i t⃗ i k t⃗ i t k k i i t⃗ t⃗ t⃗ i k t t⃗ i k t⃗ i t k k i i t⃗ t⃗ t⃗ i t t⃗ i \n"
+    url = "Hyperelastics@dev/src/data_driven.jl"
+    [[input.files]]
+    title = "Hyperelastics/general_form_incompressible_isotropic_models.jl"
+    contents = "NonlinearContinua StrainEnergyDensity ψ λ⃗ AbstractVector C I1 I₁ λ⃗ I2 I₂ λ⃗ I1_vec map Base Fix1 I1 range size C I2_vec map Base Fix1 I2 range size C W I2_vec C I1_vec NonlinearContinua StrainEnergyDensity ψ I⃗ AbstractVector C I W C j i I⃗ i I⃗ j W ψ C NonlinearContinua StrainEnergyDensity ψ λ⃗ AbstractVector A⃗ B⃗ m⃗ n⃗ length A⃗ length m⃗ length B⃗ length n⃗ sum i sum A⃗ λ⃗ i m⃗ sum B⃗ λ⃗ i n⃗ ψ A⃗ B⃗ m⃗ n⃗ NonlinearContinua StrainEnergyDensity ψ λ⃗ AbstractVector C K α β length C length α length K length β W1 C i α i I₁ λ⃗ α i W2 K i β i I₂ λ⃗ β i W W1 W2 W NonlinearContinua StrainEnergyDensity ψ I⃗ AbstractVector C K α β I length C length α length K length β W1 C α I⃗ α sum W2 K β I⃗ β sum W1 W2 ψ C K α β \n"
+    url = "Hyperelastics@dev/src/general_form_incompressible_isotropic_models.jl"
+    [[input.files]]
+    title = "ModifiedFloryErman"
+    contents = "Modified Flory Erman\nParameters: μ, N, κ\nModel:\n``W = W_}+\\sum\\limits_^{3}\\frac{2}[B_i+D_i]\nEdwards SF. The statistical mechanics of polymerized material. Proceedings of the Physical Society (1958-1967). 1967 Sep 1;92(1):9.\n\n\n"
+    url = "Hyperelastics@dev/ref/Hyperelastics.ModifiedFloryErman"
+    [[input.files]]
+    title = "BahremanDarijani"
+    contents = "Bahreman Darijani\nParameters: A2, B2, A4, A6\nModel:\nW = \\sum\\limits_{i = 1}{3}\\sum\\limits_{j=0}^{N} A_j (\\lambda_i^{m_j}-1) + B_j(\\lambda_i^{-n_j}-1)\nBahreman M, Darijani H. New polynomial strain energy function; application to rubbery circular cylinders under finite extension and torsion. Journal of Applied Polymer Science. 2015 Apr 5;132(13).\n\n\n"
+    url = "Hyperelastics@dev/ref/Hyperelastics.BahremanDarijani"
+    [[input.files]]
+    title = "GeneralDarijaniNaghdabadi"
+    contents = "General Darijani Naghdabadi \nParameters: A⃗, B⃗, m⃗, n⃗\nModel:\nW = \\sum\\limits_{i = 1}{3}\\sum\\limits_{j=0}^{N} A_j (\\lambda_i^{m_j}-1) + B_j(\\lambda_i^{-n_j}-1)\nBahreman M, Darijani H. New polynomial strain energy function; application to rubbery circular cylinders under finite extension and torsion. Journal of Applied Polymer Science. 2015 Apr 5;132(13).\n\n\n"
+    url = "Hyperelastics@dev/ref/Hyperelastics.GeneralDarijaniNaghdabadi"
+    [[input.files]]
+    title = "ArmanNarooei"
+    contents = "Arman - Narooei\nParameters: A⃗, B⃗, m⃗, n⃗, α⃗, β⃗\nModel:\nW = \\sum\\limits_{i=1}^{N} A_i\\big[\\exp{m_i(\\lambda_1^{\\alpha_i}+\\lambda_2^{\\alpha_i}+\\lambda_3^{\\alpha_i}-3)}-1] + B_i\\big[\\exp{n_i(\\lambda_1^{-\\beta_i}+\\lambda_2^{-\\beta_i}+\\lambda_3^{-\\beta_i}-3)}-1]\nNarooei K, Arman M. Modification of exponential based hyperelastic strain energy to consider free stress initial configuration and Constitutive modeling. Journal of Computational Applied Mechanics. 2018 Jun 1;49(1):189-96.\n\n\n"
+    url = "Hyperelastics@dev/ref/Hyperelastics.ArmanNarooei"
+    [[input.files]]
+    title = "Hyperelastics/invariants.jl"
+    contents = "NonlinearContinua I₁ λ⃗ AbstractVector sum Base Fix2 λ⃗ NonlinearContinua I₂ λ⃗ AbstractVector sum Base Fix2 λ⃗ NonlinearContinua I₃ λ⃗ AbstractVector prod λ⃗ NonlinearContinua J λ⃗ AbstractVector prod λ⃗ \n"
+    url = "Hyperelastics@dev/src/invariants.jl"
+    [[input.files]]
+    title = "ArrudaBoyce"
+    contents = "Arruda Boyce\nNote: The field ℒinv can be set to change the inverse Langevin function approximation used.\nParameters:\nμ: Small strain shear modulus\n\nN: Square of the locking stretch of the network.\n\n\nModel:\nW = \\mu\\bigg(\\frac{1}{2}(I_1-3)+\\frac{I_1^2-9}{20N}+\\frac{11(I_1^3-27)}{1050N^2}+\\frac{19(I_1^4-81)}{7000N^3}+\\frac{519(I_1^5-243)}{673750N^4}\\bigg)\nArruda EM, Boyce MC. A three-dimensional constitutive model for the large stretch behavior of rubber elastic materials. Journal of the Mechanics and Physics of Solids. 1993 Feb 1;41(2):389-412.\n\n\n"
+    url = "Hyperelastics@dev/ref/Hyperelastics.ArrudaBoyce"
+    [[input.files]]
+    title = "NonaffineMicroSphere"
+    contents = "Non-Affine Micro-Sphere\nNote: The field ℒinv can be set to change the inverse Langevin function approximation used.\nParameters:\nμ: Small strain shear modulus\n\nN: Number of chain segments\n\np: Non-affine stretch parameter\n\nU: Tube geometry parameter\n\nq: Non-affine tube parameter\n\n\nModel: See Paper\n\nMiehe C, Göktepe S, Lulei F. A micro-macro approach to rubber-like materials—part I: the non-affine micro-sphere model of rubber elasticity. Journal of the Mechanics and Physics of Solids. 2004 Nov 1;52(11):2617-60.\n\n\n"
+    url = "Hyperelastics@dev/ref/Hyperelastics.NonaffineMicroSphere"
+    [[input.files]]
+    title = "Hyperelastics/macro_micro_macro_model.jl"
+    contents = "NonlinearContinua StrainEnergyDensity ψ Pchain p₀ weights coeff_loss solver data λchain λ⃗ r⃗ dot r⃗ r⃗ λ⃗ ∂λchain∂λ λ⃗ r⃗ r⃗ r⃗ a b c r⃗ a a a a a a a a a a a a b c c b c c b c c b c c c b c c b c c b c c b c c c b c c b c c b c c b w1 w2 w3 w fill w1 fill w2 fill w3 λ⃗ collect data λ⃗ λch i j λchain λ⃗ i r⃗ j wrᵢ² k i w k r⃗ k i MSE p params data λch wrᵢ² params s₁ getindex data s⃗ s₂ getindex data s⃗ _Pchain Pchain p ∂W∂λᵢ j i wrᵢ² k i _Pchain λch j k s̃₁ ∂W∂λᵢ ∂W∂λᵢ getindex λ⃗ getindex λ⃗ s̃₂ ∂W∂λᵢ ∂W∂λᵢ getindex λ⃗ getindex λ⃗ LossS1 value L2DistLoss s₁ s̃₁ AggMode WeightedSum weights LossS2 value L2DistLoss s₂ s̃₂ AggMode WeightedSum weights LossC coeff_loss p LossS1 LossS2 LossC func OptimizationFunction MSE Optimization AutoForwardDiff prob OptimizationProblem func p₀ data λch wrᵢ² sol solve prob solver g_tol pchain Pchain sol u Wch λch quadgk pchain λch W λ⃗ sum x x Wch λchain λ⃗ x zip w r⃗ W ψ Pchain p₀ weights coeff_loss solver data \n"
+    url = "Hyperelastics@dev/src/macro_micro_macro_model.jl"
+    [[input.files]]
+    title = "MooneyRivlin"
+    contents = "Mooney Rivlin Model\nParameters: C01, C10\nModel:\nW = C_{10}(I_1-3)+C_{01}(I_2-3)\nMooney M. A theory of large elastic deformation. Journal of applied physics. 1940 Sep;11(9):582-92.\n\n\n"
+    url = "Hyperelastics@dev/ref/Hyperelastics.MooneyRivlin"
+    [[input.files]]
+    title = "NeoHookean"
+    contents = "NeoHookean\nParameters:\nμ: Small strain shear modulus\n\n\nModel:\nW = \\frac{\\mu}{2}(I_1-3)\nTreloar LR. The elasticity of a network of long-chain molecules—II. Transactions of the Faraday Society. 1943;39:241-6.\n\n\n"
+    url = "Hyperelastics@dev/ref/Hyperelastics.NeoHookean"
+    [[input.files]]
+    title = "HyperelasticBiaxialTest"
+    contents = "HyperelasticBiaxialTest"
+    url = "Hyperelastics@dev/ref/Hyperelastics.HyperelasticBiaxialTest"
+    [[input.files]]
+    title = "HauptSedlan"
+    contents = "Haupt Sedlan\nParameters: C10, C01, C11, C02, C30\nModel:\nW = \\sum\\limits_{i,j=0}^{3, 2}C_{i,j}(I_1-3)^i(I_2-3)^j\nHaupt P, Sedlan K. Viscoplasticity of elastomeric materials: experimental facts and constitutive modelling. Archive of Applied Mechanics. 2001 Mar;71(2):89-109.\n\n\n"
+    url = "Hyperelastics@dev/ref/Hyperelastics.HauptSedlan"
+    [[input.files]]
+    title = "BechirChevalier"
+    contents = "Bechir Chevalier\nParameters: μ₀, η, ρ, N₃, N₈\nModel:\nW = W_{3Chain}(\\mu_f, N_3)+W_{8Chain}(\\frac{\\mu_c}{3}, N_8)\nwhere:\n\\mu_f = \\rho\\sqrt{\\frac{I_1}{3N_8}}\n\\mu_c = \\bigg(1-\\frac{\\eta\\alpha}{\\sqrt{N_3}}\\bigg)\\mu_0\n\\alpha = \\max{\\lambda_1, \\lambda_2, \\lambda_3}\nBechir H, Chevalier L, Idjeri M. A three-dimensional network model for rubber elasticity: The effect of local entanglements constraints. International journal of engineering science. 2010 Mar 1;48(3):265-74.\n\n\n"
+    url = "Hyperelastics@dev/ref/Hyperelastics.BechirChevalier"
+    [[input.files]]
+    title = "InverseLangevinApproximations"
+    contents = "InverseLangevinApproximations\nMain set of models are from \"Approximation of the inverse Langevin function revisited\" by Radosław Jedynak\nCiting\nSee CITATION.bib for the relevant reference(s).\n\n"
+    url = "Hyperelastics@dev/doc/InverseLangevinApproximations/README.md"
+    [[input.files]]
+    title = "AbstractHyperelasticTest"
+    contents = "AbstractHyperelasticTest"
+    url = "Hyperelastics@dev/ref/Hyperelastics.AbstractHyperelasticTest"
+    [[input.files]]
+    title = "GenYeoh"
+    contents = "GenYeoh\nParameters: K1, K2, K3, m, p, q\nModel:\nW = K_1 (I_1 - 3)^m + K_2 * (I_1 - 3)^p + K_3 * (I_1 - 3)^q\nHohenberger TW, Windslow RJ, Pugno NM, Busfield JJ. A constitutive model for both low and high strain nonlinearities in highly filled elastomers and implementation with user-defined material subroutines in ABAQUS. Rubber Chemistry and Technology. 2019;92(4):653-86.\n\n\n"
+    url = "Hyperelastics@dev/ref/Hyperelastics.GenYeoh"
+    [[input.files]]
+    title = "YamashitaKawabata"
+    contents = "Yamashita-Kawabata\nParameters: C1, C2, C3, N\nModel:\nW = C_1(I_1-3)+C_2(I_2-3)+\\frac{C_3}{N+1}(I_1-3)^{N+1}\nYamashita Y, Kawabata S. Approximated form of the strain energy-density function of carbon-black filled rubbers for industrial applications. Nippon Gomu Kyokaishi(Journal of the Society of Rubber Industry, Japan)(Japan). 1992;65(9):517-28.\n\n\n"
+    url = "Hyperelastics@dev/ref/Hyperelastics.YamashitaKawabata"
+    [[input.files]]
+    title = "HyperelasticDataEntry"
+    contents = "HyperelasticDataEntry"
+    url = "Hyperelastics@dev/ref/Hyperelastics.HyperelasticDataEntry"
+    [[input.files]]
+    title = "ThreeChainModel"
+    contents = "Three Chain Model\nNote: The field ℒinv can be set to change the inverse Langevin function approximation used. Currently, the default choice is the Pade 3/2 Approximation from Cohen 1991 \nParameters:\nμ: Small strain shear modulus\n\nN: Square of the locking stretch of the network.\n\n\nModel:\nW = \\frac{\\mu\\sqrt{N}}{3}\\sum\\limits_{i=1}^{3}\\bigg(\\lambda_i\\beta_i+\\sqrt{N}\\log\\bigg(\\frac{\\beta_i}{\\sinh \\beta_i}\\bigg)\\bigg)\nJames HM, Guth E. Theory of the elastic properties of rubber. The Journal of Chemical Physics. 1943 Oct;11(10):455-81. Cohen A. A Padé approximant to the inverse Langevin function. Rheologica acta. 1991 May;30(3):270-3.\n\n\n"
+    url = "Hyperelastics@dev/ref/Hyperelastics.ThreeChainModel"
+    [[input.files]]
+    title = "Amin"
+    contents = "Amin\nParameters: C1, C2, C3, C4, N, M\nModel:\nW = C_1 (I_1 - 3) + \\frac{C_2}{N + 1} (I_1 - 3)^{N + 1} + \\frac{C_3}{M + 1} (I_1 - 3)^{M + 1} + C_4 (I_2 - 3)\nAmin AF, Wiraguna SI, Bhuiyan AR, Okui Y. Hyperelasticity model for finite element analysis of natural and high damping rubbers in compression and shear. Journal of engineering mechanics. 2006 Jan;132(1):54-64.\n\n\n"
+    url = "Hyperelastics@dev/ref/Hyperelastics.Amin"
+    [[input.files]]
+    title = "AbstractHyperelasticProblem"
+    contents = "AbstractHyperelasticProblem"
+    url = "Hyperelastics@dev/ref/Hyperelastics.AbstractHyperelasticProblem"
+    [[input.files]]
+    title = "Ogden"
+    contents = "Ogden\nParameters: μ⃗, α⃗\nModel:\nW = \\sum\\limits_{i=1}^{N}\\frac{\\mu_i}{\\alpha_i}(\\lambda_1^{\\alpha_i}+\\lambda_2^{\\alpha_i}+\\lambda_3^{\\alpha_i}-3)\nOgden RW. Large deformation isotropic elasticity–on the correlation of theory and experiment for incompressible rubberlike solids. Proceedings of the Royal Society of London. A. Mathematical and Physical Sciences. 1972 Feb 1;326(1567):565-84.\n\n\n"
+    url = "Hyperelastics@dev/ref/Hyperelastics.Ogden"
+    [[input.files]]
+    title = "YeohFleming"
+    contents = "Yeoh-Fleming\nParameters: A, B, C10, Im\nModel:\nW = \\frac{A}{B}(1-\\exp{-B(I_1-3)}) - C_{10}(I_m-3)\\log{1-\\frac{I_1-3}{I_m-3}}\nYeoh OH, Fleming PD. A new attempt to reconcile the statistical and phenomenological theories of rubber elasticity. Journal of Polymer Science Part B: Polymer Physics. 1997 Sep 15;35(12):1919-31.\n\n\n"
+    url = "Hyperelastics@dev/ref/Hyperelastics.YeohFleming"
+    [[input.files]]
+    title = "TODO"
+    contents = "[ ] AffineMicroSphere\n\n[ ] Beda\n\n[ ] HorganMurphy\n\n[ ] HorganSaccomandi\n\n[ ] KhiemItskov\n\n[ ] LinearElastic\n\n[ ] GeneralCompressible\n\n[ ] LogarithmicCompressible\n\n[ ] GeneralMooneyRivlin\n\n[ ] MCC\n\n[ ] NonaffineMicroSphere\n\n[ ] Shariff\n\n\n\n"
+    url = "Hyperelastics@dev/doc/TODO.md"
+    [[input.files]]
+    title = "models"
+    contents = "\\\\frac{1}{2}\n\n"
+    url = "Hyperelastics@dev/doc/docs_bku/models.md"
+    [[input.files]]
+    title = "Hyperelastics/data_types.jl"
+    contents = "\n"
+    url = "Hyperelastics@dev/src/data_types.jl"
+    [[input.files]]
+    title = "InvariantForm"
+    contents = "InvariantForm"
+    url = "Hyperelastics@dev/ref/Hyperelastics.InvariantForm"
+    [[input.files]]
+    title = "TakamizawaHayashi"
+    contents = "Takamizawa-Hayashi From: A description of arterial wall mechanics using limiting chain extensibility constitutitive models by Horgan and Saccomandi\nParameters: c, Jₘ\nModel:\nW = -c\\log{1-\\big(\\frac{I_1-3}{J_m}\\big)^2}\nTakamizawa K, Hayashi K. Strain energy density function and uniform strain hypothesis for arterial mechanics. Journal of biomechanics. 1987 Jan 1;20(1):7-17.\n\n\n"
+    url = "Hyperelastics@dev/ref/Hyperelastics.TakamizawaHayashi"
+    [[input.files]]
+    title = "Gent"
+    contents = "Gent\nParameters:\nμ:  Small strain shear modulus\n\nJₘ: Limiting stretch invariant\n\n\nModel:\nW = -\\frac{\\mu J_m}{2}\\log{\\bigg(1-\\frac{I_1-3}{J_m}\\bigg)}\nGent AN. A new constitutive relation for rubber. Rubber chemistry and technology. 1996 Mar;69(1):59-61.\n\n\n"
+    url = "Hyperelastics@dev/ref/Hyperelastics.Gent"
+    [[input.files]]
+    title = "Hyperelastics/isotropic_compressible_models.jl"
+    contents = "incompressible NonlinearContinua StrainEnergyDensity ψ λ⃗ AbstractVector p J prod λ⃗ StrainEnergyDensity ψ incompressible λ⃗ cbrt J p p κ J NonlinearContinua StrainEnergyDensity ψ F AbstractMatrix p J det F StrainEnergyDensity ψ incompressible F cbrt J p p κ J NonlinearContinua CauchyStressTensor ψ λ⃗ AbstractVector p adb AD ForwardDiffBackend σ_dev p κ prod λ⃗ σ CauchyStressTensor ψ incompressible λ⃗ cbrt prod λ⃗ p adb adb σ σ_dev NonlinearContinua CauchyStressTensor ψ F AbstractMatrix p adb AD ForwardDiffBackend σ_dev p κ J F σ CauchyStressTensor ψ incompressible F cbrt J F p adb adb σ σ_dev NonlinearContinua SecondPiolaKirchoffStressTensor ψ λ⃗ AbstractVector p adb AD ForwardDiffBackend s_dev p κ J F λ⃗ s SecondPiolaKirchoffStressTensor ψ incompressible λ⃗ cbrt J λ⃗ p adb adb s s_dev NonlinearContinua SecondPiolaKirchoffStressTensor ψ F AbstractMatrix p adb AD ForwardDiffBackend s_dev p κ J F inv F s SecondPiolaKirchoffStressTensor ψ incompressible F cbrt J F p adb adb s s_dev Base show io IO ψ println io ψ incompressible println io incompressible NonlinearContinua StrainEnergyDensity ψ λ⃗ p StrainEnergyDensity ψ incompressible λ⃗ p p κ J log J J NonlinearContinua CauchyStressTensor ψ λ⃗ Vector p adb AD ForwardDiffBackend σ_dev p κ log J λ⃗ σ CauchyStressTensor ψ incompressible λ⃗ cbrt prod λ⃗ p adb adb σ σ_dev NonlinearContinua CauchyStressTensor ψ F Matrix p adb AD ForwardDiffBackend σ_dev p κ log J F σ CauchyStressTensor ψ incompressible F cbrt J F p adb adb σ σ_dev NonlinearContinua SecondPiolaKirchoffStressTensor ψ λ⃗ Vector p adb AD ForwardDiffBackend s_dev p κ log J λ λ s SecondPiolaKirchoffStressTensor ψ incompressible λ⃗ cbrt J λ⃗ p adb adb s s_dev NonlinearContinua SecondPiolaKirchoffStressTensor ψ F Matrix p adb AD ForwardDiffBackend s_dev p κ log J λ λinv F s SecondPiolaKirchoffStressTensor ψ incompressible F cbrt J F p adb adb s s_dev Base show io IO ψ println io ψ incompressible println io \n"
+    url = "Hyperelastics@dev/src/isotropic_compressible_models.jl"
+    [[input.files]]
+    title = "GeneralConstitutiveModel_Tube"
+    contents = "GeneralConstitutiveModel_Tube"
+    url = "Hyperelastics@dev/ref/Hyperelastics.GeneralConstitutiveModel_Tube"
+    [[input.files]]
+    title = "GornetDesmorat"
+    contents = "Gornet - Desmorat\nParameters: h₁, h₂, h₃\nModel: W = h_1\\int\\exp{h_3(I_1-3)^2}\\text{d}I_1+3h_2\\int\\frac{1}{\\sqrt{I_2}}\\text{d}I_2 = \\frac{h_1 \\sqrt{\\pi} \\text{erfi}(\\sqrt{h_3}(I_1-3)^2)}{2\\sqrt{h_3}}+6h_2\\sqrt{I_2}\nNote: the differential form was original form and the closed form SEF was determine via symbolic integration in Mathematica. The model is not compatible with AD and has methods for the Second Piola Kirchoff Stress Tensor and Cauchy Stress Tensor implemented.\n\n\nGornet L, Marckmann G, Desmorat R, Charrier P. A new isotropic hyperelastic strain energy function in terms of invariants and its derivation into a pseudo-elastic model for Mullins effect: application to finite element analysis. Constitutive Models for Rubbers VII. 2012:265-71.\n\n\n"
+    url = "Hyperelastics@dev/ref/Hyperelastics.GornetDesmorat"
+    [[input.files]]
+    title = "Beatty"
+    contents = "Beatty Model\nParameters: G₀, Iₘ\nModel:\nW = -\\frac{G_0 I_m(I_m-3)}{2(2I_m-3)}\\log\\bigg(\\frac{1-\\frac{I_1-3}{I_m-3}}{1+\\frac{I_1-3}{I_m}} \\bigg)\nBeatty MF. On constitutive models for limited elastic, molecular based materials. Mathematics and mechanics of solids. 2008 Jul;13(5):375-87.\n\n\n"
+    url = "Hyperelastics@dev/ref/Hyperelastics.Beatty"
+    [[input.files]]
+    title = "Carroll"
+    contents = "Carroll\nParameters: A, B, C\nModel:\nW = AI_1+BI_1^4+C\\sqrt{I_2}\nCarroll M. A strain energy function for vulcanized rubbers. Journal of Elasticity. 2011 Apr;103(2):173-87.\n\n\n"
+    url = "Hyperelastics@dev/ref/Hyperelastics.Carroll"
+    [[input.files]]
+    title = "Hyperelastics/model_functions.jl"
+    contents = "NonlinearContinua StrainEnergyDensity ψ λ⃗ AbstractVector p typeof ψ NonlinearContinua StrainEnergyDensity ψ F AbstractMatrix p C transpose F F λ⃗² eigvals C λ⃗ sqrt abs λ⃗² StrainEnergyDensity ψ λ⃗ p NonlinearContinua StrainEnergyDensity ψ I⃗ AbstractVector p I typeof ψ NonlinearContinua StrainEnergyDensity ψ F AbstractMatrix p I NonlinearContinua StrainEnergyDensity ψ I₁ F I₂ F I₃ F p I NonlinearContinua SecondPiolaKirchoffStressTensor ψ λ⃗ AbstractVector p adb AD ForwardDiffBackend W λ⃗ StrainEnergyDensity ψ λ⃗ p ∂W∂λ AD gradient adb W λ⃗ ∂W∂λ NonlinearContinua SecondPiolaKirchoffStressTensor ψ F AbstractMatrix p adb AD ForwardDiffBackend σ CauchyStressTensor ψ F p S sqrt det F F inv F σ S NonlinearContinua CauchyStressTensor ψ λ⃗ AbstractVector p adb AD ForwardDiffBackend W λ⃗ StrainEnergyDensity ψ λ⃗ p ∂W∂λ AD gradient adb W λ⃗ σ ∂W∂λ λ⃗ J λ⃗ σ NonlinearContinua CauchyStressTensor ψ F AbstractMatrix p adb AD ForwardDiffBackend B F F a eigvecs B B_prin Diagonal a B a V_prin sqrt B_prin V a V_prin a R inv V F λ⃗ sqrt diag B_prin W StrainEnergyDensity ψ λ⃗ p σ̂ CauchyStressTensor ψ λ⃗ p Diagonal σ R a σ̂ a R σ ψ typeof ψ ψ data lb nothing ub nothing lb lb ub ub ψ data nothing \n"
+    url = "Hyperelastics@dev/src/model_functions.jl"
+    [[input.files]]
+    title = "Tube"
+    contents = "Tube\nParameters: Gc, Ge, β\nModel:\nW = \\sum\\limits_{i=1}^{3}\\frac{G_c}{2}(\\lambda_i^2-1)+\\frac{2Ge}{\\beta^2}(\\lambda_i^{-\\beta}-1)\nHeinrich G, Kaliske M. Theoretical and numerical formulation of a molecular based constitutive tube-model of rubber elasticity. Computational and Theoretical Polymer Science. 1997 Jan 1;7(3-4):227-41.\n\n\n"
+    url = "Hyperelastics@dev/ref/Hyperelastics.Tube"
+    [[input.files]]
+    title = "Attard"
+    contents = "Attard\nParameters: A⃗, B⃗\nModel:\nW = \\sum\\limits_{i=1}^N\\frac{A_i}{2i}(\\lambda_1^{2i}+\\lambda_2^{2i}+\\lambda_3^{2i}-3) + \\frac{B_i}{2i}(\\lambda_1^{-2i}+\\lambda_2^{-2i}+\\lambda_3^{-2i}-3)\nAttard MM, Hunt GW. Hyperelastic constitutive modeling under finite strain. International Journal of Solids and Structures. 2004 Sep 1;41(18-19):5327-50.\n\n\n"
+    url = "Hyperelastics@dev/ref/Hyperelastics.Attard"
+    [[input.files]]
+    title = "toc_backup"
+    contents = "\n"
+    url = "Hyperelastics@dev/doc/toc_backup.md"
+    [[input.files]]
+    title = "ConstrainedJunction"
+    contents = "Constrained Junction \nParameters: Gc, νkT, κ\nModel:\nW = G_c (I_1-3)+ \\frac{\\nu k T}{2}(\\sum\\limits_{i=1}^{3}\\kappa\\frac{\\lambda_i-1}{\\lambda_i^2+\\kappa}+\\log{\\frac{\\lambda_i^2+\\kappa}{1+\\kappa}}-\\log{\\lambda_i^2})\nFlory PJ, Erman B. Theory of elasticity of polymer networks. 3. Macromolecules. 1982 May;15(3):800-6. Erman B, Flory PJ. Relationships between stress, strain, and molecular constitution of polymer networks. Comparison of theory with experiments. Macromolecules. 1982 May;15(3):806-11.\n\n\n"
+    url = "Hyperelastics@dev/ref/Hyperelastics.ConstrainedJunction"
+    [[input.files]]
+    title = "Treloar1944Uniaxial"
+    contents = "Treloar1944Uniaxial"
+    url = "Hyperelastics@dev/ref/Hyperelastics.Treloar1944Uniaxial"
+    [[input.files]]
+    title = "Beda"
+    contents = "Beda\nParameters: C1, C2, C3, K1, α, β, ζ\nModel:\nW = \\frac{C_1}{\\alpha}(I_1-3)^{\\alpha}+C_2(I_1-3)+\\frac{C_3}{\\zeta}(I_1-3)^{\\zeta}+\\frac{K_1}{\\beta}(I_2-3)^\\beta\nBeda T. Reconciling the fundamental phenomenological expression of the strain energy of rubber with established experimental facts. Journal of Polymer Science Part B: Polymer Physics. 2005 Jan 15;43(2):125-34.\n\n\n"
+    url = "Hyperelastics@dev/ref/Hyperelastics.Beda"
+    [[input.files]]
+    title = "HossMarczakII"
+    contents = "Hoss Marczak II\nParameters: α, β, μ, b, n, C2\nModel:\nW = \\frac{\\alpha}{\\beta}(1-\\exp{-\\beta(I_1-3)})+\\frac{\\mu}{2b}\\bigg((1+\\frac{b}{n}(I_1-3))^n -1\\bigg)+C_2\\log(\\frac{I_2}{3})\nNote: The authors suggests this model for high strains.\n\n\nHoss L, Marczak RJ. A new constitutive model for rubber-like materials. Mecánica Computacional. 2010;29(28):2759-73.\n\n\n"
+    url = "Hyperelastics@dev/ref/Hyperelastics.HossMarczakII"
+    [[input.files]]
+    title = "Isihara"
+    contents = "Isihara\nParameters: C10, C20, C01\nModel:\nW = \\sum\\limits_{i,j=0}^{2, 1}C_{i,j}(I_1-3)^i(I_2-3)^j\nIsihara A, Hashitsume N, Tatibana M. Statistical theory of rubber‐like elasticity. IV.(two‐dimensional stretching). The Journal of Chemical Physics. 1951 Dec;19(12):1508-12.\n\n\n"
+    url = "Hyperelastics@dev/ref/Hyperelastics.Isihara"
+    [[input.files]]
+    title = "Shariff"
+    contents = "Shariff\nParameters: E, α⃗\nModel:\nW = E\\sum\\limits_{i=1}^3\\sum\\limits_{j=1}^{N}|\\alpha_j| \\Phi_j(\\lambda_i)\nShariff MH. Strain energy function for filled and unfilled rubberlike material. Rubber chemistry and technology. 2000 Mar;73(1):1-8.\n\n\n"
+    url = "Hyperelastics@dev/ref/Hyperelastics.Shariff"
+    [[input.files]]
+    title = "GeneralBeda"
+    contents = "General Beda \nParameters: C, K, α, β\nModel:\nW = \\sum\\limits_{i = 1}^{N}\\frac{C_i}{\\alpha_i}(I_1-3)^{\\alpha_i} + \\sum\\limits_{j=1}^{M}\\frac{K_j}{\\beta_j}(I_2-3)^{\\beta_j}\nBeda T. Reconciling the fundamental phenomenological expression of the strain energy of rubber with established experimental facts. Journal of Polymer Science Part B: Polymer Physics. 2005 Jan 15;43(2):125-34.\n\n\n"
+    url = "Hyperelastics@dev/ref/Hyperelastics.GeneralBeda"
+    [[input.files]]
+    title = "HyperelasticUniaxialTest"
+    contents = "HyperelasticUniaxialTest"
+    url = "Hyperelastics@dev/ref/Hyperelastics.HyperelasticUniaxialTest"
+    [[input.files]]
+    title = "Lion"
+    contents = "Lion\nParameters: C10, C01, C50\nModel:\nW = \\sum\\limits_{i,j=0}^{5,1}C_{i,j}(I_1-3)^i(I_2-3)^j\nLion A. On the large deformation behaviour of reinforced rubber at different temperatures. Journal of the Mechanics and Physics of Solids. 1997 Nov 1;45(11-12):1805-34.\n\n\n"
+    url = "Hyperelastics@dev/ref/Hyperelastics.Lion"
+    [[input.files]]
+    title = "AbstractDataDrivenHyperelasticModel"
+    contents = "AbstractDataDrivenHyperelasticModel"
+    url = "Hyperelastics@dev/ref/Hyperelastics.AbstractDataDrivenHyperelasticModel"
+    [[input.files]]
+    title = "StrainEnergyDensityFunction"
+    contents = "StrainEnergyDensityFunction"
+    url = "Hyperelastics@dev/ref/Hyperelastics.StrainEnergyDensityFunction"
+    [[input.files]]
+    title = "LopezPamies"
+    contents = "Lopez-Pamies\nParameters: α⃗, μ⃗\nModel:\nW = \\frac{3^{1 - \\alpha_i}}{2\\alpha_i} \\mu_i (I_1^{\\alpha_i} - 3^{\\alpha_i})\nLopez-Pamies O. A new I1-based hyperelastic model for rubber elastic materials. Comptes Rendus Mecanique. 2010 Jan 1;338(1):3-11.\n\n\n"
+    url = "Hyperelastics@dev/ref/Hyperelastics.LopezPamies"
+    [[input.files]]
+    title = "ContinuumHybrid"
+    contents = "Continuum Hybrid\nParameters: K₁, K₂, α, μ\nModel:\nW = K_1(I_1-3)+K_2\\log\\frac{I_2}{3}+\\frac{\\mu}{\\alpha}(\\lambda_1^\\alpha+\\lambda_2^\\alpha+\\lambda^\\alpha-3)\nBeda T, Chevalier Y. Hybrid continuum model for large elastic deformation of rubber. Journal of applied physics. 2003 Aug 15;94(4):2701-6.\n\n\n"
+    url = "Hyperelastics@dev/ref/Hyperelastics.ContinuumHybrid"
+    [[input.files]]
+    title = "PucciSaccomandi"
+    contents = "Pucci-Saccomandi\nParameters: K, μ, Jₘ\nModel:\nW = K\\log{\\frac{I_2}{3}}-\\frac{\\mu J_m}{2}\\log{1-\\frac{I_1-3}{J-m}}\nPucci E, Saccomandi G. A note on the Gent model for rubber-like materials. Rubber chemistry and technology. 2002 Nov;75(5):839-52.\n\n\n"
+    url = "Hyperelastics@dev/ref/Hyperelastics.PucciSaccomandi"
+    [[input.files]]
+    title = "HorganMurphy"
+    contents = "Horgan Murphy Model\nParameters: μ, Jₘ, c\nModel: -\\frac{2\\mu J_m}{c^2}\\log\\bigg(1-\\frac{\\lambda_1^c+\\lambda_2^c+\\lambda_3^c-3}{J_m})\nHorgan CO, Murphy JG. Limiting chain extensibility constitutive models of Valanis–Landel type. Journal of Elasticity. 2007 Feb;86(2):101-11.\n\n\n"
+    url = "Hyperelastics@dev/ref/Hyperelastics.HorganMurphy"
+    [[input.files]]
+    title = "Hyperelastics/Hyperelastics.jl"
+    contents = "Hyperelastics Reexport NonlinearContinua InverseLangevinApproximations LossFunctions Optimization AbstractDifferentiation ForwardDiff Tullio SpecialFunctions DataInterpolations QuadGK ComponentArrays LabelledArrays StructArrays LinearAlgebra Statistics Term predict citation NonlinearContinua AbstractMaterialTest NonlinearContinua AbstractMaterialModel include include include include include include include include include include include \n"
+    url = "Hyperelastics@dev/src/Hyperelastics.jl"
+    [[input.files]]
+    title = "EdwardVilgis"
+    contents = "Edward-Vilgis\nParameters:\nNs: Number of sliplinks\n\nNc: Number of crosslinks\n\nα: A measure of chain inextensibility\n\nη: A measure of the amount of chain slippage\n\n\nNote: Since α and η result from the same mechanism, they should be of approximately the same order of magnitude. Large differences between the two may indicate an issue with the optimizer or initial guess. Model:\nW = \\frac{1}{2}N_C\\Bigg[\\frac{(1-\\alpha^2)I_1}{1-\\alpha^2I_1}+\\log(1-\\alpha^2I_1)\\Bigg]+\\frac{1}{2}N_S\\Bigg[\\sum_{i=1}^{3}\\Big\\{\\frac{(1+\\eta)(1-\\alpha^2)\\lambda_i^2}{( 1+\\eta\\lambda_i^2)(1-\\alpha^2I_1)}+\\log(1+\\eta\\lambda_i^2)\\Big\\}+\\log(1-\\alpha^2I_1)\\Bigg]\nEdwards SF, Vilgis T. The effect of entanglements in rubber elasticity. Polymer. 1986 Apr 1;27(4):483-92.\n\n\n"
+    url = "Hyperelastics@dev/ref/Hyperelastics.EdwardVilgis"
+    [[input.files]]
+    title = "LogarithmicCompressible"
+    contents = "Logarithmic Compressible Model\nParameters: ψ, κ\nModel: \\psi_{compressible} = \\psi_{incompressible}(\\vec{\\lambda}_{incompressible})+\\kappa(J\\log{J} - J)\nExample Implementation: StrainEnergyDensityFunction(LogarithmicCompressible(NeoHookean()), λ⃗, (ψ = (μ=μ, ), κ = κ))\n\n"
+    url = "Hyperelastics@dev/ref/Hyperelastics.LogarithmicCompressible"
+    [[input.files]]
+    title = "HyperelasticProblem"
+    contents = "HyperelasticProblem"
+    url = "Hyperelastics@dev/ref/Hyperelastics.HyperelasticProblem"
+    [[input.files]]
+    title = "Knowles"
+    contents = "Knowles\nParameters: μ, b, n\nModel:\nW = \\frac{\\mu}{2b}((1+\\frac{b}{n}(I_1-3))^n-1)\nKnowles JK. The finite anti-plane shear field near the tip of a crack for a class of incompressible elastic solids. International Journal of Fracture. 1977 Oct;13(5):611-39.\n\n\n"
+    url = "Hyperelastics@dev/ref/Hyperelastics.Knowles"
+    [[input.files]]
+    title = "SussmanBathe"
+    contents = "Sussman Bathe\nParameters: data, k, interpolant\nψ = SussmanBathe(data, k, interpolant) W = StrainEnergyDensityFunction(ψ, λ⃗, ())\nSussman T, Bathe KJ. A model of incompressible isotropic hyperelastic material behavior using spline interpolations of tension–compression test data. Communications in numerical methods in engineering. 2009 Jan;25(1):53-63.\n\n\n"
+    url = "Hyperelastics@dev/ref/Hyperelastics.SussmanBathe"
+    [[input.files]]
+    title = "ZunigaBeatty"
+    contents = "Zuniga - Beatty\nParameters: μ, N₃, N₈\nModel:\nW = \\sqrt{\\frac{N_3+N_8}{2N_3}}W_{3Chain}+\\sqrt{\\frac{I_1}{3N_8}}W_{8Chain}\nElı́as-Zúñiga A, Beatty MF. Constitutive equations for amended non-Gaussian network models of rubber elasticity. International journal of engineering science. 2002 Dec 1;40(20):2265-94.\n\n\n"
+    url = "Hyperelastics@dev/ref/Hyperelastics.ZunigaBeatty"
+    [[input.files]]
+    title = "StabilitySmoothedSussmanBathe"
+    contents = "Smoothed Sussman Bathe\nModel: See paper for smoothing description.\nParameters: s⃗\nLatorre M, Montáns FJ. Experimental data reduction for hyperelasticity. Computers & Structures. 2020 May 1;232:105919.\n\n\n"
+    url = "Hyperelastics@dev/ref/Hyperelastics.StabilitySmoothedSussmanBathe"
