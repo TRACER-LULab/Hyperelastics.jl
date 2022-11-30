@@ -5,11 +5,17 @@ export MooneyRivlin, NeoHookean, Gent, Biderman, Isihara, JamesGreenSimpson, Lio
 """
 ABGI
 
-Parameters: μ, N, Ge, n
-
 Model:
 
-``W = W_{Arruda-Boyce} + G_e\\frac{\\lambda_1^n+\\lambda_2^2+\\lambda_3^2-3}{n}``
+```math
+W = W_{Arruda-Boyce} + \\frac{G_e}{n}\\left(\\sum\\limits_{i=1}^{3}\\lambda_i^n-3\\right)
+```
+
+Parameters:
+- μ
+- N
+- Ge
+- n
 
 > Meissner B, Matějka L. A Langevin-elasticity-theory-based constitutive equation for rubberlike networks and its comparison with biaxial stress–strain data. Part I. Polymer. 2003 Jul 1;44(16):4599-610.
 """
@@ -37,11 +43,15 @@ end
 """
 Affine Micro-Sphere
 
-Note: The field `ℒinv` can be set to change the inverse Langevin function approximation used
+Model:
+- See Paper
 
-Parameters: μ, N, p, U, q
+Parameters:
+- μ
+- N
 
-Model: See Paper
+Note:
+- The field `ℒinv` can be set to change the inverse Langevin function approximation used
 
 ---
 > Miehe C, Göktepe S, Lulei F. A micro-macro approach to rubber-like materials—part I: the non-affine micro-sphere model of rubber elasticity. Journal of the Mechanics and Physics of Solids. 2004 Nov 1;52(11):2617-60.
@@ -106,11 +116,19 @@ end
 """
 Alexander
 
-Parameters: μ, C₁, C₂, C₃, k, γ
-
 Model:
 
-``W = \\frac{C_1 \\sqrt{\\pi}\\text{erfi}\\big(\\sqrt{k}(I_1-3)\\big)}{2\\sqrt{k}}+C_2\\log{\\frac{I_2-3+\\gamma}{\\gamma}}+C_3(I_2-3)``
+```math
+W = \\frac{C_1 \\sqrt{\\pi}\\text{erfi}\\big(\\sqrt{k}(I_1-3)\\big)}{2\\sqrt{k}}+C_2\\log{\\frac{I_2-3+\\gamma}{\\gamma}}+C_3(I_2-3)
+```
+
+Parameters:
+- μ
+- C₁
+- C₂
+- C₃
+- k
+- γ
 
 > Alexander H. A constitutive relation for rubber-like materials. International Journal of Engineering Science. 1968 Sep 1;6(9):549-63.
 """
@@ -141,11 +159,15 @@ end
 """
 Mooney Rivlin Model
 
-Parameters: C01, C10
-
 Model:
 
-``W = C_{10}(I_1-3)+C_{01}(I_2-3)``
+```math
+W = C_{10}(I_1-3)+C_{01}(I_2-3)
+```
+
+Parameters:
+- C01
+- C10
 
 > Mooney M. A theory of large elastic deformation. Journal of applied physics. 1940 Sep;11(9):582-92.
 """
@@ -173,12 +195,14 @@ parameters(ψ::MooneyRivlin) = (:C10, :C01)
 """
 NeoHookean
 
-Parameters:
-- μ: Small strain shear modulus
-
 Model:
 
-``W = \\frac{\\mu}{2}(I_1-3)``
+```math
+W = \\frac{\\mu}{2}(I_1-3)
+```
+
+Parameters:
+- μ: Small strain shear modulus
 
 > Treloar LR. The elasticity of a network of long-chain molecules—II. Transactions of the Faraday Society. 1943;39:241-6.
 """
@@ -197,11 +221,16 @@ parameters(ψ::NeoHookean) = (:μ,)
 """
 Isihara
 
-Parameters: C10, C20, C01
-
 Model:
 
-``W = \\sum\\limits_{i,j=0}^{2, 1}C_{i,j}(I_1-3)^i(I_2-3)^j``
+```math
+W = \\sum\\limits_{i,j=0}^{2, 1}C_{i,j}(I_1-3)^i(I_2-3)^j
+```
+
+Parameters:
+- C10
+- C20
+- C01
 
 > Isihara A, Hashitsume N, Tatibana M. Statistical theory of rubber‐like elasticity. IV.(two‐dimensional stretching). The Journal of Chemical Physics. 1951 Dec;19(12):1508-12.
 """
@@ -237,11 +266,17 @@ parameters(ψ::Isihara) = (:C10, :C20, :C01)
 """
 Biderman
 
-Parameters: C10, C01, C20, C30
-
 Model:
 
-``W = \\sum\\limits_{i,j=0}^{3, 1}C_{i,j}(I_1-3)^i(I_2-3)^j``
+```math
+W = \\sum\\limits_{i,j=0}^{3, 1}C_{i,j}(I_1-3)^i(I_2-3)^j
+```
+
+Parameters:
+- C10
+- C01
+- C20
+- C30
 
 > Biderman VL. Calculation of rubber parts. Rascheti na prochnost. 1958;40.
 """
@@ -277,11 +312,18 @@ parameters(ψ::Biderman) = (:C10, :C01, :C20, :C30)
 """
 James-Green-Simpson
 
-Parameters: C10, C01, C11, C20, C30
-
 Model:
 
-``W = \\sum\\limits_{i,j=0}^{3, 1}C_{i,j}(I_1-3)^i(I_2-3)^j``
+```math
+W = \\sum\\limits_{i,j=0}^{3, 1}C_{i,j}(I_1-3)^i(I_2-3)^j
+```
+
+Parameters:
+- C10
+- C01
+- C11
+- C20
+- C30
 
 > James AG, Green A, Simpson GM. Strain energy functions of rubber. I. Characterization of gum vulcanizates. Journal of Applied Polymer Science. 1975 Jul;19(7):2033-58.
 """
@@ -317,11 +359,19 @@ parameters(ψ::JamesGreenSimpson) = (:C10, :C01, :C11, :C20, :C30)
 """
 Haines-Wilson
 
-Parameters: C10, C01, C11, C02, C20, C30
-
 Model:
 
-``W = \\sum\\limits_{i,j=0}^{3, 2}C_{i,j}(I_1-3)^i(I_2-3)^j``
+```math
+W = \\sum\\limits_{i,j=0}^{3, 2}C_{i,j}(I_1-3)^i(I_2-3)^j
+```
+
+Parameters:
+- C10
+- C01
+- C11
+- C02
+- C20
+- C30
 
 > Haines DW, Wilson WD. Strain-energy density function for rubberlike materials. Journal of the Mechanics and Physics of Solids. 1979 Aug 1;27(4):345-60.
 """
@@ -359,11 +409,16 @@ parameters(ψ::HainesWilson) = (:C10, :C01, :C11, :C02, :C20, :C30)
 """
 Yeoh
 
-Parameters: C10, C20, C30
-
 Model:
 
-``W = \\sum\\limits_{i,j=0}^{3, 0}C_{i,j}(I_1-3)^i(I_2-3)^j``
+```math
+W = \\sum\\limits_{i,j=0}^{3, 0}C_{i,j}(I_1-3)^i(I_2-3)^j
+```
+
+Parameters:
+- C10
+- C20
+- C30
 
 > Yeoh OH. Characterization of elastic properties of carbon-black-filled rubber vulcanizates. Rubber chemistry and technology. 1990 Nov;63(5):792-805.
 """
@@ -391,11 +446,16 @@ parameters(ψ::Yeoh) = (:C10, :C20, :C30)
 """
 Lion
 
-Parameters: C10, C01, C50
-
 Model:
 
-``W = \\sum\\limits_{i,j=0}^{5,1}C_{i,j}(I_1-3)^i(I_2-3)^j``
+```math
+W = \\sum\\limits_{i,j=0}^{5,1}C_{i,j}(I_1-3)^i(I_2-3)^j
+```
+
+Parameters:
+- C10
+- C01
+- C50
 
 > Lion A. On the large deformation behaviour of reinforced rubber at different temperatures. Journal of the Mechanics and Physics of Solids. 1997 Nov 1;45(11-12):1805-34.
 """
@@ -430,11 +490,18 @@ parameters(ψ::Lion) = (:C10, :C01, :C50)
 """
 Haupt Sedlan
 
-Parameters: C10, C01, C11, C02, C30
-
 Model:
 
-``W = \\sum\\limits_{i,j=0}^{3, 2}C_{i,j}(I_1-3)^i(I_2-3)^j``
+```math
+W = \\sum\\limits_{i,j=0}^{3, 2}C_{i,j}(I_1-3)^i(I_2-3)^j
+```
+
+Parameters:
+- C10
+- C01
+- C11
+- C02
+- C30
 
 > Haupt P, Sedlan K. Viscoplasticity of elastomeric materials: experimental facts and constitutive modelling. Archive of Applied Mechanics. 2001 Mar;71(2):89-109.
 """
@@ -470,11 +537,16 @@ parameters(ψ::HauptSedlan) = (:C10, :C01, :C11, :C02, :C30)
 """
 Hartmann-Neff
 
-Parameters: α, Ci0, C0j
-
 Model:
 
-``W = \\sum\\limits_{i,j=0}^{M,N}C_{i,0}(I_1-3)^i -3\\sqrt{3}^j+\\alpha(I_1-3)``
+```math
+W = \\sum\\limits_{i,j=0}^{M,N}C_{i,0}(I_1-3)^i -3\\sqrt{3}^j+\\alpha(I_1-3)
+```
+
+Parameters:
+- α
+- Ci⃗0
+- C0j⃗
 
 > Hartmann S, Neff P. Polyconvexity of generalized polynomial-type hyperelastic strain energy functions for near-incompressibility. International journal of solids and structures. 2003 Jun 1;40(11):2767-91.
 """
@@ -497,11 +569,16 @@ parameters(ψ::HartmannNeff) = (:α, :Ci⃗0, :C0j⃗)
 """
 Carroll
 
-Parameters: A, B, C
-
 Model:
 
-``W = AI_1+BI_1^4+C\\sqrt{I_2}``
+```math
+W = AI_1+BI_1^4+C\\sqrt{I_2}
+```
+
+Parameters:
+- A
+- B
+- C
 
 > Carroll M. A strain energy function for vulcanized rubbers. Journal of Elasticity. 2011 Apr;103(2):173-87.
 """
@@ -520,11 +597,17 @@ parameters(ψ::Carroll) = (:A, :B, :C)
 """
 Bahreman Darijani
 
-Parameters: A2, B2, A4, A6
-
 Model:
 
-``W = \\sum\\limits_{i = 1}{3}\\sum\\limits_{j=0}^{N} A_j (\\lambda_i^{m_j}-1) + B_j(\\lambda_i^{-n_j}-1)``
+```math
+W = \\sum\\limits_{i = 1}{3}\\sum\\limits_{j=0}^{N} A_j (\\lambda_i^{m_j}-1) + B_j(\\lambda_i^{-n_j}-1)
+```
+
+Parameters:
+- A2
+- B2
+- A4
+- A6
 
 > Bahreman M, Darijani H. New polynomial strain energy function; application to rubbery circular cylinders under finite extension and torsion. Journal of Applied Polymer Science. 2015 Apr 5;132(13).
 """
@@ -547,11 +630,17 @@ parameters(ψ::BahremanDarijani) = (:A2, :B2, :A4, :A6)
 """
 Zhao
 
-Parameters: C₋₁¹,, C₁¹, C₂¹, C₂²
-
 Model:
 
-``W = C_{-1}^1*(I_2-3)+C_{1}^{1}(I_1-3)+C_{2}^{1}(I_1^2-2I_2-3)+C_{2}^{2}(I_1^2-2I_2-3)^2``
+```math
+W = C_{-1}^1*(I_2-3)+C_{1}^{1}(I_1-3)+C_{2}^{1}(I_1^2-2I_2-3)+C_{2}^{2}(I_1^2-2I_2-3)^2
+```
+
+Parameters:
+- C₋₁¹
+- C₁¹
+- C₂¹
+- C₂²
 
 > Zhao Z, Mu X, Du F. Modeling and verification of a new hyperelastic model for rubber-like materials. Mathematical Problems in Engineering. 2019 May 2;2019.
 """
@@ -570,11 +659,16 @@ parameters(ψ::Zhao) = (:C₋₁¹, :C₁¹, :C₂¹, :C₂²)
 """
 Knowles
 
-Parameters: μ, b, n
-
 Model:
 
-``W = \\frac{\\mu}{2b}((1+\\frac{b}{n}(I_1-3))^n-1)``
+```math
+W = \\frac{\\mu}{2b}((1+\\frac{b}{n}(I_1-3))^n-1)
+```
+
+Parameters:
+- μ
+- b
+- n
 
 > Knowles JK. The finite anti-plane shear field near the tip of a crack for a class of incompressible elastic solids. International Journal of Fracture. 1977 Oct;13(5):611-39.
 """
@@ -600,11 +694,17 @@ end
 """
 Swanson
 
-Parameters: A⃗, α⃗, B⃗, β⃗
-
 Model:
 
-``W = \\sum\\limits_{i=1}^{N} \\frac{3}{2}(\\frac{A_i}{1+\\alpha_i}(\\frac{I_1}{3})^{1+\\alpha_i}+\\frac{B_i}{1+\\beta_i}(\\frac{I_2}{3})^{1+\\beta_i}``
+```math
+W = \\sum\\limits_{i=1}^{N} \\frac{3}{2}(\\frac{A_i}{1+\\alpha_i}(\\frac{I_1}{3})^{1+\\alpha_i}+\\frac{B_i}{1+\\beta_i}(\\frac{I_2}{3})^{1+\\beta_i}
+```
+
+Parameters:
+- A⃗
+- α⃗
+- B⃗
+- β⃗
 
 > Swanson SR. A constitutive model for high elongation elastic materials.
 """
@@ -625,11 +725,17 @@ parameters(ψ::Swanson) = (:A⃗, :α⃗, :B⃗, :β⃗)
 """
 Yamashita-Kawabata
 
-Parameters: C1, C2, C3, N
-
 Model:
 
-``W = C_1(I_1-3)+C_2(I_2-3)+\\frac{C_3}{N+1}(I_1-3)^{N+1}``
+```math
+W = C_1(I_1-3)+C_2(I_2-3)+\\frac{C_3}{N+1}(I_1-3)^{N+1}
+```
+
+Parameters:
+- C1
+- C2
+- C3
+- N
 
 > Yamashita Y, Kawabata S. Approximated form of the strain energy-density function of carbon-black filled rubbers for industrial applications. Nippon Gomu Kyokaishi(Journal of the Society of Rubber Industry, Japan)(Japan). 1992;65(9):517-28.
 """
@@ -648,11 +754,17 @@ parameters(ψ::YamashitaKawabata) = (:C1, :C2, :C3, :N)
 """
 Davis-DeThomas
 
-Parameters: A, n, C, k
-
 Model:
 
-``W = \\frac{A}{2(1-\\frac{n}{2})}(I_1-3+C^2)^{1-\\frac{n}{2}}+k(I_1-3)^2``
+```math
+W = \\frac{A}{2(1-\\frac{n}{2})}(I_1-3+C^2)^{1-\\frac{n}{2}}+k(I_1-3)^2
+```
+
+Parameters:
+- A
+- n
+- C
+- k
 
 > Davies CK, De DK, Thomas AG. Characterization of the behavior of rubber for engineering design purposes. 1. Stress-strain relations. Rubber chemistry and technology. 1994 Sep;67(4):716-28.
 """
@@ -673,11 +785,18 @@ end
 """
 Gregory
 
-Parameters: A, B, C, m, n
-
 Model:
 
-``W = \\frac{A}{2-n}(I_1-3+C^2)^{1-\\frac{n}{2}}+\\frac{B}{2+m}(I_1-3+C^2)^{1+\\frac{m}{2}}``
+```math
+W = \\frac{A}{2-n}(I_1-3+C^2)^{1-\\frac{n}{2}}+\\frac{B}{2+m}(I_1-3+C^2)^{1+\\frac{m}{2}}
+```
+
+Parameters:
+- A
+- B
+- C
+- m
+- n
 
 > Gregory IH, Muhr AH, Stephens IJ. Engineering applications of rubber in simple extension. Plastics rubber and composites processing and applications. 1997;26(3):118-22.
 """
@@ -698,11 +817,19 @@ end
 """
 Modified Gregory
 
-Parameters: A, α, M, B, β, N
-
 Model:
 
-``W = \\frac{A}{1+\\alpha}(I_1-3+M^2)^{1+\\alpha}+\\frac{B}{1+\\beta}(I_1-3+N^2)^{1+\\beta}``
+```math
+W = \\frac{A}{1+\\alpha}(I_1-3+M^2)^{1+\\alpha}+\\frac{B}{1+\\beta}(I_1-3+N^2)^{1+\\beta}
+```
+
+Parameters:
+- A
+- α
+- M
+- B
+- β
+- N
 
 > He H, Zhang Q, Zhang Y, Chen J, Zhang L, Li F. A comparative study of 85 hyperelastic constitutive models for both unfilled rubber and highly filled rubber nanocomposite material. Nano Materials Science. 2021 Jul 16.
 """
@@ -723,11 +850,20 @@ end
 """
 Beda
 
-Parameters: C1, C2, C3, K1, α, β, ζ
-
 Model:
 
-``W = \\frac{C_1}{\\alpha}(I_1-3)^{\\alpha}+C_2(I_1-3)+\\frac{C_3}{\\zeta}(I_1-3)^{\\zeta}+\\frac{K_1}{\\beta}(I_2-3)^\\beta``
+```math
+W = \\frac{C_1}{\\alpha}(I_1-3)^{\\alpha}+C_2(I_1-3)+\\frac{C_3}{\\zeta}(I_1-3)^{\\zeta}+\\frac{K_1}{\\beta}(I_2-3)^\\beta
+```
+
+Parameters:
+- C1
+- C2
+- C3
+- K1
+- α
+- β
+- ζ
 
 > Beda T. Reconciling the fundamental phenomenological expression of the strain energy of rubber with established experimental facts. Journal of Polymer Science Part B: Polymer Physics. 2005 Jan 15;43(2):125-34.
 """
@@ -772,11 +908,19 @@ end
 """
 Amin
 
-Parameters: C1, C2, C3, C4, N, M
-
 Model:
 
-``W = C_1 (I_1 - 3) + \\frac{C_2}{N + 1} (I_1 - 3)^{N + 1} + \\frac{C_3}{M + 1} (I_1 - 3)^{M + 1} + C_4 (I_2 - 3)``
+```math
+W = C_1 (I_1 - 3) + \\frac{C_2}{N + 1} (I_1 - 3)^{N + 1} + \\frac{C_3}{M + 1} (I_1 - 3)^{M + 1} + C_4 (I_2 - 3)
+```
+
+Parameters:
+- C1
+- C2
+- C3
+- C4
+- N
+- M
 
 > Amin AF, Wiraguna SI, Bhuiyan AR, Okui Y. Hyperelasticity model for finite element analysis of natural and high damping rubbers in compression and shear. Journal of engineering mechanics. 2006 Jan;132(1):54-64.
 """
@@ -797,11 +941,15 @@ end
 """
 Lopez-Pamies
 
-Parameters: α⃗, μ⃗
-
 Model:
 
-``W = \\frac{3^{1 - \\alpha_i}}{2\\alpha_i} \\mu_i (I_1^{\\alpha_i} - 3^{\\alpha_i})``
+```math
+W = \\frac{3^{1 - \\alpha_i}}{2\\alpha_i} \\mu_i (I_1^{\\alpha_i} - 3^{\\alpha_i})
+```
+
+Parameters:
+- α⃗
+- μ⃗
 
 > Lopez-Pamies O. A new I1-based hyperelastic model for rubber elastic materials. Comptes Rendus Mecanique. 2010 Jan 1;338(1):3-11.
 """
@@ -824,11 +972,19 @@ end
 """
 GenYeoh
 
-Parameters: K1, K2, K3, m, p, q
-
 Model:
 
-``W = K_1 (I_1 - 3)^m + K_2 * (I_1 - 3)^p + K_3 * (I_1 - 3)^q``
+```math
+W = K_1 (I_1 - 3)^m + K_2 * (I_1 - 3)^p + K_3 * (I_1 - 3)^q
+```
+
+Parameters:
+- K1
+- K2
+- K3
+- m
+- p
+- q
 
 > Hohenberger TW, Windslow RJ, Pugno NM, Busfield JJ. A constitutive model for both low and high strain nonlinearities in highly filled elastomers and implementation with user-defined material subroutines in ABAQUS. Rubber Chemistry and Technology. 2019;92(4):653-86.
 """
@@ -849,11 +1005,16 @@ end
 """
 Hart-Smith
 
-Parameters: G, k₁, k₂
-
 Model:
 
-``W = \\frac{G\\exp{(-9k_1+k_1I_1)}}{k_1}+Gk_2\\log{I_2}``
+```math
+W = \\frac{G\\exp{(-9k_1+k_1I_1)}}{k_1}+Gk_2\\log{I_2}
+```
+
+Parameters:
+- G
+- k₁
+- k₂
 
 > Hart-Smith LJ. Elasticity parameters for finite deformations of rubber-like materials. Zeitschrift für angewandte Mathematik und Physik ZAMP. 1966 Sep;17(5):608-26.
 """
@@ -874,11 +1035,16 @@ end
 """
 Veronda-Westmann
 
-Parameters: C1, C2, α
-
 Model:
 
-``W = C_1 (\\exp(\\alpha(I_1 - 3)) - 1) + C_2 (I_2 - 3)``
+```math
+W = C_1 (\\exp(\\alpha(I_1 - 3)) - 1) + C_2 (I_2 - 3)
+```
+
+Parameters:
+- C1
+- C2
+- α
 
 > Veronda DR, Westmann RA. Mechanical characterization of skin—finite deformations. Journal of biomechanics. 1970 Jan 1;3(1):111-24.
 """
@@ -899,11 +1065,15 @@ end
 """
 Fung-Demiray
 
-Parameters: μ, b
-
 Model:
 
-``W = \\frac{\\mu}{2 * b} (\\exp(b(I_1 - 3)) - 1)``
+```math
+W = \\frac{\\mu}{2 * b} (\\exp(b(I_1 - 3)) - 1)
+```
+
+Parameters:
+- μ
+- b
 
 > Fung YC. Elasticity of soft tissues in simple elongation. American Journal of Physiology-Legacy Content. 1967 Dec 1;213(6):1532-44.
 > Demiray H. A note on the elasticity of soft biological tissues. Journal of biomechanics. 1972 May 1;5(3):309-11.
@@ -925,11 +1095,16 @@ end
 """
 Vito
 
-Parameters: α, β, γ
-
 Model:
 
-``W = \\alpha (\\exp\\bigg(\\beta (I_1 - 3)\\bigg) + \\gamma  (I_2 - 3)) - 1)``
+```math
+W = \\alpha (\\exp\\bigg(\\beta (I_1 - 3)\\bigg) + \\gamma  (I_2 - 3)) - 1)
+```
+
+Parameters:
+- α
+- β
+- γ
 
 > Vito R. A note on arterial elasticity. Journal of Biomechanics. 1973 Sep 1;6(5):561-4.
 """
@@ -950,11 +1125,18 @@ end
 """
 Modified Yeoh
 
-Parameters: C10, C20, C30, α, β
-
 Model:
 
-``W = C_{10} * (I_1 - 3) + C_{20} * (I_1 - 3)^2 + C_{30} * (I_1 - 3)^3 + \\alpha / \\beta * (1 - \\exp{-\\beta * (I_1 - 3)})``
+```math
+W = C_{10} * (I_1 - 3) + C_{20} * (I_1 - 3)^2 + C_{30} * (I_1 - 3)^3 + \\alpha / \\beta * (1 - \\exp{-\\beta * (I_1 - 3)})
+```
+
+Parameters:
+- C10
+- C20
+- C30
+- α
+- β
 
 > He H, Zhang Q, Zhang Y, Chen J, Zhang L, Li F. A comparative study of 85 hyperelastic constitutive models for both unfilled rubber and highly filled rubber nanocomposite material. Nano Materials Science. 2021 Jul 16.
 """
@@ -975,17 +1157,26 @@ end
 """
 Chevalier-Marco
 
-Parameters: a⃗, b⃗
-
 Model:
 
-``W = \\int\\limits_{3}^{I_1(\\vec\\lambda)} \\exp\\bigg(\\sum\\limits_{i=0}^{N}a_i(I_1-3)^i\\bigg)\\text{d}I_1+ \\int\\limits_{3}^{I_2(\\vec\\lambda)} \\sum\\limits_{i=0}^{n}\\frac{b_i}{I_2^i}\\text{d}I_2``
+```math
+W = \\int\\limits_{3}^{I_1(\\vec\\lambda)} \\exp\\bigg(\\sum\\limits_{i=0}^{N}a_i(I_1-3)^i\\bigg)\\text{d}I_1+ \\int\\limits_{3}^{I_2(\\vec\\lambda)} \\sum\\limits_{i=0}^{n}\\frac{b_i}{I_2^i}\\text{d}I_2
+```
 
-``[\\mathbf{S}] = 2(I-\\frac{\\partial W}{\\partial I_1} - C^{-2}\\frac{\\partial W}{\\partial I_2})``
+```math
+[\\mathbf{S}] = 2(I-\\frac{\\partial W}{\\partial I_1} - C^{-2}\\frac{\\partial W}{\\partial I_2})
+```
 
-``[\\mathbf{\\sigma}] = \\mathbf{F} \\cdot \\mathbf{S}``
+```math
+[\\mathbf{\\sigma}] = \\mathbf{F} \\cdot \\mathbf{S}
+```
 
-Note: Model is not compatible with AD. A method for accessing the Second Piola Kirchoff Tensor and Cauchy Stress Tensor have been implemented.
+Parameters:
+- a⃗
+- b⃗
+
+Note:
+- Model is not compatible with AD. A method for accessing the Second Piola Kirchoff Tensor and Cauchy Stress Tensor have been implemented.
 
 > Chevalier L, Marco Y. Tools for multiaxial validation of behavior laws chosen for modeling hyper‐elasticity of rubber‐like materials. Polymer Engineering & Science. 2002 Feb;42(2):280-98.
 """
@@ -1025,11 +1216,18 @@ end
 """
 Gornet - Desmorat
 
-Parameters: h₁, h₂, h₃
+Model:
+```math
+W = h_1\\int\\exp{h_3(I_1-3)^2}\\text{d}I_1+3h_2\\int\\frac{1}{\\sqrt{I_2}}\\text{d}I_2 = \\frac{h_1 \\sqrt{\\pi} \\text{erfi}(\\sqrt{h_3}(I_1-3)^2)}{2\\sqrt{h_3}}+6h_2\\sqrt{I_2}
+```
 
-Model: ``W = h_1\\int\\exp{h_3(I_1-3)^2}\\text{d}I_1+3h_2\\int\\frac{1}{\\sqrt{I_2}}\\text{d}I_2 = \\frac{h_1 \\sqrt{\\pi} \\text{erfi}(\\sqrt{h_3}(I_1-3)^2)}{2\\sqrt{h_3}}+6h_2\\sqrt{I_2}``
+Parameters:
+- h₁
+- h₂
+- h₃
 
-* Note: the differential form was original form and the closed form SEF was determine via symbolic integration in Mathematica. The model is not compatible with AD and has methods for the Second Piola Kirchoff Stress Tensor and Cauchy Stress Tensor implemented.
+Note:
+- The differential form was original form and the closed form SEF was determine via symbolic integration in Mathematica. The model is not compatible with AD and has methods for the Second Piola Kirchoff Stress Tensor and Cauchy Stress Tensor implemented.
 
 > Gornet L, Marckmann G, Desmorat R, Charrier P. A new isotropic hyperelastic strain energy function in terms of invariants and its derivation into a pseudo-elastic model for Mullins effect: application to finite element analysis. Constitutive Models for Rubbers VII. 2012:265-71.
 """
@@ -1066,11 +1264,17 @@ end
 """
 Mansouri-Darijani
 
-Parameters: A1, m1, B1, n1
-
 Model:
 
-``W = A_1\\exp{m_1(I_1-3)-1}+B_1\\exp{n_1(I_2-3)-1}``
+```math
+W = A_1\\exp{m_1(I_1-3)-1}+B_1\\exp{n_1(I_2-3)-1}
+```
+
+Parameters:
+- A1
+- m1
+- B1
+- n1
 
 > Mansouri MR, Darijani H. Constitutive modeling of isotropic hyperelastic materials in an exponential framework using a self-contained approach. International Journal of Solids and Structures. 2014 Dec 1;51(25-26):4316-26.
 """
@@ -1091,11 +1295,15 @@ end
 """
 Gent Thomas
 
-Paramters: C1, C2
-
 Model:
 
-``W = C_1(I_1-3)+C_2\\log(\\frac{I_2}{3})``
+```math
+W = C_1(I_1-3)+C_2\\log(\\frac{I_2}{3})
+```
+
+Paramters:
+- C1
+- C2
 
 > Gent AN, Thomas AG. Forms for the stored (strain) energy function for vulcanized rubber. Journal of Polymer Science. 1958 Apr;28(118):625-8.
 """
@@ -1116,11 +1324,15 @@ end
 """
 Lambert-Diani Rey
 
-Parameters: aᵢ, bᵢ
-
 Model:
 
-``W = \\int\\limits_{3}^{I_1}\\exp\\bigg(\\sum\\limits_{i=0}^{n}a_i(I_1-3)^i\\bigg)\\text{d}I_1+\\int\\limits_{3}^{I_2}\\sum\\limits_{j=0}^{m}b_i\\log(I_2)^i\\text{d}I_2``
+```math
+W = \\int\\limits_{3}^{I_1}\\exp\\bigg(\\sum\\limits_{i=0}^{n}a_i(I_1-3)^i\\bigg)\\text{d}I_1+\\int\\limits_{3}^{I_2}\\sum\\limits_{j=0}^{m}b_i\\log(I_2)^i\\text{d}I_2
+```
+
+Parameters:
+- aᵢ
+- bᵢ
 
 > Lambert-Diani J, Rey C. New phenomenological behavior laws for rubbers and thermoplastic elastomers. European Journal of Mechanics-A/Solids. 1999 Nov 1;18(6):1027-43.
 """
@@ -1161,13 +1373,21 @@ end
 """
 Hoss Marczak I
 
-Parameters: α, β, μ, b, n
-
 Model:
 
-``W = \\frac{\\alpha}{\\beta}(1-\\exp{-\\beta(I_1-3)})+\\frac{\\mu}{2b}\\bigg((1+\\frac{b}{n}(I_1-3))^n -1\\bigg)``
+```math
+W = \\frac{\\alpha}{\\beta}(1-\\exp{-\\beta(I_1-3)})+\\frac{\\mu}{2b}\\bigg((1+\\frac{b}{n}(I_1-3))^n -1\\bigg)
+```
 
-* Note: The authors suggested this model for low strains.
+Parameters:
+- α
+- β
+- μ
+- b
+- n
+
+Note:
+- The authors suggested this model for low strains.
 
 > Hoss L, Marczak RJ. A new constitutive model for rubber-like materials. Mecánica Computacional. 2010;29(28):2759-73.
 """
@@ -1194,13 +1414,22 @@ end
 """
 Hoss Marczak II
 
-Parameters: α, β, μ, b, n, C2
-
 Model:
 
-``W = \\frac{\\alpha}{\\beta}(1-\\exp{-\\beta(I_1-3)})+\\frac{\\mu}{2b}\\bigg((1+\\frac{b}{n}(I_1-3))^n -1\\bigg)+C_2\\log(\\frac{I_2}{3})``
+```math
+W = \\frac{\\alpha}{\\beta}(1-\\exp{-\\beta(I_1-3)})+\\frac{\\mu}{2b}\\bigg((1+\\frac{b}{n}(I_1-3))^n -1\\bigg)+C_2\\log(\\frac{I_2}{3})
+```
 
-* Note: The authors suggests this model for high strains.
+Parameters:
+- α
+- β
+- μ
+- b
+- n
+- C2
+
+Note:
+- The authors suggests this model for high strains.
 
 > Hoss L, Marczak RJ. A new constitutive model for rubber-like materials. Mecánica Computacional. 2010;29(28):2759-73.
 """
@@ -1228,11 +1457,16 @@ end
 """
 Exp-Ln
 
-Parameters: A, a, b
-
 Model:
 
-``W = A\\bigg[\\frac{1}{a}\\exp{(a(I_1-3))}+b(I_1-2)(1-\\log{I_1-2})-\\frac{1}{a}-b\\bigg]``
+```math
+W = A\\bigg[\\frac{1}{a}\\exp{(a(I_1-3))}+b(I_1-2)(1-\\log{I_1-2})-\\frac{1}{a}-b\\bigg]
+```
+
+Parameters:
+- A
+- a
+- b
 
 > Khajehsaeid H, Arghavani J, Naghdabadi R. A hyperelastic constitutive model for rubber-like materials. European Journal of Mechanics-A/Solids. 2013 Mar 1;38:144-51.
 """
@@ -1253,13 +1487,23 @@ end
 """
 Van der Waals
 
-Parameters: μ, λm, β, α
-
 Model:
 
-``W = -\\mu\\{(\\lambda_m^2-3)\\log(1-\\Theta)+\\Theta\\}-\\frac{2\\alpha}{3}\\bigg(\\frac{I-3}{2}\\bigg)^{3/2}``
+```math
+W = -\\mu\\{(\\lambda_m^2-3)\\log(1-\\Theta)+\\Theta\\}-\\frac{2\\alpha}{3}\\bigg(\\frac{I-3}{2}\\bigg)^{3/2}
+```
 
-``\\Theta = \\frac{\\beta I_1 + (1-\\beta)I_2-3}{\\lambda_m^2-3)}``
+where:
+
+```math
+\\Theta = \\frac{\\beta I_1 + (1-\\beta)I_2-3}{\\lambda_m^2-3)}
+```
+
+Parameters:
+- μ
+- λm
+- β
+- α
 
 > Kilian HG, Enderle HF, Unseld K. The use of the van der Waals model to elucidate universal aspects of structure-property relationships in simply extended dry and swollen rubbers. Colloid and Polymer Science. 1986 Oct;264(10):866-76.
 > Ambacher H, Enderle HF, Kilian HG, Sauter A. Relaxation in permanent networks. InRelaxation in Polymers 1989 (pp. 209-220). Steinkopff.
@@ -1298,14 +1542,15 @@ end
 """
 Gent
 
+Model:
+
+```math
+W = -\\frac{\\mu J_m}{2}\\log{\\bigg(1-\\frac{I_1-3}{J_m}\\bigg)}
+```
+
 Parameters:
 - μ:  Small strain shear modulus
 - Jₘ: Limiting stretch invariant
-
-Model:
-
-``W = -\\frac{\\mu J_m}{2}\\log{\\bigg(1-\\frac{I_1-3}{J_m}\\bigg)}``
-
 
 > Gent AN. A new constitutive relation for rubber. Rubber chemistry and technology. 1996 Mar;69(1):59-61.
 """
@@ -1334,13 +1579,16 @@ end
 
 """
 Takamizawa-Hayashi
-From: A description of arterial wall mechanics using limiting chain extensibility constitutitive models by Horgan and Saccomandi
-
-Parameters: c, Jₘ
 
 Model:
 
-``W = -c\\log{1-\\big(\\frac{I_1-3}{J_m}\\big)^2}``
+```math
+W = -c\\log{1-\\big(\\frac{I_1-3}{J_m}\\big)^2}
+```
+
+Parameters:
+- c
+- Jₘ
 
 > Takamizawa K, Hayashi K. Strain energy density function and uniform strain hypothesis for arterial mechanics. Journal of biomechanics. 1987 Jan 1;20(1):7-17.
 """
@@ -1369,11 +1617,17 @@ end
 """
 Yeoh-Fleming
 
-Parameters: A, B, C10, Im
-
 Model:
 
-``W = \\frac{A}{B}(1-\\exp{-B(I_1-3)}) - C_{10}(I_m-3)\\log{1-\\frac{I_1-3}{I_m-3}}``
+```math
+W = \\frac{A}{B}(1-\\exp{-B(I_1-3)}) - C_{10}(I_m-3)\\log{1-\\frac{I_1-3}{I_m-3}}
+```
+
+Parameters:
+- A
+- B
+- C10
+- Im
 
 >  Yeoh OH, Fleming PD. A new attempt to reconcile the statistical and phenomenological theories of rubber elasticity. Journal of Polymer Science Part B: Polymer Physics. 1997 Sep 15;35(12):1919-31.
 """
@@ -1401,11 +1655,16 @@ end
 """
 Pucci-Saccomandi
 
-Parameters: K, μ, Jₘ
-
 Model:
 
-``W = K\\log{\\frac{I_2}{3}}-\\frac{\\mu J_m}{2}\\log{1-\\frac{I_1-3}{J-m}}``
+```math
+W = K\\log{\\frac{I_2}{3}}-\\frac{\\mu J_m}{2}\\log{1-\\frac{I_1-3}{J-m}}
+```
+
+Parameters:
+- K
+- μ
+- Jₘ
 
 > Pucci E, Saccomandi G. A note on the Gent model for rubber-like materials. Rubber chemistry and technology. 2002 Nov;75(5):839-52.
 """
@@ -1434,11 +1693,15 @@ end
 """
 Horgan Saccomandi Model
 
-Parameters: μ, J
-
 Model:
 
-``W = -\\frac{\\mu J}{2}\\log\\bigg(\\frac{J^3-J^2I_1+JI_2-1}{(J-1)^3}\\bigg)``
+```math
+W = -\\frac{\\mu J}{2}\\log\\bigg(\\frac{J^3-J^2I_1+JI_2-1}{(J-1)^3}\\bigg)
+```
+
+Parameters:
+- μ
+- J
 
 > Horgan CO, Saccomandi G. Constitutive models for compressible nonlinearly elastic materials with limiting chain extensibility. Journal of Elasticity. 2004 Nov;77(2):123-38.\
 > Horgan CO, Saccomandi G. Constitutive models for atactic elastomers. InWaves And Stability In Continuous Media 2004 (pp. 281-294).
@@ -1473,11 +1736,15 @@ end
 """
 Beatty Model
 
-Parameters: G₀, Iₘ
-
 Model:
 
-``W = -\\frac{G_0 I_m(I_m-3)}{2(2I_m-3)}\\log\\bigg(\\frac{1-\\frac{I_1-3}{I_m-3}}{1+\\frac{I_1-3}{I_m}} \\bigg)``
+```math
+W = -\\frac{G_0 I_m(I_m-3)}{2(2I_m-3)}\\log\\bigg(\\frac{1-\\frac{I_1-3}{I_m-3}}{1+\\frac{I_1-3}{I_m}} \\bigg)
+```
+
+Parameters:
+- G₀
+- Iₘ
 
 > Beatty MF. On constitutive models for limited elastic, molecular based materials. Mathematics and mechanics of solids. 2008 Jul;13(5):375-87.
 """
@@ -1504,9 +1771,16 @@ end
 """
 Horgan Murphy Model
 
-Parameters: μ, Jₘ, c
+Model:
 
-Model: ``-\\frac{2\\mu J_m}{c^2}\\log\\bigg(1-\\frac{\\lambda_1^c+\\lambda_2^c+\\lambda_3^c-3}{J_m})``
+```math
+W = -\\frac{2\\mu J_m}{c^2}\\log\\bigg(1-\\frac{\\lambda_1^c+\\lambda_2^c+\\lambda_3^c-3}{J_m})
+```
+
+Parameters:
+- μ
+- Jₘ
+- c
 
 > Horgan CO, Murphy JG. Limiting chain extensibility constitutive models of Valanis–Landel type. Journal of Elasticity. 2007 Feb;86(2):101-11.
 """
@@ -1533,13 +1807,16 @@ end
 """
 Valanis-Landel
 
-Parameters: μ
-
 Model:
 
-``W = 2\\mu\\sum\\limits_{1}^{3}(\\lambda_i(\\log\\lambda_i -1))``
+```math
+W = 2\\mu\\sum\\limits_{1}^{3}(\\lambda_i(\\log\\lambda_i -1))
+```
 
-Valanis KC, Landel RF. The strain‐energy function of a hyperelastic material in terms of the extension ratios. Journal of Applied Physics. 1967 Jun;38(7):2997-3002.
+Parameters:
+- μ
+
+> Valanis KC, Landel RF. The strain‐energy function of a hyperelastic material in terms of the extension ratios. Journal of Applied Physics. 1967 Jun;38(7):2997-3002.
 """
 struct ValanisLandel <: AbstractHyperelasticModel end
 
@@ -1554,11 +1831,14 @@ end
 """
 Peng - Landel
 
-Parameters: E
-
 Model:
 
-``W = E\\sum\\limits_{i=1}^{3}\\bigg[\\lambda_i - 1 - \\log(\\lambda_i) - \\frac{1}{6}\\log(\\lambda_i)^2 + \\frac{1}{18}\\log(\\lambda_i)^3-\\frac{1}{216}\\log(\\lambda_i)^4\\bigg]``
+```math
+W = E\\sum\\limits_{i=1}^{3}\\bigg[\\lambda_i - 1 - \\log(\\lambda_i) - \\frac{1}{6}\\log(\\lambda_i)^2 + \\frac{1}{18}\\log(\\lambda_i)^3-\\frac{1}{216}\\log(\\lambda_i)^4\\bigg]
+```
+
+Parameters:
+- E
 
 > Peng TJ, Landel RF. Stored energy function of rubberlike materials derived from simple tensile data. Journal of Applied Physics. 1972 Jul;43(7):3064-7.
 """
@@ -1575,11 +1855,15 @@ end
 """
 Ogden
 
-Parameters: μ⃗, α⃗
-
 Model:
 
-``W = \\sum\\limits_{i=1}^{N}\\frac{\\mu_i}{\\alpha_i}(\\lambda_1^{\\alpha_i}+\\lambda_2^{\\alpha_i}+\\lambda_3^{\\alpha_i}-3)``
+```math
+W = \\sum\\limits_{i=1}^{N}\\frac{\\mu_i}{\\alpha_i}(\\lambda_1^{\\alpha_i}+\\lambda_2^{\\alpha_i}+\\lambda_3^{\\alpha_i}-3)
+```
+
+Parameters:
+- μ⃗
+- α⃗
 
 > Ogden RW. Large deformation isotropic elasticity–on the correlation of theory and experiment for incompressible rubberlike solids. Proceedings of the Royal Society of London. A. Mathematical and Physical Sciences. 1972 Feb 1;326(1567):565-84.
 """
@@ -1596,11 +1880,15 @@ end
 """
 Attard
 
-Parameters: A⃗, B⃗
-
 Model:
 
-``W = \\sum\\limits_{i=1}^N\\frac{A_i}{2i}(\\lambda_1^{2i}+\\lambda_2^{2i}+\\lambda_3^{2i}-3) + \\frac{B_i}{2i}(\\lambda_1^{-2i}+\\lambda_2^{-2i}+\\lambda_3^{-2i}-3)``
+```math
+W = \\sum\\limits_{i=1}^N\\frac{A_i}{2i}(\\lambda_1^{2i}+\\lambda_2^{2i}+\\lambda_3^{2i}-3) + \\frac{B_i}{2i}(\\lambda_1^{-2i}+\\lambda_2^{-2i}+\\lambda_3^{-2i}-3)
+```
+
+Parameters:
+- A⃗
+- B⃗
 
 > Attard MM, Hunt GW. Hyperelastic constitutive modeling under finite strain. International Journal of Solids and Structures. 2004 Sep 1;41(18-19):5327-50.
 """
@@ -1618,11 +1906,15 @@ end
 """
 Shariff
 
-Parameters: E, α⃗
-
 Model:
 
-``W = E\\sum\\limits_{i=1}^3\\sum\\limits_{j=1}^{N}|\\alpha_j| \\Phi_j(\\lambda_i)``
+```math
+W = E\\sum\\limits_{i=1}^3\\sum\\limits_{j=1}^{N}|\\alpha_j| \\Phi_j(\\lambda_i)
+```
+
+Parameters:
+- E
+- α⃗
 
 > Shariff MH. Strain energy function for filled and unfilled rubberlike material. Rubber chemistry and technology. 2000 Mar;73(1):1-8.
 """
@@ -1678,11 +1970,19 @@ end
 """
 Arman - Narooei
 
-Parameters: A⃗, B⃗, m⃗, n⃗, α⃗, β⃗
-
 Model:
 
-``W = \\sum\\limits_{i=1}^{N} A_i\\big[\\exp{m_i(\\lambda_1^{\\alpha_i}+\\lambda_2^{\\alpha_i}+\\lambda_3^{\\alpha_i}-3)}-1] + B_i\\big[\\exp{n_i(\\lambda_1^{-\\beta_i}+\\lambda_2^{-\\beta_i}+\\lambda_3^{-\\beta_i}-3)}-1]``
+```math
+W = \\sum\\limits_{i=1}^{N} A_i\\big[\\exp{m_i(\\lambda_1^{\\alpha_i}+\\lambda_2^{\\alpha_i}+\\lambda_3^{\\alpha_i}-3)}-1] + B_i\\big[\\exp{n_i(\\lambda_1^{-\\beta_i}+\\lambda_2^{-\\beta_i}+\\lambda_3^{-\\beta_i}-3)}-1]
+```
+
+Parameters:
+- A⃗
+- B⃗
+- m⃗
+- n⃗
+- α⃗
+- β⃗
 
 > Narooei K, Arman M. Modification of exponential based hyperelastic strain energy to consider free stress initial configuration and Constitutive modeling. Journal of Computational Applied Mechanics. 2018 Jun 1;49(1):189-96.
 """
@@ -1700,11 +2000,17 @@ end
 """
 Continuum Hybrid
 
-Parameters: K₁, K₂, α, μ
-
 Model:
 
-``W = K_1(I_1-3)+K_2\\log\\frac{I_2}{3}+\\frac{\\mu}{\\alpha}(\\lambda_1^\\alpha+\\lambda_2^\\alpha+\\lambda^\\alpha-3)``
+```math
+W = K_1(I_1-3)+K_2\\log\\frac{I_2}{3}+\\frac{\\mu}{\\alpha}(\\lambda_1^\\alpha+\\lambda_2^\\alpha+\\lambda^\\alpha-3)
+```
+
+Parameters:
+- K₁
+- K₂
+- α
+- μ
 
 > Beda T, Chevalier Y. Hybrid continuum model for large elastic deformation of rubber. Journal of applied physics. 2003 Aug 15;94(4):2701-6.
 """
@@ -1721,11 +2027,17 @@ end
 """
 Bechir-4 Term
 
-Parameters: C11, C12, C21, C22
-
 Model:
 
-``W = C_1^1(I_1-3)+\\sum\\limits_{n=1}^{2}\\sum\\limits_{r=1}^{2}C_n^{r}(\\lambda_1^{2n}+\\lambda_2^{2n}+\\lambda_3^{2n}-3)^r``
+```
+W = C_1^1(I_1-3)+\\sum\\limits_{n=1}^{2}\\sum\\limits_{r=1}^{2}C_n^{r}(\\lambda_1^{2n}+\\lambda_2^{2n}+\\lambda_3^{2n}-3)^r
+```
+
+Parameters:
+- C11
+- C12
+- C21
+- C22
 
 > Khajehsaeid H, Arghavani J, Naghdabadi R. A hyperelastic constitutive model for rubber-like materials. European Journal of Mechanics-A/Solids. 2013 Mar 1;38:144-51.
 """
@@ -1743,11 +2055,16 @@ end
 """
 Constrained Junction [^2]
 
-Parameters: Gc, νkT, κ
-
 Model:
 
-``W = G_c (I_1-3)+ \\frac{\\nu k T}{2}(\\sum\\limits_{i=1}^{3}\\kappa\\frac{\\lambda_i-1}{\\lambda_i^2+\\kappa}+\\log{\\frac{\\lambda_i^2+\\kappa}{1+\\kappa}}-\\log{\\lambda_i^2})``
+```math
+W = G_c (I_1-3)+ \\frac{\\nu k T}{2}(\\sum\\limits_{i=1}^{3}\\kappa\\frac{\\lambda_i-1}{\\lambda_i^2+\\kappa}+\\log{\\frac{\\lambda_i^2+\\kappa}{1+\\kappa}}-\\log{\\lambda_i^2})
+```
+
+Parameters:
+- Gc
+- νkT
+- κ
 
 > Flory PJ, Erman B. Theory of elasticity of polymer networks. 3. Macromolecules. 1982 May;15(3):800-6.
 > Erman B, Flory PJ. Relationships between stress, strain, and molecular constitution of polymer networks. Comparison of theory with experiments. Macromolecules. 1982 May;15(3):806-11.
@@ -1772,16 +2089,20 @@ end
 """
 Edward-Vilgis
 
+Model:
+
+```math
+W = \\frac{1}{2}N_C\\Bigg[\\frac{(1-\\alpha^2)I_1}{1-\\alpha^2I_1}+\\log(1-\\alpha^2I_1)\\Bigg]+\\frac{1}{2}N_S\\Bigg[\\sum_{i=1}^{3}\\Big\\{\\frac{(1+\\eta)(1-\\alpha^2)\\lambda_i^2}{( 1+\\eta\\lambda_i^2)(1-\\alpha^2I_1)}+\\log(1+\\eta\\lambda_i^2)\\Big\\}+\\log(1-\\alpha^2I_1)\\Bigg]
+```
+
 Parameters:
 - Ns: Number of sliplinks
 - Nc: Number of crosslinks
 - α: A measure of chain inextensibility
 - η: A measure of the amount of chain slippage
 
-Note: Since α and η result from the same mechanism, they should be of approximately the same order of magnitude. Large differences between the two may indicate an issue with the optimizer or initial guess.
-Model:
-
-``W = \\frac{1}{2}N_C\\Bigg[\\frac{(1-\\alpha^2)I_1}{1-\\alpha^2I_1}+\\log(1-\\alpha^2I_1)\\Bigg]+\\frac{1}{2}N_S\\Bigg[\\sum_{i=1}^{3}\\Big\\{\\frac{(1+\\eta)(1-\\alpha^2)\\lambda_i^2}{( 1+\\eta\\lambda_i^2)(1-\\alpha^2I_1)}+\\log(1+\\eta\\lambda_i^2)\\Big\\}+\\log(1-\\alpha^2I_1)\\Bigg]``
+Note:
+- Since α and η result from the same mechanism, they should be of approximately the same order of magnitude. Large differences between the two may indicate an issue with the optimizer or initial guess.
 
 > Edwards SF, Vilgis T. The effect of entanglements in rubber elasticity. Polymer. 1986 Apr 1;27(4):483-92.
 """
@@ -1811,15 +2132,28 @@ end
 """
 MCC (modified constrained chain)
 
-Parameters:
-
 Model:
 
-``W = \\frac{1}{2}\\zeta k T \\sum\\limits_{i=1}^{3}(\\lambda_i^2-1)+\\frac{1}{2}\\mu k T\\sum\\limits_{i=1}^{3}[B_i+D_i-\\log{(1+B_i)}-\\log{(1+D_i)}]``
+```math
+W = \\frac{1}{2}\\zeta k T \\sum\\limits_{i=1}^{3}(\\lambda_i^2-1)+\\frac{1}{2}\\mu k T\\sum\\limits_{i=1}^{3}[B_i+D_i-\\log{(1+B_i)}-\\log{(1+D_i)}]
+```
 
-``B_i = \\frac{\\kappa^2(\\lambda_i^2-1)}{(\\lambda_i^2+\\kappa)^2}``
+where:
 
-``D_i = \\frac{\\lambda_i^2 B_i}{\\kappa}``
+```math
+B_i = \\frac{\\kappa^2(\\lambda_i^2-1)}{(\\lambda_i^2+\\kappa)^2}
+```
+
+and
+
+```math
+D_i = \\frac{\\lambda_i^2 B_i}{\\kappa}
+```
+
+Parameters:
+- ζkT
+- μkT
+- κ
 
 > Erman B, Monnerie L. Theory of elasticity of amorphous networks: effect of constraints along chains. Macromolecules. 1989 Aug;22(8):3342-8.
 """
@@ -1847,11 +2181,16 @@ end
 """
 Tube
 
-Parameters: Gc, Ge, β
-
 Model:
 
-``W = \\sum\\limits_{i=1}^{3}\\frac{G_c}{2}(\\lambda_i^2-1)+\\frac{2Ge}{\\beta^2}(\\lambda_i^{-\\beta}-1)``
+```math
+W = \\sum\\limits_{i=1}^{3}\\frac{G_c}{2}(\\lambda_i^2-1)+\\frac{2Ge}{\\beta^2}(\\lambda_i^{-\\beta}-1)
+```
+
+Parameters:
+- Gc
+- Ge
+- β
 
 > Heinrich G, Kaliske M. Theoretical and numerical formulation of a molecular based constitutive tube-model of rubber elasticity. Computational and Theoretical Polymer Science. 1997 Jan 1;7(3-4):227-41.
 """
@@ -1868,9 +2207,15 @@ end
 """
 Nonaffine - Tube
 
-Parameters: Gc, Ge
+Model:
 
-Model: ``G_c \\sum\\limits_{i=1}^{3}\\frac{\\lambda_i^2}{2}+G_e\\sum\\limits_{i=1}^{3}\\lambda_i+\\frac{1}{\\lambda_i}``
+```math
+W = G_c \\sum\\limits_{i=1}^{3}\\frac{\\lambda_i^2}{2}+G_e\\sum\\limits_{i=1}^{3}\\lambda_i+\\frac{1}{\\lambda_i}
+```
+
+Parameters:
+- Gc
+- Ge
 
 > Rubinstein M, Panyukov S. Nonaffine deformation and elasticity of polymer networks. Macromolecules. 1997 Dec 15;30(25):8036-44.
 """
@@ -1887,19 +2232,20 @@ end
 """
 Three Chain Model
 
-Note: The field `ℒinv` can be set to change the inverse Langevin function approximation used. Currently, the default choice is the Pade 3/2 Approximation from Cohen 1991 [^2]
+Model:
+
+```math
+W = \\frac{\\mu\\sqrt{N}}{3}\\sum\\limits_{i=1}^{3}\\bigg(\\lambda_i\\beta_i+\\sqrt{N}\\log\\bigg(\\frac{\\beta_i}{\\sinh \\beta_i}\\bigg)\\bigg)
+```
 
 Parameters:
 - μ: Small strain shear modulus
 - N: Square of the locking stretch of the network.
 
-Model:
-
-``W = \\frac{\\mu\\sqrt{N}}{3}\\sum\\limits_{i=1}^{3}\\bigg(\\lambda_i\\beta_i+\\sqrt{N}\\log\\bigg(\\frac{\\beta_i}{\\sinh \\beta_i}\\bigg)\\bigg)``
+Note:
+- The field `ℒinv` can be set to change the inverse Langevin function approximation used.
 
 > James HM, Guth E. Theory of the elastic properties of rubber. The Journal of Chemical Physics. 1943 Oct;11(10):455-81.
-> Cohen A. A Padé approximant to the inverse Langevin function. Rheologica acta. 1991 May;30(3):270-3.
-
 """
 struct ThreeChainModel <: AbstractHyperelasticModel
     ℒinv::Function
@@ -1925,16 +2271,30 @@ end
 """
 Arruda Boyce
 
-Note: The field `ℒinv` can be set to change the inverse Langevin function approximation used.
+Model:
+
+```math
+W = \\mu N \\left( \\frac{\\lambda_{chain}}{\\sqrt{N}} \\beta + \\log\\left(\\frac{\\beta}{\\sinh\\beta}\\right) \\right)
+```
+
+where
+
+```math
+\\beta = \\mathcal{L}^{-1}\\left(\\frac{\\lambda_{chain}}{\\sqrt{N}}\\right)
+```
+
+and
+
+```math
+\\lambda_{chain} = \\sqrt{\\frac{I_1}{3}}
+```
 
 Parameters:
 - μ: Small strain shear modulus
 - N: Square of the locking stretch of the network.
 
-Model:
-
-``W = \\mu\\bigg(\\frac{1}{2}(I_1-3)+\\frac{I_1^2-9}{20N}+\\frac{11(I_1^3-27)}{1050N^2}+\\frac{19(I_1^4-81)}{7000N^3}+\\frac{519(I_1^5-243)}{673750N^4}\\bigg)``
-
+Fields
+- ℒinv: Sets the inverse Langevin approxamation used
 
 > Arruda EM, Boyce MC. A three-dimensional constitutive model for the large stretch behavior of rubber elastic materials. Journal of the Mechanics and Physics of Solids. 1993 Feb 1;41(2):389-412.
 
@@ -1970,11 +2330,16 @@ end
 """
 Modified Flory Erman
 
-Parameters: μ, N, κ
-
 Model:
 
-``W = W_{\\text{Arruda-Boyce}}+\\sum\\limits_{i=1}^{3}\\frac{\\mu}{2}[B_i+D_i]
+```math
+W = W_{\\text{Arruda-Boyce}}+\\sum\\limits_{i=1}^{3}\\frac{\\mu}{2}[B_i+D_i]
+```
+
+Parameters:
+- μ
+- N
+- κ
 
 > Edwards SF. The statistical mechanics of polymerized material. Proceedings of the Physical Society (1958-1967). 1967 Sep 1;92(1):9.
 """
@@ -2007,11 +2372,17 @@ end
 """
 Extended Tube Model
 
-Parameters: Gc, Ge, δ, β
-
 Model:
 
-``W = \\frac{G_c}{2}\\bigg[\\frac{(1-\\delta^2)(I_1-3)}{1-\\delta^2(I_1-3)}+\\log{(1-\\delta^2(I_1-3))}\\bigg]+\\frac{2G_e}{\\beta^2}\\sum\\limits_{i=1}^{3}(\\lambda_i^{-\\beta}-1)``
+```math
+W = \\frac{G_c}{2}\\bigg[\\frac{(1-\\delta^2)(I_1-3)}{1-\\delta^2(I_1-3)}+\\log{(1-\\delta^2(I_1-3))}\\bigg]+\\frac{2G_e}{\\beta^2}\\sum\\limits_{i=1}^{3}(\\lambda_i^{-\\beta}-1)
+```
+
+Parameters:
+- Gc
+- Ge
+- δ
+- β
 
 > Kaliske M, Heinrich G. An extended tube-model for rubber elasticity: statistical-mechanical theory and finite element implementation. Rubber Chemistry and Technology. 1999 Sep;72(4):602-32.
 """
@@ -2037,7 +2408,7 @@ end
 """
 Non-Affine Micro-Sphere
 
-Note: The field `ℒinv` can be set to change the inverse Langevin function approximation used.
+Model: See Paper
 
 Parameters:
 - μ: Small strain shear modulus
@@ -2046,9 +2417,9 @@ Parameters:
 - U: Tube geometry parameter
 - q: Non-affine tube parameter
 
-Model: See Paper
+Fields:
+- ℒinv: Sets the inverse Langevin approximation used.
 
----
 > Miehe C, Göktepe S, Lulei F. A micro-macro approach to rubber-like materials—part I: the non-affine micro-sphere model of rubber elasticity. Journal of the Mechanics and Physics of Solids. 2004 Nov 1;52(11):2617-60.
 """
 struct NonaffineMicroSphere <: AbstractHyperelasticModel
@@ -2122,19 +2493,30 @@ end
 """
 Bootstrapped 8Chain Model
 
-Note: The field `ℒinv` can be set to change the inverse Langevin function approximation used.
-
-Parameters: μ, N
-
 Model:
 
-``W = W_8(\\frac{\\sum\\lambda}{\\sqrt{3N}}-\\frac{\\lambda_{chain}}{\\sqrt{N}})+W_{8}(\\frac{\\lambda_{chain}}{\\sqrt{N}})``
+```math
+W = W_8(\\frac{\\sum\\lambda}{\\sqrt{3N}}-\\frac{\\lambda_{chain}}{\\sqrt{N}})+W_{8}(\\frac{\\lambda_{chain}}{\\sqrt{N}})
+```
 
 where:
 
-``W_8(x) = \\mu N (x \\mathcal{L}^{-1}(x) + \\log\\frac{\\mathcal{L}^{-1}(x)}{\\sinh\\mathcal{L}^{-1}(x)})``
+```math
+W_8(x) = \\mu N (x \\mathcal{L}^{-1}(x) + \\log\\frac{\\mathcal{L}^{-1}(x)}{\\sinh\\mathcal{L}^{-1}(x)})
+```
 
-``\\lambda_{chain} = \\sqrt{\\frac{I_1}{3}}``
+and
+
+```math
+\\lambda_{chain} = \\sqrt{\\frac{I_1}{3}}
+```
+
+Parameters:
+- μ
+- N
+
+Fields:
+- ℒinv: Sets the inverse Langevin approximation used.
 
 > Miroshnychenko D, Green WA, Turner DM. Composite and filament models for the mechanical behaviour of elastomeric materials. Journal of the Mechanics and Physics of Solids. 2005 Apr 1;53(4):748-70.
 > Miroshnychenko D, Green WA. Heuristic search for a predictive strain-energy function in nonlinear elasticity. International Journal of Solids and Structures. 2009 Jan 15;46(2):271-86.
@@ -2169,11 +2551,16 @@ end
 """
 Davidson - Goulbourne
 
-Parameters: Gc, Ge, λmax
-
 Model:
 
-``W = \\frac{G_c}{6}I_1-G_c\\lambda_{max}\\log\\bigg(3\\lambda_{max}^2-I_1\\bigg)+G_e\\sum\\limits_{i=1}^{3}\\big(\\lambda_i+\\frac{1}{\\lambda_i}\\big)``
+```math
+W = \\frac{G_c I_1}{6}-G_c\\lambda_{max}\\log\\left(3\\lambda_{max}^2-I_1\\right)+G_e\\sum\\limits_{i=1}^{3}\\left(\\lambda_i+\\frac{1}{\\lambda_i}\\right)
+```
+
+Parameters:
+- Gc
+- Ge
+- λmax
 
 > Davidson JD, Goulbourne NC. A nonaffine network model for elastomers undergoing finite deformations. Journal of the Mechanics and Physics of Solids. 2013 Aug 1;61(8):1784-97.
 """
@@ -2198,11 +2585,17 @@ end
 """
 Khiêm-Itskov Model
 
-Parameters: μcκ, n, q, μt
-
 Model:
 
-``W = \\mu_c \\kappa n \\log\\bigg(\\frac{\\sin(\\frac{\\pi}{\\sqrt{n}})(\\frac{I_1}{3})^{\\frac{q}{2}}}{\\sin(\\frac{\\pi}{\\sqrt{n}}(\\frac{I_1}{3})^{\\frac{q}{2}}}\\bigg)+\\mu_t\\big[\\frac{I_2}{3}^{1/2} - 1 \\big]``
+```math
+W = \\mu_c \\kappa n \\log\\bigg(\\frac{\\sin(\\frac{\\pi}{\\sqrt{n}})(\\frac{I_1}{3})^{\\frac{q}{2}}}{\\sin(\\frac{\\pi}{\\sqrt{n}}(\\frac{I_1}{3})^{\\frac{q}{2}}}\\bigg)+\\mu_t\\big[\\frac{I_2}{3}^{1/2} - 1 \\big]
+```
+
+Parameters:
+- μcκ
+- n
+- q
+- μt
 
 > Khiêm VN, Itskov M. Analytical network-averaging of the tube model:: Rubber elasticity. Journal of the Mechanics and Physics of Solids. 2016 Oct 1;95:254-69.
 """
@@ -2269,11 +2662,16 @@ end
 """
 General Constitutive Model
 
-Parameters: Gc, Ge, N
-
 Model:
 
-``W = G_c N \\log\\bigg(\\frac{3N+\\frac{1}{2}I_1}{3N-I_1}\\bigg)+G_e\\sum\\limits_{i=1}^{3}\\frac{1}{\\lambda_I}``
+```math
+W = G_c N \\log\\bigg(\\frac{3N+\\frac{1}{2}I_1}{3N-I_1}\\bigg)+G_e\\sum\\limits_{i=1}^{3}\\frac{1}{\\lambda_I}
+```
+
+Parameters:
+- Gc
+- Ge
+- N
 
 > Xiang Y, Zhong D, Wang P, Mao G, Yu H, Qu S. A general constitutive model of soft elastomers. Journal of the Mechanics and Physics of Solids. 2018 Aug 1;117:110-22.
 """
@@ -2299,11 +2697,16 @@ end
 """
 Full Network - Wu Geisson
 
-Parameters: μ, N, ρ
-
 Model:
 
-``W = (1-\\rho)W_{3Chain}+\\rho W_{8chain}``
+```math
+W = (1-\\rho)W_{3Chain}+\\rho W_{8chain}
+```
+
+Parameters:
+- μ
+- N
+- ρ
 
 > Treloar LR, Riding G. A non-Gaussian theory for rubber in biaxial strain. I. Mechanical properties. Proceedings of the Royal Society of London. A. Mathematical and Physical Sciences. 1979 Dec 31;369(1737):261-80.
 > Wu PD, van der Giessen E. On improved 3-D non-Gaussian network models for rubber elasticity. Mechanics research communications. 1992 Sep 1;19(5):427-33.
@@ -2338,11 +2741,16 @@ end
 """
 Zuniga - Beatty
 
-Parameters: μ, N₃, N₈
-
 Model:
 
-``W = \\sqrt{\\frac{N_3+N_8}{2N_3}}W_{3Chain}+\\sqrt{\\frac{I_1}{3N_8}}W_{8Chain}``
+```math
+W = \\sqrt{\\frac{N_3+N_8}{2N_3}}W_{3Chain}+\\sqrt{\\frac{I_1}{3N_8}}W_{8Chain}
+```
+
+Parameters:
+- μ
+- N₃
+- N₈
 
 > Elı́as-Zúñiga A, Beatty MF. Constitutive equations for amended non-Gaussian network models of rubber elasticity. International journal of engineering science. 2002 Dec 1;40(20):2265-94.
 """
@@ -2377,11 +2785,17 @@ end
 """
 Lim
 
-Parameters: μ₁, μ₂, N, Î₁
-
 Model:
 
-``W = (1-f(\\frac{I_1-3}{\\hat{I_1}-3}))W_{NeoHookean}(μ₁)+fW_{ArrudaBoyce}(μ₂, N)``
+```math
+W = (1-f(\\frac{I_1-3}{\\hat{I_1}-3}))W_{NeoHookean}(μ₁)+fW_{ArrudaBoyce}(μ₂, N)
+```
+
+Parameters:
+- μ₁
+- μ₂
+- N
+- Î₁
 
 > Lim GT. Scratch behavior of polymers. Texas A&M University; 2005.
 """
@@ -2421,19 +2835,32 @@ end
 """
 Bechir Chevalier
 
-Parameters: μ₀, η, ρ, N₃, N₈
-
 Model:
 
-``W = W_{3Chain}(\\mu_f, N_3)+W_{8Chain}(\\frac{\\mu_c}{3}, N_8)``
+```math
+W = W_{3Chain}(\\mu_f, N_3)+W_{8Chain}(\\frac{\\mu_c}{3}, N_8)
+```
 
 where:
 
-``\\mu_f = \\rho\\sqrt{\\frac{I_1}{3N_8}}``
+```math
+\\mu_f = \\rho\\sqrt{\\frac{I_1}{3N_8}}
+```
 
-``\\mu_c = \\bigg(1-\\frac{\\eta\\alpha}{\\sqrt{N_3}}\\bigg)\\mu_0``
+```math
+\\mu_c = \\bigg(1-\\frac{\\eta\\alpha}{\\sqrt{N_3}}\\bigg)\\mu_0
+```
 
-``\\alpha = \\max{\\lambda_1, \\lambda_2, \\lambda_3}``
+```math
+\\alpha = \\max{\\lambda_1, \\lambda_2, \\lambda_3}
+```
+
+Parameters:
+- μ₀
+- η
+- ρ
+- N₃
+- N₈
 
 > Bechir H, Chevalier L, Idjeri M. A three-dimensional network model for rubber elasticity: The effect of local entanglements constraints. International journal of engineering science. 2010 Mar 1;48(3):265-74.
 """
