@@ -28,7 +28,7 @@ url_prefix = ""
     url = "Hyperelastics@dev/ref/Hyperelastics.Zhao"
     [[input.files]]
     title = "DataDrivenAverageChainBehavior"
-    contents = "Average Chain Behavior - Data-Driven \nAdapted from the code provided in the article's supplementary material\nParameters: data: Hyperelastic Data Object fchain(λch, pch): A function for interpolating the stress-stretch behavior of the chain\n > Amores VJ, Benítez JM, Montáns FJ. Average-chain behavior of isotropic incompressible polymers obtained from macroscopic experimental data. A simple structure-based WYPiWYG model in Julia language. Advances in Engineering Software. 2019 Apr 1;130:41-57.\n\n"
+    contents = "Average Chain Behavior - Data-Driven\nAdapted from the code provided in the article's supplementary material\nParameters: data: Hyperelastic Data Object fchain(λch, pch): A function for interpolating the stress-stretch behavior of the chain\nAmores VJ, Benítez JM, Montáns FJ. Average-chain behavior of isotropic incompressible polymers obtained from macroscopic experimental data. A simple structure-based WYPiWYG model in Julia language. Advances in Engineering Software. 2019 Apr 1;130:41-57.\n\n\n"
     url = "Hyperelastics@dev/ref/Hyperelastics.DataDrivenAverageChainBehavior"
     [[input.files]]
     title = "ExpLn"
@@ -99,20 +99,24 @@ url_prefix = ""
     contents = "GeneralConstitutiveModel_Network"
     url = "Hyperelastics@dev/ref/Hyperelastics.GeneralConstitutiveModel_Network"
     [[input.files]]
+    title = "Data Driven Modelling"
+    contents = "Data Driven Modelling\nIntroduction\nSometimes, the constituitive models used in Hyperelastic modelling are not sufficient to capture the full behavior of engineered materials. To this end, a small set of data-driven models are included.\nSetup\nLoading the required packages and the Treloar1944Uniaxial dataset and create a test set for prediction:\nHyperelastics CairoMakie MakiePublication DataInterpolations treloar test collect range extrema getindex treloar data λ length name \nSussman-Bathe Model\nThe SussmanBathe model constructor takes three arguments:\nA HyperelasticUniaxialTest\n\nAn Int for the number of terms in the series\n\nAn interpolation function constructor, f(σ, λ), which returns an interpolation function for predicting the Cauchy stress from the stretch.\n\nFor this example, CubicSpline from DataInterpolations.jl will be used and k will be varied.\nPredicting the behavior of the model:\nf Figure ax Axis f xlabel ylabel itp CubicSpline k ψ treloar interpolant itp k k pred predict ψ test λ̂₁ getindex pred data λ ŝ₁ getindex pred data s lines! ax λ̂₁ ŝ₁ label k split string itp λ₁ getindex treloar data λ s₁ getindex treloar data s scatter! ax λ₁ s₁ label color black axislegend position lt nbanks f \nAverage Chain Behavior Model\nThe DataDrivenAverageChainBehavior  asdf.\n\n"
+    url = "Hyperelastics@dev/doc/docs/examples/data_driven_modelling.md"
+    [[input.files]]
+    title = "Hyperelastics/datasets.jl"
+    contents = "λ₁ λ₁ λ₁ λ₂ λ₁ fill λ₁ length λ₂ s₁ s₂ λ₁ λ₂ λ₁ fill λ₁ length λ₂ s₁ s₂ λ₁ λ₂ λ₁ fill λ₁ length λ₂ s₁ s₂ λ₁ λ₂ λ₁ fill λ₁ length λ₂ s₁ s₂ λ₁ λ₂ λ₁ fill λ₁ length λ₂ s₁ s₂ λ₁ λ₂ λ₁ fill λ₁ length λ₂ s₁ s₂ λ₁ λ₂ λ₁ fill λ₁ length λ₂ s₁ s₂ λ₁ λ₂ λ₁ fill λ₁ length λ₂ s₁ s₂ λ₁ λ₂ λ₁ fill λ₁ length λ₂ s₁ s₂ λ₁ λ₂ λ₁ fill λ₁ length λ₂ s₁ s₂ λ₁ λ₂ λ₁ fill λ₁ length λ₂ s₁ s₂ λ₁ λ₂ λ₁ fill λ₁ length λ₂ s₁ s₂ λ₁ λ₂ λ₁ fill λ₁ length λ₂ s₁ s₂ λ₁ λ₂ λ₁ fill λ₁ length λ₂ s₁ s₂ λ₁ λ₂ λ₁ fill λ₁ length λ₂ s₁ s₂ λ₁ λ₂ λ₁ fill λ₁ length λ₂ s₁ s₂ λ₁ λ₂ λ₁ fill λ₁ length λ₂ s₁ s₂ λ₁ λ₂ λ₁ fill λ₁ length λ₂ s₁ s₂ λ₁ λ₂ s₁ s₂ name λ₁ λ₁ s₁ λ₁ s₁ name \n"
+    url = "Hyperelastics@dev/src/datasets.jl"
+    [[input.files]]
     title = "N"
     contents = "N"
     url = "Hyperelastics@dev/ref/Hyperelastics.N"
-    [[input.files]]
-    title = "Hyperelastics/datasets.jl"
-    contents = "λ₁ λ₁ λ₁ λ₂ λ₁ fill λ₁ length λ₂ s₁ s₂ λ₁ λ₂ λ₁ fill λ₁ length λ₂ s₁ s₂ λ₁ λ₂ λ₁ fill λ₁ length λ₂ s₁ s₂ λ₁ λ₂ λ₁ fill λ₁ length λ₂ s₁ s₂ λ₁ λ₂ λ₁ fill λ₁ length λ₂ s₁ s₂ λ₁ λ₂ λ₁ fill λ₁ length λ₂ s₁ s₂ λ₁ λ₂ λ₁ fill λ₁ length λ₂ s₁ s₂ λ₁ λ₂ λ₁ fill λ₁ length λ₂ s₁ s₂ λ₁ λ₂ λ₁ fill λ₁ length λ₂ s₁ s₂ λ₁ λ₂ λ₁ fill λ₁ length λ₂ s₁ s₂ λ₁ λ₂ λ₁ fill λ₁ length λ₂ s₁ s₂ λ₁ λ₂ λ₁ fill λ₁ length λ₂ s₁ s₂ λ₁ λ₂ λ₁ fill λ₁ length λ₂ s₁ s₂ λ₁ λ₂ λ₁ fill λ₁ length λ₂ s₁ s₂ λ₁ λ₂ λ₁ fill λ₁ length λ₂ s₁ s₂ λ₁ λ₂ λ₁ fill λ₁ length λ₂ s₁ s₂ λ₁ λ₂ λ₁ fill λ₁ length λ₂ s₁ s₂ λ₁ λ₂ λ₁ fill λ₁ length λ₂ s₁ s₂ λ₁ λ₂ s₁ s₂ name s₁ λ₁ data λ₁ s₁ name \n"
-    url = "Hyperelastics@dev/src/datasets.jl"
     [[input.files]]
     title = "LICENSE"
     contents = "MIT License\nCopyright (c) 2022 TRACER Lab at Liberty University\nPermission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the \"Software\"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:\nThe above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.\n\n"
     url = "Hyperelastics@dev/doc/LICENSE.md"
     [[input.files]]
     title = "Hyperelastics"
-    contents = "Hyperelastics\nStable Dev\nA hyperelastic model library and fitting toolkit developed by TRACER Lab at Liberty University. A constructor is provided for Optimization.jl for parameter fitting based on experimental data.\n\\alpha = 2+2\nCitations\nAll relevant citations are located in CITATIONS.bib\n\n"
+    contents = "Hyperelastics\nStable Dev\nA hyperelastic model library and fitting toolkit developed by TRACER Lab at Liberty University. A constructor is provided for Optimization.jl for parameter fitting based on experimental data.\nCitations\nAll relevant citations are located in CITATIONS.bib\n\n"
     url = "Hyperelastics@dev/doc/README.md"
     [[input.files]]
     title = "Bechir4Term"
@@ -122,6 +126,10 @@ url_prefix = ""
     title = "Swanson"
     contents = "Swanson\nModel:\nW = \\sum\\limits_{i=1}^{N} \\frac{3}{2}(\\frac{A_i}{1+\\alpha_i}(\\frac{I_1}{3})^{1+\\alpha_i}+\\frac{B_i}{1+\\beta_i}(\\frac{I_2}{3})^{1+\\beta_i}\nParameters:\nA⃗\n\nα⃗\n\nB⃗\n\nβ⃗\n\n\nSwanson SR. A constitutive model for high elongation elastic materials.\n\n\n"
     url = "Hyperelastics@dev/ref/Hyperelastics.Swanson"
+    [[input.files]]
+    title = "pchain"
+    contents = "pchain"
+    url = "Hyperelastics@dev/ref/Hyperelastics.pchain"
     [[input.files]]
     title = "LambertDianiRey"
     contents = "Lambert-Diani Rey\nModel:\nW = \\int\\limits_{3}^{I_1}\\exp\\bigg(\\sum\\limits_{i=0}^{n}a_i(I_1-3)^i\\bigg)\\text{d}I_1+\\int\\limits_{3}^{I_2}\\sum\\limits_{j=0}^{m}b_i\\log(I_2)^i\\text{d}I_2\nParameters:\naᵢ\n\nbᵢ\n\n\nLambert-Diani J, Rey C. New phenomenological behavior laws for rubbers and thermoplastic elastomers. European Journal of Mechanics-A/Solids. 1999 Nov 1;18(6):1027-43.\n\n\n"
@@ -144,7 +152,7 @@ url_prefix = ""
     url = "Hyperelastics@dev/ref/Hyperelastics.GeneralCompressible"
     [[input.files]]
     title = "Kawabata1981"
-    contents = "Biaxial Experimental Data from Kawabata et al. \nReturns the\nParameters: λ₁\nKawabata S, Matsuda M, Tei K, Kawai H. Experimental survey of the strain energy density function of isoprene rubber vulcanizate. Macromolecules. 1981 Jan;14(1):154-62.\n\n\n"
+    contents = "Kawabata1981(λ₁)\nBiaxial Experimental Data from Kawabata et al. The model is more challenging to correctly fit a hyperelastic model to and is proposed as a better test than the Treloar1944 simple tension dataset.\nData provided for fixed λ₁ of:\n1.040\n\n1.060\n\n1.080\n\n1.100\n\n1.120\n\n1.14\n\n1.16\n\n1.2\n\n1.24\n\n1.3\n\n1.6\n\n1.9\n\n2.2\n\n2.5\n\n2.8\n\n3.1\n\n3.4\n\n3.7\n\n\nKawabata S, Matsuda M, Tei K, Kawai H. Experimental survey of the strain energy density function of isoprene rubber vulcanizate. Macromolecules. 1981 Jan;14(1):154-62.\n\n\n"
     url = "Hyperelastics@dev/ref/Hyperelastics.Kawabata1981"
     [[input.files]]
     title = "ChevalierMarco"
@@ -160,7 +168,7 @@ url_prefix = ""
     url = "Hyperelastics@dev/ref/Hyperelastics.HorganSaccomandi"
     [[input.files]]
     title = "Hyperelastics/average_chain_behavior.jl"
-    contents = "ψ data pchain typeof data UniaxialHyperelasticData BiaxialHyperelasticData λchain λ⃗ sqrt I₁ λ⃗ λ₁ getindex data λ⃗ λ₃ getindex data λ⃗ s₁ getindex data s⃗ pch s₁ λ₁ λ₁ λ₃ λchain data λ⃗ pch pch _pnchain pchain λchain collect data λ⃗ pch wchain λch quadgk x _pnchain x λch W λ⃗ wchain λchain λ⃗ W ψ data pchain \n"
+    contents = "T S data T S x y BSplineInterpolation y x Uniform Uniform data λchain λ⃗ sqrt I₁ λ⃗ λ₁ getindex data data λ λ₃ getindex data data λ s₁ getindex data data s pch s₁ λ₁ λ₁ λ₃ λchain data data λ⃗ pch pch λchain collect data data λ⃗ pch typeof data typeof data NonlinearContinua StrainEnergyDensity ψ λ⃗ Vector p λchain sqrt I₁ λ⃗ wchain quadgk ψ pnchain x λchain W wchain W NonlinearContinua SecondPiolaKirchoffStressTensor ψ λ⃗ Vector p NonlinearContinua CauchyStressTensor ψ λ⃗ Vector p nothing \n"
     url = "Hyperelastics@dev/src/average_chain_behavior.jl"
     [[input.files]]
     title = "parameters"
@@ -220,7 +228,7 @@ url_prefix = ""
     url = "Hyperelastics@dev/ref/Hyperelastics.Yeoh"
     [[input.files]]
     title = "Hyperelastics/precompile.jl"
-    contents = "SnoopPrecompile λ₁ data UniaxialHyperelasticData λ₁ ψ⃗ filter x typeof x DataType Base Fix1 getfield Hyperelastics names Hyperelastics ψ⃗ filter x x x ψ⃗ bounds map ψ ψ data ψ⃗ p⃗ map ψ NamedTuple zip ψ ones length ψ ψ⃗ i eachindex p⃗ isnothing bounds i lb key value pairs bounds i lb p⃗ i key value dict_form Dict pairs p⃗ i dict_form key value p⃗ i NamedTuple dict_form isnothing bounds i ub key value pairs bounds i ub p⃗ i key value dict_form Dict pairs p⃗ i dict_form key value p⃗ i NamedTuple dict_form ψ⃗ i Hyperelastics p⃗ i C ones ψ⃗ i Hyperelastics p⃗ i μcκ n q μt ψ⃗ i Hyperelastics p⃗ i E α⃗ ones ψ⃗ i Hyperelastics p⃗ i μ λm sqrt β α p⃗_LabelledArrays map LVector p⃗ p⃗_ComponentArrays map ComponentVector p⃗ ψ p zip ψ⃗ p⃗ ψ data λ⃗ p ψ p zip ψ⃗ p⃗_LabelledArrays ψ data λ⃗ p ψ p zip ψ⃗ p⃗_ComponentArrays ψ data λ⃗ p \n"
+    contents = "SnoopPrecompile λ₁ data UniaxialHyperelasticData λ₁ ψ⃗ filter x typeof x DataType Base Fix1 getfield Hyperelastics names Hyperelastics ψ⃗ filter x x x ψ⃗ bounds map ψ ψ data ψ⃗ p⃗ map ψ NamedTuple zip ψ ones length ψ ψ⃗ i eachindex p⃗ isnothing bounds i lb key value pairs bounds i lb p⃗ i key value dict_form Dict pairs p⃗ i dict_form key value p⃗ i NamedTuple dict_form isnothing bounds i ub key value pairs bounds i ub p⃗ i key value dict_form Dict pairs p⃗ i dict_form key value p⃗ i NamedTuple dict_form ψ⃗ i Hyperelastics p⃗ i C ones ψ⃗ i Hyperelastics p⃗ i μcκ n q μt ψ⃗ i Hyperelastics p⃗ i E α⃗ ones ψ⃗ i Hyperelastics p⃗ i μ λm sqrt β α p⃗_LabelledArrays map LVector p⃗ p⃗_ComponentArrays map ComponentVector p⃗ ψ p zip ψ⃗ p⃗ StrainEnergyDensityFunction ψ data λ⃗ p ψ p zip ψ⃗ p⃗_LabelledArrays StrainEnergyDensityFunction ψ data λ⃗ p ψ p zip ψ⃗ p⃗_ComponentArrays StrainEnergyDensityFunction ψ data λ⃗ p \n"
     url = "Hyperelastics@dev/src/precompile.jl"
     [[input.files]]
     title = "Hyperelastics/isotropic_incompressible_models.jl"
@@ -240,7 +248,7 @@ url_prefix = ""
     url = "Hyperelastics@dev/ref/Hyperelastics.ValanisLandel"
     [[input.files]]
     title = "Hyperelastics/data_driven.jl"
-    contents = "w′ Function data k Integer interpolant σ̂ interpolant getindex data data s getindex data data λ getindex data data λ f i λ σ̂ λ i σ̂ λ i λ w′ λ sum Base Fix2 f λ k w′ NonlinearContinua StrainEnergyDensity ψ λ⃗ AbstractVector p sum x quadgk ψ w′ x λ⃗ NonlinearContinua SecondPiolaKirchoffStressTensor ψ λ⃗ AbstractVector p adb nothing ψ w′ λ⃗ NonlinearContinua CauchyStressTensor ψ λ⃗ AbstractVector p ψ w′ λ⃗ λ⃗ ψ p s⃗ λ⃗ k n q p ∫ f a b quadgk f a b Ê log getindex λ⃗ Emin Emax extrema Ê σ̂ getindex s⃗ getindex λ⃗ m n k t⃗ range extrema Ê length m N⃗ E map i E k k i i t⃗ t⃗ n N̂ E⃗ vcat N⃗ E⃗ σ E B N⃗ E B σ⃗ E⃗ B N̂ E⃗ B σ′ E B ForwardDiff derivative Base Fix2 σ B E σ′′ E B ForwardDiff derivative Base Fix2 σ′ B E σ′′2 E B σ′′ E B f̂ E⃗ B Wr I length E⃗ σ⃗ E⃗ B σ̂ Wr σ⃗ E⃗ B σ̂ f̃_curve B ∫ Base Fix2 σ′′2 B Emin Emax Emax Emin Cp E B σ′ E B σ E B Cm E B σ′ E B σ E B dCpdE E B ForwardDiff derivative Base Fix2 Cp B E dSpdE E B exp E Cp E B dCpdE E B dCmdE E B ForwardDiff derivative Base Fix2 Cp B E dSmdE E B exp E Cm E B dCmdE E B f̃_stability B ∫ x dSmdE x B Emin ∫ x dSpdE x B Emax Emax Emin f B _ q f̂ Ê B func OptimizationFunction f Optimization AutoForwardDiff prob OptimizationProblem func randn n sol solve prob LBFGS Base Fix2 σ sol u t k i t⃗ k t t⃗ i t⃗ i k t⃗ i t k k i i t⃗ t⃗ t⃗ i k t t⃗ i k t⃗ i t k k i i t⃗ t⃗ t⃗ i t t⃗ i \n"
+    contents = "T S w′ Function test k T itp S data interpolant CubicSpline k Integer σ̂ interpolant getindex data data s getindex data data λ getindex data data λ f i λ σ̂ λ i σ̂ λ i λ w′ λ sum Base Fix2 f λ k typeof k typeof σ̂ w′ data k σ̂ Base show io IO ψ Base show io Base show io ψ test name Base show io ψ k Base show io ψ itp NonlinearContinua StrainEnergyDensity ψ λ⃗ AbstractVector p sum x quadgk ψ w′ x λ⃗ NonlinearContinua SecondPiolaKirchoffStressTensor ψ λ⃗ AbstractVector p adb nothing ψ w′ λ⃗ NonlinearContinua CauchyStressTensor ψ λ⃗ AbstractVector p ψ w′ λ⃗ λ⃗ ψ p s⃗ λ⃗ k n q p ∫ f a b quadgk f a b Ê log getindex λ⃗ Emin Emax extrema Ê σ̂ getindex s⃗ getindex λ⃗ m n k t⃗ range extrema Ê length m N⃗ E map i E k k i i t⃗ t⃗ n N̂ E⃗ vcat N⃗ E⃗ σ E B N⃗ E B σ⃗ E⃗ B N̂ E⃗ B σ′ E B ForwardDiff derivative Base Fix2 σ B E σ′′ E B ForwardDiff derivative Base Fix2 σ′ B E σ′′2 E B σ′′ E B f̂ E⃗ B Wr I length E⃗ σ⃗ E⃗ B σ̂ Wr σ⃗ E⃗ B σ̂ f̃_curve B ∫ Base Fix2 σ′′2 B Emin Emax Emax Emin Cp E B σ′ E B σ E B Cm E B σ′ E B σ E B dCpdE E B ForwardDiff derivative Base Fix2 Cp B E dSpdE E B exp E Cp E B dCpdE E B dCmdE E B ForwardDiff derivative Base Fix2 Cp B E dSmdE E B exp E Cm E B dCmdE E B f̃_stability B ∫ x dSmdE x B Emin ∫ x dSpdE x B Emax Emax Emin f B _ q f̂ Ê B func OptimizationFunction f Optimization AutoForwardDiff prob OptimizationProblem func randn n sol solve prob LBFGS Base Fix2 σ sol u t k i t⃗ k t t⃗ i t⃗ i k t⃗ i t k k i i t⃗ t⃗ t⃗ i k t t⃗ i k t⃗ i t k k i i t⃗ t⃗ t⃗ i t t⃗ i \n"
     url = "Hyperelastics@dev/src/data_driven.jl"
     [[input.files]]
     title = "Hyperelastics/general_form_incompressible_isotropic_models.jl"
@@ -280,7 +288,7 @@ url_prefix = ""
     url = "Hyperelastics@dev/ref/Hyperelastics.NonaffineMicroSphere"
     [[input.files]]
     title = "Hyperelastics/macro_micro_macro_model.jl"
-    contents = "NonlinearContinua StrainEnergyDensity ψ Pchain p₀ weights coeff_loss solver data λchain λ⃗ r⃗ dot r⃗ r⃗ λ⃗ ∂λchain∂λ λ⃗ r⃗ r⃗ r⃗ a b c r⃗ a a a a a a a a a a a a b c c b c c b c c b c c c b c c b c c b c c b c c c b c c b c c b c c b w1 w2 w3 w fill w1 fill w2 fill w3 λ⃗ collect data λ⃗ λch i j λchain λ⃗ i r⃗ j wrᵢ² k i w k r⃗ k i MSE p params data λch wrᵢ² params s₁ getindex data s⃗ s₂ getindex data s⃗ _Pchain Pchain p ∂W∂λᵢ j i wrᵢ² k i _Pchain λch j k s̃₁ ∂W∂λᵢ ∂W∂λᵢ getindex λ⃗ getindex λ⃗ s̃₂ ∂W∂λᵢ ∂W∂λᵢ getindex λ⃗ getindex λ⃗ LossS1 value L2DistLoss s₁ s̃₁ AggMode WeightedSum weights LossS2 value L2DistLoss s₂ s̃₂ AggMode WeightedSum weights LossC coeff_loss p LossS1 LossS2 LossC func OptimizationFunction MSE Optimization AutoForwardDiff prob OptimizationProblem func p₀ data λch wrᵢ² sol solve prob solver g_tol pchain Pchain sol u Wch λch quadgk pchain λch W λ⃗ sum x x Wch λchain λ⃗ x zip w r⃗ W ψ Pchain p₀ weights coeff_loss solver data \n"
+    contents = "NonlinearContinua StrainEnergyDensity ψ Pchain p₀ weights coeff_loss solver data λchain λ⃗ r⃗ dot r⃗ r⃗ λ⃗ ∂λchain∂λ λ⃗ r⃗ r⃗ r⃗ a b c r⃗ a a a a a a a a a a a a b c c b c c b c c b c c c b c c b c c b c c b c c c b c c b c c b c c b w1 w2 w3 w fill w1 fill w2 fill w3 λ⃗ collect data λ⃗ λch i j λchain λ⃗ i r⃗ j wrᵢ² k i w k r⃗ k i MSE p params data λch wrᵢ² params s₁ getindex data s⃗ s₂ getindex data s⃗ _Pchain Pchain p ∂W∂λᵢ j i wrᵢ² k i _Pchain λch j k s̃₁ ∂W∂λᵢ ∂W∂λᵢ getindex λ⃗ getindex λ⃗ s̃₂ ∂W∂λᵢ ∂W∂λᵢ getindex λ⃗ getindex λ⃗ LossS1 value L2DistLoss s₁ s̃₁ AggMode WeightedSum weights LossS2 value L2DistLoss s₂ s̃₂ AggMode WeightedSum weights LossC coeff_loss p LossS1 LossS2 LossC func OptimizationFunction MSE Optimization AutoForwardDiff prob OptimizationProblem func p₀ data λch wrᵢ² sol solve prob solver g_tol Pchain sol u Wch λch quadgk λch W λ⃗ sum x x Wch λchain λ⃗ x zip w r⃗ W ψ Pchain p₀ weights coeff_loss solver data \n"
     url = "Hyperelastics@dev/src/macro_micro_macro_model.jl"
     [[input.files]]
     title = "MooneyRivlin"
@@ -306,6 +314,10 @@ url_prefix = ""
     title = "InverseLangevinApproximations"
     contents = "InverseLangevinApproximations\nMain set of models are from \"Approximation of the inverse Langevin function revisited\" by Radosław Jedynak\nCiting\nSee CITATION.bib for the relevant reference(s).\n\n"
     url = "Hyperelastics@dev/doc/InverseLangevinApproximations/README.md"
+    [[input.files]]
+    title = "Bayesian Parameter Estimation of Model Parameters"
+    contents = "Bayesian Parameter Estimation of Model Parameters\nLearn how to use Bayesian parameter estimation with Hyperelastics.jl\nWhile the traditional loss-based types of analysis generally work for predicting the parameters of hyperelastic materials, other alternatives for parameter existmation exist. One such example is Bayesian parameter fitting which provides a probablity of model parameters and noise in the measurements. Turing.jl is used in this example:\nHyperelastics Turing Distributions LinearAlgebra MCMCChains SciMLExpectations KernelDensity CairoMakie MakiePublication ComponentArrays ComponentVector Optimization OptimizationOptimJL Turing setadbackend forwarddiff \nFor this example, we will use all of Kawabata1981 Biaxial data and the ExpLn model:\nkawabata_data map λ₁ λ₁ ψ \nFirst a guess of the optimal parameters is performed with the Optimization.jl to find a starting guess for the mean values of the distributions:\np₀ ComponentVector A a b prob ψ kawabata_data p₀ sol solve prob LBFGS \nsol retcode \nTo ease the setting of model parameters, a parametric struct is created to be passed to the Hyperelastic model:\np_ExpLn S T R A S a T b R \nA helper function is created to get the stress predictions for a single data instance:\nŝ ψ test p pred Hyperelastics predict ψ test p s getindex pred data s s \nNext the model is created:\nfit_model s₁ datasets σ InverseGamma A Normal sol u A sol u A a Normal sol u a sol u a b Normal sol u b sol u b ŝ₁ map data ŝ ψ data p_ExpLn A a b datasets ŝ₁ vcat ŝ₁ index ŝ enumerate ŝ₁ s₁ index MvNormal ŝ σ I nothing \nNext, we create a vector of the Uniaxial stresses from the datasets:\ns₁ map data getindex data data s kawabata_data s₁ vcat s₁ s₁ map s s s₁ \nThen we can create the model for fitting with Turing.jl:\nmodel fit_model s₁ kawabata_data \nFinally, sampling the model gives:\nchns sample model NUTS MCMCSerial \nFinally, plotting the distributions\nparams names chns n_chains length chains chns n_samples length chns f Figure i param enumerate params ax Axis f i xlabel string param colors Makie current_default_theme attributes palette color chain n_chains values chns param chain density! ax values color colors chain strokecolor black strokewidth f \nNow, using the fitted distributions a data retrodiction plot can be generated to see how distributions impact the performance of the model:\nf Figure ax Axis f xlabel ylabel posterior_samples sample chns A a b replace test_data kawabata_data posterior_p eachrow Array posterior_samples ŝ₂ getindex Hyperelastics predict ψ test_data p_ExpLn posterior_p posterior_p posterior_p data s lines! ax getindex test_data data λ ŝ₂ alpha color strokewidth scatter! ax getindex test_data data λ getindex test_data data s color black f \n\n"
+    url = "Hyperelastics@dev/doc/docs/examples/bayesian_parameter_fitting.md"
     [[input.files]]
     title = "AbstractHyperelasticTest"
     contents = "AbstractHyperelasticTest"
@@ -408,7 +420,7 @@ url_prefix = ""
     url = "Hyperelastics@dev/ref/Hyperelastics.ConstrainedJunction"
     [[input.files]]
     title = "Treloar1944Uniaxial"
-    contents = "Treloar1944Uniaxial"
+    contents = "Treloar1944Uniaxial()\nUniaxial data for tension of 8% S Rubber at 20C from Fig 3 of Treloar 1944. This is commonly used for testing hyperelastic models.\nTreloar LR. Stress-strain data for vulcanized rubber under various types of deformation. Rubber Chemistry and Technology. 1944 Dec;17(4):813-25.\n\n\n"
     url = "Hyperelastics@dev/ref/Hyperelastics.Treloar1944Uniaxial"
     [[input.files]]
     title = "Beda"
@@ -427,6 +439,10 @@ url_prefix = ""
     contents = "Shariff\nModel:\nW = E\\sum\\limits_{i=1}^3\\sum\\limits_{j=1}^{N}|\\alpha_j| \\Phi_j(\\lambda_i)\nParameters:\nE\n\nα⃗\n\n\nShariff MH. Strain energy function for filled and unfilled rubberlike material. Rubber chemistry and technology. 2000 Mar;73(1):1-8.\n\n\n"
     url = "Hyperelastics@dev/ref/Hyperelastics.Shariff"
     [[input.files]]
+    title = "Package Imports"
+    contents = "Package Imports\nHyperelastics Optimization OptimizationOptimJL ComponentArrays ComponentVector CairoMakie MakiePublication set_theme! theme_web width \nFor commonly used datasets in hyperelastic modelling, such as the Treloar1944Uniaxial data, functions are available for getting the datasets:\nf Figure ax Makie Axis f treloar_data scatter! ax getindex treloar_data data λ getindex treloar_data data s label color black axislegend position lt f \nMultiple dispatch is used on the corresponding function to calculate the values. Based on the model passed to the function, the correct method will be used in the calculation. StrainEnergyDensity, SecondPiolaKirchoffStressTensor, and CauchyStressTensor accept the deformation state as either the principal components in a vector, [λ₁, λ₂, λ₃] or as the deformation gradient matrix, Fᵢⱼ. The returned value matches the type of the input. Parameters are accessed by field allowing for structs, NamedTuples, or other field-based data-types such as those in ComponentArrays.jl and LabelledArrays.jl. For example, the NeoHookean model is accessed with:\nψ λ⃗ sqrt sqrt p μ StrainEnergyDensity ψ λ⃗ p \nor\nF rand p μ StrainEnergyDensity ψ F p \nA method for creating an OptimizationProblem compatible with Optimization.jl is provided. To fit the NeoHookean model to the Treloar data previously loaded, an additional field-indexed array is used as the initial guess to HyperelasticProblem. It is recommendedto use ComponentArrays.jl for optimization of model parameters.\nprob ψ treloar_data ComponentVector μ solve prob LBFGS \nFor fiting multiple models to the same dataset,\nmodels Dict ComponentVector μ Jₘ ComponentVector Ns Nc α η ComponentVector μ κ ComponentVector μ ComponentVector μ p U q ComponentVector C1 C2 C3 K1 α β ζ sol Dict DataType SciMLSolution ψ p₀ models HEProblem ψ treloar_data p₀ sol ψ solve HEProblem NelderMead ψ sol ψ u \nTo predict the reponse of a model to a proivded dataset and parameters, a predict function is provided:\nf Figure ax Makie Axis f ψ p sol pred predict ψ treloar_data p u lines! ax getindex pred data λ getindex pred data s label string ψ scatter! ax getindex treloar_data data λ getindex treloar_data data s label color black axislegend position lt f \nWhile the majority of the models provided by Hyperelastics.jl are based on closed form strain energy density functions, a selection of data-driven models are proivded. For example, the [SussmanBathe] model is created with:\nDataInterpolations ψ treloar_data QuadraticSpline λ₁ range extrema getindex treloar_data data λ length uniaxial_prediction λ₁ name pred predict ψ uniaxial_prediction λ₁ getindex treloar_data data λ s₁ getindex treloar_data data s λ̂₁ getindex pred data λ ŝ₁ getindex pred data s f ax p lines λ̂₁ ŝ₁ label scatter! ax λ₁ s₁ label color black axislegend position lt f \n\n"
+    url = "Hyperelastics@dev/doc/docs/examples/example.md"
+    [[input.files]]
     title = "GeneralBeda"
     contents = "General Beda\nModel:\nW = \\sum\\limits_{i = 1}^{N}\\frac{C_i}{\\alpha_i}(I_1-3)^{\\alpha_i} + \\sum\\limits_{j=1}^{M}\\frac{K_j}{\\beta_j}(I_2-3)^{\\beta_j}\nParameters:\nC\n\nK\n\nα\n\nβ\n\n\nBeda T. Reconciling the fundamental phenomenological expression of the strain energy of rubber with established experimental facts. Journal of Polymer Science Part B: Polymer Physics. 2005 Jan 15;43(2):125-34.\n\n\n"
     url = "Hyperelastics@dev/ref/Hyperelastics.GeneralBeda"
@@ -442,10 +458,6 @@ url_prefix = ""
     title = "AbstractDataDrivenHyperelasticModel"
     contents = "AbstractDataDrivenHyperelasticModel"
     url = "Hyperelastics@dev/ref/Hyperelastics.AbstractDataDrivenHyperelasticModel"
-    [[input.files]]
-    title = "StrainEnergyDensityFunction"
-    contents = "StrainEnergyDensityFunction"
-    url = "Hyperelastics@dev/ref/Hyperelastics.StrainEnergyDensityFunction"
     [[input.files]]
     title = "LopezPamies"
     contents = "Lopez-Pamies\nModel:\nW = \\frac{3^{1 - \\alpha_i}}{2\\alpha_i} \\mu_i (I_1^{\\alpha_i} - 3^{\\alpha_i})\nParameters:\nα⃗\n\nμ⃗\n\n\nLopez-Pamies O. A new I1-based hyperelastic model for rubber elastic materials. Comptes Rendus Mecanique. 2010 Jan 1;338(1):3-11.\n\n\n"
@@ -484,7 +496,7 @@ url_prefix = ""
     url = "Hyperelastics@dev/ref/Hyperelastics.Knowles"
     [[input.files]]
     title = "SussmanBathe"
-    contents = "Sussman Bathe\nParameters: data, k, interpolant\nψ = SussmanBathe(data, k, interpolant) W = StrainEnergyDensityFunction(ψ, λ⃗, ())\nSussman T, Bathe KJ. A model of incompressible isotropic hyperelastic material behavior using spline interpolations of tension–compression test data. Communications in numerical methods in engineering. 2009 Jan;25(1):53-63.\n\n\n"
+    contents = "SussmanBathe(data, k, interpolant)\nFields:\ndata\n\nk\n\ninterpolant\n\n\nSussman T, Bathe KJ. A model of incompressible isotropic hyperelastic material behavior using spline interpolations of tension–compression test data. Communications in numerical methods in engineering. 2009 Jan;25(1):53-63.\n\n\n"
     url = "Hyperelastics@dev/ref/Hyperelastics.SussmanBathe"
     [[input.files]]
     title = "ZunigaBeatty"
