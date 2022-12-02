@@ -8,7 +8,7 @@ set_theme!(theme_web(width=800))
 treloar_data = Treloar1944Uniaxial()
 
 # ## Fit the Gent Model
-# $W(\vec{\lambda}) = -\frac{\mu J_m}{2}\log{\bigg(1-\frac{I_1-3}{J_m}\bigg)}$
+# W(\vec{\lambda}) = -\frac{\mu J_m}{2}\log{\bigg(1-\frac{I_1-3}{J_m}\bigg)}$
 #
 # Initial guess for the parameters
 models = Dict(
@@ -92,7 +92,7 @@ end
 Jₘ_min = maximum(I₁.(data.data.λ)) - 3
 function ŝ(ψ, test, p)
     ŷ = predict(ψ, test, p)
-    s = getindex.(ŷ.data.s)
+    s = getindex.(ŷ.data.s, 1)
     return s
 end
 @model function fitHE(s₁, data)
@@ -125,7 +125,7 @@ fig = Figure()
 ax = Makie.Axis(fig[1, 1], xlabel="Stretch", ylabel="Stress [MPa]")
 posterior_samples = sample(chain[[:μ, :Jₘ]], 1000; replace=false)
 for p in eachrow(Array(posterior_samples))
-    ŝ₁ = map(λ -> ŝ(λ, Gent(), (μ=p[1], Jₘ=NelderMeadp[2]))[1], λ⃗_predict)
+    ŝ₁ = map(λ -> ŝ(λ, Gent(), (μ=p[1], Jₘ=p[2]))[1], λ⃗_predict)
     lines!(ax, getindex.(λ⃗_predict, 1), ŝ₁ ./ 1e6, alpha=0.1, color="#BBBBBB")
 end
 scatter!(ax, λ₁, s₁ ./ 1e6, color=:black)
