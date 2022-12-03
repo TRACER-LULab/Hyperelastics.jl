@@ -43,7 +43,7 @@ jobs:
       - name: Deploy changes
         run: |
           ls -lt
-          rm -r frontend/build/data
+          rm -rf frontend/build/data
           cp -r frontend/build/** pages
           cp -r data pages/
           cd pages

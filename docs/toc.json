@@ -3,7 +3,8 @@
     "Examples":{
         "Basics": "/docs/examples/example.md",
         "Bayesian Parameter Fitting": "/docs/examples/bayesian_parameter_fitting.md",
-        "Data Driven Modelling": "/docs/examples/data_driven_modelling.md"
+        "Data Driven Modelling": "/docs/examples/data_driven_modelling.md",
+        "Online Fitting": "/docs/website.html"
     },
     "Reference": {
         "Hyperelastics.jl": "/ref/Hyperelastics",
