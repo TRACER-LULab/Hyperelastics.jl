@@ -1,7 +1,7 @@
 export Kawabata1981, Treloar1944Uniaxial
 
 """
-Kawabata1981(λ₁)
+`Kawabata1981(λ₁)`
 
 Biaxial Experimental Data from Kawabata et al. The model is more challenging to correctly fit a hyperelastic model to and is proposed as a better test than the Treloar1944 simple tension dataset.
 
@@ -25,6 +25,8 @@ Data provided for fixed λ₁ of:
 - 3.4
 - 3.7
 
+Fields:
+- `λ₁`: Specification of λ₁ stretch for the data.
 > Kawabata S, Matsuda M, Tei K, Kawai H. Experimental survey of the strain energy density function of isoprene rubber vulcanizate. Macromolecules. 1981 Jan;14(1):154-62.
 """
 function Kawabata1981(λ₁)
@@ -124,14 +126,14 @@ function Kawabata1981(λ₁)
 end
 
 """
-Treloar1944Uniaxial()
+`Treloar1944Uniaxial()`
 
 Uniaxial data for tension of 8% S Rubber at 20C from Fig 3 of Treloar 1944. This is commonly used for testing hyperelastic models.
 
 > Treloar LR. Stress-strain data for vulcanized rubber under various types of deformation. Rubber Chemistry and Technology. 1944 Dec;17(4):813-25.
 """
 function Treloar1944Uniaxial()
-    λ₁ = [1.0292, 1.1267, 1.2437, 1.3946, 1.6039, 1.8861, 2.1683, 2.4165, 3.0101, 3.5696, 4.0173, 4.7573, 5.3659, 5.7558, 6.1652, 6.4093, 6.6339, 6.8789, 7.0686, 7.1765, 7.2943, 7.4509, 7.5102, 7.6290]
-    s₁ = [0.0482, 1.2927, 2.2745, 3.185, 4.1203, 5.1043, 5.921, 6.7851, 8.6818, 10.626, 12.3773, 16.1647, 19.8069, 23.3744, 27.2768, 30.8423, 34.551, 38.2599, 41.9682, 45.5557, 49.3824, 53.1619, 56.7966, 64.2572].*0.0980665
+    λ₁ = [1.0, 1.0292, 1.1267, 1.2437, 1.3946, 1.6039, 1.8861, 2.1683, 2.4165, 3.0101, 3.5696, 4.0173, 4.7573, 5.3659, 5.7558, 6.1652, 6.4093, 6.6339, 6.8789, 7.0686, 7.1765, 7.2943, 7.4509, 7.5102, 7.6290]
+    s₁ = [0.0, 0.0482, 1.2927, 2.2745, 3.185, 4.1203, 5.1043, 5.921, 6.7851, 8.6818, 10.626, 12.3773, 16.1647, 19.8069, 23.3744, 27.2768, 30.8423, 34.551, 38.2599, 41.9682, 45.5557, 49.3824, 53.1619, 56.7966, 64.2572].*0.0980665
     return HyperelasticUniaxialTest(λ₁, s₁, name="treloar")
 end

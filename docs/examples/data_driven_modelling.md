@@ -47,4 +47,73 @@ f
 ```
 
 ## Average Chain Behavior Model
-The [`DataDrivenAverageChainBehavior`](#)  asdf.
+Another data-driven model is providedin [`DataDrivenAverageChainBehavior`](#) where the chain characteristics are determined from data and extrapolated out to the continuum response. For this example, the default interpolation of a \(4^{\text{th}}\) order B-spline is used. 
+
+{cell}
+```julia
+f = Figure()
+ax = Axis(f[1,1], xlabel = "Stretch", ylabel = "Stress [MPa]")
+fchain(x, y) = BSplineInterpolation(y, x, 3, :Uniform, :Uniform)
+ψ = DataDrivenAverageChainBehavior(treloar, fchain= fchain)
+pred = predict(ψ, test, [])
+λ̂₁ = getindex.(pred.data.λ,1)
+ŝ₁ = getindex.(pred.data.s,1)
+lines!(ax, λ̂₁, ŝ₁, label = "DataDrivenAverageChainBehavior")
+λ₁ = getindex.(treloar.data.λ,1)
+s₁ = getindex.(treloar.data.s,1)
+scatter!(ax, λ₁, s₁, label = "Treloar", color = :black)
+axislegend(position = :lt)
+f
+``` 
+
+The chain behavior can be accessed with:
+
+{cell}
+```julia
+f = Figure()
+ax = Axis(f[1,1], xlabel = L"\lambda_{ch}", ylabel = L"f(\lambda_{ch})")
+lines!(ax,1.0:0.01:4.4, ψ.fchain.(1.0:0.01:4.4))
+f
+```
+
+## Macro-Micro-Macro Model
+
+Lastly, the Macro-Micro-Macro model is provided. The model determines the average chain behavior based on an average over the microsphere for chain orientations. 
+
+{cell}
+```julia
+λ₁ = [1.04,3.1]
+tests = Kawabata1981.(λ₁)
+n1 = 100
+p₀ = range(0.0, 0.7, length=100)|>collect
+λ_max = maximum(maximum.(map(x->maximum.(x.data.λ),tests)))
+λs = collect(range(0.001, 6.0, length=n1))
+PChain(u) = BSplineApprox(u, λs, 3, 12, :Uniform, :Uniform)
+weights = ones(sum(map(test->length(test.data.s), tests)))
+
+# Set the model Parameters
+optimizer=LBFGS()
+
+# Create the Model
+ψ = MacroMicroMacro(tests, PChain, p₀, optimizer = optimizer);
+preds = predict(ψ, Kawabata1981.([1.6, 1.9,2.5]), [])
+## Compare the Experimental and Predicted stresses
+f = Figure()
+ax = Makie.Axis(f[1,1], xlabel = "Stretch [-]", ylabel = "Stress [MPa]")
+for (pred,test) in zip(preds, Kawabata1981.([1.6, 1.9, 2.5]))
+    lines!(
+        ax,
+        getindex.(pred.data.λ, 2),
+        getindex.(pred.data.s, 1),
+        label = "Predicted"
+    )
+    scatter!(
+        ax,
+        getindex.(test.data.λ, 2),
+        getindex.(test.data.s, 1),
+        label = "Experimental"
+    )
+end
+axislegend(position = :rb)
+f
+```

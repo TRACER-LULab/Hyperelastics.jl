@@ -89,12 +89,12 @@ axislegend(position = :lt)
 f
 ```
 
-While the majority of the models provided by `Hyperelastics.jl` are based on closed form strain energy density functions, a selection of data-driven models are proivded. For example, the [`SussmanBathe`] model is created with:
+While the majority of the models provided by [`Hyperelastics.jl`](#) are based on closed form strain energy density functions, a selection of data-driven models are proivded. For example, the [`SussmanBathe`](#) model is created with:
 
 {cell}
 ```julia
 using DataInterpolations
-ψ = SussmanBathe(treloar_data, 4, QuadraticSpline)
+ψ = SussmanBathe(treloar_data, k=4, interpolant = QuadraticSpline)
 λ₁ = range(extrema(getindex.(treloar_data.data.λ, 1))..., length = 100)
 uniaxial_prediction = HyperelasticUniaxialTest(λ₁, name = "Prediction")
 pred = predict(ψ, uniaxial_prediction, [])

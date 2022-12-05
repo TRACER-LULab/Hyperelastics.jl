@@ -1,23 +1,33 @@
 
 """
-strain_energy_density(ψ, λ⃗, p)
+`StrainEnergyDensity(ψ, λ⃗, p)`
 
-Returns a function for the strain energy density function for the hyperelastic model `ψ` with parameters `p`.
-> ψ = strain_energy_density(Gent(), (μ = 10, Jₘ = 100.0))
+Returns the strain energy density for the hyperelastic model `ψ` with the principle stretches `λ⃗` with parameters `p`.
+
+Fields:
+- `ψ`: Hyperelastic model
+- `λ⃗`: Vector of principal stretches
+- `p`: Model parameters
 """
 function NonlinearContinua.StrainEnergyDensity(ψ::AbstractHyperelasticModel, λ⃗::AbstractVector, p)
-    @error "$(typeof(ψ)) does not have a Strain Energy Density Function implemented"
+    @error "$(typeof(ψ)) does not have a Strain Energy Density implemented"
 end
 
 """
-StrainEnergyDensity(ψ, F, p)
+`StrainEnergyDensity(ψ, F, p)`
 
 Returns a function for the strain energy density function for the hyperelastic model based on calculating the principal stretches of the deformation gradient, `F`. The eigen values are found by the following procedure:
-``C = F^T \\cdot F``
-``a = transpose(eigvecs(C))``
-``C^\\ast = (U^\\ast)^2 = a^T \\cdot C \\cdot a``
-``\\vec{\\lambda} = diag(U)``
+```math
+C = F^T \\cdot F
+a = transpose(eigvecs(C))
+C^\\ast = (U^\\ast)^2 = a^T \\cdot C \\cdot a
+\\vec{\\lambda} = diag(U)
+```
 
+Fields:
+- `ψ`: Hyperelastic model
+- `F`: Deformation gradient matrix
+- `p`: Model parameters
 """
 function NonlinearContinua.StrainEnergyDensity(ψ::AbstractHyperelasticModel, F::AbstractMatrix, p)
     C = transpose(F) * F
@@ -27,31 +37,45 @@ function NonlinearContinua.StrainEnergyDensity(ψ::AbstractHyperelasticModel, F:
 end
 
 """
-StrainEnergyDensity(ψ, λ⃗, p, InvariantForm())
+`StrainEnergyDensity(ψ, I⃗, p, InvariantForm())`
 
-Returns a function for the strain energy density function for the hyperelastic model `ψ` with parameters `p`.
-> ψ = strain_energy_density(Gent(), (μ = 10, Jₘ = 100.0), InvariantForm())
+Returns the strain energy density for the model `ψ` with invariants `I⃗` with parameters `p`.
+
+Fields:
+- `ψ`: Hyperelastic model
+- `I⃗`: vector of principal stretches or stretch invariants, respectively.
+- `p`: parameters
+- `InvariantForm()`
 """
 function NonlinearContinua.StrainEnergyDensity(ψ::AbstractHyperelasticModel, I⃗::AbstractVector, p, I::InvariantForm)
-    @error "$(typeof(ψ)) does not have a stretch Invariant Form of Strain Energy Density Function implemented"
+    @error "$(typeof(ψ)) does not have a stretch Invariant Form of Strain Energy Density implemented"
 end
 
 """
-StrainEnergyDensity(ψ, F, p, InvariantForm())
+`StrainEnergyDensity(ψ, F, p, InvariantForm())`
 
-Returns a function for the strain energy density function for the hyperelastic model `ψ` with parameters `p` given a deformation gradient, `F` where the invariants are calculated.
-> ψ = StrainEnergyDensity(Gent(), (μ = 10, Jₘ = 100.0), InvariantForm())
+Returns the strain energy density for the model `ψ` with deformation gradient `F` with parameters `p`.
+
+Fields:
+- `ψ`: Hyperelastic model
+- `F`: Deformation gradient tensor
+- `p`: parameters
+- `InvariantForm()`
 """
 function NonlinearContinua.StrainEnergyDensity(ψ::AbstractHyperelasticModel, F::AbstractMatrix, p, I::InvariantForm)
     NonlinearContinua.StrainEnergyDensity(ψ, [I₁(F), I₂(F), I₃(F)], p, I)
 end
 
 """
-SecondPiolaKirchoffStressTensor(ψ, λ⃗, p; adb = AD.ForwardDiffBackend())
+`SecondPiolaKirchoffStressTensor(ψ::AbstractHyperelasticModel, λ⃗::AbstractVector, p; adb=AD.ForwardDiffBackend())`
 
-Return a function for the nominal (2nd Piola Kirchoff) Stress Function  for the hyperelastic model `ψ` with parameters `p` for principal stretchs, `\\vec{\\lambda}}`. Defaults to using ForwardDiff for calculating the gradient of the strain energy density function. Implementing a new method for a model requires adding a new function with the type of the model.
+Returns the second PK stress tensor for the hyperelastic model `ψ` with the principle stretches `λ⃗` with parameters `p`.
 
-> s = SecondPiolaKirchoffStressTensor(Gent(), [2.0, 2.0, 1/4.0], (μ = 10, Jₘ = 100.0))
+Fields:
+- `ψ`: Hyperelastic model
+- `λ⃗`: Vector of principal stretches
+- `p`: Model parameters
+- `adb`: Differentiation backend from `AbstractDifferentiation.jl`
 """
 function NonlinearContinua.SecondPiolaKirchoffStressTensor(ψ::AbstractHyperelasticModel, λ⃗::AbstractVector, p; adb=AD.ForwardDiffBackend())
     W(λ⃗) = StrainEnergyDensity(ψ, λ⃗, p)
@@ -60,9 +84,15 @@ function NonlinearContinua.SecondPiolaKirchoffStressTensor(ψ::AbstractHyperelas
 end
 
 """
-Return a function for the nominal (2nd Piola Kirchoff) Stress Function  for the hyperelastic model `ψ` with parameters `p` for deformation gradient tensor, `F`. Defaults to using ForwardDiff for calculating the gradient of the strain energy density function. Implementing a new method for a model requires adding a new function with the type of the model.
+`SecondPiolaKirchoffStressTensor(ψ::AbstractHyperelasticModel, F::AbstractMatrix, p; adb=AD.ForwardDiffBackend())`
 
-> s = SecondPiolaKirchoffStressTensor(Gent(), [2 -2 0; 1 1 0; 0 0 1], (μ = 10, Jₘ = 100.0))
+Returns the second PK stress tensor for the hyperelastic model `ψ` with the deformation gradient `F` with parameters `p`.
+
+Fields:
+- `ψ`: Hyperelastic model
+- `F`: Deformation gradient tensor
+- `p`: Model parameters
+- `adb`: Differentiation backend from `AbstractDifferentiation.jl`
 """
 function NonlinearContinua.SecondPiolaKirchoffStressTensor(ψ::AbstractHyperelasticModel, F::AbstractMatrix, p; adb=AD.ForwardDiffBackend())
     σ = CauchyStressTensor(ψ, F, p)
@@ -70,12 +100,17 @@ function NonlinearContinua.SecondPiolaKirchoffStressTensor(ψ::AbstractHyperelas
     return S
 end
 
-"""viscous
-CauchyStressTensor(ψ, p; adb = AD.ForwardDiffBackend())
-
-Return a function for the true (Cauchy) Stress Function  for the hyperelastic model `ψ` with parameters `p`.
-> σ = CauchyStressTensor(Gent(), (μ = 10, Jₘ = 100.0))
 """
+`CauchyStressTensor(ψ::AbstractHyperelasticModel, λ⃗::AbstractVector, p; adb=AD.ForwardDiffBackend())`
+
+Returns the Cauchy stress tensor for the hyperelastic model `ψ` with the principle stretches `λ⃗` with parameters `p`.
+
+Fields:
+- `ψ`: Hyperelastic model
+- `λ⃗`: Vector of principal stretches
+- `p`: Model parameters
+- `adb`: Differentiation backend from `AbstractDifferentiation.jl`
+    """
 function NonlinearContinua.CauchyStressTensor(ψ::AbstractHyperelasticModel, λ⃗::AbstractVector, p; adb=AD.ForwardDiffBackend())
     W(λ⃗) = StrainEnergyDensity(ψ, λ⃗, p)
     ∂W∂λ = AD.gradient(adb, W, λ⃗)[1]
@@ -84,11 +119,15 @@ function NonlinearContinua.CauchyStressTensor(ψ::AbstractHyperelasticModel, λ�
 end
 
 """
-CauchyStressTensor(ψ, F, p; adb = AD.ForwardDiffBackend())
+`CauchyStressTensor(ψ::AbstractHyperelasticModel, F::AbstractMatrix, p; adb=AD.ForwardDiffBackend())`
 
-Return a function for the true (Cauchy) Stress Function  for the hyperelastic model `ψ` with parameters `p` for deformation gradient tensor, `F`. Defaults to using ForwardDiff for calculating the gradient of the strain energy density function. Implementing a new method for a model requires adding a new function with the type of the model.
+Returns the Cauchy stress tensor for the hyperelastic model `ψ` with the deformation gradient `F` with parameters `p`.
 
-> σ = CauchyStressTensor(Gent(), [2 -2 0; 1 1 0; 0 0 1], (μ = 10, Jₘ = 100.0))
+Fields:
+- `ψ`: Hyperelastic model
+- `F`: Deformation gradient tensor
+- `p`: Model parameters
+- `adb`: Differentiation backend from `AbstractDifferentiation.jl`
 """
 function NonlinearContinua.CauchyStressTensor(ψ::AbstractHyperelasticModel, F::AbstractMatrix, p; adb=AD.ForwardDiffBackend())
     B = F * F'
@@ -106,18 +145,50 @@ end
 
 
 """
+`parameters(ψ::AbstractHyperelasticModel)`
+
 Returns a tuple of the parameters required for the model
+
+Fields
+- `ψ`: Hyperelastics model
 """
 function parameters(ψ::AbstractHyperelasticModel)
     @error "$(typeof(ψ)) does not have a parameters function implemented"
 end
 
 """
+`parameter_bounds(ψ::AbstractHyperelasticModel, test::AbstractHyperelasticTest)`
+`parameter_bounds(ψ::AbstractHyperelasticModel, tests::Vector{AbstractHyperelasticTest})`
+
 Returns a tuple of the parameter bounds provided the experimental data and model
+
+Fields
+- `ψ`: Hyperelastic model
+- `test` or `tests`: The test or vector of tests to use in finding the parameter bounds.
 """
-function parameter_bounds(ψ::AbstractHyperelasticModel, data::AbstractHyperelasticTest)
+function parameter_bounds(ψ::AbstractHyperelasticModel, test::AbstractHyperelasticTest)
     lb = nothing
     ub = nothing
+    return (lb=lb, ub=ub)
+end
+
+function parameter_bounds(ψ::AbstractHyperelasticModel, tests::Vector{<:AbstractHyperelasticTest})
+    bounds = map(Base.Fix1(parameter_bounds, ψ), tests)
+    lbs = getfield.(bounds, :lb)
+    ubs = getfield.(bounds, :ub)
+    if !(eltype(lbs) <: Nothing)
+        lb_ps = fieldnames(eltype(lbs))
+        lb = map(p -> p .=> maximum(getfield.(lbs, p)), lb_ps) |> NamedTuple
+    else
+        lb = nothing
+    end
+
+    if !(eltype(ubs) <: Nothing)
+        ub_ps = fieldnames(eltype(ubs))
+        ub = map(p -> p .=> minimum(getfield.(ubs, p)), ub_ps) |> NamedTuple
+    else
+        ub = nothing
+    end
     return (lb=lb, ub=ub)
 end
 

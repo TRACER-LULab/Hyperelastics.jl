@@ -1,9 +1,10 @@
 export GeneralMooneyRivlin, GeneralDarijaniNaghdabadi, GeneralBeda
 
 """
-General Mooney Rivlin
+`GeneralMooneyRivlin`
 
 Model:
+
 ```math
 W = \\sum\\limits_{i,j = 0}^{N,M} C_{i,j}(I_1-3)^i(I_2-3)^j
 ```
@@ -31,7 +32,7 @@ end
 parameters(ψ::GeneralMooneyRivlin) = (:C,)
 
 """
-General Darijani Naghdabadi
+`GeneralDarijaniNaghdabadi`
 
 Model:
 
@@ -60,7 +61,7 @@ function parameters(ψ::GeneralDarijaniNaghdabadi)
 end
 
 """
-General Beda
+`GeneralBeda`
 
 Model:
 

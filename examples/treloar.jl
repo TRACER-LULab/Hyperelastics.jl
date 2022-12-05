@@ -5,7 +5,7 @@ using ComponentArrays
 using CairoMakie, MakiePublication
 set_theme!(theme_web(width=800))
 # # Load the Treloar 1994 Uniaxial Dataset
-treloar_data = Treloar1944Uniaxial()
+treloar_data = [Treloar1944Uniaxial(),Treloar1944Uniaxial()]
 
 # ## Fit the Gent Model
 # W(\vec{\lambda}) = -\frac{\mu J_m}{2}\log{\bigg(1-\frac{I_1-3}{J_m}\bigg)}$

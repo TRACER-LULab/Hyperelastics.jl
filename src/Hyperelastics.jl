@@ -1,6 +1,6 @@
 module Hyperelastics
 
-using Reexport
+using Reexport, DocStringExtensions
 @reexport using NonlinearContinua
 using InverseLangevinApproximations
 using LossFunctions, Optimization
@@ -24,14 +24,15 @@ abstract type AbstractHyperelasticProblem end
 
 struct InvariantForm end
 
-include("data_types.jl")
 include("invariants.jl")
 include("material_tests.jl")
 include("model_functions.jl")
 include("datasets.jl")
+
 include("general_form_incompressible_isotropic_models.jl")
 include("isotropic_incompressible_models.jl")
 include("isotropic_compressible_models.jl")
+
 include("data_driven.jl")
 include("macro_micro_macro_model.jl")
 include("average_chain_behavior.jl")

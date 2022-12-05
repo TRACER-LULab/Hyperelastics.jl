@@ -2,14 +2,16 @@ export GeneralCompressible, LogarithmicCompressible
 """
 Generic Compressible Model
 
+Model:
+```math
+\\psi_{compressible} = \\psi_{incompressible}(\\vec{\\lambda}_{incompressible})+\\kappa(J-1)^2
+```
+
 Parameters:
 - ψ
     - Incompressible model parameters (see model selected for parameter names)
 - κ
 
-Model: ``\\psi_{compressible} = \\psi_{incompressible}(\\vec{\\lambda}_{incompressible})+\\kappa(J-1)^2``
-
-Example Implementation: `StrainEnergyDensityFunction(GeneralCompressible(NeoHookean()), λ⃗, (ψ = (μ=μ, ), κ = κ))`
 """
 struct GeneralCompressible <: AbstractHyperelasticModel
     incompressible::AbstractHyperelasticModel
@@ -17,12 +19,12 @@ end
 
 function NonlinearContinua.StrainEnergyDensity(ψ::GeneralCompressible, λ⃗::AbstractVector, p)
     J = prod(λ⃗)
-    StrainEnergyDensity(ψ.incompressible, λ⃗./cbrt(J), p) + p.κ / 2 * (J - 1)^2
+    StrainEnergyDensity(ψ.incompressible, λ⃗ ./ cbrt(J), p) + p.κ / 2 * (J - 1)^2
 end
 
 function NonlinearContinua.StrainEnergyDensity(ψ::GeneralCompressible, F::AbstractMatrix, p)
     J = det(F)
-    StrainEnergyDensity(ψ.incompressible, F./cbrt(J), p) + p.κ / 2 * (J - 1)^2
+    StrainEnergyDensity(ψ.incompressible, F ./ cbrt(J), p) + p.κ / 2 * (J - 1)^2
 end
 
 function NonlinearContinua.CauchyStressTensor(ψ::GeneralCompressible, λ⃗::AbstractVector, p; adb=AD.ForwardDiffBackend())
@@ -57,11 +59,16 @@ end
 """
 Logarithmic Compressible Model
 
-Parameters: ψ, κ
+Model:
+```math
+\\psi_{compressible} = \\psi_{incompressible}(\\vec{\\lambda}_{incompressible})+\\kappa(J\\log{J} - J)
+```
 
-Model: ``\\psi_{compressible} = \\psi_{incompressible}(\\vec{\\lambda}_{incompressible})+\\kappa(J\\log{J} - J)``
+Parameters:
+- ψ
+    - See Selected hyperelastic model for the required parameters.
+- κ
 
-Example Implementation: `StrainEnergyDensityFunction(LogarithmicCompressible(NeoHookean()), λ⃗, (ψ = (μ=μ, ), κ = κ))`
 """
 struct LogarithmicCompressible <: AbstractHyperelasticModel
     incompressible::AbstractHyperelasticModel

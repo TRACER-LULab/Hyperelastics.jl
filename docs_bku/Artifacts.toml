@@ -1,7 +1,0 @@
-[Tracer-Theme]
-lazy = true
-git-tree-sha1 = "581e0452d45fef9c45f74e2597aab9f20349850a"
-
-    [[Tracer-Theme.download]]
-    sha256 = "910bce4fb848d762994dddd3c3c32dc0526fbf4897bd6272e60dd49eaab9dc91"
-    url = "https://github.com/TRACER-LULab/Tracer-Theme/releases/download/v0.1/theme.tar.gz" 
