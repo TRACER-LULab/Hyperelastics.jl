@@ -1,6 +1,6 @@
 module Hyperelastics
 
-using Reexport, DocStringExtensions
+using Reexport
 @reexport using NonlinearContinua
 using InverseLangevinApproximations
 using LossFunctions, Optimization

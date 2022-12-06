@@ -25,7 +25,7 @@ function createproject(; tag = "dev", package = m, modules = ms)
 
     project = Project([
         # Add written documentation, source files, and symbol docstrings as pages
-        DocumentationFiles([package]; pkgtags),
+        DocumentationFiles([package]; pkgtags=pkgtags, extensions = ["md", "html"]),
         SourceFiles(modules; pkgtags),
         ModuleReference(pkgindex),
 

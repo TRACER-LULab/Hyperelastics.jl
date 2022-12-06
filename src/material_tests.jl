@@ -214,7 +214,8 @@ function HyperelasticProblem(ψ::AbstractHyperelasticModel, tests::Vector{<:Abst
 
     get_s(test) = hcat(test.data.s...)
 
-    function f(ps, (; ψ, tests, adb, loss))
+    function f(ps, p)
+        (; ψ, tests, loss) = p
         preds = predict(ψ, tests, ps)
         s = get_s.(tests)
         ŝ = get_s.(preds)
@@ -223,7 +224,7 @@ function HyperelasticProblem(ψ::AbstractHyperelasticModel, tests::Vector{<:Abst
     end
 
     func = OptimizationFunction(f, adtype)
-    prob = OptimizationProblem(func, u₀, ps)
+    prob = OptimizationProblem(func, u₀, (ψ = ψ, tests = tests, loss = loss))
 
     # # Check for Bounds
     lb, ub = parameter_bounds(ψ, tests)
