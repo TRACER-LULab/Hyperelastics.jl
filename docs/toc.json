@@ -4,7 +4,7 @@
         "Basics": "/docs/examples/example.md",
         "Bayesian Parameter Fitting": "/docs/examples/bayesian_parameter_fitting.md",
         "Data Driven Modelling": "/docs/examples/data_driven_modelling.md",
-        "Online Fitting": "/docs/examples/website.html"
+        "Online Fitting": "https://vagusllc.github.io/HyperelasticWebsiteDeployed/website.html"
     },
     "Reference": {
         "Hyperelastics.jl": "/ref/Hyperelastics",
