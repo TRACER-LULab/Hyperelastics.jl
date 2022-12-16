@@ -27,6 +27,12 @@ function NonlinearContinua.StrainEnergyDensity(ψ::GeneralCompressible, F::Abstr
     StrainEnergyDensity(ψ.incompressible, F ./ cbrt(J), p) + p.κ / 2 * (J - 1)^2
 end
 
+function NonlinearContinua.StrainEnergyDensity(ψ::GeneralCompressible, F::AbstractMatrix, p, ::InvariantForm)
+    J = det(F)
+    F̄ = F ./ cbrt(J)
+    StrainEnergyDensity(ψ.incompressible, [I₁(F̄), I₂(F̄), I₃(F̄)], p) + p.κ / 2 * (J - 1)^2
+end
+
 function NonlinearContinua.CauchyStressTensor(ψ::GeneralCompressible, λ⃗::AbstractVector, p; adb=AD.ForwardDiffBackend())
     σ_dev = p.κ * (prod(λ⃗) - 1)
     σ = CauchyStressTensor(ψ.incompressible, λ⃗ ./ cbrt(prod(λ⃗)), p, adb=adb)

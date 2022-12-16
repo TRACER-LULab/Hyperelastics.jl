@@ -2310,6 +2310,12 @@ function NonlinearContinua.StrainEnergyDensity(ψ::ArrudaBoyce, λ⃗::AbstractV
     μ * N * (rchain_Nl * β + log(β / sinh(β)))
 end
 
+function NonlinearContinua.StrainEnergyDensity(ψ::ArrudaBoyce, I⃗::AbstractVector, (; μ, N), ::InvariantForm)
+    rchain_Nl = √(I⃗[1] / 3 / N)
+    β = ψ.ℒinv(rchain_Nl)
+    μ * N * (rchain_Nl * β + log(β / sinh(β)))
+end
+
 function parameters(ψ::ArrudaBoyce)
     return (:μ, :N)
 end
