@@ -2913,7 +2913,6 @@ Fields
 
 > Anssari-Benam A. On a new class of non-Gaussian molecular-based constitutive models with limiting chain extensibility for incompressible rubber-like materials. Mathematics and Mechanics of Solids. 2021 Nov;26(11):1660-74.
 """
-
 struct AnsarriBenam
     ℒinv::Function
     n::Int
