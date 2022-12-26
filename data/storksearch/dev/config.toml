@@ -340,7 +340,7 @@ url_prefix = ""
     url = "Hyperelastics@dev/ref/Hyperelastics.AbstractHyperelasticProblem"
     [[input.files]]
     title = "AnsarriBenam"
-    contents = "AnsarriBenam"
+    contents = "Ansarri-Benam\nModel:\nW = \\frac{3(n-1)}{2n}\\mu N \\left[\\frac{1}{3N(n-1)}(I_1 - 3) - \\log{\\frac{I_1 - 3N}{3 -3N}} \\right]\nParameters:\nμ\n\nn\n\nN\n\n\nFields\nℒinv: Sets the inverse Langevin approxamation used (default = TreloarApproximation())\n\nn (Integer): Sets the order of the model (default = 3)\n\n\nAnssari-Benam A. On a new class of non-Gaussian molecular-based constitutive models with limiting chain extensibility for incompressible rubber-like materials. Mathematics and Mechanics of Solids. 2021 Nov;26(11):1660-74.\n\n\n"
     url = "Hyperelastics@dev/ref/Hyperelastics.AnsarriBenam"
     [[input.files]]
     title = "Ogden"
