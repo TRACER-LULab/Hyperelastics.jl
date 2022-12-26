@@ -2898,7 +2898,8 @@ end
 Ansarri-Benam
 
 Model:
-```
+
+```math
 W = \\frac{3(n-1)}{2n}\\mu N \\left[\\frac{1}{3N(n-1)}(I_1 - 3) - \\log{\\frac{I_1 - 3N}{3 -3N}} \\right]
 ```
 
