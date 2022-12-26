@@ -2269,7 +2269,7 @@ function parameter_bounds(ψ::ThreeChainModel, data::AbstractHyperelasticTest)
 end
 
 """
-Arruda Boyce
+ArrudaBoyce
 
 Model:
 
@@ -2892,4 +2892,38 @@ function parameter_bounds(ψ::BechirChevalier, data::AbstractHyperelasticTest)
     lb = (μ₀=-Inf, η=-Inf, ρ=-Inf, N₃=0, N₈=0)
     ub = nothing
     return (lb=lb, ub=ub)
+end
+
+"""
+Ansarri-Benam
+
+Model:
+```
+W = \\frac{3(n-1)}{2n}\\mu N \\left[\\frac{1}{3N(n-1)}(I_1 - 3) - \\log{\\frac{I_1 - 3N}{3 -3N}} \\right]
+```
+
+Parameters:
+- μ
+- n
+- N
+
+Fields
+- ℒinv: Sets the inverse Langevin approxamation used (default = `TreloarApproximation()`)
+- n (Integer): Sets the order of the model (default = 3)
+
+> Anssari-Benam A. On a new class of non-Gaussian molecular-based constitutive models with limiting chain extensibility for incompressible rubber-like materials. Mathematics and Mechanics of Solids. 2021 Nov;26(11):1660-74.
+"""
+
+struct AnsarriBenam
+    ℒinv::Function
+    n::Int
+    AnsarriBenam(; n = 3,  ℒinv::Function=TreloarApproximation) = new(ℒinv, n)
+end
+
+function NonlinearContinua.StrainEnergyDensity(ψ::AnsarriBenam, λ⃗::AbstractVector, (; μ, n, N))
+    return (3 * (ψ.n - 1)) / (2*ψ.n) * μ * N * ((I₁(λ⃗) - 3) / (3N * (ψ.n - 1)) - log((I₁(λ⃗) - 3N) / (3 - 3N))) + C₂ * log(I₂(λ⃗) / 3)^γ
+end
+
+function NonlinearContinua.StrainEnergyDensity(ψ::AnsarriBenam, I⃗::AbstractVector, (; μ, n, N), ::InvariantForm)
+    return (3 * (ψ.n - 1)) / (2*ψ.n) * μ * N * ((I⃗[1] - 3) / (3N * (ψ.n - 1)) - log((I⃗[1] - 3N) / (3 - 3N))) + C₂ * log(I⃗[2] / 3)^γ
 end
