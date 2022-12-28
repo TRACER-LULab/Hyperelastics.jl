@@ -4,7 +4,7 @@ url_prefix = ""
 
     [[input.files]]
     title = "ABGI"
-    contents = "ABGI\nModel:\nW = W_{Arruda-Boyce} + \\frac{G_e}{n}\\left(\\sum\\limits_{i=1}^{3}\\lambda_i^n-3\\right)\nParameters:\nμ\n\nN\n\nGe\n\nn\n\n\nMeissner B, Matějka L. A Langevin-elasticity-theory-based constitutive equation for rubberlike networks and its comparison with biaxial stress–strain data. Part I. Polymer. 2003 Jul 1;44(16):4599-610.\n\n\n"
+    contents = "ABGI\nModel:\nW = W_{Arruda-Boyce} + \\frac{G_e}{n}\\left(\\sum\\limits_{i=1}^{3}\\lambda_i^n-3\\right)\nParameters:\nμ\n\nN\n\nGe\n\nn\n\n\nFields:\nℒinv: Sets the inverse Langevin approxamation used (default = TreloarApproximation())\n\n\nMeissner B, Matějka L. A Langevin-elasticity-theory-based constitutive equation for rubberlike networks and its comparison with biaxial stress–strain data. Part I. Polymer. 2003 Jul 1;44(16):4599-610.\n\n\n"
     url = "Hyperelastics@dev/ref/Hyperelastics.ABGI"
     [[input.files]]
     title = "Bootstrapped8Chain"
@@ -40,7 +40,7 @@ url_prefix = ""
     url = "Hyperelastics@dev/ref/Hyperelastics.PengLandel"
     [[input.files]]
     title = "Lim"
-    contents = "Lim\nModel:\nW = (1-f(\\frac{I_1-3}{\\hat{I_1}-3}))W_{NeoHookean}(μ₁)+fW_{ArrudaBoyce}(μ₂, N)\nParameters:\nμ₁\n\nμ₂\n\nN\n\nÎ₁\n\n\nLim GT. Scratch behavior of polymers. Texas A&M University; 2005.\n\n\n"
+    contents = "Lim\nModel:\nW = (1-f(\\frac{I_1-3}{\\hat{I_1}-3}))W_{NeoHookean}(μ₁)+fW_{ArrudaBoyce}(μ₂, N)\nParameters:\nμ₁\n\nμ₂\n\nN\n\nÎ₁\n\n\nFields:\nℒinv: Sets the inverse Langevin approxamation used (default = TreloarApproximation())\n\n\nLim GT. Scratch behavior of polymers. Texas A&M University; 2005.\n\n\n"
     url = "Hyperelastics@dev/ref/Hyperelastics.Lim"
     [[input.files]]
     title = "Biderman"
@@ -76,7 +76,7 @@ url_prefix = ""
     url = "Hyperelastics@dev/doc/NonlinearContinua/README.md"
     [[input.files]]
     title = "AffineMicroSphere"
-    contents = "Affine Micro-Sphere\nModel:\nSee Paper\n\n\nParameters:\nμ\n\nN\n\n\nNote:\nThe field ℒinv can be set to change the inverse Langevin function approximation used\n\n\n\nMiehe C, Göktepe S, Lulei F. A micro-macro approach to rubber-like materials—part I: the non-affine micro-sphere model of rubber elasticity. Journal of the Mechanics and Physics of Solids. 2004 Nov 1;52(11):2617-60.\n\n\n"
+    contents = "Affine Micro-Sphere\nModel:\nSee Paper\n\n\nParameters:\nμ\n\nN\n\n\nFields:\nℒinv: Sets the inverse Langevin approxamation used (default = TreloarApproximation())\n\n\n\nMiehe C, Göktepe S, Lulei F. A micro-macro approach to rubber-like materials—part I: the non-affine micro-sphere model of rubber elasticity. Journal of the Mechanics and Physics of Solids. 2004 Nov 1;52(11):2617-60.\n\n\n"
     url = "Hyperelastics@dev/ref/Hyperelastics.AffineMicroSphere"
     [[input.files]]
     title = "ModifiedYeoh"
@@ -148,7 +148,7 @@ url_prefix = ""
     url = "Hyperelastics@dev/ref/Hyperelastics.ChevalierMarco"
     [[input.files]]
     title = "FullNetwork"
-    contents = "Full Network - Wu Geisson\nModel:\nW = (1-\\rho)W_{3Chain}+\\rho W_{8chain}\nParameters:\nμ\n\nN\n\nρ\n\n\nTreloar LR, Riding G. A non-Gaussian theory for rubber in biaxial strain. I. Mechanical properties. Proceedings of the Royal Society of London. A. Mathematical and Physical Sciences. 1979 Dec 31;369(1737):261-80. Wu PD, van der Giessen E. On improved 3-D non-Gaussian network models for rubber elasticity. Mechanics research communications. 1992 Sep 1;19(5):427-33. Wu PD, Van Der Giessen E. On improved network models for rubber elasticity and their applications to orientation hardening in glassy polymers. Journal of the Mechanics and Physics of Solids. 1993 Mar 1;41(3):427-56.\n\n\n"
+    contents = "Full Network - Wu Geisson\nModel:\nW = (1-\\rho)W_{3Chain}+\\rho W_{8chain}\nParameters:\nμ\n\nN\n\nρ\n\n\nFields\nℒinv: Sets the inverse Langevin approxamation used (default = TreloarApproximation())\n\n\nTreloar LR, Riding G. A non-Gaussian theory for rubber in biaxial strain. I. Mechanical properties. Proceedings of the Royal Society of London. A. Mathematical and Physical Sciences. 1979 Dec 31;369(1737):261-80. Wu PD, van der Giessen E. On improved 3-D non-Gaussian network models for rubber elasticity. Mechanics research communications. 1992 Sep 1;19(5):427-33. Wu PD, Van Der Giessen E. On improved network models for rubber elasticity and their applications to orientation hardening in glassy polymers. Journal of the Mechanics and Physics of Solids. 1993 Mar 1;41(3):427-56.\n\n\n"
     url = "Hyperelastics@dev/ref/Hyperelastics.FullNetwork"
     [[input.files]]
     title = "HorganSaccomandi"
@@ -244,7 +244,7 @@ url_prefix = ""
     url = "Hyperelastics@dev/src/general_form_incompressible_isotropic_models.jl"
     [[input.files]]
     title = "ModifiedFloryErman"
-    contents = "Modified Flory Erman\nModel:\nW = W_{\\text{Arruda-Boyce}}+\\sum\\limits_{i=1}^{3}\\frac{\\mu}{2}[B_i+D_i]\nParameters:\nμ\n\nN\n\nκ\n\n\nEdwards SF. The statistical mechanics of polymerized material. Proceedings of the Physical Society (1958-1967). 1967 Sep 1;92(1):9.\n\n\n"
+    contents = "Modified Flory Erman\nModel:\nW = W_{\\text{Arruda-Boyce}}+\\sum\\limits_{i=1}^{3}\\frac{\\mu}{2}[B_i+D_i]\nParameters:\nμ\n\nN\n\nκ\n\n\nFields:\nℒinv: Sets the inverse Langevin approxamation used (default = TreloarApproximation())\n\n\nEdwards SF. The statistical mechanics of polymerized material. Proceedings of the Physical Society (1958-1967). 1967 Sep 1;92(1):9.\n\n\n"
     url = "Hyperelastics@dev/ref/Hyperelastics.ModifiedFloryErman"
     [[input.files]]
     title = "BahremanDarijani"
@@ -268,7 +268,7 @@ url_prefix = ""
     url = "Hyperelastics@dev/doc/docs/model_list.md"
     [[input.files]]
     title = "ArrudaBoyce"
-    contents = "ArrudaBoyce\nModel:\nW = \\mu N \\left( \\frac{\\lambda_{chain}}{\\sqrt{N}} \\beta + \\log\\left(\\frac{\\beta}{\\sinh\\beta}\\right) \\right)\nwhere\n\\beta = \\mathcal{L}^{-1}\\left(\\frac{\\lambda_{chain}}{\\sqrt{N}}\\right)\nand\n\\lambda_{chain} = \\sqrt{\\frac{I_1}{3}}\nParameters:\nμ: Small strain shear modulus\n\nN: Square of the locking stretch of the network.\n\n\nFields\nℒinv: Sets the inverse Langevin approxamation used\n\n\nArruda EM, Boyce MC. A three-dimensional constitutive model for the large stretch behavior of rubber elastic materials. Journal of the Mechanics and Physics of Solids. 1993 Feb 1;41(2):389-412.\n\n\n"
+    contents = "ArrudaBoyce\nModel:\nW = \\mu N \\left( \\frac{\\lambda_{chain}}{\\sqrt{N}} \\beta + \\log\\left(\\frac{\\beta}{\\sinh\\beta}\\right) \\right)\nwhere\n\\beta = \\mathcal{L}^{-1}\\left(\\frac{\\lambda_{chain}}{\\sqrt{N}}\\right)\nand\n\\lambda_{chain} = \\sqrt{\\frac{I_1}{3}}\nParameters:\nμ: Small strain shear modulus\n\nN: Square of the locking stretch of the network.\n\n\nFields:\nℒinv: Sets the inverse Langevin approxamation used\n\n\nArruda EM, Boyce MC. A three-dimensional constitutive model for the large stretch behavior of rubber elastic materials. Journal of the Mechanics and Physics of Solids. 1993 Feb 1;41(2):389-412.\n\n\n"
     url = "Hyperelastics@dev/ref/Hyperelastics.ArrudaBoyce"
     [[input.files]]
     title = "NonaffineMicroSphere"
@@ -296,7 +296,7 @@ url_prefix = ""
     url = "Hyperelastics@dev/ref/Hyperelastics.HauptSedlan"
     [[input.files]]
     title = "BechirChevalier"
-    contents = "Bechir Chevalier\nModel:\nW = W_{3Chain}(\\mu_f, N_3)+W_{8Chain}(\\frac{\\mu_c}{3}, N_8)\nwhere:\n\\mu_f = \\rho\\sqrt{\\frac{I_1}{3N_8}}\n\\mu_c = \\bigg(1-\\frac{\\eta\\alpha}{\\sqrt{N_3}}\\bigg)\\mu_0\n\\alpha = \\max{\\lambda_1, \\lambda_2, \\lambda_3}\nParameters:\nμ₀\n\nη\n\nρ\n\nN₃\n\nN₈\n\n\nBechir H, Chevalier L, Idjeri M. A three-dimensional network model for rubber elasticity: The effect of local entanglements constraints. International journal of engineering science. 2010 Mar 1;48(3):265-74.\n\n\n"
+    contents = "Bechir Chevalier\nModel:\nW = W_{3Chain}(\\mu_f, N_3)+W_{8Chain}(\\frac{\\mu_c}{3}, N_8)\nwhere:\n\\mu_f = \\rho\\sqrt{\\frac{I_1}{3N_8}}\n\\mu_c = \\bigg(1-\\frac{\\eta\\alpha}{\\sqrt{N_3}}\\bigg)\\mu_0\n\\alpha = \\max{\\lambda_1, \\lambda_2, \\lambda_3}\nParameters:\nμ₀\n\nη\n\nρ\n\nN₃\n\nN₈\n\n\nFields:\nℒinv: Sets the inverse Langevin approxamation used (default = TreloarApproximation())\n\n\nBechir H, Chevalier L, Idjeri M. A three-dimensional network model for rubber elasticity: The effect of local entanglements constraints. International journal of engineering science. 2010 Mar 1;48(3):265-74.\n\n\n"
     url = "Hyperelastics@dev/ref/Hyperelastics.BechirChevalier"
     [[input.files]]
     title = "InverseLangevinApproximations"
@@ -328,7 +328,7 @@ url_prefix = ""
     url = "Hyperelastics@dev/ref/Hyperelastics.HyperelasticDataEntry"
     [[input.files]]
     title = "ThreeChainModel"
-    contents = "Three Chain Model\nModel:\nW = \\frac{\\mu\\sqrt{N}}{3}\\sum\\limits_{i=1}^{3}\\bigg(\\lambda_i\\beta_i+\\sqrt{N}\\log\\bigg(\\frac{\\beta_i}{\\sinh \\beta_i}\\bigg)\\bigg)\nParameters:\nμ: Small strain shear modulus\n\nN: Square of the locking stretch of the network.\n\n\nNote:\nThe field ℒinv can be set to change the inverse Langevin function approximation used.\n\n\nJames HM, Guth E. Theory of the elastic properties of rubber. The Journal of Chemical Physics. 1943 Oct;11(10):455-81.\n\n\n"
+    contents = "Three Chain Model\nModel:\nW = \\frac{\\mu\\sqrt{N}}{3}\\sum\\limits_{i=1}^{3}\\bigg(\\lambda_i\\beta_i+\\sqrt{N}\\log\\bigg(\\frac{\\beta_i}{\\sinh \\beta_i}\\bigg)\\bigg)\nParameters:\nμ: Small strain shear modulus\n\nN: Square of the locking stretch of the network.\n\n\nFields:\nℒinv: Sets the inverse Langevin approxamation used (default = TreloarApproximation())\n\n\nJames HM, Guth E. Theory of the elastic properties of rubber. The Journal of Chemical Physics. 1943 Oct;11(10):455-81.\n\n\n"
     url = "Hyperelastics@dev/ref/Hyperelastics.ThreeChainModel"
     [[input.files]]
     title = "Amin"
@@ -340,7 +340,7 @@ url_prefix = ""
     url = "Hyperelastics@dev/ref/Hyperelastics.AbstractHyperelasticProblem"
     [[input.files]]
     title = "AnsarriBenam"
-    contents = "Ansarri-Benam\nModel:\nW = \\frac{3(n-1)}{2n}\\mu N \\left[\\frac{1}{3N(n-1)}(I_1 - 3) - \\log{\\frac{I_1 - 3N}{3 -3N}} \\right]\nParameters:\nμ\n\nn\n\nN\n\n\nFields\nℒinv: Sets the inverse Langevin approxamation used (default = TreloarApproximation())\n\nn (Integer): Sets the order of the model (default = 3)\n\n\nAnssari-Benam A. On a new class of non-Gaussian molecular-based constitutive models with limiting chain extensibility for incompressible rubber-like materials. Mathematics and Mechanics of Solids. 2021 Nov;26(11):1660-74.\n\n\n"
+    contents = "Ansarri-Benam\nModel:\nW = \\frac{3(n-1)}{2n}\\mu N \\left[\\frac{1}{3N(n-1)}(I_1 - 3) - \\log{\\frac{I_1 - 3N}{3 -3N}} \\right]\nParameters:\nμ\n\nn\n\nN\n\n\nFields:\nℒinv: Sets the inverse Langevin approxamation used (default = TreloarApproximation())\n\nn (Integer): Sets the order of the model (default = 3)\n\n\nAnssari-Benam A. On a new class of non-Gaussian molecular-based constitutive models with limiting chain extensibility for incompressible rubber-like materials. Mathematics and Mechanics of Solids. 2021 Nov;26(11):1660-74.\n\n\n"
     url = "Hyperelastics@dev/ref/Hyperelastics.AnsarriBenam"
     [[input.files]]
     title = "Ogden"
@@ -480,5 +480,5 @@ url_prefix = ""
     url = "Hyperelastics@dev/ref/Hyperelastics.SussmanBathe"
     [[input.files]]
     title = "ZunigaBeatty"
-    contents = "Zuniga - Beatty\nModel:\nW = \\sqrt{\\frac{N_3+N_8}{2N_3}}W_{3Chain}+\\sqrt{\\frac{I_1}{3N_8}}W_{8Chain}\nParameters:\nμ\n\nN₃\n\nN₈\n\n\nElı́as-Zúñiga A, Beatty MF. Constitutive equations for amended non-Gaussian network models of rubber elasticity. International journal of engineering science. 2002 Dec 1;40(20):2265-94.\n\n\n"
+    contents = "Zuniga - Beatty\nModel:\nW = \\sqrt{\\frac{N_3+N_8}{2N_3}}W_{3Chain}+\\sqrt{\\frac{I_1}{3N_8}}W_{8Chain}\nParameters:\nμ\n\nN₃\n\nN₈\n\n\nFields:\nℒinv: Sets the inverse Langevin approxamation used (default = TreloarApproximation())\n\n\nElı́as-Zúñiga A, Beatty MF. Constitutive equations for amended non-Gaussian network models of rubber elasticity. International journal of engineering science. 2002 Dec 1;40(20):2265-94.\n\n\n"
     url = "Hyperelastics@dev/ref/Hyperelastics.ZunigaBeatty"
