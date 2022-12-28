@@ -17,6 +17,9 @@ Parameters:
 - Ge
 - n
 
+Fields:
+- ℒinv: Sets the inverse Langevin approxamation used (default = `TreloarApproximation()`)
+
 > Meissner B, Matějka L. A Langevin-elasticity-theory-based constitutive equation for rubberlike networks and its comparison with biaxial stress–strain data. Part I. Polymer. 2003 Jul 1;44(16):4599-610.
 """
 struct ABGI <: AbstractHyperelasticModel
@@ -50,8 +53,8 @@ Parameters:
 - μ
 - N
 
-Note:
-- The field `ℒinv` can be set to change the inverse Langevin function approximation used
+Fields:
+- ℒinv: Sets the inverse Langevin approxamation used (default = `TreloarApproximation()`)
 
 ---
 > Miehe C, Göktepe S, Lulei F. A micro-macro approach to rubber-like materials—part I: the non-affine micro-sphere model of rubber elasticity. Journal of the Mechanics and Physics of Solids. 2004 Nov 1;52(11):2617-60.
@@ -2242,8 +2245,8 @@ Parameters:
 - μ: Small strain shear modulus
 - N: Square of the locking stretch of the network.
 
-Note:
-- The field `ℒinv` can be set to change the inverse Langevin function approximation used.
+Fields:
+- ℒinv: Sets the inverse Langevin approxamation used (default = `TreloarApproximation()`)
 
 > James HM, Guth E. Theory of the elastic properties of rubber. The Journal of Chemical Physics. 1943 Oct;11(10):455-81.
 """
@@ -2293,7 +2296,7 @@ Parameters:
 - μ: Small strain shear modulus
 - N: Square of the locking stretch of the network.
 
-Fields
+Fields:
 - ℒinv: Sets the inverse Langevin approxamation used
 
 > Arruda EM, Boyce MC. A three-dimensional constitutive model for the large stretch behavior of rubber elastic materials. Journal of the Mechanics and Physics of Solids. 1993 Feb 1;41(2):389-412.
@@ -2346,6 +2349,9 @@ Parameters:
 - μ
 - N
 - κ
+
+Fields:
+- ℒinv: Sets the inverse Langevin approxamation used (default = `TreloarApproximation()`)
 
 > Edwards SF. The statistical mechanics of polymerized material. Proceedings of the Physical Society (1958-1967). 1967 Sep 1;92(1):9.
 """
@@ -2714,6 +2720,9 @@ Parameters:
 - N
 - ρ
 
+Fields
+- ℒinv: Sets the inverse Langevin approxamation used (default = `TreloarApproximation()`)
+
 > Treloar LR, Riding G. A non-Gaussian theory for rubber in biaxial strain. I. Mechanical properties. Proceedings of the Royal Society of London. A. Mathematical and Physical Sciences. 1979 Dec 31;369(1737):261-80.
 > Wu PD, van der Giessen E. On improved 3-D non-Gaussian network models for rubber elasticity. Mechanics research communications. 1992 Sep 1;19(5):427-33.
 > Wu PD, Van Der Giessen E. On improved network models for rubber elasticity and their applications to orientation hardening in glassy polymers. Journal of the Mechanics and Physics of Solids. 1993 Mar 1;41(3):427-56.
@@ -2757,6 +2766,9 @@ Parameters:
 - μ
 - N₃
 - N₈
+
+Fields:
+- ℒinv: Sets the inverse Langevin approxamation used (default = `TreloarApproximation()`)
 
 > Elı́as-Zúñiga A, Beatty MF. Constitutive equations for amended non-Gaussian network models of rubber elasticity. International journal of engineering science. 2002 Dec 1;40(20):2265-94.
 """
@@ -2802,6 +2814,9 @@ Parameters:
 - μ₂
 - N
 - Î₁
+
+Fields:
+- ℒinv: Sets the inverse Langevin approxamation used (default = `TreloarApproximation()`)
 
 > Lim GT. Scratch behavior of polymers. Texas A&M University; 2005.
 """
@@ -2868,6 +2883,10 @@ Parameters:
 - N₃
 - N₈
 
+Fields:
+- ℒinv: Sets the inverse Langevin approxamation used (default = `TreloarApproximation()`)
+
+
 > Bechir H, Chevalier L, Idjeri M. A three-dimensional network model for rubber elasticity: The effect of local entanglements constraints. International journal of engineering science. 2010 Mar 1;48(3):265-74.
 """
 struct BechirChevalier <: AbstractHyperelasticModel
@@ -2908,8 +2927,9 @@ Parameters:
 - n
 - N
 
-Fields
+Fields:
 - ℒinv: Sets the inverse Langevin approxamation used (default = `TreloarApproximation()`)
+
 - n (Integer): Sets the order of the model (default = 3)
 
 > Anssari-Benam A. On a new class of non-Gaussian molecular-based constitutive models with limiting chain extensibility for incompressible rubber-like materials. Mathematics and Mechanics of Solids. 2021 Nov;26(11):1660-74.
@@ -2917,13 +2937,13 @@ Fields
 struct AnsarriBenam
     ℒinv::Function
     n::Int
-    AnsarriBenam(; n = 3,  ℒinv::Function=TreloarApproximation) = new(ℒinv, n)
+    AnsarriBenam(; n=3, ℒinv::Function=TreloarApproximation) = new(ℒinv, n)
 end
 
 function NonlinearContinua.StrainEnergyDensity(ψ::AnsarriBenam, λ⃗::AbstractVector, (; μ, n, N))
-    return (3 * (ψ.n - 1)) / (2*ψ.n) * μ * N * ((I₁(λ⃗) - 3) / (3N * (ψ.n - 1)) - log((I₁(λ⃗) - 3N) / (3 - 3N))) + C₂ * log(I₂(λ⃗) / 3)^γ
+    return (3 * (ψ.n - 1)) / (2 * ψ.n) * μ * N * ((I₁(λ⃗) - 3) / (3N * (ψ.n - 1)) - log((I₁(λ⃗) - 3N) / (3 - 3N))) + C₂ * log(I₂(λ⃗) / 3)^γ
 end
 
 function NonlinearContinua.StrainEnergyDensity(ψ::AnsarriBenam, I⃗::AbstractVector, (; μ, n, N), ::InvariantForm)
-    return (3 * (ψ.n - 1)) / (2*ψ.n) * μ * N * ((I⃗[1] - 3) / (3N * (ψ.n - 1)) - log((I⃗[1] - 3N) / (3 - 3N))) + C₂ * log(I⃗[2] / 3)^γ
+    return (3 * (ψ.n - 1)) / (2 * ψ.n) * μ * N * ((I⃗[1] - 3) / (3N * (ψ.n - 1)) - log((I⃗[1] - 3N) / (3 - 3N))) + C₂ * log(I⃗[2] / 3)^γ
 end
