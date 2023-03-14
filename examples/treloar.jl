@@ -1,5 +1,5 @@
 # # Package Imports
-using Hyperelastics
+using Hyperelastics, ForwardDiff
 using Optimization, OptimizationOptimJL
 using ComponentArrays
 using CairoMakie, MakiePublication
@@ -10,7 +10,7 @@ treloar_data = [Treloar1944Uniaxial(),Treloar1944Uniaxial()]
 # ## Fit the Gent Model
 # W(\vec{\lambda}) = -\frac{\mu J_m}{2}\log{\bigg(1-\frac{I_1-3}{J_m}\bigg)}$
 #
-# Initial guess for the parameters
+## Initial guess for the parameters
 models = Dict(
     Gent => ComponentVector(μ=240e-3, Jₘ=80.0),
     EdwardVilgis => ComponentVector(Ns=0.10, Nc=0.20, α=0.001, η=0.001),
@@ -23,7 +23,7 @@ models = Dict(
 ##
 f = Figure()
 ax = Makie.Axis(f[1, 1], xlabel="Stretch", ylabel="Stress [MPa]")
-scatter!(ax, getindex.(pred.data.λ, 1), getindex.(treloar_data.data.s, 1), label="Treloar Data")
+# scatter!(ax, getindex.(pred.data.λ, 1), getindex.(treloar_data.data.s, 1), label="Treloar Data")
 for (ψ, p₀) in models
     @show ψ, p₀
     HEProblem = HyperelasticProblem(ψ(), treloar_data, p₀)
@@ -33,7 +33,7 @@ for (ψ, p₀) in models
 end
 # axislegend(position=:lt)
 f
-# # For multiple tests
+## # For multiple tests
 f = Figure()
 ax = Makie.Axis(f[1, 1], xlabel="Stretch", ylabel="Stress [MPa]")
 kawabata_data = map(λ₁ -> Kawabata1981(λ₁), [1.040, 1.060, 1.080, 1.100, 1.120, 1.14, 1.16, 1.2, 1.24, 1.3, 1.6, 1.9, 2.2, 2.5, 2.8, 3.1, 3.4, 3.7])
