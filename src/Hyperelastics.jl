@@ -43,6 +43,8 @@ include("data_driven.jl")
 include("macro_micro_macro_model.jl")
 include("average_chain_behavior.jl")
 
+
+
 function available_models()
     exclude = [:HorganMurphy, :KhiemItskov, :GeneralCompressible, :LogarithmicCompressible, :GeneralMooneyRivlin]
     ns = filter(x -> x ∉ [:citation, :update_history, :update_history!], names(Hyperelastics))
