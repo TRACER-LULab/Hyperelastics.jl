@@ -19,7 +19,7 @@ on:
       juliaversion:
         description: "Julia version to use when building the documentation"
         required: false
-        default: "1.8"
+        default: "^1.9.0-0"
         type: string
 
 jobs:
