@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE article PUBLIC "-//NLM//DTD JATS (Z39.96) Journal Publishing DTD v1.2 20190208//EN"
+                  "JATS-publishing1.dtd">
+<article xmlns:mml="http://www.w3.org/1998/Math/MathML" xmlns:xlink="http://www.w3.org/1999/xlink" dtd-version="1.2" article-type="other">
+<front>
+<journal-meta>
+<journal-id></journal-id>
+<journal-title-group>
+<journal-title>Journal of Open Source Software</journal-title>
+<abbrev-journal-title>JOSS</abbrev-journal-title>
+</journal-title-group>
+<issn publication-format="electronic">2475-9066</issn>
+<publisher>
+<publisher-name>Open Journals</publisher-name>
+</publisher>
+</journal-meta>
+<article-meta>
+<article-id pub-id-type="publisher-id">0</article-id>
+<article-id pub-id-type="doi">N/A</article-id>
+<title-group>
+<article-title>Hyperelastics.jl: A Julia package for hyperelastic
+material modelling</article-title>
+</title-group>
+<contrib-group>
+<contrib contrib-type="author">
+<name>
+<surname>Farmer</surname>
+<given-names>Carson</given-names>
+</name>
+<xref ref-type="aff" rid="aff-1"/>
+</contrib>
+<contrib contrib-type="author">
+<name>
+<surname>Medina</surname>
+<given-names>Hector</given-names>
+</name>
+<xref ref-type="aff" rid="aff-"/>
+</contrib>
+<aff id="aff-1">
+<institution-wrap>
+<institution>School of Engineering, Liberty University, Lynchburg, VA,
+United States</institution>
+</institution-wrap>
+</aff>
+</contrib-group>
+<pub-date date-type="pub" publication-format="electronic" iso-8601-date="2023-03-28">
+<day>28</day>
+<month>3</month>
+<year>2023</year>
+</pub-date>
+<volume>¿VOL?</volume>
+<issue>¿ISSUE?</issue>
+<fpage>¿PAGE?</fpage>
+<permissions>
+<copyright-statement>Authors of papers retain copyright and release the
+work under a Creative Commons Attribution 4.0 International License (CC
+BY 4.0)</copyright-statement>
+<copyright-year>2022</copyright-year>
+<copyright-holder>The article authors</copyright-holder>
+<license license-type="open-access" xlink:href="https://creativecommons.org/licenses/by/4.0/">
+<license-p>Authors of papers retain copyright and release the work under
+a Creative Commons Attribution 4.0 International License (CC BY
+4.0)</license-p>
+</license>
+</permissions>
+<kwd-group kwd-group-type="author">
+<kwd>Julia</kwd>
+<kwd>hyperelasticity</kwd>
+<kwd>solid mechanics</kwd>
+</kwd-group>
+</article-meta>
+</front>
+<body>
+<sec id="summary">
+  <title>Summary</title>
+  <p>The modelling of hyperelastic materials is of paramount importance
+  for research areas including: soft robotics, cancer screening, and
+  automobile tire modelling. The challenge in hyperelastic material
+  modelling arises from the variety of material models available for
+  predicting the stress-stretch behavior of the material. Commonly, the
+  strain energy density (SED) function (SEDF) is used to predict the
+  energy stored in the material. Derivatives of the SEDF provide
+  measures for the stress-stretch relationship. The further challenge
+  arises as the derivatives are often hand-derived and implemented in a
+  finite element method software. The problem of hyperelastic material
+  moodelling requires a high-performance set of SEDFs and the tools
+  required to calibrate the models to material tests.
+  <monospace>Hyperelastics.jl</monospace> is a Julia
+  (<xref alt="Bezanson et al., 2017" rid="ref-Bezanson2017" ref-type="bibr">Bezanson
+  et al., 2017</xref>) package containing 70+ analytical SEDF along with
+  3 data-driven methods for predicting the force-deformation
+  behavior.</p>
+</sec>
+<sec id="statement-of-need">
+  <title>Statement of need</title>
+  <p><monospace>Hyperelastics.jl</monospace> is part of the Multi-Scale
+  Material Modelling (<inline-formula><alternatives>
+  <tex-math><![CDATA[M^3]]></tex-math>
+  <mml:math display="inline" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:msup><mml:mi>M</mml:mi><mml:mn>3</mml:mn></mml:msup></mml:math></alternatives></inline-formula>)
+  Suite being developed in the Translational Robotics and Controls
+  Engineering Research (TRACER) Lab at Liberty University. A pure Julia
+  implementation allows for the use of automatic differentiation (AD)
+  packages to calculate the partial derivatives of the SEDF.
+  <monospace>Hyperelastics.jl</monospace> is designed to leverage
+  multiple-dispatch to define a common set of functions for calculating
+  the SED, Second Piola Kirchoff Stress Tensor, and the Cauchy Stress
+  Tensor. The package provides: 1) a material model library that is AD
+  compatible and 2) a set of extensible methods for easily defining and
+  testing new material models.</p>
+</sec>
+<sec id="functionality">
+  <title>Functionality</title>
+  <p>The most basic definition in
+  <monospace>Hyperelastics.jl</monospace> is the SEDF. The material
+  +</p>
+</sec>
+<sec id="mathematics">
+  <title>Mathematics</title>
+  <p>Single dollars ($) are required for inline mathematics
+  e.g. <inline-formula><alternatives>
+  <tex-math><![CDATA[f(x) = e^{\pi/x}]]></tex-math>
+  <mml:math display="inline" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mrow><mml:mi>f</mml:mi><mml:mrow><mml:mo stretchy="true" form="prefix">(</mml:mo><mml:mi>x</mml:mi><mml:mo stretchy="true" form="postfix">)</mml:mo></mml:mrow><mml:mo>=</mml:mo><mml:msup><mml:mi>e</mml:mi><mml:mrow><mml:mi>π</mml:mi><mml:mi>/</mml:mi><mml:mi>x</mml:mi></mml:mrow></mml:msup></mml:mrow></mml:math></alternatives></inline-formula></p>
+  <p>Double dollars make self-standing equations:</p>
+  <p><disp-formula><tex-math><![CDATA[\Theta(x) = \left\{\begin{array}{l}
+  0\textrm{ if } x < 0\cr
+  1\textrm{ else}
+  \end{array}\right.]]></tex-math></disp-formula></p>
+  <p>You can also use plain LaTeXfor equations
+  <named-content id="eqU003Afourier" content-type="equation"><disp-formula><alternatives>
+  <tex-math><![CDATA[
+  \hat f(\omega) = \int_{-\infty}^{\infty} f(x) e^{i\omega x} dx]]></tex-math>
+  <mml:math display="block" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mrow><mml:mover><mml:mi>f</mml:mi><mml:mo accent="true">̂</mml:mo></mml:mover><mml:mrow><mml:mo stretchy="true" form="prefix">(</mml:mo><mml:mi>ω</mml:mi><mml:mo stretchy="true" form="postfix">)</mml:mo></mml:mrow><mml:mo>=</mml:mo><mml:msubsup><mml:mo>∫</mml:mo><mml:mrow><mml:mo>−</mml:mo><mml:mi>∞</mml:mi></mml:mrow><mml:mi>∞</mml:mi></mml:msubsup><mml:mi>f</mml:mi><mml:mrow><mml:mo stretchy="true" form="prefix">(</mml:mo><mml:mi>x</mml:mi><mml:mo stretchy="true" form="postfix">)</mml:mo></mml:mrow><mml:msup><mml:mi>e</mml:mi><mml:mrow><mml:mi>i</mml:mi><mml:mi>ω</mml:mi><mml:mi>x</mml:mi></mml:mrow></mml:msup><mml:mi>d</mml:mi><mml:mi>x</mml:mi></mml:mrow></mml:math></alternatives></disp-formula></named-content>
+  and refer to
+  <xref alt="Equation 1" rid="eqU003Afourier">Equation 1</xref> from
+  text.</p>
+</sec>
+<sec id="citations">
+  <title>Citations</title>
+  <p>Citations to entries in paper.bib should be in
+  <ext-link ext-link-type="uri" xlink:href="http://rmarkdown.rstudio.com/authoring_bibliographies_and_citations.html">rMarkdown</ext-link>
+  format.</p>
+  <p>If you want to cite a software repository URL (e.g. something on
+  GitHub without a preferred citation) then you can do it with the
+  example BibTeX entry below for
+  (<xref alt="fidgit?" rid="ref-fidgit" ref-type="bibr"><bold>fidgit?</bold></xref>).</p>
+  <p>For a quick reference, the following citation commands can be used:
+  </p>
+</sec>
+<sec id="figures">
+  <title>Figures</title>
+  <p>Figures can be included like this: </p>
+  <p>Figure sizes can be customized by adding an optional second
+  parameter: </p>
+</sec>
+<sec id="acknowledgements">
+  <title>Acknowledgements</title>
+  <p>We acknowledge contributions from Brigitta Sipocz, Syrtis Major,
+  and Semyeong Oh, and support from Kathryn Johnston during the genesis
+  of this project.</p>
+  <p>Example paper.bib file:</p>
+</sec>
+</body>
+<back>
+<ref-list>
+  <ref id="ref-Bezanson2017">
+    <element-citation publication-type="article-journal">
+      <person-group person-group-type="author">
+        <name><surname>Bezanson</surname><given-names>Jeff</given-names></name>
+        <name><surname>Edelman</surname><given-names>Alan</given-names></name>
+        <name><surname>Karpinski</surname><given-names>Stefan</given-names></name>
+        <name><surname>Shah</surname><given-names>Viral B.</given-names></name>
+      </person-group>
+      <article-title>Julia: A fresh approach to numerical computing</article-title>
+      <source>SIAM Review</source>
+      <year iso-8601-date="2017">2017</year>
+      <volume>59</volume>
+      <issue>1</issue>
+      <uri>
+                    https://doi.org/10.1137/141000671
+                    </uri>
+      <pub-id pub-id-type="doi">10.1137/141000671</pub-id>
+      <fpage>65</fpage>
+      <lpage>98</lpage>
+    </element-citation>
+  </ref>
+</ref-list>
+</back>
+</article>

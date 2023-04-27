@@ -30,9 +30,9 @@ function Hyperelastics.HyperelasticProblem(ψ::Hyperelastics.AbstractHyperelasti
     optimization_AD_type = getfield(Optimization, b)()
     function f(ps, (; ψ, test, kwargs, loss))
         pred = predict(ψ, test, ps, adtype, kwargs...)
-        s = hcat(test.data.s...)
-        ŝ = hcat(pred.data.s...)
-        res = sum(abs, value(loss, s, ŝ, AggMode.Mean(), ObsDim.First()))
+        # s = hcat(test.data.s...)
+        # ŝ = hcat(pred.data.s...)
+        res = sum(abs, value(loss, test.data.s, pred.data.s, AggMode.Mean()))
         return res
     end
 
@@ -97,7 +97,7 @@ function Hyperelastics.HyperelasticProblem(ψ::Hyperelastics.AbstractHyperelasti
         preds = map(test->predict(ψ, test, ps, adtype, kwargs...), tests)
         s = get_s.(tests)
         ŝ = get_s.(preds)
-        res = sum(abs, map(i -> mean(value(loss, s[i], ŝ[i], AggMode.Mean(), ObsDim.First())), eachindex(s)))
+        res = sum(abs, map(i -> mean(value(loss, s[i], ŝ[i], AggMode.Mean())), eachindex(s)))
         return res
     end
 

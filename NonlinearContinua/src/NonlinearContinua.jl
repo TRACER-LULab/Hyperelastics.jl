@@ -14,11 +14,11 @@ export MaterialHistory
 """
 Predicts the model behavior for provided experimental test.
 """
-function predict(ψ::AbstractMaterialModel, test::AbstractMaterialTest, ps)
+function predict(ψ::AbstractMaterialModel, test::AbstractMaterialTest, ps, adtype)
     @error "Method not implemented for model $(typeof(ψ)) and test $(typeof(test))"
 end
-function predict(ψ::AbstractMaterialModel, tests::Vector{<:AbstractMaterialTest}, ps)
-    f(test) = predict(ψ, test, ps)
+function predict(ψ::AbstractMaterialModel, tests::Vector{<:AbstractMaterialTest}, ps, adtype)
+    f(test) = predict(ψ, test, ps, adtype)
     results = map(f, tests)
     return results
 end

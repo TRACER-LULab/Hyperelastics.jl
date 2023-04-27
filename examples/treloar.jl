@@ -5,8 +5,8 @@ using ComponentArrays
 using CairoMakie, MakiePublication
 set_theme!(theme_web(width=800))
 # # Load the Treloar 1994 Uniaxial Dataset
-treloar_data = [Treloar1944Uniaxial(),Treloar1944Uniaxial()]
-
+# treloar_data = [Treloar1944Uniaxial(),Treloar1944Uniaxial()]
+treloar_data = Treloar1944Uniaxial()
 # ## Fit the Gent Model
 # W(\vec{\lambda}) = -\frac{\mu J_m}{2}\log{\bigg(1-\frac{I_1-3}{J_m}\bigg)}$
 #
@@ -26,9 +26,10 @@ ax = Makie.Axis(f[1, 1], xlabel="Stretch", ylabel="Stress [MPa]")
 # scatter!(ax, getindex.(pred.data.λ, 1), getindex.(treloar_data.data.s, 1), label="Treloar Data")
 for (ψ, p₀) in models
     @show ψ, p₀
-    HEProblem = HyperelasticProblem(ψ(), treloar_data, p₀)
+    HEProblem = HyperelasticProblem(ψ(), treloar_data, p₀, AutoForwardDiff())
     sol = solve(HEProblem, NelderMead())
-    pred = predict(ψ(), treloar_data, sol.u)
+    @show sol
+    pred = predict(ψ(), treloar_data, sol.u, AutoForwardDiff())
     lines!(ax, getindex.(pred.data.λ, 1), getindex.(pred.data.s, 1), label=string(ψ))
 end
 # axislegend(position=:lt)
