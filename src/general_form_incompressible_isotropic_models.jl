@@ -79,21 +79,21 @@ Parameters:
 """
 struct GeneralBeda <: AbstractHyperelasticModel end
 
-function NonlinearContinua.StrainEnergyDensity(ψ::GeneralBeda, λ⃗::AbstractVector, (; C, K, α, β))
-    @assert length(C) == length(α) "Vector C and Vector α are not the same length"
-    @assert length(K) == length(β) "Vector K and Vector β are not the same length"
-    @tullio W1 := C[i] / α[i] * (I₁(λ⃗) - 3)^α[i]# |> sum
-    @tullio W2 := K[i] / β[i] * (I₂(λ⃗) - 3)^β[i]# |> sum
+function NonlinearContinua.StrainEnergyDensity(ψ::GeneralBeda, λ⃗::AbstractVector, (; C⃗, K⃗, α⃗, β⃗))
+    @assert length(C⃗) == length(α⃗) "Vector C and Vector α are not the same length"
+    @assert length(K⃗) == length(β⃗) "Vector K and Vector β are not the same length"
+    @tullio W1 := C⃗[i] / α⃗[i] * (I₁(λ⃗) - 3)^α⃗[i]# |> sum
+    @tullio W2 := K⃗[i] / β⃗[i] * (I₂(λ⃗) - 3)^β⃗[i]# |> sum
     W = W1 + W2
     return W
 end
 
-function NonlinearContinua.StrainEnergyDensity(ψ::GeneralBeda, I⃗::AbstractVector, (; C, K, α, β), I::InvariantForm)
-    @assert length(C) == length(α) "Vector C and Vector α are not the same length"
-    @assert length(K) == length(β) "Vector K and Vector β are not the same length"
-    W1 = C ./ α .* (I⃗[1] - 3) .^ α |> sum
-    W2 = K ./ β .* (I⃗[2] - 3) .^ β |> sum
+function NonlinearContinua.StrainEnergyDensity(ψ::GeneralBeda, I⃗::AbstractVector, (; C⃗, K⃗, α⃗, β⃗), I::InvariantForm)
+    @assert length(C⃗) == length(α⃗) "Vector C and Vector α are not the same length"
+    @assert length(K⃗) == length(β⃗) "Vector K and Vector β are not the same length"
+    W1 = C⃗ ./ α⃗ .* (I⃗[1] - 3) .^ α⃗ |> sum
+    W2 = K⃗ ./ β⃗ .* (I⃗[2] - 3) .^ β⃗ |> sum
     return W1 + W2
 end
 
-parameters(ψ::GeneralBeda) = (:C, :K, :α, :β)
+parameters(ψ::GeneralBeda) = (:C⃗, :K⃗, :α⃗, :β⃗)

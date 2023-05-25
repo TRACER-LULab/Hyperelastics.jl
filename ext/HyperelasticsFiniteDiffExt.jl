@@ -1,9 +1,10 @@
-module HyperelasticsEnzyme
+module HyperelasticsFiniteDiffExt
 
+import FiniteDiff: finite_difference_gradient
 import NonlinearContinua
-using Enzyme
 using Hyperelastics
 using LinearAlgebra
+using ADTypes
 
 """
 `SecondPiolaKirchoffStressTensor(ψ::Hyperelastics.AbstractHyperelasticModel, λ⃗::AbstractVector, p; adb=AD.ForwardDiffBackend())`
@@ -14,11 +15,11 @@ Fields:
 - `ψ`: Hyperelastic model
 - `λ⃗`: Vector of principal stretches
 - `p`: Model parameters
-- `mode`: Differentiation mode for `Enzyme`. Default = `Forward`
+- `adb`: Differentiation backend from `AbstractDifferentiation.jl`
 """
-function NonlinearContinua.SecondPiolaKirchoffStressTensor(ψ::Hyperelastics.AbstractHyperelasticModel, λ⃗::AbstractVector, p; mode=Forward, kwargs...)
+function NonlinearContinua.SecondPiolaKirchoffStressTensor(ψ::Hyperelastics.AbstractHyperelasticModel, λ⃗::AbstractVector, p, ad_type::AutoFiniteDiff; return_type=eltype(λ⃗), kwargs...)
     W(λ⃗) = StrainEnergyDensity(ψ, λ⃗, p)
-    ∂W∂λ = gradient(mode, W, λ⃗, kwargs...)
+    ∂W∂λ = finite_difference_gradient(W, λ⃗, ad_type.fdtype, return_type)
     return ∂W∂λ
 end
 
@@ -31,10 +32,10 @@ Fields:
 - `ψ`: Hyperelastic model
 - `F`: Deformation gradient tensor
 - `p`: Model parameters
-- `mode`: Differentiation mode for `Enzyme`. Default = `Forward`
+- `adb`: Differentiation backend from `AbstractDifferentiation.jl`
 """
-function NonlinearContinua.SecondPiolaKirchoffStressTensor(ψ::Hyperelastics.AbstractHyperelasticModel, F::AbstractMatrix, p; mode = Forward, kwargs...)
-    σ = CauchyStressTensor(ψ, F, p, mode=mode, kwargs...)
+function NonlinearContinua.SecondPiolaKirchoffStressTensor(ψ::Hyperelastics.AbstractHyperelasticModel, F::AbstractMatrix, p, ad_type::AutoFiniteDiff; return_type=eltype(λ⃗), kwargs...)
+    σ = CauchyStressTensor(ψ, F, p, ad_type=ad_type, return_type=return_type, kwargs...)
     S = sqrt(det(F' * F)) * inv(F) * σ
     return S
 end
@@ -50,9 +51,9 @@ Fields:
 - `p`: Model parameters
 - `adb`: Differentiation backend from `AbstractDifferentiation.jl`
     """
-function NonlinearContinua.CauchyStressTensor(ψ::Hyperelastics.AbstractHyperelasticModel, λ⃗::AbstractVector, p; mode = Forward, kwargs...)
+function NonlinearContinua.CauchyStressTensor(ψ::Hyperelastics.AbstractHyperelasticModel, λ⃗::AbstractVector, p, ad_type::AutoFiniteDiff; return_type=eltype(λ⃗), kwargs...)
     W(λ⃗) = StrainEnergyDensity(ψ, λ⃗, p)
-    ∂W∂λ = gradient(mode, W, λ⃗, kwargs...)
+    ∂W∂λ = finite_difference_gradient(W, λ⃗, ad_type.fdtype, return_type, kwargs...)
     σ = ∂W∂λ .* λ⃗ ./ J(λ⃗)
     return σ
 end
@@ -68,7 +69,7 @@ Fields:
 - `p`: Model parameters
 - `adb`: Differentiation backend from `AbstractDifferentiation.jl`
 """
-function NonlinearContinua.CauchyStressTensor(ψ::Hyperelastics.AbstractHyperelasticModel, F::AbstractMatrix, p; mode = Forward, kwargs...)
+function NonlinearContinua.CauchyStressTensor(ψ::Hyperelastics.AbstractHyperelasticModel, F::AbstractMatrix, p, ad_type::AutoFiniteDiff; return_type=eltype(λ⃗), kwargs...)
     B = F * F'
     a = eigvecs(B)'
     B_prin = Diagonal(a * B * a')
@@ -76,9 +77,9 @@ function NonlinearContinua.CauchyStressTensor(ψ::Hyperelastics.AbstractHyperela
     V = a' * V_prin * a
     R = inv(V) * F
     λ⃗ = sqrt.(diag(B_prin))
-    W = StrainEnergyDensity(ψ, λ⃗, p)
-    σ̂ = CauchyStressTensor(ψ, λ⃗, p, mode = mode, kwargs...) |> Diagonal
+    σ̂ = CauchyStressTensor(ψ, λ⃗, p, ad_type=ad_type, return_type=return_type, kwargs...) |> Diagonal
     σ = R * a' * σ̂ * a * R'
     return σ
 end
+
 end

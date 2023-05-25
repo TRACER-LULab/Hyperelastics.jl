@@ -1,4 +1,4 @@
-module HyperelasticsPlots
+module HyperelasticsPlotsExt
 
 import Plots: Plots, @ext_imp_use, @recipe, @series
 @ext_imp_use :import Hyperelastics HyperelasticUniaxialTest HyperelasticBiaxialTest

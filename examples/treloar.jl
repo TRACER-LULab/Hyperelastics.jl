@@ -1,39 +1,47 @@
 # # Package Imports
-using Hyperelastics, ForwardDiff
-using Optimization, OptimizationOptimJL
+using Hyperelastics
+using Unitful
+using ForwardDiff, FiniteDiff
+using Optimization
+using OptimizationOptimJL
 using ComponentArrays
-using CairoMakie, MakiePublication
-set_theme!(theme_web(width=800))
+
 # # Load the Treloar 1994 Uniaxial Dataset
 # treloar_data = [Treloar1944Uniaxial(),Treloar1944Uniaxial()]
 treloar_data = Treloar1944Uniaxial()
+λ₁ = getindex.(treloar_data.data.λ, 1)u"m/m"
+s₁ = getindex.(treloar_data.data.s, 1)u"MPa"
+treloar_data = HyperelasticUniaxialTest(λ₁, s₁, name = "test")
+
 # ## Fit the Gent Model
-# W(\vec{\lambda}) = -\frac{\mu J_m}{2}\log{\bigg(1-\frac{I_1-3}{J_m}\bigg)}$
+# $W(\vec{\lambda}) = -\frac{\mu J_m}{2}\log{\bigg(1-\frac{I_1-3}{J_m}\bigg)}$
 #
 ## Initial guess for the parameters
 models = Dict(
-    Gent => ComponentVector(μ=240e-3, Jₘ=80.0),
-    EdwardVilgis => ComponentVector(Ns=0.10, Nc=0.20, α=0.001, η=0.001),
-    ModifiedFloryErman => ComponentVector(μ=0.24, N=50.0, κ=10.0),
-    NeoHookean => ComponentVector(μ=200e-3),
-    NonaffineMicroSphere => ComponentVector(μ=0.292, N=22.5, p=1.471, U=0.744, q=0.1086),
-    Beda => ComponentVector(C1=0.1237, C2=0.0424, C3=7.84e-5, K1=0.0168, α=0.9, β=0.68, ζ=3.015)
+    Gent => ComponentVector((μ=240e-3u"MPa", Jₘ=80.0)),
+    # EdwardVilgis => ComponentVector(Ns=0.10, Nc=0.20, α=0.001, η=0.001),
+    # ModifiedFloryErman => ComponentVector(μ=0.24, N=50.0, κ=10.0),
+    # NeoHookean => ComponentVector(μ=200e-3),
+    # NonaffineMicroSphere => HyperelasticsZygoteExComponentVector(μ=0.292, N=22.5, p=1.471, U=0.744, q=0.1086),
+    # Beda => ComponentVector(C1=0.1237, C2=0.0424, C3=7.84e-5, K1=0.0168, α=0.9, β=0.68, ζ=3.015)
 )
 
-##
-f = Figure()
-ax = Makie.Axis(f[1, 1], xlabel="Stretch", ylabel="Stress [MPa]")
+#
+# f = Figure()
+# ax = Makie.Axis(f[1, 1], xlabel="Stretch", ylabel="Stress [MPa]")
+
 # scatter!(ax, getindex.(pred.data.λ, 1), getindex.(treloar_data.data.s, 1), label="Treloar Data")
 for (ψ, p₀) in models
-    @show ψ, p₀
-    HEProblem = HyperelasticProblem(ψ(), treloar_data, p₀, AutoForwardDiff())
-    sol = solve(HEProblem, NelderMead())
+    prob = HyperelasticProblem(ψ(), treloar_data, p₀, AutoFiniteDiff())
+    display(prob.u0)
+    sol = solve(prob, NelderMead())
     @show sol
     pred = predict(ψ(), treloar_data, sol.u, AutoForwardDiff())
-    lines!(ax, getindex.(pred.data.λ, 1), getindex.(pred.data.s, 1), label=string(ψ))
+    @show pred
+    # lines!(ax, getindex.(pred.data.λ, 1), getindex.(pred.data.s, 1), label=string(ψ))
 end
 # axislegend(position=:lt)
-f
+# f
 ## # For multiple tests
 f = Figure()
 ax = Makie.Axis(f[1, 1], xlabel="Stretch", ylabel="Stress [MPa]")

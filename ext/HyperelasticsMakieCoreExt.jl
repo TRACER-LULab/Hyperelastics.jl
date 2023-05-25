@@ -1,4 +1,4 @@
-module HyperelasticsMakieCore
+module HyperelasticsMakieCoreExt
 
 using MakieCore
 using Hyperelastics

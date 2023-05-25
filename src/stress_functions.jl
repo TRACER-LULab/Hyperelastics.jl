@@ -33,7 +33,7 @@ function NonlinearContinua.StrainEnergyDensity(ψ::AbstractHyperelasticModel, F:
     C = transpose(F) * F
     λ⃗² = eigvals(C)
     λ⃗ = sqrt.(abs.(λ⃗²))
-    return StrainEnergyDensity(ψ::AbstractHyperelasticModel, λ⃗, p)
+    return StrainEnergyDensity(ψ, λ⃗::AbstractVector, p)
 end
 
 """

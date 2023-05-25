@@ -156,7 +156,7 @@ function NonlinearContinua.CauchyStressTensor(ψ::Alexander, λ⃗::AbstractVect
 end
 
 function parameters(ψ::Alexander)
-    return (:C₁, :C₂, :C₃, :k, :γ)
+    return (:μ, :C₁, :C₂, :C₃, :k, :γ)
 end
 
 """
@@ -877,10 +877,10 @@ function NonlinearContinua.StrainEnergyDensity(ψ::Beda, λ⃗::AbstractVector, 
         GeneralBeda(),
         λ⃗,
         (
-            C=[C1, C2, C3],
-            K=[K1],
-            α=[α, 1, ζ],
-            β=[β]
+            C⃗=[C1, C2, C3],
+            K⃗=[K1],
+            α⃗=[α, 1, ζ],
+            β⃗=[β]
         ),
     )
 end
@@ -890,10 +890,10 @@ function NonlinearContinua.StrainEnergyDensity(ψ::Beda, I⃗::AbstractVector, (
         GeneralBeda(),
         I⃗,
         (
-            C=[C1, C2, C3],
-            K=[K1],
-            α=[α, 1, ζ],
-            β=[β]
+            C⃗=[C1, C2, C3],
+            K⃗=[K1],
+            α⃗=[α, 1, ζ],
+            β⃗=[β]
         ),
         I
     )
@@ -1572,10 +1572,10 @@ function parameters(ψ::Gent)
     return (:μ, :Jₘ)
 end
 
-function parameter_bounds(ψ::Gent, test::AbstractHyperelasticTest)
+function parameter_bounds(ψ::Gent, test::AbstractHyperelasticTest{S, T}) where {S,T}
     I₁_max = maximum(I₁.(test.data.λ))
     Jₘ_min = I₁_max - 3
-    lb = (μ=0, Jₘ=Jₘ_min)
+    lb = (μ=zero(T), Jₘ=Jₘ_min)
     ub = nothing
     return (lb=lb, ub=ub)
 end
@@ -1729,7 +1729,7 @@ function parameter_bounds(ψ::HorganSaccomandi, data::AbstractHyperelasticTest)
 
     Js = @. 1 / 6 * (2 * _I1 + (2 * 2^(1 / 3) * (_I1^2 - 3 * _I2)) / (27 + 2 * _I1^3 - 9 * _I1 * _I2)^(1 / 3) + 2^(2 / 3) * (27 + 2 * (_I1^3) - 9 * _I1 * _I2)^(1 / 3))
 
-    J_min = maximum(Js)
+    J_min = maximum(Js[(!isnan).(Js)])
 
     lb = (μ=-Inf, J=J_min)
     ub = nothing
@@ -2062,7 +2062,9 @@ Model:
 
 ```math
 W = G_c (I_1-3)+ \\frac{\\nu k T}{2}(\\sum\\limits_{i=1}^{3}\\kappa\\frac{\\lambda_i-1}{\\lambda_i^2+\\kappa}+\\log{\\frac{\\lambda_i^2+\\kappa}{1+\\kappa}}-\\log{\\lambda_i^2})
-```
+```        if sum(contains.(string.(ps), "⃗")) > 0
+            @info model
+        end
 
 Parameters:
 - Gc

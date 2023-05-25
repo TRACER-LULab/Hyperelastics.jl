@@ -1,6 +1,6 @@
-module HyperelasticsFiniteDiff
+module HyperelasticsZygoteExt
 
-import FiniteDiff: finite_difference_gradient
+import Zygote: gradient
 import NonlinearContinua
 using Hyperelastics
 using LinearAlgebra
@@ -17,9 +17,9 @@ Fields:
 - `p`: Model parameters
 - `adb`: Differentiation backend from `AbstractDifferentiation.jl`
 """
-function NonlinearContinua.SecondPiolaKirchoffStressTensor(ψ::Hyperelastics.AbstractHyperelasticModel, λ⃗::AbstractVector, p, ad_type::AutoFiniteDiff; kwargs...)
+function NonlinearContinua.SecondPiolaKirchoffStressTensor(ψ::Hyperelastics.AbstractHyperelasticModel, λ⃗::AbstractVector, p, ad_type::AutoZygote; kwargs...)
     W(λ⃗) = StrainEnergyDensity(ψ, λ⃗, p)
-    ∂W∂λ = finite_difference_gradient(W, λ⃗, ad_type.fdtype, eltype(λ⃗))
+    ∂W∂λ = gradient(W, λ⃗, kwargs...)[1]
     return ∂W∂λ
 end
 
@@ -34,7 +34,7 @@ Fields:
 - `p`: Model parameters
 - `adb`: Differentiation backend from `AbstractDifferentiation.jl`
 """
-function NonlinearContinua.SecondPiolaKirchoffStressTensor(ψ::Hyperelastics.AbstractHyperelasticModel, F::AbstractMatrix, p, ad_type::AutoFiniteDiff; kwargs...)
+function NonlinearContinua.SecondPiolaKirchoffStressTensor(ψ::Hyperelastics.AbstractHyperelasticModel, F::AbstractMatrix, p, ad_type::AutoZygote; kwargs...)
     σ = CauchyStressTensor(ψ, F, p, ad_type=ad_type, kwargs...)
     S = sqrt(det(F' * F)) * inv(F) * σ
     return S
@@ -51,9 +51,9 @@ Fields:
 - `p`: Model parameters
 - `adb`: Differentiation backend from `AbstractDifferentiation.jl`
     """
-function NonlinearContinua.CauchyStressTensor(ψ::Hyperelastics.AbstractHyperelasticModel, λ⃗::AbstractVector, p, ad_type::AutoFiniteDiff;kwargs...)
+function NonlinearContinua.CauchyStressTensor(ψ::Hyperelastics.AbstractHyperelasticModel, λ⃗::AbstractVector, p, ad_type::AutoZygote; kwargs...)
     W(λ⃗) = StrainEnergyDensity(ψ, λ⃗, p)
-    ∂W∂λ = finite_difference_gradient(W, λ⃗, ad_type.fdtype, eltype(λ⃗), kwargs...)
+    ∂W∂λ = gradient(W, λ⃗, kwargs...)[1]
     σ = ∂W∂λ .* λ⃗ ./ J(λ⃗)
     return σ
 end
@@ -69,7 +69,7 @@ Fields:
 - `p`: Model parameters
 - `adb`: Differentiation backend from `AbstractDifferentiation.jl`
 """
-function NonlinearContinua.CauchyStressTensor(ψ::Hyperelastics.AbstractHyperelasticModel, F::AbstractMatrix, p, ad_type::AutoFiniteDiff; kwargs...)
+function NonlinearContinua.CauchyStressTensor(ψ::Hyperelastics.AbstractHyperelasticModel, F::AbstractMatrix, p, ad_type::AutoZygote; kwargs...)
     B = F * F'
     a = eigvecs(B)'
     B_prin = Diagonal(a * B * a')

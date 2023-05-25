@@ -17,20 +17,21 @@ struct GeneralCompressible <: AbstractHyperelasticModel
     incompressible::AbstractHyperelasticModel
 end
 
-function NonlinearContinua.StrainEnergyDensity(ψ::GeneralCompressible, λ⃗::AbstractVector, p)
+function NonlinearContinua.StrainEnergyDensity(ψ::GeneralCompressible, λ⃗::AbstractVector, p; kwargs...)
     J = prod(λ⃗)
-    StrainEnergyDensity(ψ.incompressible, λ⃗ ./ cbrt(J), p.ψ) + p.κ / 2 * (J - 1)^2
+    StrainEnergyDensity(ψ.incompressible, λ⃗ ./ cbrt(J), p.ψ, kwargs...) + p.κ / 2 * (J - 1)^2
 end
 
-function NonlinearContinua.StrainEnergyDensity(ψ::GeneralCompressible, F::AbstractMatrix, p)
-    J = det(F)
-    StrainEnergyDensity(ψ.incompressible, F ./ cbrt(J), p.ψ) + p.κ / 2 * (J - 1)^2
-end
-
-function NonlinearContinua.StrainEnergyDensity(ψ::GeneralCompressible, F::AbstractMatrix, p, ::InvariantForm)
+function NonlinearContinua.StrainEnergyDensity(ψ::GeneralCompressible, F::AbstractMatrix, p; kwargs...)
     J = det(F)
     F̄ = F ./ cbrt(J)
-    StrainEnergyDensity(ψ.incompressible, [I₁(F̄), I₂(F̄), I₃(F̄)], p.ψ, InvariantForm()) + p.κ / 2 * (J - 1)^2
+    StrainEnergyDensity(ψ.incompressible, F̄::AbstractMatrix, p.ψ, kwargs...) + p.κ / 2 * (J - 1)^2
+end
+
+function NonlinearContinua.StrainEnergyDensity(ψ::GeneralCompressible, F::AbstractMatrix, p, ::InvariantForm; kwargs...)
+    J = det(F)
+    F̄ = F ./ cbrt(J)
+    StrainEnergyDensity(ψ.incompressible, [I₁(F̄), I₂(F̄), I₃(F̄)], p.ψ, InvariantForm(), kwargs...) + p.κ / 2 * (J - 1)^2
 end
 
 function NonlinearContinua.CauchyStressTensor(ψ::GeneralCompressible, λ⃗::AbstractVector, p; kwargs...)
@@ -94,42 +95,42 @@ struct LogarithmicCompressible <: AbstractHyperelasticModel
     incompressible::AbstractHyperelasticModel
 end
 
-function NonlinearContinua.StrainEnergyDensity(ψ::LogarithmicCompressible, λ⃗, p)
-    StrainEnergyDensity(ψ.incompressible, λ⃗, p.ψ) + p.κ * (J * log(J) - J)
+function NonlinearContinua.StrainEnergyDensity(ψ::LogarithmicCompressible, λ⃗::AbstractVector, p)
+    StrainEnergyDensity(ψ.incompressible, λ⃗./cbrt(J(λ⃗)), p.ψ) + p.κ * (J(λ⃗) * log(J(λ⃗)) - J(λ⃗))
 end
 
-function NonlinearContinua.CauchyStressTensor(ψ::LogarithmicCompressible, λ⃗::Vector, p; kwargs...)
+function NonlinearContinua.CauchyStressTensor(ψ::LogarithmicCompressible, λ⃗::AbstractVector, p; kwargs...)
     σ_dev = p.κ * (log(J(λ⃗)))
     σ = CauchyStressTensor(ψ.incompressible, λ⃗ ./ cbrt(prod(λ⃗)), p.ψ, kwargs...)
     return σ .+ σ_dev
 end
 
-function NonlinearContinua.CauchyStressTensor(ψ::LogarithmicCompressible, F::Matrix, p; kwargs...)
+function NonlinearContinua.CauchyStressTensor(ψ::LogarithmicCompressible, F::AbstractMatrix, p; kwargs...)
     σ_dev = p.κ * (log(J(F)))
     σ = CauchyStressTensor(ψ.incompressible, F ./ cbrt(J(F)), p.ψ, kwargs...)
     return σ .+ σ_dev
 end
 
-function NonlinearContinua.CauchyStressTensor(ψ::LogarithmicCompressible, F::Matrix, p, ::InvariantForm; kwargs...)
+function NonlinearContinua.CauchyStressTensor(ψ::LogarithmicCompressible, F::AbstractMatrix, p, ::InvariantForm; kwargs...)
     σ_dev = p.κ * (log(J(F)))
     F̄ = F ./ cbrt(J(F))
     σ = CauchyStressTensor(ψ.incompressible, [I₁(F̄), I₂(F̄), I₃(F̄)], p.ψ, InvariantForm(), kwargs...)
     return σ .+ σ_dev
 end
 
-function NonlinearContinua.SecondPiolaKirchoffStressTensor(ψ::LogarithmicCompressible, λ⃗::Vector, p; kwargs...)
+function NonlinearContinua.SecondPiolaKirchoffStressTensor(ψ::LogarithmicCompressible, λ⃗::AbstractVector, p; kwargs...)
     s_dev = p.κ * (log(J(λ))) ./ λ
     s = SecondPiolaKirchoffStressTensor(ψ.incompressible, λ⃗ ./ cbrt(J(λ⃗)), p.ψ, kwargs...)
     return s .+ s_dev
 end
 
-function NonlinearContinua.SecondPiolaKirchoffStressTensor(ψ::LogarithmicCompressible, F::Matrix, p; kwargs...)
+function NonlinearContinua.SecondPiolaKirchoffStressTensor(ψ::LogarithmicCompressible, F::AbstractMatrix, p; kwargs...)
     s_dev = p.κ * (log(J(λ))) ./ λinv(F)
     s = SecondPiolaKirchoffStressTensor(ψ.incompressible, F ./ cbrt(J(F)), p.ψ, kwargs...)
     return s .+ s_dev
 end
 
-function NonlinearContinua.SecondPiolaKirchoffStressTensor(ψ::LogarithmicCompressible, F::Matrix, p, ::InvariantForm; kwargs...)
+function NonlinearContinua.SecondPiolaKirchoffStressTensor(ψ::LogarithmicCompressible, F::AbstractMatrix, p, ::InvariantForm; kwargs...)
     s_dev = p.κ * (log(J(λ))) ./ λinv(F)
     F̄ = F ./ cb
     s = SecondPiolaKirchoffStressTensor(ψ.incompressible, [I₁(F̄), I₂(F̄), I₃(F̄)], p.ψ, InvariantForm(), kwargs...)

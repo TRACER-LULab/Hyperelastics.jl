@@ -15,7 +15,7 @@ Fields:
 - `name`: string for the name of the test
 - `incompressible`: `true` if the material can be assumed to be incompressible.
 """
-struct HyperelasticUniaxialTest <: AbstractHyperelasticTest
+struct HyperelasticUniaxialTest{T,S} <: AbstractHyperelasticTest{T,S}
     data::StructVector
     name::String
     function HyperelasticUniaxialTest(λ₁, s₁; name, incompressible=true)
@@ -28,7 +28,7 @@ struct HyperelasticUniaxialTest <: AbstractHyperelasticTest
         λ = collect.(zip(λ₁, λ₂, λ₃))
         s = collect.(zip(s₁))
         data = StructArray{HyperelasticDataEntry}((λ, s))
-        new(data, name)
+        new{eltype(eltype(λ)), eltype(eltype(s))}(data, name)
     end
     function HyperelasticUniaxialTest(λ₁; name, incompressible=true)
         if incompressible
@@ -39,7 +39,7 @@ struct HyperelasticUniaxialTest <: AbstractHyperelasticTest
         λ = collect.(zip(λ₁, λ₂, λ₃))
         s = collect.(zip(Vector{eltype(λ₁)}(undef, length(λ₁))))
         data = StructArray{HyperelasticDataEntry}((λ, s))
-        new(data, name)
+        new{eltype(eltype(λ)), eltype(eltype(s))}(data, name)
     end
 end
 
@@ -68,7 +68,7 @@ Fields:
 - `name`: string for the name of the test
 - `incompressible`: `true` if the material can be assumed to be incompressible.
 """
-struct HyperelasticBiaxialTest <: AbstractHyperelasticTest
+struct HyperelasticBiaxialTest{T,S} <: AbstractHyperelasticTest{T,S}
     data::StructVector
     name::String
     function HyperelasticBiaxialTest(λ₁, λ₂, s₁, s₂; name, incompressible=true)
@@ -81,7 +81,7 @@ struct HyperelasticBiaxialTest <: AbstractHyperelasticTest
         λ = collect.(zip(λ₁, λ₂, λ₃))
         s = collect.(zip(s₁, s₂))
         data = StructArray{HyperelasticDataEntry}((λ, s))
-        new(data, name)
+        new{promote(eltype(eltype(λ₁)), eltype(eltype(λ₂))),promote(eltype(eltype(s₁)), eltype(eltype(s₂)))}(data, name)
     end
     function HyperelasticBiaxialTest(λ₁, λ₂; name, incompressible=true)
         @assert length(λ₁) == length(λ₂) "Inputs must be the same length"
@@ -94,7 +94,7 @@ struct HyperelasticBiaxialTest <: AbstractHyperelasticTest
         λ = collect.(zip(λ₁, λ₂, λ₃))
         s = collect.(zip(s₁, s₂))
         data = StructArray{HyperelasticDataEntry}((λ, s))
-        new(data, name)
+        new{promote(eltype(eltype(λ₁)), eltype(eltype(λ₂))),promote(eltype(eltype(s₁)), eltype(eltype(s₂)))}(data, name)
     end
 end
 
@@ -109,8 +109,8 @@ function Base.show(io::IO, test::HyperelasticBiaxialTest)
     )
 end
 
-function NonlinearContinua.predict(ψ::AbstractHyperelasticModel, test::HyperelasticUniaxialTest, p, adtype; kwargs...)
-    f(λ) = SecondPiolaKirchoffStressTensor(ψ, λ, p, adtype, kwargs...)
+function NonlinearContinua.predict(ψ::AbstractHyperelasticModel, test::HyperelasticUniaxialTest{T,S}, p, adtype; kwargs...) where {T,S}
+    f(λ) = SecondPiolaKirchoffStressTensor(ψ, λ, p, adtype, return_type=S, kwargs...)
     λ = test.data.λ
     s = map(f, λ)
     s₁ = getindex.(s, 1)
