@@ -72,14 +72,7 @@ using InteractiveUtils
                 # Strain Energy Density Test
                 @test !isnan(StrainEnergyDensity(ψ̄, compressible_deformation, compressible_guess))
                 @test !isinf(StrainEnergyDensity(ψ̄, compressible_deformation, compressible_guess))
-                # Loop over AD Backends
-                # for AD in [AutoForwardDiff()]
-                #     # Second Piola Kirchoff Stress Test
-                #     SecondPiolaKirchoffStressTensor(ψ̄, deformation, compressible_guess, AD)
-                #     # Cauchy Stress Tensor Test
-                # end
             end
-
         end
     end
 end
