@@ -105,6 +105,11 @@
                     W = StrainEnergyDensity(ψ̄_inv, [I₁(compressible_deformation), I₂(compressible_deformation), I₃(compressible_deformation)], compressible_guess)
                     @test !isnan(W)
                     @test !isinf(W)
+                    if compressible_deformation isa Matrix
+                        W = StrainEnergyDensity(ψ̄_inv,compressible_deformation, compressible_guess)
+                        @test !isnan(W)
+                        @test !isinf(W)
+                    end
                 end
             end
         end

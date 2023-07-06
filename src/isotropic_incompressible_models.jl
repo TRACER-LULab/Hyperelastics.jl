@@ -1,6 +1,9 @@
 # # Available Models
 export MooneyRivlin, NeoHookean, Gent, Biderman, Isihara, JamesGreenSimpson, Lion, Yeoh, HauptSedlan, HartmannNeff, HainesWilson, Carroll, BahremanDarijani, Zhao, Knowles, Swanson, YamashitaKawabata, DavisDeThomas, Gregory, ModifiedGregory, Beda, Amin, LopezPamies, GenYeoh, VerondaWestmann, FungDemiray, Vito, ModifiedYeoh, MansouriDarijani, GentThomas, HossMarczakI, HossMarczakII, ExpLn, VanDerWaals, TakamizawaHayashi, YeohFleming, PucciSaccomandi, HorganSaccomandi, Beatty, ArrudaBoyce, Ogden, EdwardVilgis, NonaffineTube, Tube, MCC, Bechir4Term, ConstrainedJunction, ContinuumHybrid, ArmanNarooei, PengLandel, ValanisLandel, Attard, Shariff, ThreeChainModel, ModifiedFloryErman, ABGI, BechirChevalier, Bootstrapped8Chain, DavidsonGoulbourne, ExtendedTubeModel, FullNetwork, HartSmith, GeneralConstitutiveModel, Lim, NonaffineMicroSphere, AffineMicroSphere, ZunigaBeatty, ChevalierMarco, Alexander, GornetDesmorat, LambertDianiRey, AnsarriBenam
 
+export HorganMurphy, KhiemItskov
+
+export GeneralConstitutiveModel_Network, GeneralConstitutiveModel_Tube
 
 """
 ArrudaBoyce
@@ -61,11 +64,6 @@ function parameter_bounds(::ArrudaBoyce, data::AbstractHyperelasticTest)
     lb = (μ=-Inf, N=N_max)
     ub = nothing
     return (lb=lb, ub=ub)
-end
-
-function Base.show(io::IO, ψ::ArrudaBoyce)
-    println(io, "Arruda-Boyce")
-    println(io, "\t Inverse Langevin = ", ψ.ℒinv)
 end
 
 """
@@ -133,41 +131,36 @@ struct AffineMicroSphere{T,R,S} <: AbstractIncompressibleModel{T}
     w::Vector{S}
     λr::Function
     function AffineMicroSphere(::T=PrincipalValueForm(); ℒinv::Function=TreloarApproximation, n=21) where T<:PrincipalValueForm
-        if n == 21
-            a = √(2) / 2
-            b = 0.836095596749
-            c = 0.387907304067
-            r⃗ = [
-                [0, 0, 1],
-                [0, 1, 0],
-                [1, 0, 0],
-                [0, a, a],
-                [0, -a, a],
-                [a, 0, a],
-                [-a, 0, a],
-                [a, a, 0],
-                [-a, a, 0],
-                [b, c, c],
-                [-b, c, c],
-                [b, -c, c],
-                [-b, -c, c],
-                [c, b, c],
-                [-c, b, c],
-                [c, -b, c],
-                [-c, -b, c],
-                [c, c, b],
-                [-c, c, b],
-                [c, -c, b],
-                [-c, -c, b],
-            ]
-            w1 = 0.02652142440932
-            w2 = 0.0199301476312
-            w3 = 0.0250712367487
-
-            w = 2 .* [fill(w1, 3); fill(w2, 6); fill(w3, 12)] # Multiply by two since integration is over the half-sphere
-        else
-            @error "Method for n = $(n) is not implemented"
-        end
+        a = √(2) / 2
+        b = 0.836095596749
+        c = 0.387907304067
+        r⃗ = [
+            [0, 0, 1],
+            [0, 1, 0],
+            [1, 0, 0],
+            [0, a, a],
+            [0, -a, a],
+            [a, 0, a],
+            [-a, 0, a],
+            [a, a, 0],
+            [-a, a, 0],
+            [b, c, c],
+            [-b, c, c],
+            [b, -c, c],
+            [-b, -c, c],
+            [c, b, c],
+            [-c, b, c],
+            [c, -b, c],
+            [-c, -b, c],
+            [c, c, b],
+            [-c, c, b],
+            [c, -c, b],
+            [-c, -c, b],
+        ]
+        w1 = 0.02652142440932
+        w2 = 0.0199301476312
+        w3 = 0.0250712367487
+        w = 2 .* [fill(w1, 3); fill(w2, 6); fill(w3, 12)] # Multiply by two since integration is over the half-sphere
         λr((;λ, N), r) = sqrt(sum(λ .^ 2 .* r .^ 2)) / √N
         new{T,eltype(r⃗),eltype(w)}(ℒinv, r⃗, w, λr)
     end
@@ -1695,11 +1688,11 @@ function parameters(::VanDerWaals)
     return (:μ, :λm, :β, :α)
 end
 
-function constraints(::VanDerWaals, data::AbstractHyperelasticTest)
-    I₁_max = maximum(I₁.(data.data.λ))
-    I₂_max = maximum(I₂.(data.data.λ))
-    return f(u, p) = [1 - (u.β * I₁_max + (1 - u.β) * I₂_max - 3) / (u.λm^2 - 3)]
-end
+# function constraints(::VanDerWaals, data::AbstractHyperelasticTest)
+#     I₁_max = maximum(I₁.(data.data.λ))
+#     I₂_max = maximum(I₂.(data.data.λ))
+#     return f(u, p) = [1 - (u.β * I₁_max + (1 - u.β) * I₂_max - 3) / (u.λm^2 - 3)]
+# end
 
 """
 Gent
@@ -1971,14 +1964,14 @@ function parameters(::HorganMurphy)
     return (:μ, :J, :c)
 end
 
-function constraints(::HorganMurphy, data::AbstractHyperelasticTest)
-    function f(res, u, p)
-        max_sum = minimum(λ⃗ -> (sum(λ⃗ .^ u[3]) - 3) / u[2], p.test.data.λ)
-        res .= [max_sum]
-        res
-    end
-    return (cons=f, lcons=[-Inf], ucons=[0.0])
-end
+# function constraints(::HorganMurphy, data::AbstractHyperelasticTest)
+#     function f(res, u, p)
+#         max_sum = minimum(λ⃗ -> (sum(λ⃗ .^ u[3]) - 3) / u[2], p.test.data.λ)
+#         res .= [max_sum]
+#         res
+#     end
+#     return (cons=f, lcons=[-Inf], ucons=[0.0])
+# end
 
 """
 Valanis-Landel
@@ -2815,21 +2808,26 @@ function parameters(::KhiemItskov)
 end
 
 
-function constraints(::KhiemItskov, data::AbstractHyperelasticTest)
-    I₁_max = maximum(I₁.(data.data.λ))
-    f(u, p) = [(sin(π / sqrt(u.n)) * (I₁_max / 3)^(u.q / 2)) / (sin(π / sqrt(u.n) * (I₁_max / 3)^(u.q / 2)))]
-    return f
-end
+# function constraints(::KhiemItskov, data::AbstractHyperelasticTest)
+#     I₁_max = maximum(I₁.(data.data.λ))
+#     f(u, p) = [(sin(π / sqrt(u.n)) * (I₁_max / 3)^(u.q / 2)) / (sin(π / sqrt(u.n) * (I₁_max / 3)^(u.q / 2)))]
+#     return f
+# end
 
 
 struct GeneralConstitutiveModel_Network{T} <: AbstractIncompressibleModel{T}
-    GeneralConstitutiveModel_Network(::T=PrincipalValueForm()) where {T<:PrincipalValueForm} = new{T}()
+    GeneralConstitutiveModel_Network(::T=PrincipalValueForm()) where {T<:Union{PrincipalValueForm, InvariantForm}} = new{T}()
 end
 
-function NonlinearContinua.StrainEnergyDensity(::GeneralConstitutiveModel_Network{T}, λ⃗::Vector{S}, (; Gc, N)) where {T,S}
+function NonlinearContinua.StrainEnergyDensity(::GeneralConstitutiveModel_Network{T}, λ⃗::Vector{S}, (; Gc, N)) where {T<:PrincipalValueForm,S}
     I1 = I₁(λ⃗)
     return Gc * N * log((3 * N + 0.5 * I1) / (3 * N - I1))
 end
+
+function NonlinearContinua.StrainEnergyDensity(::GeneralConstitutiveModel_Network{T}, I⃗::Vector{S}, (; Gc, N)) where {T<:InvariantForm,S}
+    return Gc * N * log((3 * N + 0.5 * I⃗[1]) / (3 * N - I⃗[1]))
+end
+
 
 function parameters(::GeneralConstitutiveModel_Network)
     return (:Gc, :N)
@@ -2881,13 +2879,17 @@ function NonlinearContinua.StrainEnergyDensity(W::GeneralConstitutiveModel{T}, �
     return StrainEnergyDensity(W.Network, λ⃗, ps) + StrainEnergyDensity(W.Tube, λ⃗, ps)
 end
 
-function parameters(::GeneralConstitutiveModel)
-    return (:Gc, :Ge, :N)
+function parameters(W::GeneralConstitutiveModel)
+    return (parameters(W.Network)..., parameters(W.Tube))
 end
 
 function parameter_bounds(::GeneralConstitutiveModel, data::AbstractHyperelasticTest)
     I₁_max = maximum(I₁.(data.data.λ))
     N_min = I₁_max / 3
+    lb = (Gc=-Inf, Ge=-Inf, N=N_min)
+    network_bounds = parameter_bounds(W.Network, data)
+    tube_bounds = parameter_bounds(W.Tube, data)
+    lb = (network)
     lb = (Gc=-Inf, Ge=-Inf, N=N_min)
     ub = nothing
     return (lb=lb, ub=ub)
@@ -3140,7 +3142,7 @@ Fields:
 """
 struct AnsarriBenam{T} <: AbstractIncompressibleModel{T}
     n::Int
-    function AnsarriBenam(::T=PrincipalValueForm();n::Int=3) where T<:PrincipalValueForm
+    function AnsarriBenam(::T=PrincipalValueForm();n::Int=3) where T<:Union{PrincipalValueForm, InvariantForm}
         @assert n > 1
         new{T}(n)
     end
