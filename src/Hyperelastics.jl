@@ -1,12 +1,165 @@
+
 module Hyperelastics
 
-include("../NonlinearContinua/src/NonlinearContinua.jl")
-include("../InverseLangevinApproximations/src/InverseLangevinApproximations.jl")
-
 using Reexport
-# @reexport using NonlinearContinua
+@reexport module NonlinearContinua
+
+using LinearAlgebra
+using RecursiveArrayTools
+
+abstract type AbstractMaterialModel end
+abstract type AbstractMaterialState end
+abstract type AbstractMaterialTest end
+
+export I₁, I₂, I₃, J
+export MaterialHistory, update_history, update_history!
+export predict
+
+## Material Tests
+"""
+`predict(ψ::AbstractMaterialModel, test::AbstractMaterialTest, ps)`
+
+Fields:
+- `ψ`: Material Model
+- `test` or `tests`: A single test or vector of tests. This is used to predict the response of the model in comparison to the experimental data provided.
+- `ps`: Model parameters to be used.
+"""
+function predict(ψ::AbstractMaterialModel, test::AbstractMaterialTest, ps)
+    @error "Method not implemented for model $(typeof(ψ)) and test $(typeof(test))"
+end
+function predict(ψ::AbstractMaterialModel, tests::Vector{<:AbstractMaterialTest}, ps, args...)
+    f(test) = predict(ψ, test, ps,args...)
+    results = map(f, tests)
+    return results
+end
+
+"""
+`MaterialHistory(values::Vector, times::Vector)`
+
+Structure for storing the behavior of a material as it evolves in time. Design to be used in time-dependent models such as viscoelasticity.
+
+"""
+struct MaterialHistory{T} <: AbstractMaterialState
+    value::VectorOfArray
+    time::Vector{T}
+    function MaterialHistory(value::Vector, time::T) where { T}
+        new{T}(VectorOfArray([value]), [time])
+    end
+    function MaterialHistory(value::Matrix, time::T) where {T}
+        new{T}(VectorOfArray([value]), [time])
+    end
+end
+
+## Energy Models
+for Model ∈ [
+    :StrainEnergyDensity,
+    :StrainEnergyDensity!,
+]
+    @eval export $Model
+    @eval @inline function $Model(M::AbstractMaterialModel, S, P; kwargs...) end
+end
+## Stress Tensors
+for Tensor ∈ [
+    :FirstPiolaKirchoffStressTensor,
+    :SecondPiolaKirchoffStressTensor,
+    :CauchyStressTensor,
+    :FirstPiolaKirchoffStressTensor!,
+    :SecondPiolaKirchoffStressTensor!,
+    :CauchyStressTensor!,
+]
+    @eval export $Tensor
+    @eval @inline function $Tensor(M::AbstractMaterialModel, S, P, ;kwargs...) end
+end
+
+## Deformation Tensors
+for Tensor ∈ [
+    :DeformationGradientTensor,
+    :InverseDeformationGradientTensor,
+    :RightCauchyGreenDeformationTensor,
+    :LeftCauchyGreenDeformationTensor,
+    :InverseLeftCauchyGreenDeformationTensor,
+    :DeformationGradientTensor!,
+    :InverseDeformationGradientTensor!,
+    :RightCauchyGreenDeformationTensor!,
+    :LeftCauchyGreenDeformationTensor!,
+    :InverseLeftCauchyGreenDeformationTensor!,
+]
+    @eval export $Tensor
+    @eval @inline function $Tensor(M::AbstractMaterialModel, S::AbstractMaterialState, P;kwargs...) end
+end
+
+
+## Strain Tensors
+for Tensor ∈ [
+    :GreenStrainTensor,
+    :AlmansiStrainTensor,
+    :GreenStrainTensor!,
+    :AlmansiStrainTensor!,
+]
+    @eval export $Tensor
+    @eval @inline function $Tensor(M::AbstractMaterialModel, S::AbstractMaterialState, P;kwargs...) end
+end
+
+## Time Dependent Tensors
+# Deformation
+for Tensor ∈ [
+    :VelocityGradientTensor,
+    :VelocityGradientTensor!,
+]
+    @eval export $Tensor
+    @eval @inline function $Tensor(M::AbstractMaterialModel, S::AbstractMaterialState, P; kwargs...) end
+end
+
+## Electric Field Tensors
+
+## Charge Displacement Tensors
+
+## Tensor Invariant Calculations
+I₁(T::AbstractMatrix) = tr(T)
+I₂(T::AbstractMatrix) = 1 / 2 * (tr(T)^2 - tr(T^2))
+I₃(T::AbstractMatrix) = det(T)
+J(T::AbstractMatrix) = sqrt(det(T))
+
+end
+
 @reexport using ADTypes
-# using InverseLangevinApproximations
+@reexport module InverseLangevinApproximations
+
+export CohenRounded3_2, CohenExact3_2, PusoApproximation, TreloarApproximation, WarnerApproximation, KuhnGrunApproximation, BergstromApproximation, PadeApproximation_1_4, PadeApproximation_1_2, PadeApproximation_5_0, PadeApproximation_3_0, Jedynak2017, ArrudaApproximation
+
+CohenRounded3_2(y) = y * (3 - y^2) / (1 - y^2)
+
+ArrudaApproximation(y) = 3y + 9 / 5 * y + 297 / 175 * y^3 + 297 / 175 * y^5 + 1539 / 875 * y^7 + 126117 / 67375 * y^9
+
+PadeApproximation_3_2(y) = y * (3 - 36 / 35 * y^2) / (1 - 33 / 35 * y^2)
+
+PusoApproximation(y) = 3 * y / (1 - y^3)
+
+TreloarApproximation(y) = 3 * y / (1 - (3 / 5 * y^2 + 36 / 175 * y^4 + 108 / 875 * y^6))
+
+WarnerApproximation(y) = 3 * y / (1 - y^2)
+
+KuhnGrunApproximation(y) = 3y + 9y^3 / 5 + 297y^5 / 175 + 1539y^7 / 875 + 126117y^9 / 67375 + 43733439y^11 / 21896875 + 231321177y^13 / 109484375 + 20495009043y^15 / 9306171875 + 1073585186448381y^17 / 476522530859375 + 4387445039583y^19 / 1944989921875
+
+function BergstromApproximation(y)
+    if abs(y) < 0.84136
+        return 1.31446tan(1.58986y) + 0.91209y
+    elseif 0.84136 <= abs(y) < 1.0
+        return 1 / (sign(y) - y)
+    end
+end
+
+PadeApproximation_1_4(y) = 3y / (1 - 3y^2 / 5 - 36y^4 / 175)
+
+PadeApproximation_1_2(y) = 3y / (1 - 3y^2 / 5)
+
+PadeApproximation_5_0(y) = 3y + 9y^3 / 5 + 297y^5 / 175
+
+PadeApproximation_3_0(y) = 3y + 9y^3 / 5
+
+Jedynak2017(y) = y * (3 - 773 / 768 * y^2 - 1300 / 1351 * y^4 + 501 / 340 * y^6 - 678 / 1385 * y^8) / (1 - y) / (1 + 866 / 853 * y)
+
+end
 using LossFunctions
 
 # using Tullio

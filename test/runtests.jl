@@ -1,5 +1,6 @@
 using LinearAlgebra
 using Hyperelastics
+include("../../NonlinearContinua/src/NonlinearContinua.jl")
 using Test
 using ForwardDiff, FiniteDiff, Zygote, Enzyme
 using InteractiveUtils
