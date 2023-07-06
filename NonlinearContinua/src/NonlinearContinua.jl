@@ -1,50 +1,49 @@
 module NonlinearContinua
 
 using LinearAlgebra
-using Accessors
+using RecursiveArrayTools
 
 abstract type AbstractMaterialModel end
 abstract type AbstractMaterialState end
 abstract type AbstractMaterialTest end
 
-export I₁, I₂, I₃, I1, I2, I3, J
-export MaterialHistory
+export I₁, I₂, I₃, J
+export MaterialHistory, update_history, update_history!
+export predict
 
 ## Material Tests
 """
-Predicts the model behavior for provided experimental test.
+`predict(ψ::AbstractMaterialModel, test::AbstractMaterialTest, ps)`
+
+Fields:
+- `ψ`: Material Model
+- `test` or `tests`: A single test or vector of tests. This is used to predict the response of the model in comparison to the experimental data provided.
+- `ps`: Model parameters to be used.
 """
-function predict(ψ::AbstractMaterialModel, test::AbstractMaterialTest, ps, adtype)
+function predict(ψ::AbstractMaterialModel, test::AbstractMaterialTest, ps)
     @error "Method not implemented for model $(typeof(ψ)) and test $(typeof(test))"
 end
-function predict(ψ::AbstractMaterialModel, tests::Vector{<:AbstractMaterialTest}, ps, adtype)
-    f(test) = predict(ψ, test, ps, adtype)
+function predict(ψ::AbstractMaterialModel, tests::Vector{<:AbstractMaterialTest}, ps, args...)
+    f(test) = predict(ψ, test, ps,args...)
     results = map(f, tests)
     return results
 end
-export predict
-## Material Properties
-export MaterialHistory, update_history, update_history!
-struct MaterialHistory{T,S} <: AbstractMaterialState
-    value::Vector{T}
-    time::Vector{S}
-    function MaterialHistory(values, times)
-        new{eltype(values),eltype(times)}(values, times)
+
+"""
+`MaterialHistory(values::Vector, times::Vector)`
+
+Structure for storing the behavior of a material as it evolves in time. Design to be used in time-dependent models such as viscoelasticity.
+
+"""
+struct MaterialHistory{T} <: AbstractMaterialState
+    value::VectorOfArray
+    time::Vector{T}
+    function MaterialHistory(value::Vector, time::T) where { T}
+        new{T}(VectorOfArray([value]), [time])
     end
-end
-value(history::MaterialHistory) = history.value
-time(history::MaterialHistory) = history.time
-
-function update_history!(history::MaterialHistory, value, time)
-    push!(history.value, value)
-    push!(history.time, time)
-    return nothing
-end
-
-function update_history(history::MaterialHistory, value, time)
-    history = @set history.value = vcat(history.value, [value])
-    history = @set history.time = vcat(history.time, [time])
-    return history
+    function MaterialHistory(value::Matrix, time::T) where {T}
+        new{T}(VectorOfArray([value]), [time])
+    end
 end
 
 ## Energy Models
@@ -53,7 +52,7 @@ for Model ∈ [
     :StrainEnergyDensity!,
 ]
     @eval export $Model
-    @eval @inline function $Model(M::AbstractMaterialModel, S::AbstractMaterialState, P) end
+    @eval @inline function $Model(M::AbstractMaterialModel, S, P; kwargs...) end
 end
 ## Stress Tensors
 for Tensor ∈ [
@@ -65,7 +64,7 @@ for Tensor ∈ [
     :CauchyStressTensor!,
 ]
     @eval export $Tensor
-    @eval @inline function $Tensor(M::AbstractMaterialModel, S::AbstractMaterialState, P) end
+    @eval @inline function $Tensor(M::AbstractMaterialModel, S, P, ;kwargs...) end
 end
 
 ## Deformation Tensors
@@ -82,7 +81,7 @@ for Tensor ∈ [
     :InverseLeftCauchyGreenDeformationTensor!,
 ]
     @eval export $Tensor
-    @eval @inline function $Tensor(M::AbstractMaterialModel, S::AbstractMaterialState, P) end
+    @eval @inline function $Tensor(M::AbstractMaterialModel, S::AbstractMaterialState, P;kwargs...) end
 end
 
 
@@ -94,7 +93,7 @@ for Tensor ∈ [
     :AlmansiStrainTensor!,
 ]
     @eval export $Tensor
-    @eval @inline function $Tensor(M::AbstractMaterialModel, S::AbstractMaterialState, P) end
+    @eval @inline function $Tensor(M::AbstractMaterialModel, S::AbstractMaterialState, P;kwargs...) end
 end
 
 ## Time Dependent Tensors
@@ -104,7 +103,7 @@ for Tensor ∈ [
     :VelocityGradientTensor!,
 ]
     @eval export $Tensor
-    @eval @inline function $Tensor(M::AbstractMaterialModel, S::AbstractMaterialState, P) end
+    @eval @inline function $Tensor(M::AbstractMaterialModel, S::AbstractMaterialState, P; kwargs...) end
 end
 
 ## Electric Field Tensors
@@ -116,11 +115,5 @@ I₁(T::AbstractMatrix) = tr(T)
 I₂(T::AbstractMatrix) = 1 / 2 * (tr(T)^2 - tr(T^2))
 I₃(T::AbstractMatrix) = det(T)
 J(T::AbstractMatrix) = sqrt(det(T))
-const I1 = I₁
-const I2 = I₂
-const I3 = I₃
-
-## Precompile
-# using SnoopPrecompile
 
 end

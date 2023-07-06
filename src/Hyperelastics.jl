@@ -6,9 +6,9 @@ using Reexport
 using InverseLangevinApproximations
 using LossFunctions
 
-using Tullio
+# using Tullio
 using SpecialFunctions
-# using DataInterpolations
+using DataInterpolations
 using QuadGK
 using ComponentArrays, LabelledArrays, StructArrays
 using LinearAlgebra, Statistics
@@ -18,15 +18,21 @@ export HyperelasticUniaxialTest, HyperelasticBiaxialTest
 export HyperelasticProblem
 export predict
 export parameters, parameter_bounds
-export available_models
+export InvariantForm, PrincipalValueForm, DataDrivenForm
 
 abstract type AbstractHyperelasticTest{T,S} <: NonlinearContinua.AbstractMaterialTest end
-abstract type AbstractHyperelasticModel <: NonlinearContinua.AbstractMaterialModel end
-abstract type AbstractDataDrivenHyperelasticModel <: AbstractHyperelasticModel end
+
+abstract type AbstractHyperelasticModel{T} <: NonlinearContinua.AbstractMaterialModel end
+
+abstract type AbstractIncompressibleModel{T} <: AbstractHyperelasticModel{T} end
+abstract type AbstractCompressibleModel{T} <: AbstractHyperelasticModel{T} end
+abstract type AbstractDataDrivenHyperelasticModel{T} <: AbstractHyperelasticModel{T} end
+
 abstract type AbstractHyperelasticProblem end
 
 struct InvariantForm end
-
+struct PrincipalValueForm end
+struct DataDrivenForm end
 
 """
 `HyperelasticProblem(ψ::AbstractHyperelasticModel, test::AbstractHyperelasticTest, u₀, ps=Nothing;
@@ -57,7 +63,8 @@ struct HyperelasticProblem{iip,F,uType,P,LB,UB,I,LC,UC,S,K}
     sense::S
     kwargs::K
 end
-include("../ext/HyperelasticsOptimizationExt.jl")
+
+# include("../ext/HyperelasticsOptimizationExt.jl")
 include("invariants.jl")
 include("material_tests.jl")
 include("model_functions.jl")
@@ -69,18 +76,6 @@ include("isotropic_incompressible_models.jl")
 include("isotropic_compressible_models.jl")
 
 include("data_driven.jl")
-include("macro_micro_macro_model.jl")
 include("average_chain_behavior.jl")
-
-
-
-function available_models()
-    exclude = [:HorganMurphy, :KhiemItskov, :GeneralCompressible, :LogarithmicCompressible, :GeneralMooneyRivlin]
-    ns = filter(x -> x ∉ [:citation, :update_history, :update_history!], names(Hyperelastics))
-    hyperelastic_models = filter(x -> typeof(getfield(Hyperelastics, x)) <: Union{DataType,UnionAll}, ns)
-    hyperelastic_models = filter(x -> !(getfield(Hyperelastics, x) <: Hyperelastics.AbstractDataDrivenHyperelasticModel) && (getfield(Hyperelastics, x) <: Hyperelastics.AbstractHyperelasticModel), hyperelastic_models)
-    hyperelastic_models_sym = filter(x -> !(x in exclude), hyperelastic_models)
-    return hyperelastic_models_sym
-end
-
+# include("macro_micro_macro_model.jl")
 end

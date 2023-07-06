@@ -15,7 +15,7 @@ Fields:
 
 > Sussman T, Bathe KJ. A model of incompressible isotropic hyperelastic material behavior using spline interpolations of tension–compression test data. Communications in numerical methods in engineering. 2009 Jan;25(1):53-63.
 """
-struct SussmanBathe{T,S} <: AbstractDataDrivenHyperelasticModel
+struct SussmanBathe{T,S} <: AbstractDataDrivenHyperelasticModel{PrincipalValueForm}
     w′::Function
     test::AbstractHyperelasticTest
     k::T
@@ -36,10 +36,15 @@ function Base.show(io::IO, ψ::SussmanBathe)
     Base.show(io, "\t interpolant = $(ψ.itp)")
 end
 
-NonlinearContinua.StrainEnergyDensity(ψ::SussmanBathe, λ⃗::AbstractVector, p) = sum(x -> quadgk(ψ.w′, 1.0, x)[1], λ⃗)
+NonlinearContinua.StrainEnergyDensity(ψ::SussmanBathe, λ⃗::Vector{T}, p) where {T} = sum(x -> quadgk(ψ.w′, 1.0, x)[1], λ⃗)
 
-NonlinearContinua.SecondPiolaKirchoffStressTensor(ψ::SussmanBathe, λ⃗::AbstractVector, p; adb=nothing) = ψ.w′.(λ⃗)
+function NonlinearContinua.StrainEnergyDensity(ψ::SussmanBathe, F::Matrix{T}, p)  where {T}
+    λ⃗ = eigvals(F)
+    return StrainEnergyDensity(ψ, λ⃗, p)
+end
 
-NonlinearContinua.CauchyStressTensor(ψ::SussmanBathe, λ⃗::AbstractVector, p) = ψ.w′.(λ⃗) .* λ⃗
+NonlinearContinua.SecondPiolaKirchoffStressTensor(ψ::SussmanBathe, λ⃗::Vector{T}, p; kwargs...) where {T} = ψ.w′.(λ⃗)
+
+NonlinearContinua.CauchyStressTensor(ψ::SussmanBathe, λ⃗::Vector{T}, p; kwargs...) where {T} = ψ.w′.(λ⃗) .* λ⃗
 
 parameters(ψ::SussmanBathe) = ()

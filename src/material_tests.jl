@@ -81,7 +81,9 @@ struct HyperelasticBiaxialTest{T,S} <: AbstractHyperelasticTest{T,S}
         λ = collect.(zip(λ₁, λ₂, λ₃))
         s = collect.(zip(s₁, s₂))
         data = StructArray{HyperelasticDataEntry}((λ, s))
-        new{promote(eltype(eltype(λ₁)), eltype(eltype(λ₂))),promote(eltype(eltype(s₁)), eltype(eltype(s₂)))}(data, name)
+        T = promote_type(eltype(eltype(λ₁)), eltype(eltype(λ₂)))
+        S = promote_type(eltype(eltype(s₁)), eltype(eltype(s₂)))
+        new{T,S}(data, name)
     end
     function HyperelasticBiaxialTest(λ₁, λ₂; name, incompressible=true)
         @assert length(λ₁) == length(λ₂) "Inputs must be the same length"
@@ -94,7 +96,7 @@ struct HyperelasticBiaxialTest{T,S} <: AbstractHyperelasticTest{T,S}
         λ = collect.(zip(λ₁, λ₂, λ₃))
         s = collect.(zip(s₁, s₂))
         data = StructArray{HyperelasticDataEntry}((λ, s))
-        new{promote(eltype(eltype(λ₁)), eltype(eltype(λ₂))),promote(eltype(eltype(s₁)), eltype(eltype(s₂)))}(data, name)
+        new{promote_type(eltype(eltype(λ₁)), eltype(eltype(λ₂))),promote_type(eltype(eltype(s₁)), eltype(eltype(s₂)))}(data, name)
     end
 end
 
@@ -109,8 +111,9 @@ function Base.show(io::IO, test::HyperelasticBiaxialTest)
     )
 end
 
-function NonlinearContinua.predict(ψ::AbstractHyperelasticModel, test::HyperelasticUniaxialTest{T,S}, p, adtype; kwargs...) where {T,S}
-    f(λ) = SecondPiolaKirchoffStressTensor(ψ, λ, p, adtype, return_type=S, kwargs...)
+## Predict overloads
+function NonlinearContinua.predict(ψ::AbstractHyperelasticModel{A}, test::HyperelasticUniaxialTest{B,C}, p; kwargs...) where {A, B, C}
+    f(λ) = SecondPiolaKirchoffStressTensor(ψ, λ, p; kwargs...)
     λ = test.data.λ
     s = map(f, λ)
     s₁ = getindex.(s, 1)
@@ -122,8 +125,8 @@ function NonlinearContinua.predict(ψ::AbstractHyperelasticModel, test::Hyperela
     return pred
 end
 
-function NonlinearContinua.predict(ψ::AbstractHyperelasticModel, test::HyperelasticBiaxialTest, p, adtype; kwargs...)
-    f(λ) = SecondPiolaKirchoffStressTensor(ψ, λ, p, adtype, kwargs...)
+function NonlinearContinua.predict(ψ::AbstractHyperelasticModel{A}, test::HyperelasticBiaxialTest{B,C}, p, adtype; kwargs...) where {A, B, C}
+    f(λ) = SecondPiolaKirchoffStressTensor(ψ, λ, p; kwargs...)
     λ = test.data.λ
     s = map(f, λ)
     s₁ = getindex.(s, 1)

@@ -97,14 +97,14 @@ function Optimization.SciMLBase.solve(
     Optimization.SciMLBase.OptimizationSolution{
         typeof(sol.retcode),
         ndims(sol.u),
-        typeof(sol.u.*prob.p.units),
+        typeof(sol.u),
         typeof(sol.cache),
         typeof(sol.alg),
         typeof(sol.objective),
         typeof(sol.original),
         typeof(sol.solve_time),
         typeof(sol.stats)}(
-        sol.u.*prob.p.units,
+        sol.u,
         sol.cache,
         sol.alg,
         sol.objective,

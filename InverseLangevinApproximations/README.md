@@ -4,4 +4,4 @@ Main set of models are from "Approximation of the inverse Langevin function revi
 
 ## Citing
 
-See `CITATION.bib` for the relevant reference(s).
+See [`CITATION.bib`](CITATION.bib) for the relevant reference(s).

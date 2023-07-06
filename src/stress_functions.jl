@@ -9,7 +9,7 @@ Fields:
 - `λ⃗`: Vector of principal stretches
 - `p`: Model parameters
 """
-function NonlinearContinua.StrainEnergyDensity(ψ::AbstractHyperelasticModel, λ⃗::AbstractVector, p)
+function NonlinearContinua.StrainEnergyDensity(ψ::AbstractHyperelasticModel, λ⃗::Vector{T}, p) where {T}
     @error "$(typeof(ψ)) does not have a Strain Energy Density implemented"
 end
 
@@ -29,11 +29,11 @@ Fields:
 - `F`: Deformation gradient matrix
 - `p`: Model parameters
 """
-function NonlinearContinua.StrainEnergyDensity(ψ::AbstractHyperelasticModel, F::AbstractMatrix, p)
+function NonlinearContinua.StrainEnergyDensity(ψ::AbstractHyperelasticModel, F::Matrix{T}, p) where {T}
     C = transpose(F) * F
     λ⃗² = eigvals(C)
     λ⃗ = sqrt.(abs.(λ⃗²))
-    return StrainEnergyDensity(ψ, λ⃗::AbstractVector, p)
+    return StrainEnergyDensity(ψ, λ⃗::Vector{T}, p)
 end
 
 """
@@ -47,12 +47,12 @@ Fields:
 - `p`: parameters
 - `InvariantForm()`
 """
-function NonlinearContinua.StrainEnergyDensity(ψ::AbstractHyperelasticModel, I⃗::AbstractVector, p, I::InvariantForm)
+function NonlinearContinua.StrainEnergyDensity(ψ::AbstractHyperelasticModel{T}, ::Vector{R}, p) where {T<:InvariantForm, R}
     @error "$(typeof(ψ)) does not have a stretch Invariant Form of Strain Energy Density implemented"
 end
 
 """
-`StrainEnergyDensity(ψ, F, p, InvariantForm())`
+`StrainEnergyDensity(ψ, F, p)`
 
 Returns the strain energy density for the model `ψ` with deformation gradient `F` with parameters `p`.
 
@@ -62,12 +62,12 @@ Fields:
 - `p`: parameters
 - `InvariantForm()`
 """
-function NonlinearContinua.StrainEnergyDensity(ψ::AbstractHyperelasticModel, F::AbstractMatrix, p, I::InvariantForm)
-    NonlinearContinua.StrainEnergyDensity(ψ, [I₁(F), I₂(F), I₃(F)], p, I)
+function NonlinearContinua.StrainEnergyDensity(ψ::AbstractHyperelasticModel{T}, F::Matrix{R}, p) where {T <: InvariantForm, R}
+    StrainEnergyDensity(ψ, [I₁(F), I₂(F), I₃(F)], p)
 end
 
 """
-`SecondPiolaKirchoffStressTensor(ψ::AbstractHyperelasticModel, λ⃗::AbstractVector, p; adb=AD.ForwardDiffBackend())`
+`SecondPiolaKirchoffStressTensor(ψ::AbstractHyperelasticModel, λ⃗::AbstractVector, p; ad_type=AD.ForwardDiffBackend())`
 
 Returns the second PK stress tensor for the hyperelastic model `ψ` with the principle stretches `λ⃗` with parameters `p`.
 
@@ -75,9 +75,12 @@ Fields:
 - `ψ`: Hyperelastic model
 - `λ⃗`: Vector of principal stretches
 - `p`: Model parameters
-- `adb`: Differentiation backend from `AbstractDifferentiation.jl`
 """
-function NonlinearContinua.SecondPiolaKirchoffStressTensor(ψ::AbstractHyperelasticModel, λ⃗::AbstractVector, p; kwargs...)
+function NonlinearContinua.SecondPiolaKirchoffStressTensor(ψ::AbstractHyperelasticModel, State, p; ad_type=nothing, kwargs...)
+    _SecondPiolaKirchoffStressTensor(ψ, State, p, ad_type; kwargs...)
+end
+
+function _SecondPiolaKirchoffStressTensor(ψ, λ⃗, p, ad_type; kwargs...)
     @error "Please load a support derivative backend:
             1. ForwardDiff.jl
             2. Zygote.jl
@@ -95,10 +98,9 @@ Fields:
 - `ψ`: Hyperelastic model
 - `F`: Deformation gradient tensor
 - `p`: Model parameters
-- `adb`: Differentiation backend from `AbstractDifferentiation.jl`
 """
-function NonlinearContinua.SecondPiolaKirchoffStressTensor(ψ::AbstractHyperelasticModel, F::AbstractMatrix, p; kwargs...)
-    σ = CauchyStressTensor(ψ, F, p)
+function NonlinearContinua.SecondPiolaKirchoffStressTensor(ψ::Hyperelastics.AbstractHyperelasticModel, F::Matrix{T}, p; kwargs...) where {T}
+    σ = CauchyStressTensor(ψ, F, p; kwargs...)
     S = sqrt(det(F' * F)) * inv(F) * σ
     return S
 end
@@ -114,14 +116,21 @@ Fields:
 - `p`: Model parameters
 - `adb`: Differentiation backend from `AbstractDifferentiation.jl`
     """
-function NonlinearContinua.CauchyStressTensor(ψ::AbstractHyperelasticModel, λ⃗::AbstractVector, p; kwargs...)
-    @error "Please load a support derivative backend:
-            1. ForwardDiff.jl
-            2. Zygote.jl
-            3. Enzyme.jl
-            4. FiniteDiff.jl
-            5. Or define a custom method for the material model"
+# NonlinearContinua.CauchyStressTensor(ψ::AbstractHyperelasticModel, State, p; ad_type=nothing, kwargs...) = _CauchyStressTensor(ψ, State, p, ad_type; kwargs...)
+
+function NonlinearContinua.CauchyStressTensor(ψ::Hyperelastics.AbstractHyperelasticModel, λ⃗::Vector{T}, p; kwargs...) where {T}
+    S = SecondPiolaKirchoffStressTensor(ψ, λ⃗, p; kwargs...)
+    σ = S .* λ⃗ ./ J(λ⃗)
+    return σ
 end
+# function _CauchyStressTensor(ψ::AbstractHyperelasticModel, λ⃗::Vector{T}, p, ad_type; kwargs...) where T
+#     @error "Please load a support derivative backend:
+#             1. ForwardDiff.jl
+#             2. Zygote.jl
+#             3. Enzyme.jl
+#             4. FiniteDiff.jl
+#             5. Or define a custom method for the material model"
+# end
 
 """
 `CauchyStressTensor(ψ::AbstractHyperelasticModel, F::AbstractMatrix, p; adb=AD.ForwardDiffBackend())`
@@ -134,7 +143,7 @@ Fields:
 - `p`: Model parameters
 - `adb`: Differentiation backend from `AbstractDifferentiation.jl`
 """
-function NonlinearContinua.CauchyStressTensor(ψ::AbstractHyperelasticModel, F::AbstractMatrix, p; kwargs...)
+function NonlinearContinua.CauchyStressTensor(ψ::Hyperelastics.AbstractHyperelasticModel, F::Matrix{T}, p; kwargs...) where {T}
     B = F * F'
     a = eigvecs(B)'
     B_prin = Diagonal(a * B * a')
@@ -142,8 +151,7 @@ function NonlinearContinua.CauchyStressTensor(ψ::AbstractHyperelasticModel, F::
     V = a' * V_prin * a
     R = inv(V) * F
     λ⃗ = sqrt.(diag(B_prin))
-    W = StrainEnergyDensity(ψ, λ⃗, p)
-    σ̂ = CauchyStressTensor(ψ, λ⃗, p) |> Diagonal
+    σ̂ = CauchyStressTensor(ψ, λ⃗, p; kwargs...) |> Diagonal
     σ = R * a' * σ̂ * a * R'
     return σ
 end

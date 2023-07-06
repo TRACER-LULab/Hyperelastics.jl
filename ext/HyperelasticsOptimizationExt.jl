@@ -31,8 +31,8 @@ end
 function HyperelasticProblem(
     ψ::Hyperelastics.AbstractHyperelasticModel,
     test::Hyperelastics.AbstractHyperelasticTest{T,S},
-    u0,
-    adtype::ADTypes.AbstractADType,
+    u0;
+    ad_type::ADTypes.AbstractADType,
     loss=L2DistLoss(),
     lb=parameter_bounds(ψ, test).lb,
     ub=parameter_bounds(ψ, test).ub,
@@ -42,14 +42,11 @@ function HyperelasticProblem(
     sense=nothing,
     kwargs...) where {T,S}
 
-    a = typeof(adtype)
-    b = Symbol(split(split(string(a), "{")[1], ".")[end])
-
-    optimization_AD_type = getfield(Optimization, b)()
+    # optimization_AD_type = ad_type
 
     function f(ps, (; ψ, test, kwargs, loss))
-        pred = predict(ψ, test, ps, adtype, kwargs...)
-        @show test.data.s[1]
+        pred = predict(ψ, test, ps; ad_type, kwargs...)
+        # @show test.data.s[1]
 
         # res = sum(abs, mean(loss.(pred.data.s, test.data.s)))
         res = map(i -> L2DistLoss().(i[1], i[2]), zip(pred.data.s, test.data.s)) |> mean
@@ -71,25 +68,25 @@ function HyperelasticProblem(
         ub = u0 .* Inf
         lb = u0 .* -Inf
     end
-    @show lb
+
     model_ps = parameters(ψ)
 
     for p in model_ps
         if !isnothing(lb)
             if (u0[p] < lb[p])
-                @error "Parameter $p = $(u₀[p]) is less than lower bound of $(lb[p])"
+                @error "Parameter $p = $(u0[p]) is less than lower bound of $(lb[p])"
                 return nothing
             end
         end
         if !isnothing(ub)
             if (u0[p] > ub[p])
-                @error "Parameter $p = $(u₀[p]) is greater than upper bound of $(ub[p])"
+                @error "Parameter $p = $(u0[p]) is greater than upper bound of $(ub[p])"
                 return nothing
             end
         end
     end
 
-    func = OptimizationFunction(f, optimization_AD_type)
+    func = OptimizationFunction(f, ad_type)
          # Check for Bounds
     p = (ψ=ψ, test=test, loss=loss, kwargs=kwargs)
 

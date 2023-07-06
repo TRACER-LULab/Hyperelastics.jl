@@ -1,8 +1,9 @@
 using Hyperelastics
-using Optimization, OptimizationOptimJL, ComponentArrays
+using Optimization, OptimizationOptimJL
+using ComponentArrays
 using CairoMakie
-using Interpolations, DataInterpolations
-using LinearAlgebra, Tullio
+using DataInterpolations
+using LinearAlgebra
 
 ## Test Stretches
 λ₁ = [1.04,3.1]

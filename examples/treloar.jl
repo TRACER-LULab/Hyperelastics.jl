@@ -18,7 +18,7 @@ treloar_data = HyperelasticUniaxialTest(λ₁, s₁, name = "test")
 #
 ## Initial guess for the parameters
 models = Dict(
-    Gent => ComponentVector((μ=240e-3u"MPa", Jₘ=80.0)),
+    Gent => ComponentVector((μ=240e-3, Jₘ=79.0)),
     # EdwardVilgis => ComponentVector(Ns=0.10, Nc=0.20, α=0.001, η=0.001),
     # ModifiedFloryErman => ComponentVector(μ=0.24, N=50.0, κ=10.0),
     # NeoHookean => ComponentVector(μ=200e-3),
@@ -32,12 +32,12 @@ models = Dict(
 
 # scatter!(ax, getindex.(pred.data.λ, 1), getindex.(treloar_data.data.s, 1), label="Treloar Data")
 for (ψ, p₀) in models
-    prob = HyperelasticProblem(ψ(), treloar_data, p₀, AutoFiniteDiff())
+    prob = HyperelasticProblem(ψ(), treloar_data, p₀, ad_type=AutoForwardDiff())
     display(prob.u0)
     sol = solve(prob, NelderMead())
     @show sol
-    pred = predict(ψ(), treloar_data, sol.u, AutoForwardDiff())
-    @show pred
+    pred = predict(ψ(), treloar_data, p₀, ad_type = AutoForwardDiff())
+    # @show pred
     # lines!(ax, getindex.(pred.data.λ, 1), getindex.(pred.data.s, 1), label=string(ψ))
 end
 # axislegend(position=:lt)
