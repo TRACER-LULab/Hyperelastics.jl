@@ -1,7 +1,6 @@
 module HyperelasticsZygoteExt
 
 import Zygote: gradient
-import NonlinearContinua
 using Hyperelastics
 using LinearAlgebra
 using ADTypes
