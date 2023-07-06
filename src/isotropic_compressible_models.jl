@@ -211,7 +211,7 @@ end
 ### Invariant Form
 function NonlinearContinua.StrainEnergyDensity(ψ::LogarithmicCompressible{T}, F::Matrix{S}, p) where {T<:InvariantForm,S}
     J = det(F)
-    F̄ = F ./ cbrt(J(F))
+    F̄ = F ./ cbrt(J)
     StrainEnergyDensity(ψ.incompressible, [I₁(F̄), I₂(F̄), I₃(F̄)], p.ψ) + p.κ * (J * log(J) - J)
 end
 function Base.show(io::IO, ψ::LogarithmicCompressible)
