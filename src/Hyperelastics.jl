@@ -1,9 +1,12 @@
 module Hyperelastics
 
+include("../NonlinearContinua/src/NonlinearContinua.jl")
+include("../InverseLangevinApproximations/src/InverseLangevinApproximations.jl")
+
 using Reexport
-@reexport using NonlinearContinua
+# @reexport using NonlinearContinua
 @reexport using ADTypes
-using InverseLangevinApproximations
+# using InverseLangevinApproximations
 using LossFunctions
 
 # using Tullio
