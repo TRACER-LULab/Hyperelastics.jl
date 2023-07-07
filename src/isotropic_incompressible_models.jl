@@ -1955,13 +1955,13 @@ struct HorganMurphy{T} <: AbstractIncompressibleModel{T}
     HorganMurphy(::T=PrincipalValueForm()) where T<:PrincipalValueForm = new{T}()
 end
 
-function NonlinearContinua.StrainEnergyDensity(::HorganMurphy{T}, λ⃗::Vector{S} , (;μ, Jₘ, c)) where {T,S}
+function NonlinearContinua.StrainEnergyDensity(::HorganMurphy{T}, λ⃗::Vector{S}, (; μ, Jₘ, c)) where {T<:PrincipalValueForm,S}
     return -2 * μ * Jₘ / c^2 * log(1 - (sum(λ⃗ .^ c) - 3) / Jₘ)
     # -2 * ps.μ  * ps.J / ps.c^2 * log(1 - (sum(λ⃗ .^ ps.c) - 3) / ps.J)
 end
 
 function parameters(::HorganMurphy)
-    return (:μ, :J, :c)
+    return (:μ, :Jₘ, :c)
 end
 
 # function constraints(::HorganMurphy, data::AbstractHyperelasticTest)
@@ -2807,8 +2807,12 @@ function parameters(::KhiemItskov)
     return (:μcκ, :n, :q, :μt)
 end
 
-
-# function constraints(::KhiemItskov, data::AbstractHyperelasticTest)
+function parameter_bounds(::KhiemItskov, data::AbstractHyperelasticTest)
+    lb = (n = 0, μcκ = -Inf, μt = Inf, q = 0)
+    ub = (n = Inf, μcκ = -Inf, μt = Inf, q = Inf)
+    return (lb = lb, ub = ub)
+end
+    # function constraints(::KhiemItskov, data::AbstractHyperelasticTest)
 #     I₁_max = maximum(I₁.(data.data.λ))
 #     f(u, p) = [(sin(π / sqrt(u.n)) * (I₁_max / 3)^(u.q / 2)) / (sin(π / sqrt(u.n) * (I₁_max / 3)^(u.q / 2)))]
 #     return f
@@ -2880,16 +2884,12 @@ function NonlinearContinua.StrainEnergyDensity(W::GeneralConstitutiveModel{T}, �
 end
 
 function parameters(W::GeneralConstitutiveModel)
-    return (parameters(W.Network)..., parameters(W.Tube))
+    return (parameters(W.Network)..., parameters(W.Tube)...)
 end
 
-function parameter_bounds(::GeneralConstitutiveModel, data::AbstractHyperelasticTest)
+function parameter_bounds(W::GeneralConstitutiveModel, data::AbstractHyperelasticTest)
     I₁_max = maximum(I₁.(data.data.λ))
     N_min = I₁_max / 3
-    lb = (Gc=-Inf, Ge=-Inf, N=N_min)
-    network_bounds = parameter_bounds(W.Network, data)
-    tube_bounds = parameter_bounds(W.Tube, data)
-    lb = (network)
     lb = (Gc=-Inf, Ge=-Inf, N=N_min)
     ub = nothing
     return (lb=lb, ub=ub)

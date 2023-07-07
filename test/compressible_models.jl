@@ -18,6 +18,7 @@
     for model in incompressible_models
         # Instantiate model
         ψ = model()
+        @show model
         @test ψ isa Hyperelastics.AbstractIncompressibleModel
 
         # Create an empty parameter set
