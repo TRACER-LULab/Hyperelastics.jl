@@ -13,6 +13,10 @@ function NonlinearContinua.StrainEnergyDensity(ψ::AbstractHyperelasticModel, λ
     @error "$(typeof(ψ)) does not have a Strain Energy Density implemented"
 end
 
+function NonlinearContinua.StrainEnergyDensity(ψ::AbstractHyperelasticModel{T}, ::Vector{R}, p) where {T<:InvariantForm,R}
+    @error "$(typeof(ψ)) does not have a stretch Invariant Form of Strain Energy Density implemented"
+end
+
 """
 `StrainEnergyDensity(ψ, F, p)`
 
@@ -29,40 +33,14 @@ Fields:
 - `F`: Deformation gradient matrix
 - `p`: Model parameters
 """
-function NonlinearContinua.StrainEnergyDensity(ψ::AbstractHyperelasticModel, F::Matrix{T}, p) where {T}
+function NonlinearContinua.StrainEnergyDensity(ψ::AbstractHyperelasticModel{T}, F::Matrix{R}, p) where {T <: PrincipalValueForm, R}
     C = transpose(F) * F
     λ⃗² = eigvals(C)
     λ⃗ = sqrt.(abs.(λ⃗²))
-    return StrainEnergyDensity(ψ, λ⃗::Vector{T}, p)
+    return StrainEnergyDensity(ψ, λ⃗::Vector{R}, p)
 end
 
-"""
-`StrainEnergyDensity(ψ, I⃗, p, InvariantForm())`
-
-Returns the strain energy density for the model `ψ` with invariants `I⃗` with parameters `p`.
-
-Fields:
-- `ψ`: Hyperelastic model
-- `I⃗`: vector of principal stretches or stretch invariants, respectively.
-- `p`: parameters
-- `InvariantForm()`
-"""
-function NonlinearContinua.StrainEnergyDensity(ψ::AbstractHyperelasticModel{T}, ::Vector{R}, p) where {T<:InvariantForm, R}
-    @error "$(typeof(ψ)) does not have a stretch Invariant Form of Strain Energy Density implemented"
-end
-
-"""
-`StrainEnergyDensity(ψ, F, p)`
-
-Returns the strain energy density for the model `ψ` with deformation gradient `F` with parameters `p`.
-
-Fields:
-- `ψ`: Hyperelastic model
-- `F`: Deformation gradient tensor
-- `p`: parameters
-- `InvariantForm()`
-"""
-function NonlinearContinua.StrainEnergyDensity(ψ::AbstractHyperelasticModel{T}, F::Matrix{R}, p) where {T <: InvariantForm, R}
+function NonlinearContinua.StrainEnergyDensity(ψ::AbstractHyperelasticModel{T}, F::Matrix{R}, p) where {T<:InvariantForm,R}
     StrainEnergyDensity(ψ, [I₁(F), I₂(F), I₃(F)], p)
 end
 
@@ -76,17 +54,8 @@ Fields:
 - `λ⃗`: Vector of principal stretches
 - `p`: Model parameters
 """
-function NonlinearContinua.SecondPiolaKirchoffStressTensor(ψ::AbstractHyperelasticModel, State, p; ad_type=nothing, kwargs...)
-    _SecondPiolaKirchoffStressTensor(ψ, State, p, ad_type; kwargs...)
-end
-
-function _SecondPiolaKirchoffStressTensor(ψ, λ⃗, p, ad_type; kwargs...)
-    @error "Please load a support derivative backend:
-            1. ForwardDiff.jl
-            2. Zygote.jl
-            3. Enzyme.jl
-            4. FiniteDiff.jl
-            5. Or define a custom method for the material model"
+function NonlinearContinua.SecondPiolaKirchoffStressTensor(ψ::AbstractIncompressibleModel{T}, λ⃗::Vector{R}, p; ad_type=nothing, kwargs...) where {T<:PrincipalValueForm,R}
+    ∂ψ(ψ, λ⃗, p, ad_type; kwargs...)
 end
 
 """
@@ -99,10 +68,28 @@ Fields:
 - `F`: Deformation gradient tensor
 - `p`: Model parameters
 """
-function NonlinearContinua.SecondPiolaKirchoffStressTensor(ψ::Hyperelastics.AbstractHyperelasticModel, F::Matrix{T}, p; kwargs...) where {T}
+function NonlinearContinua.SecondPiolaKirchoffStressTensor(ψ::AbstractIncompressibleModel{T}, F::Matrix{R}, p; kwargs...) where {T<:PrincipalValueForm, R}
     σ = CauchyStressTensor(ψ, F, p; kwargs...)
     S = sqrt(det(F' * F)) * inv(F) * σ
     return S
+end
+
+function NonlinearContinua.SecondPiolaKirchoffStressTensor(ψ::AbstractIncompressibleModel{T}, F::Matrix{R}, p; ad_type=nothing, kwargs...) where {T<:InvariantForm,R}
+    I1 = I₁(F)
+    I2 = I₂(F)
+    I3 = I₃(F)
+    ∂ψ∂I = ∂ψ(ψ, [I1, I2, I3], p, ad_type; kwargs...)
+    S = 2∂ψ∂I[1] * F' + 2∂ψ∂I[2] * (I1 * F' + F' * F * F') + 2I3*∂ψ∂I[3]*inv(F)
+    return S
+end
+
+function ∂ψ(ψ, λ⃗, p, ad_type; kwargs...)
+    @error "Please load a support derivative backend:
+            1. ForwardDiff.jl
+            2. Zygote.jl
+            3. Enzyme.jl
+            4. FiniteDiff.jl
+            5. Or define a custom method for the material model"
 end
 
 """
@@ -116,21 +103,11 @@ Fields:
 - `p`: Model parameters
 - `adb`: Differentiation backend from `AbstractDifferentiation.jl`
     """
-# NonlinearContinua.CauchyStressTensor(ψ::AbstractHyperelasticModel, State, p; ad_type=nothing, kwargs...) = _CauchyStressTensor(ψ, State, p, ad_type; kwargs...)
-
-function NonlinearContinua.CauchyStressTensor(ψ::Hyperelastics.AbstractHyperelasticModel, λ⃗::Vector{T}, p; kwargs...) where {T}
-    S = SecondPiolaKirchoffStressTensor(ψ, λ⃗, p; kwargs...)
-    σ = S .* λ⃗ ./ J(λ⃗)
+function NonlinearContinua.CauchyStressTensor(ψ::Hyperelastics.AbstractIncompressibleModel, λ⃗::Vector{T}, p; kwargs...) where {T}
+    S = SecondPiolaKirchoffStressTensor(ψ, λ⃗::Vector{T}, p; kwargs...)
+    σ = S .* λ⃗
     return σ
 end
-# function _CauchyStressTensor(ψ::AbstractHyperelasticModel, λ⃗::Vector{T}, p, ad_type; kwargs...) where T
-#     @error "Please load a support derivative backend:
-#             1. ForwardDiff.jl
-#             2. Zygote.jl
-#             3. Enzyme.jl
-#             4. FiniteDiff.jl
-#             5. Or define a custom method for the material model"
-# end
 
 """
 `CauchyStressTensor(ψ::AbstractHyperelasticModel, F::AbstractMatrix, p; adb=AD.ForwardDiffBackend())`
@@ -143,7 +120,7 @@ Fields:
 - `p`: Model parameters
 - `adb`: Differentiation backend from `AbstractDifferentiation.jl`
 """
-function NonlinearContinua.CauchyStressTensor(ψ::Hyperelastics.AbstractHyperelasticModel, F::Matrix{T}, p; kwargs...) where {T}
+function NonlinearContinua.CauchyStressTensor(ψ::Hyperelastics.AbstractIncompressibleModel{T}, F::Matrix{S}, p; kwargs...) where {T<:PrincipalValueForm, S}
     B = F * F'
     a = eigvecs(B)'
     B_prin = Diagonal(a * B * a')
@@ -153,5 +130,16 @@ function NonlinearContinua.CauchyStressTensor(ψ::Hyperelastics.AbstractHyperela
     λ⃗ = sqrt.(diag(B_prin))
     σ̂ = CauchyStressTensor(ψ, λ⃗, p; kwargs...) |> Diagonal
     σ = R * a' * σ̂ * a * R'
+    return σ
+end
+
+function NonlinearContinua.CauchyStressTensor(ψ::Hyperelastics.AbstractIncompressibleModel{T}, F::Matrix{S}, p; ad_type, kwargs...) where {T<:InvariantForm, S}
+    I1 = I₁(F)
+    I2 = I₂(F)
+    I3 = I₃(F)
+    J = sqrt(I3)
+    B = F * F'
+    ∂ψ∂I = ∂ψ(ψ, [I1, I2, I3], p, ad_type; kwargs...)
+    σ = 2 * inv(J) * (∂ψ∂I[1] + I1 * ∂ψ∂I[2]) * B - 2 * inv(J) * ∂ψ∂I[2] * B^2 + 2 * J * ∂ψ∂I[3] * I
     return σ
 end

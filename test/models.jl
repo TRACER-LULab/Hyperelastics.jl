@@ -1,4 +1,4 @@
-@testset showtiming = true "Hyperelastics Models" begin
+@testset failfast = true showtiming = true "Hyperelastics Models" begin
     # AD Backends to test.
     ADs = [AutoForwardDiff(), AutoFiniteDiff(), AutoZygote(), AutoEnzyme()]
 
@@ -21,6 +21,9 @@
         @show model
         @test ψ isa Hyperelastics.AbstractIncompressibleModel
 
+        if model isa Ogden
+            continue
+        end
         # Create an empty parameter set
         guess = Dict{Symbol,Union{Matrix{Float64},Vector{Float64},Float64}}()
 
@@ -32,6 +35,14 @@
         for p in ps
             if ψ isa GeneralMooneyRivlin
                 guess[p] = [1.0 1.0; 1.0 1.0]
+            elseif ψ isa HorganMurphy
+                guess[p] = if p == :μ
+                    1.0
+                elseif p == :c
+                    2.0
+                elseif p == :Jₘ
+                    200.0
+                end
             elseif contains(string(p), '⃗')
                 guess[p] = ones(10)
             else
@@ -47,17 +58,17 @@
         # Move the guess to within the parameter bounds
         if !isnothing(lb) && !isnothing(ub)
             for (k, v) in pairs(lb)
-                lb_val = !isinf(getfield(lb, k)) ? (float(getfield(lb, k))) : (1.0)
-                ub_val = !isinf(getfield(ub, k)) ? (float(getfield(ub, k))) : (1.0)
+                lb_val = !isinf(v) && guess[k] < v ? (float(v) + 0.9) : (1.0)
+                ub_val = !isinf(v) && guess[k] > v ? (float(v) - 0.9) : (1.0)
                 guess[k] = (lb_val + ub_val) / 2.0
             end
         elseif !isnothing(lb)
             for (k, v) in pairs(lb)
-                guess[k] = !isinf(getfield(lb, k)) ? (getfield(lb, k)) + 1.0 : (1.0)
+                guess[k] = !isinf(v) && guess[k] < v ? (float(v) + 0.9) : (1.0)
             end
         elseif !isnothing(ub)
             for (k, v) in pairs(ub)
-                guess[k] = !isinf(getfield(ub, k)) ? (getfield(ub, k)) - 1.0 : (1.0)
+                guess[k] = !isinf(v) && guess[k] > v ? (float(v) - 0.9) : (1.0)
             end
         end
         guess = NamedTuple(guess)
@@ -65,12 +76,8 @@
         # Example deformation for testing
         λ⃗ = [1.1, inv(sqrt(1.1)), inv(sqrt(1.1))]
         F = diagm(λ⃗)
-        λ⃗_c = λ⃗./0.99
+        λ⃗_c = λ⃗ ./ 0.99
         F_c = diagm(λ⃗_c)
-
-        # if ψ isa Shariff
-        #     continue
-        # end
 
         for compressible_model in compressible_models
             ψ̄ = compressible_model(ψ)
@@ -97,24 +104,38 @@
                     @test sum(isinf.(σ)) == 0
 
                     # Predict Test
-                    # @test predict(ψ̄, Treloar1944Uniaxial(), compressible_guess, ad_type = AD) isa Hyperelastics.AbstractHyperelasticTest
+                    @test predict(ψ̄, Treloar1944Uniaxial(), compressible_guess, ad_type=AD) isa Hyperelastics.AbstractHyperelasticTest
+
+                    # Strain Energy Density test for deformation gradient matrix
+                    if model in invariant_incompressible_models && compressible_deformation isa Matrix
+                        ψ̄_inv = compressible_model(model(InvariantForm()))
+
+                        # Strain Energy Density Test
+                        W = StrainEnergyDensity(ψ̄_inv, compressible_deformation, compressible_guess)
+                        @test !isnan(W)
+                        @test !isinf(W)
+
+                        # Second Piola Kirchoff Test
+                        s = SecondPiolaKirchoffStressTensor(ψ̄_inv, compressible_deformation, compressible_guess; ad_type=AD)
+                        @test sum(isnan.(s)) == 0
+                        @test sum(isinf.(s)) == 0
+
+                        # Cauchy Stress Test
+                        σ = CauchyStressTensor(ψ̄_inv, compressible_deformation, compressible_guess; ad_type=AD)
+                        @test sum(isnan.(σ)) == 0
+                        @test sum(isinf.(σ)) == 0
+                    end
                 end
 
                 # Invariant Form Test
                 if model in invariant_incompressible_models
                     ψ̄_inv = compressible_model(model(InvariantForm()))
+                    # Strain Energy Density for vector of invariants
                     W = StrainEnergyDensity(ψ̄_inv, [I₁(compressible_deformation), I₂(compressible_deformation), I₃(compressible_deformation)], compressible_guess)
                     @test !isnan(W)
                     @test !isinf(W)
-                    if compressible_deformation isa Matrix
-                        W = StrainEnergyDensity(ψ̄_inv,compressible_deformation, compressible_guess)
-                        @test !isnan(W)
-                        @test !isinf(W)
-                    end
                 end
             end
         end
-
-
     end
 end

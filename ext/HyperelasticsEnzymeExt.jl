@@ -5,7 +5,7 @@ using Enzyme
 using Hyperelastics
 using LinearAlgebra
 
-function Hyperelastics._SecondPiolaKirchoffStressTensor(ψ::Hyperelastics.AbstractHyperelasticModel, λ⃗::Vector{T}, p, ad_type::AutoEnzyme; mode=Forward, kwargs...) where {T}
+function Hyperelastics.∂ψ(ψ::Hyperelastics.AbstractHyperelasticModel, λ⃗::Vector{T}, p, ad_type::AutoEnzyme; mode=Forward, kwargs...) where {T}
     W(λ⃗) = StrainEnergyDensity(ψ, λ⃗, p)
     ∂W∂λ = collect(gradient(mode, W, λ⃗, kwargs...))
     return ∂W∂λ

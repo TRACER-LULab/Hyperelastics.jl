@@ -29,13 +29,6 @@ function SussmanBathe(data::HyperelasticUniaxialTest; interpolant=CubicSpline, k
     SussmanBathe{typeof(k),typeof(σ̂)}(w′, data, k, σ̂)
 end
 
-function Base.show(io::IO, ψ::SussmanBathe)
-    Base.show(io, "Sussman-Bathe Model")
-    Base.show(io, "\t Data = $(ψ.test.name)")
-    Base.show(io, "\t k = $(ψ.k)")
-    Base.show(io, "\t interpolant = $(ψ.itp)")
-end
-
 NonlinearContinua.StrainEnergyDensity(ψ::SussmanBathe, λ⃗::Vector{T}, p) where {T} = sum(x -> quadgk(ψ.w′, 1.0, x)[1], λ⃗)
 
 function NonlinearContinua.StrainEnergyDensity(ψ::SussmanBathe, F::Matrix{T}, p)  where {T}

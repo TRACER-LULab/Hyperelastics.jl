@@ -104,10 +104,34 @@ function NonlinearContinua.StrainEnergyDensity(ψ::GeneralCompressible{T}, F::Ma
     StrainEnergyDensity(ψ.incompressible, [I₁(F̄), I₂(F̄), I₃(F̄)], p.ψ; kwargs...) + p.κ / 2 * (J - 1)^2
 end
 
-## Print Statement
-function Base.show(io::IO, ψ::GeneralCompressible)
-    println(io, "Incompressible Model: W=", ψ.incompressible)
-    println(io, "Compressible Model: W=", "κ*(J-1)")
+function NonlinearContinua.SecondPiolaKirchoffStressTensor(ψ::GeneralCompressible{T}, F::Matrix{S}, p; kwargs...) where {T<:InvariantForm,S}
+    J = det(F)
+    F̄ = F ./ cbrt(J)
+
+    # Deviatoric Portion
+    s_dev = SecondPiolaKirchoffStressTensor(ψ.incompressible, F̄, p.ψ; kwargs...)
+
+    # Hydrostatic Portion
+    ∂ψ∂I₃ = p.κ / 2 * (1 - inv(J))
+    s_vol = 2 * J^2 * ∂ψ∂I₃ * inv(F)
+
+    # Total Stress
+    return s_dev .+ s_vol
+end
+
+function NonlinearContinua.CauchyStressTensor(ψ::GeneralCompressible{T}, F::Matrix{S}, p; kwargs...) where {T<:InvariantForm,S}
+    J = det(F)
+    F̄ = F ./ cbrt(J)
+
+    # Deviatoric Portion
+    σ_dev = CauchyStressTensor(ψ.incompressible, F̄, p.ψ; kwargs...)
+
+    # Hydrostatic Portion
+    ∂ψ∂I₃ = p.κ / 2 * (1 - inv(J))
+    σ_vol = 2*J*∂ψ∂I₃*I
+
+    # Total Stress
+    return σ_dev + σ_vol
 end
 
 """
@@ -212,9 +236,23 @@ end
 function NonlinearContinua.StrainEnergyDensity(ψ::LogarithmicCompressible{T}, F::Matrix{S}, p) where {T<:InvariantForm,S}
     J = det(F)
     F̄ = F ./ cbrt(J)
-    StrainEnergyDensity(ψ.incompressible, [I₁(F̄), I₂(F̄), I₃(F̄)], p.ψ) + p.κ * (J * log(J) - J)
+    StrainEnergyDensity(ψ.incompressible, F̄, p.ψ) + p.κ * (J * log(J) - J)
 end
-function Base.show(io::IO, ψ::LogarithmicCompressible)
-    println(io, "Incompressible Model: \n \t W = ", ψ.incompressible)
-    println(io, "Compressible Model: \n\t W = ", "kappa*(J*log(J)-J)")
+
+function NonlinearContinua.SecondPiolaKirchoffStressTensor(ψ::LogarithmicCompressible{T}, F::Matrix{S}, p; kwargs...) where {T<:InvariantForm,S}
+    J = det(F)
+    F̄ = F ./ cbrt(J)
+    s_dev = SecondPiolaKirchoffStressTensor(ψ.incompressible, F̄, p.ψ; kwargs...)
+    ∂ψ∂I3 = p.κ*log(J^2)/(4*J)
+    s_vol = 2*J^2*∂ψ∂I3*inv(F)
+    return s_dev + s_vol
+end
+
+function NonlinearContinua.CauchyStressTensor(ψ::LogarithmicCompressible{T}, F::Matrix{S}, p; kwargs...) where {T<:InvariantForm,S}
+    J = det(F)
+    F̄ = F ./ cbrt(J)
+    σ_dev = CauchyStressTensor(ψ.incompressible, F̄, p.ψ; kwargs...)
+    ∂ψ∂I3 = p.κ*log(J^2)/(4*J)
+    σ_vol = 2*J*∂ψ∂I3*I
+    return σ_dev + σ_vol
 end

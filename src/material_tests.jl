@@ -43,17 +43,6 @@ struct HyperelasticUniaxialTest{T,S} <: AbstractHyperelasticTest{T,S}
     end
 end
 
-function Base.show(io::IO, test::HyperelasticUniaxialTest)
-    print(io, Term.RenderableText("Uniaxial Test: {bold} $(test.name)"))
-    print(io,
-        Term.Table(
-            hcat(getindex.(test.data.λ, 1), getindex.(test.data.s, 1)),
-            header=["λ₁", "s₁"],
-            box=:ROUNDED,
-        )
-    )
-end
-
 """
 `HyperelasticBiaxialTest(λ₁, λ₂, s₁, s₂; name, incompressible=true)`
 `HyperelasticBiaxialTest(λ₁, λ₂; name, incompressible=true)`
@@ -100,17 +89,6 @@ struct HyperelasticBiaxialTest{T,S} <: AbstractHyperelasticTest{T,S}
     end
 end
 
-function Base.show(io::IO, test::HyperelasticBiaxialTest)
-    print(io, Term.RenderableText("Biaxial Test: {bold} $(test.name)"))
-    print(io,
-        Term.Table(
-            hcat(getindex.(test.data.λ, 1), getindex.(test.data.λ, 2), getindex.(test.data.s, 1), getindex.(test.data.s, 2)),
-            header=["λ₁", "λ₂", "s₁", "s₂"],
-            box=:ROUNDED,
-        )
-    )
-end
-
 ## Predict overloads
 function NonlinearContinua.predict(ψ::AbstractHyperelasticModel{A}, test::HyperelasticUniaxialTest{B,C}, p; kwargs...) where {A, B, C}
     f(λ) = SecondPiolaKirchoffStressTensor(ψ, λ, p; kwargs...)
@@ -125,7 +103,7 @@ function NonlinearContinua.predict(ψ::AbstractHyperelasticModel{A}, test::Hyper
     return pred
 end
 
-function NonlinearContinua.predict(ψ::AbstractHyperelasticModel{A}, test::HyperelasticBiaxialTest{B,C}, p, adtype; kwargs...) where {A, B, C}
+function NonlinearContinua.predict(ψ::AbstractHyperelasticModel{A}, test::HyperelasticBiaxialTest{B,C}, p; kwargs...) where {A, B, C}
     f(λ) = SecondPiolaKirchoffStressTensor(ψ, λ, p; kwargs...)
     λ = test.data.λ
     s = map(f, λ)

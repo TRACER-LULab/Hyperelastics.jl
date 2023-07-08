@@ -32,12 +32,6 @@ function DataDrivenAverageChainBehavior(data::HyperelasticUniaxialTest; fchain=f
     DataDrivenAverageChainBehavior{typeof(data.name),typeof(fch)}(data.name, fch)
 end
 
-function Base.show(io::IO, ψ::DataDrivenAverageChainBehavior)
-    Base.println(io, "DataDrivenAverageChainBehavior")
-    Base.println(io, "\t Test Name: $(ψ.data)")
-    Base.println(io, "\t Interpolant: $(ψ.fchain)")
-end
-
 function NonlinearContinua.StrainEnergyDensity(ψ::DataDrivenAverageChainBehavior, λ⃗::Vector, p)
     λchain = sqrt(I₁(λ⃗) / 3)
     W = ψ.fchain(λchain) / 2 * I₁(λ⃗)

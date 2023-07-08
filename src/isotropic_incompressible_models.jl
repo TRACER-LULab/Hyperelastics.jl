@@ -59,7 +59,6 @@ end
 
 function parameter_bounds(::ArrudaBoyce, data::AbstractHyperelasticTest)
     I₁_max = maximum(I₁.(data.data.λ))
-    N_max = 11 / 35 * I₁_max # old
     N_max = I₁_max / 3
     lb = (μ=-Inf, N=N_max)
     ub = nothing
@@ -104,7 +103,7 @@ end
 
 function parameter_bounds(::ABGI, data::AbstractHyperelasticTest)
     I₁_max = maximum(I₁.(data.data.λ))
-    lb = (μ=-Inf, N=11 / 35 * I₁_max, Ge=-Inf, n=0)
+    lb = (μ=-Inf, N=11 / 35 * I₁_max, Ge=-Inf, n=0.0)
     ub = nothing
     return (lb=lb, ub=ub)
 end
@@ -197,15 +196,11 @@ Parameters:
 > Alexander H. A constitutive relation for rubber-like materials. International Journal of Engineering Science. 1968 Sep 1;6(9):549-63.
 """
 struct Alexander{T} <: AbstractIncompressibleModel{T}
-    Alexander(::T=PrincipalValueForm()) where {T<:Union{InvariantForm, PrincipalValueForm}}= new{T}()
+    Alexander(::T=PrincipalValueForm()) where {T<:PrincipalValueForm}= new{T}()
 end
 
 function NonlinearContinua.StrainEnergyDensity(::Alexander{T}, λ⃗::Vector{S}, (; μ, C₁, C₂, C₃, k, γ)) where {T<:PrincipalValueForm,S}
     return μ / 3 * (C₁ * √π * erfi(√k * (I₁(λ⃗) - 3)) / 2 / √k + C₂ * log((I₂(λ⃗) - 3 + γ) / γ) + C₃ * (I₂(λ⃗) - 3))
-end
-
-function NonlinearContinua.StrainEnergyDensity(::Alexander{T}, I⃗::Vector{S}, (; μ, C₁, C₂, C₃, k, γ)) where {T<:InvariantForm, S}
-    return μ / 3 * (C₁ * √π * erfi(√k * (I⃗[1] - 3)) / 2 / √k + C₂ * log((I⃗[2] - 3 + γ) / γ) + C₃ * (I⃗[2] - 3))
 end
 
 function NonlinearContinua.SecondPiolaKirchoffStressTensor(::Alexander{T}, λ⃗::Vector{S}, (; μ, C₁, C₂, C₃, k, γ); kwargs...) where {T<:PrincipalValueForm,S }
@@ -213,12 +208,6 @@ function NonlinearContinua.SecondPiolaKirchoffStressTensor(::Alexander{T}, λ⃗
     I2 = I₂(λ⃗)
     s = @. μ / 3 * ((3 * λ⃗^2 - I1) * C₁ * exp(k * (I1 - 3)^2) + (I2 - 3 * λ⃗^2) * (C₂ / (I2 - 3 + γ) + C₃))
     return s
-end
-
-function NonlinearContinua.CauchyStressTensor(ψ::Alexander{T}, λ⃗::Vector{S}, p; kwargs...) where {T<:PrincipalValueForm,S}
-    s = SecondPiolaKirchoffStressTensor(ψ, λ⃗, p; kwargs... )
-    σ = s .* λ⃗
-    return σ
 end
 
 parameters(::Alexander) = (:μ, :C₁, :C₂, :C₃, :k, :γ)
@@ -1295,7 +1284,7 @@ Note:
 struct ChevalierMarco{T} <: AbstractIncompressibleModel{T}
     ∂W∂I1::Function
     ∂W∂I2::Function
-    function ChevalierMarco(::T=PrincipalValueForm()) where {T<:Union{InvariantForm,PrincipalValueForm}}
+    function ChevalierMarco(::T=PrincipalValueForm()) where {T<:Union{PrincipalValueForm}}
         function ∂W∂I1(I₁, a⃗)
             L_a = size(a⃗,1)
             return exp(sum(@. a⃗ * (I₁ - 3)^(1:L_a)))
@@ -1314,11 +1303,11 @@ function NonlinearContinua.StrainEnergyDensity(W::ChevalierMarco{T}, λ⃗::Vect
     return quadgk(Base.Fix2(W.∂W∂I1, a⃗), 3, I₁(λ⃗))[1] + quadgk(Base.Fix2(W.∂W∂I2, b⃗), 3, I₂(λ⃗))[1]
 end
 
-function NonlinearContinua.StrainEnergyDensity(W::ChevalierMarco{T}, I⃗::Vector{S}, (; a⃗, b⃗)) where {T<:InvariantForm, S}
-    # ∂W∂I1(I₁) = exp(sum(@tullio _ := a⃗[i] * (I₁ - 3)^(i - 1)))
-    # ∂W∂I2(I₂) = @tullio _ := b⃗[i] / I₂^(i - 1)
-    return quadgk(Base.Fix2(W.∂W∂I1,a⃗), 3, I⃗[1])[1] + quadgk(Base.Fix2(W.∂W∂I2,b⃗), 3, I⃗[2])[1]
-end
+# function NonlinearContinua.StrainEnergyDensity(W::ChevalierMarco{T}, I⃗::Vector{S}, (; a⃗, b⃗)) where {T<:InvariantForm, S}
+#     # ∂W∂I1(I₁) = exp(sum(@tullio _ := a⃗[i] * (I₁ - 3)^(i - 1)))
+#     # ∂W∂I2(I₂) = @tullio _ := b⃗[i] / I₂^(i - 1)
+#     return quadgk(Base.Fix2(W.∂W∂I1,a⃗), 3, I⃗[1])[1] + quadgk(Base.Fix2(W.∂W∂I2,b⃗), 3, I⃗[2])[1]
+# end
 
 function NonlinearContinua.SecondPiolaKirchoffStressTensor(W::ChevalierMarco{T}, λ⃗::Vector{S}, (; a⃗, b⃗);kwargs...) where {T<:PrincipalValueForm, S}
     𝐒 = 2 * (I(3) * W.∂W∂I1(I₁(λ⃗), a⃗) - diagm(λ⃗ .^ 2)^(-2) * W.∂W∂I2(I₂(λ⃗), b⃗))
@@ -1378,10 +1367,35 @@ function NonlinearContinua.CauchyStressTensor(::GornetDesmorat{T}, λ⃗::Vector
 end
 
 function NonlinearContinua.SecondPiolaKirchoffStressTensor(ψ::GornetDesmorat{T}, λ⃗::Vector{S}, ps; kwargs...) where {T<:PrincipalValueForm, S}
-    σ = CauchyStressTensor(ψ, λ⃗, ps)
+    σ = CauchyStressTensor(ψ, λ⃗, ps; kwargs...)
     s = σ ./ λ⃗
     return s
 end
+
+function NonlinearContinua.SecondPiolaKirchoffStressTensor(ψ::GornetDesmorat{T}, F::Matrix{R}, (; h₁, h₂, h₃); ad_type=nothing, kwargs...) where {T<:InvariantForm,R}
+    I1 = I₁(F)
+    I2 = I₂(F)
+    I3 = I₃(F)
+    ∂W∂I₁ = h₁ * exp(h₃ * (I1 - 3)^2)
+    ∂W∂I₂ = 3 * h₂ * exp(1 / sqrt(I2))
+    ∂ψ∂I = [∂W∂I₁, ∂W∂I₂, 0.0]
+    S = 2∂ψ∂I[1] * F' + 2∂ψ∂I[2] * (I1 * F' + F' * F * F') + 2I3 * ∂ψ∂I[3] * inv(F)
+    return S
+end
+
+function NonlinearContinua.CauchyStressTensor(ψ::GornetDesmorat{T}, F::Matrix{S}, (; h₁, h₂, h₃); ad_type, kwargs...) where {T<:InvariantForm,S}
+    I1 = I₁(F)
+    I2 = I₂(F)
+    I3 = I₃(F)
+    J = sqrt(I3)
+    ∂W∂I₁ = h₁ * exp(h₃ * (I1 - 3)^2)
+    ∂W∂I₂ = 3 * h₂ * exp(1 / sqrt(I2))
+    ∂ψ∂I = [∂W∂I₁, ∂W∂I₂, 0.0]
+    B = F * F'
+    σ = 2 * inv(J) * (∂ψ∂I[1] + I1 * ∂ψ∂I[2]) * B - 2 * inv(J) * ∂ψ∂I[2] * B^2 + 2 * J * ∂ψ∂I[3] * I
+    return σ
+end
+
 
 function parameters(::GornetDesmorat)
     return (:h₁, :h₂, :h₃)
@@ -1512,6 +1526,36 @@ function NonlinearContinua.CauchyStressTensor(ψ::LambertDianiRey{T}, λ⃗::Vec
     σᵢ = λ⃗ .* s
     return σᵢ
 end
+
+function NonlinearContinua.SecondPiolaKirchoffStressTensor(::LambertDianiRey{T}, F::Matrix{R}, p; kwargs...) where {T<:InvariantForm,R}
+    (; a⃗, b⃗) = p
+    I⃗ = [I₁(F), I₂(F), I₃(F)]
+    length_a = length(a⃗)
+    length_b = length(b⃗)
+    ∂W∂I₁ = exp(sum(@. a⃗ * (I⃗[1] - 3)^(1:length_a)))
+    ∂W∂I₂ = exp(sum(@. b⃗ * (I⃗[2] - 3)^(1:length_b)))
+    ∂W∂I₃ = zero(eltype(I⃗))
+    ∂ψ∂I = [∂W∂I₁, ∂W∂I₂, ∂W∂I₃]
+    S = 2∂ψ∂I[1] * F' + 2∂ψ∂I[2] * (I⃗[1] * F' + F' * F * F') + 2*I⃗[3] * ∂ψ∂I[3] * inv(F)
+    return S
+end
+
+function NonlinearContinua.CauchyStressTensor(ψ::LambertDianiRey{T}, F::Matrix{S}, p; kwargs...) where {T<:InvariantForm,S}
+    (; a⃗, b⃗) = p
+    I⃗ = [I₁(F), I₂(F), I₃(F)]
+    J = sqrt(I₃(F))
+    B = F * F'
+    (; a⃗, b⃗) = p
+    length_a = length(a⃗)
+    length_b = length(b⃗)
+    ∂W∂I₁ = exp(sum(@. a⃗ * (I⃗[1] - 3)^(1:length_a)))
+    ∂W∂I₂ = exp(sum(@. b⃗ * (I⃗[2] - 3)^(1:length_b)))
+    ∂W∂I₃ = zero(eltype(I⃗))
+    ∂ψ∂I = [∂W∂I₁, ∂W∂I₂, ∂W∂I₃]
+    σ = 2 * inv(J) * (∂ψ∂I[1] + I⃗[1] * ∂ψ∂I[2]) * B - 2 * inv(J) * ∂ψ∂I[2] * B^2 + 2 * sqrt(I⃗[3]) * ∂ψ∂I[3] * I
+    return σ
+end
+
 
 function parameters(::LambertDianiRey)
     return (:a⃗, :b⃗)
@@ -2045,9 +2089,8 @@ struct Ogden{T} <: AbstractIncompressibleModel{T}
 end
 
 function NonlinearContinua.StrainEnergyDensity(::Ogden{T}, λ⃗::Vector{S}, (; μ⃗, α⃗)) where {T,S}
-    λ_a = sum.(broadcast(Base.Fix1(.^, λ⃗), α⃗))
+    λ_a = λ⃗[1] .^ α⃗ + λ⃗[2] .^ α⃗ + λ⃗[3] .^ α⃗
     return sum(@. μ⃗/α⃗*(λ_a - 3))
-    # @tullio _ := μ⃗[i] / α⃗[i] * (sum(λ⃗ .^ α⃗[i]) - 3)
 end
 
 function parameters(::Ogden)
@@ -2598,41 +2641,36 @@ struct NonaffineMicroSphere{T} <: AbstractIncompressibleModel{T}
     r⃗²::Vector{Vector{Float64}}
     w::Vector{Float64}
     function NonaffineMicroSphere(::T=PrincipalValueForm(); ℒinv::Function=CohenRounded3_2, n=21) where T<: PrincipalValueForm
-        if n == 21
-            a = √(2) / 2
-            b = 0.836095596749
-            c = 0.387907304067
-            r⃗² = [
-                [0, 0, 1].^2,
-                [0, 1, 0].^2,
-                [1, 0, 0].^2,
-                [0, a, a].^2,
-                [0, -a, a].^2,
-                [a, 0, a].^2,
-                [-a, 0, a].^2,
-                [a, a, 0].^2,
-                [-a, a, 0].^2,
-                [b, c, c].^2,
-                [-b, c, c].^2,
-                [b, -c, c].^2,
-                [-b, -c, c].^2,
-                [c, b, c].^2,
-                [-c, b, c].^2,
-                [c, -b, c].^2,
-                [-c, -b, c].^2,
-                [c, c, b].^2,
-                [-c, c, b].^2,
-                [c, -c, b].^2,
-                [-c, -c, b].^2,
-            ]
-            w1 = 0.02652142440932
-            w2 = 0.0199301476312
-            w3 = 0.0250712367487
-
-            w = 2 .* [fill(w1, 3); fill(w2, 6); fill(w3, 12)] # Multiply by two since integration is over the half-sphere
-        else
-            @error "Method not implemented for n = $(n)"
-        end
+        a = √(2) / 2
+        b = 0.836095596749
+        c = 0.387907304067
+        r⃗² = [
+            [0, 0, 1].^2,
+            [0, 1, 0].^2,
+            [1, 0, 0].^2,
+            [0, a, a].^2,
+            [0, -a, a].^2,
+            [a, 0, a].^2,
+            [-a, 0, a].^2,
+            [a, a, 0].^2,
+            [-a, a, 0].^2,
+            [b, c, c].^2,
+            [-b, c, c].^2,
+            [b, -c, c].^2,
+            [-b, -c, c].^2,
+            [c, b, c].^2,
+            [-c, b, c].^2,
+            [c, -b, c].^2,
+            [-c, -b, c].^2,
+            [c, c, b].^2,
+            [-c, c, b].^2,
+            [c, -c, b].^2,
+            [-c, -c, b].^2,
+        ]
+        w1 = 0.02652142440932
+        w2 = 0.0199301476312
+        w3 = 0.0250712367487
+        w = 2 .* [fill(w1, 3); fill(w2, 6); fill(w3, 12)] # Multiply by two since integration is over the half-sphere
         new{T}(ℒinv, r⃗², w)
     end
 end
@@ -2704,7 +2742,6 @@ Fields:
 struct Bootstrapped8Chain{T} <: AbstractIncompressibleModel{T}
     ℒinv::Function
     W8::Function
-    ExtendedTubeModel() = new{T}()
     function Bootstrapped8Chain(::T=PrincipalValueForm(); ℒinv::Function=TreloarApproximation) where {T<:PrincipalValueForm}
         function W8(x, (; μ, N))
             β = ℒinv(x)
@@ -2792,14 +2829,14 @@ function NonlinearContinua.StrainEnergyDensity(::KhiemItskov{T}, λ⃗::Vector{S
     I1 = I₁(λ⃗)
     num = (sin(π / sqrt(n)) * (I1 / 3)^(q / 2))
     denom = (sin(π / sqrt(n) * (I1 / 3)^(q / 2)))
-    @assert num ≥ denom "Parameters are not feasible"
+    # @assert num ≥ denom "Parameters are not feasible"
     return μcκ * n * log(num / denom) + μt * ((I₂(λ⃗) / 3)^(1 / 2) - 1)
 end
 
 function NonlinearContinua.StrainEnergyDensity(::KhiemItskov{T}, I⃗::Vector{S}, (; μcκ, n, q, μt)) where {T<:InvariantForm, S}
     num = (sin(π / sqrt(n)) * (I⃗[1] / 3)^(q / 2))
     denom = (sin(π / sqrt(n) * (I⃗[1] / 3)^(q / 2)))
-    @assert num ≥ denom "Parameters are not feasible"
+    # @assert num ≥ denom "Parameters are not feasible: $((μcκ, n, q, μt))"
     return μcκ * n * log(num / denom) + μt * ((I⃗[2] / 3)^(1 / 2) - 1)
 end
 
@@ -3161,7 +3198,8 @@ function parameters(::AnsarriBenam)
 end
 
 function parameter_bounds(::AnsarriBenam, test::AbstractHyperelasticTest)
-    lb = (μ = -Inf, N = 1, C₂ = -Inf, γ=-Inf)
+    N_min = maximum(I₁, test.data.λ)
+    lb = (μ=-Inf, N=N_min, C₂=-Inf, γ=-Inf)
     ub = nothing
     return (lb = lb, ub = ub)
 end
