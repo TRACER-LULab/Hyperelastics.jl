@@ -1711,9 +1711,16 @@ struct VanDerWaals{T} <: AbstractIncompressibleModel{T}
 end
 
 function NonlinearContinua.StrainEnergyDensity(::VanDerWaals{T}, λ⃗::Vector{S}, (; μ, λm, β, α)) where {T<:PrincipalValueForm, S}
+    # I = β * I₁(λ⃗) + (1 - β) * I₂(λ⃗)
+    # θ = (I - 3) / (λm^2 - 3)
+
     I = β * I₁(λ⃗) + (1 - β) * I₂(λ⃗)
-    θ = (I - 3) / (λm^2 - 3)
-    return μ * (-(λm^2 - 3) * log(1 - θ) + θ) - 2 / 3 * α * ((I - 3) / 2)^(3 / 2)
+    θ = sqrt((I - 3) / (λm^2 - 3))
+    @show θ
+    W = -μ * ((λm^2 - 3) * log(1 - θ) + θ) - (2 * α / 3) * sqrt((I - 3) / 2)^3
+    return W
+
+    # return μ * (-(λm^2 - 3) * log(1 - θ) + θ) - 2 / 3 * α * ((I - 3) / 2)^(3 / 2)
 end
 
 function NonlinearContinua.StrainEnergyDensity(::VanDerWaals{T}, I⃗::Vector{S}, (; μ, λm, β, α)) where {T<:InvariantForm, S}
@@ -1723,7 +1730,12 @@ function NonlinearContinua.StrainEnergyDensity(::VanDerWaals{T}, I⃗::Vector{S}
 end
 
 function parameter_bounds(::VanDerWaals, data::AbstractHyperelasticTest)
-    lb = (μ=0.0, λm=sqrt(3), β=0.0, α=0.0)
+    _I2 = data.data.λ .|> I₂
+    _I1 = data.data.λ .|> I₁
+    # @show minimum(@. _I1 - _I2)
+    β_min = maximum(@. (3 - _I2) / (_I1 - _I2))
+    # @show β_min
+    lb = (μ=0.0, λm=sqrt(3), β=β_min, α=0.0)
     ub = (μ=Inf, λm=Inf, β=1.0, α=Inf)
     return (ub=ub, lb=lb)
 end
@@ -1933,7 +1945,7 @@ function parameter_bounds(::HorganSaccomandi, data::AbstractHyperelasticTest)
     _I1 = @. I₁(data.data.λ)
     _I2 = @. I₂(data.data.λ)
 
-    Js = @. 1 / 6 * (2 * _I1 + (2 * 2^(1 / 3) * (_I1^2 - 3 * _I2)) / (27 + 2 * _I1^3 - 9 * _I1 * _I2)^(1 / 3) + 2^(2 / 3) * (27 + 2 * (_I1^3) - 9 * _I1 * _I2)^(1 / 3))
+    Js = @. 1 / 6 * (2 * _I1 + (2 * (2^(1 / 3)) * (_I1^2 - 3 * _I2)) / cbrt(27 + 2 * (_I1^3) - 9 * _I1 * _I2) + 2^(2 / 3) * cbrt(27 + 2 * (_I1^3) - 9 * _I1 * _I2))
 
     J_min = maximum(Js[(!isnan).(Js)])
 

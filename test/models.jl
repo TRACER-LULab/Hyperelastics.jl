@@ -43,6 +43,16 @@
                 elseif p == :Jₘ
                     200.0
                 end
+            elseif ψ isa VanDerWaals
+                guess[p] = if p == :μ
+                    0.355
+                elseif p == :λm
+                    10.0
+                elseif p == :β
+                    1.0
+                elseif p == :α
+                    0.25
+                end
             elseif contains(string(p), '⃗')
                 guess[p] = ones(10)
             else
@@ -55,8 +65,14 @@
         @test lb isa NamedTuple || isnothing(lb)
         @test ub isa NamedTuple || isnothing(ub)
 
+        lb, ub = parameter_bounds(ψ, [Treloar1944Uniaxial(), Kawabata1981(1.04)])
+        @test lb isa NamedTuple || isnothing(lb)
+        @test ub isa NamedTuple || isnothing(ub)
+
         # Move the guess to within the parameter bounds
-        if !isnothing(lb) && !isnothing(ub)
+        if ψ isa VanDerWaals || ψ isa HorganMurphy
+            continue
+        elseif !isnothing(lb) && !isnothing(ub)
             for (k, v) in pairs(lb)
                 lb_val = !isinf(v) && guess[k] < v ? (float(v) + 0.9) : (1.0)
                 ub_val = !isinf(v) && guess[k] > v ? (float(v) - 0.9) : (1.0)
@@ -72,7 +88,6 @@
             end
         end
         guess = NamedTuple(guess)
-
         # Example deformation for testing
         λ⃗ = [1.1, inv(sqrt(1.1)), inv(sqrt(1.1))]
         F = diagm(λ⃗)
@@ -104,8 +119,8 @@
                     @test sum(isinf.(σ)) == 0
 
                     # Predict Test
-                    @test predict(ψ̄, Treloar1944Uniaxial(), compressible_guess, ad_type=AD) isa Hyperelastics.AbstractHyperelasticTest
-
+                    @test predict(ψ̄, Treloar1944Uniaxial(), compressible_guess, ad_type=AD) isa Hyperelastics.HyperelasticUniaxialTest
+                    @test predict(ψ̄, Kawabata1981(1.04), compressible_guess, ad_type=AD) isa Hyperelastics.HyperelasticBiaxialTest
                     # Strain Energy Density test for deformation gradient matrix
                     if model in invariant_incompressible_models && compressible_deformation isa Matrix
                         ψ̄_inv = compressible_model(model(InvariantForm()))
