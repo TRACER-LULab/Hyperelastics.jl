@@ -9,12 +9,12 @@ Fields:
 - `λ⃗`: Vector of principal stretches
 - `p`: Model parameters
 """
-function NonlinearContinua.StrainEnergyDensity(ψ::AbstractHyperelasticModel, λ⃗::Vector{T}, p) where {T}
-    @error "$(typeof(ψ)) does not have a Strain Energy Density implemented"
+function NonlinearContinua.StrainEnergyDensity(ψ::AbstractHyperelasticModel{T}, ::Vector{R}, p) where {T, R}
+    return throw(ArgumentError("$(typeof(ψ)) does not have a Strain Energy Density implemented"))
 end
 
 function NonlinearContinua.StrainEnergyDensity(ψ::AbstractHyperelasticModel{T}, ::Vector{R}, p) where {T<:InvariantForm,R}
-    @error "$(typeof(ψ)) does not have a stretch Invariant Form of Strain Energy Density implemented"
+    return throw(ArgumentError("$(typeof(ψ)) does not have a stretch Invariant Form of Strain Energy Density implemented"))
 end
 
 """
@@ -84,12 +84,12 @@ function NonlinearContinua.SecondPiolaKirchoffStressTensor(ψ::AbstractIncompres
 end
 
 function ∂ψ(ψ, λ⃗, p, ad_type; kwargs...)
-    @error "Please load a support derivative backend:
+    return throw(ArgumentError("Please load a support derivative backend:
             1. ForwardDiff.jl
             2. Zygote.jl
             3. Enzyme.jl
             4. FiniteDiff.jl
-            5. Or define a custom method for the material model"
+            5. Or define a custom method for the material model"))
 end
 
 """

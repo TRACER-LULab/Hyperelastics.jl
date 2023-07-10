@@ -7,7 +7,8 @@ Fields
 - `ψ`: Hyperelastics model
 """
 function parameters(ψ::AbstractHyperelasticModel)
-    @error "$(typeof(ψ)) does not have a parameters function implemented"
+    # @error "$(typeof(ψ)) does not have a parameters function implemented"
+    return throw(ArgumentError("$(typeof(ψ)) does not have a parameters function implemented"))
 end
 
 """
@@ -46,9 +47,9 @@ function parameter_bounds(ψ::AbstractHyperelasticModel, tests::Vector{<:Abstrac
     return (lb=lb, ub=ub)
 end
 
-"""
-Returns a constraint equation for models were parameters bounds are interdependent
-"""
-function constraints(ψ::AbstractHyperelasticModel, data::AbstractHyperelasticTest)
-    return nothing
-end
+# """
+# Returns a constraint equation for models were parameters bounds are interdependent
+# """
+# function constraints(ψ::AbstractHyperelasticModel, data::AbstractHyperelasticTest)
+#     return nothing
+# end

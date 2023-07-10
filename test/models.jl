@@ -71,7 +71,7 @@
 
         # Move the guess to within the parameter bounds
         if ψ isa VanDerWaals || ψ isa HorganMurphy
-            continue
+            nothing
         elseif !isnothing(lb) && !isnothing(ub)
             for (k, v) in pairs(lb)
                 lb_val = !isinf(v) && guess[k] < v ? (float(v) + 0.9) : (1.0)
@@ -153,4 +153,16 @@
             end
         end
     end
+
+    # Test for unimplemented functions
+    struct TestModel{T} <: Hyperelastics.AbstractIncompressibleModel{T}
+        TestModel(::R=PrincipalValueForm()) where {R} = new{R}()
+    end
+    ψ = TestModel()
+    ψ_inv = TestModel(InvariantForm())
+    @test_throws ArgumentError parameters(ψ)
+    @test_throws ArgumentError StrainEnergyDensity(ψ, ones(3), ())
+    @test_throws ArgumentError StrainEnergyDensity(ψ_inv, ones(3), ())
+
+    @test_throws ArgumentError Hyperelastics.∂ψ(ψ, ones(3), (), nothing)
 end
