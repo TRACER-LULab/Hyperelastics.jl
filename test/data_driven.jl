@@ -10,17 +10,9 @@
     λ⃗ = [1.1, inv(sqrt(1.1)), inv(sqrt(1.1))]
     F = diagm(λ⃗)
 
-    for model in [SussmanBathe, DataDrivenAverageChainBehavior]#, MacroMicroMacro]
-        # if model == MacroMicroMacro
-        #     n1 = 100
-        #     p₀ = range(0.0, 0.7, length=n1) |> collect
-        #     λ_max = maximum(maximum.(map(x -> maximum.(x.data.λ), tests)))
-        #     λs = collect(range(0.001, 6.0, length=n1))
-        #     PChain(u) = BSplineApprox(u, λs, 3, 12, :Uniform, :Uniform)
-        #     ψ = model(data_biaxial, PChain, p₀)
-        # else
-            ψ = model(data_uniaxial)
-        # end
+    for model in [SussmanBathe, DataDrivenAverageChainBehavior]
+        @show model
+        ψ = model(data_uniaxial)
         for deformation in [λ⃗, F]
             W = StrainEnergyDensity(ψ, deformation, [])
             S = SecondPiolaKirchoffStressTensor(ψ, deformation, nothing)

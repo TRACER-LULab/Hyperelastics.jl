@@ -21,9 +21,6 @@
         @show model
         @test ψ isa Hyperelastics.AbstractIncompressibleModel
 
-        if model isa Ogden
-            continue
-        end
         # Create an empty parameter set
         guess = Dict{Symbol,Union{Matrix{Float64},Vector{Float64},Float64}}()
 

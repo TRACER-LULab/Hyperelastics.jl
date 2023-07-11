@@ -38,6 +38,7 @@ end
 
 NonlinearContinua.SecondPiolaKirchoffStressTensor(ψ::SussmanBathe, λ⃗::Vector{T}, p; kwargs...) where {T} = ψ.w′.(λ⃗)
 
+
 NonlinearContinua.CauchyStressTensor(ψ::SussmanBathe, λ⃗::Vector{T}, p; kwargs...) where {T} = ψ.w′.(λ⃗) .* λ⃗
 
 parameters(ψ::SussmanBathe) = ()

@@ -54,7 +54,7 @@ Fields:
 - `λ⃗`: Vector of principal stretches
 - `p`: Model parameters
 """
-function NonlinearContinua.SecondPiolaKirchoffStressTensor(ψ::AbstractIncompressibleModel{T}, λ⃗::Vector{R}, p; ad_type=nothing, kwargs...) where {T<:PrincipalValueForm,R}
+function NonlinearContinua.SecondPiolaKirchoffStressTensor(ψ::AbstractHyperelasticModel{T}, λ⃗::Vector{R}, p; ad_type=nothing, kwargs...) where {T<:PrincipalValueForm,R}
     ∂ψ(ψ, λ⃗, p, ad_type; kwargs...)
 end
 
@@ -68,13 +68,13 @@ Fields:
 - `F`: Deformation gradient tensor
 - `p`: Model parameters
 """
-function NonlinearContinua.SecondPiolaKirchoffStressTensor(ψ::AbstractIncompressibleModel{T}, F::Matrix{R}, p; kwargs...) where {T<:PrincipalValueForm, R}
+function NonlinearContinua.SecondPiolaKirchoffStressTensor(ψ::AbstractHyperelasticModel{T}, F::Matrix{R}, p; kwargs...) where {T<:PrincipalValueForm,R}
     σ = CauchyStressTensor(ψ, F, p; kwargs...)
     S = sqrt(det(F' * F)) * inv(F) * σ
     return S
 end
 
-function NonlinearContinua.SecondPiolaKirchoffStressTensor(ψ::AbstractIncompressibleModel{T}, F::Matrix{R}, p; ad_type=nothing, kwargs...) where {T<:InvariantForm,R}
+function NonlinearContinua.SecondPiolaKirchoffStressTensor(ψ::AbstractHyperelasticModel{T}, F::Matrix{R}, p; ad_type=nothing, kwargs...) where {T<:InvariantForm,R}
     I1 = I₁(F)
     I2 = I₂(F)
     I3 = I₃(F)
@@ -103,8 +103,8 @@ Fields:
 - `p`: Model parameters
 - `adb`: Differentiation backend from `AbstractDifferentiation.jl`
     """
-function NonlinearContinua.CauchyStressTensor(ψ::Hyperelastics.AbstractIncompressibleModel, λ⃗::Vector{T}, p; kwargs...) where {T}
-    S = SecondPiolaKirchoffStressTensor(ψ, λ⃗::Vector{T}, p; kwargs...)
+function NonlinearContinua.CauchyStressTensor(ψ::Hyperelastics.AbstractHyperelasticModel{T}, λ⃗::Vector{R}, p; kwargs...) where {T<:PrincipalValueForm, R}
+    S = SecondPiolaKirchoffStressTensor(ψ, λ⃗::Vector{R}, p; kwargs...)
     σ = S .* λ⃗
     return σ
 end
@@ -120,7 +120,7 @@ Fields:
 - `p`: Model parameters
 - `adb`: Differentiation backend from `AbstractDifferentiation.jl`
 """
-function NonlinearContinua.CauchyStressTensor(ψ::Hyperelastics.AbstractIncompressibleModel{T}, F::Matrix{S}, p; kwargs...) where {T<:PrincipalValueForm, S}
+function NonlinearContinua.CauchyStressTensor(ψ::Hyperelastics.AbstractHyperelasticModel{T}, F::Matrix{S}, p; kwargs...) where {T<:PrincipalValueForm,S}
     B = F * F'
     a = eigvecs(B)'
     B_prin = Diagonal(a * B * a')
@@ -133,7 +133,7 @@ function NonlinearContinua.CauchyStressTensor(ψ::Hyperelastics.AbstractIncompre
     return σ
 end
 
-function NonlinearContinua.CauchyStressTensor(ψ::Hyperelastics.AbstractIncompressibleModel{T}, F::Matrix{S}, p; ad_type, kwargs...) where {T<:InvariantForm, S}
+function NonlinearContinua.CauchyStressTensor(ψ::Hyperelastics.AbstractHyperelasticModel{T}, F::Matrix{S}, p; ad_type, kwargs...) where {T<:InvariantForm,S}
     I1 = I₁(F)
     I2 = I₂(F)
     I3 = I₃(F)

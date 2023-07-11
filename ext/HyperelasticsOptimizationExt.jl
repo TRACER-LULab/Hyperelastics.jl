@@ -8,7 +8,9 @@ using Statistics
 using ADTypes
 using Optimization.SciMLBase
 
-export HyperelasticProblem
+export HyperelasticProblemc
+
+# include(joinpath(@__DIR__, "..", "src", "macro_micro_macro_model.jl"))
 
 Optimization.SciMLBase.@add_kwonly function HyperelasticProblem{iip}(
     f::OptimizationFunction{iip},
