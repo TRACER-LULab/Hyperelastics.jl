@@ -41,6 +41,7 @@ HyperelasticsPlotsExt = "Plots"
 HyperelasticsZygoteExt = "Zygote"
 
 [compat]
+Integrals = "3"
 julia = "1.9"
 
 [extras]
