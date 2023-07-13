@@ -42,6 +42,8 @@ HyperelasticsZygoteExt = "Zygote"
 
 [compat]
 Reexport = "1"
+ADTypes = "0.1"
+SpecialFunctions = "2"
 julia = "1.9"
 
 [extras]

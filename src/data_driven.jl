@@ -22,23 +22,41 @@ struct SussmanBathe{T,S} <: AbstractDataDrivenHyperelasticModel{PrincipalValueFo
     itp::S
 end
 
-function SussmanBathe(data::HyperelasticUniaxialTest; interpolant=CubicSpline, k::Integer=5)
-    σ̂ = interpolant(getindex.(data.data.s, 1) .* getindex.(data.data.λ, 1), getindex.(data.data.λ, 1))
+function SussmanBathe(
+    data::HyperelasticUniaxialTest;
+    interpolant = CubicSpline,
+    k::Integer = 5,
+)
+    σ̂ = interpolant(
+        getindex.(data.data.s, 1) .* getindex.(data.data.λ, 1),
+        getindex.(data.data.λ, 1),
+    )
     f(i, λ) = (σ̂(λ^((4.0)^(-i))) + σ̂(λ^(-0.5 * (4.0^(-i))))) / λ
     w′(λ) = sum(Base.Fix2(f, λ), 0:k)
     SussmanBathe{typeof(k),typeof(σ̂)}(w′, data, k, σ̂)
 end
 
-NonlinearContinua.StrainEnergyDensity(ψ::SussmanBathe, λ⃗::Vector{T}, p) where {T} = sum(x -> quadgk(ψ.w′, 1.0, x)[1], λ⃗)
+NonlinearContinua.StrainEnergyDensity(ψ::SussmanBathe, λ⃗::Vector{T}, p) where {T} =
+    sum(x -> quadgk(ψ.w′, 1.0, x)[1], λ⃗)
 
-function NonlinearContinua.StrainEnergyDensity(ψ::SussmanBathe, F::Matrix{T}, p)  where {T}
+function NonlinearContinua.StrainEnergyDensity(ψ::SussmanBathe, F::Matrix{T}, p) where {T}
     λ⃗ = eigvals(F)
     return StrainEnergyDensity(ψ, λ⃗, p)
 end
 
-NonlinearContinua.SecondPiolaKirchoffStressTensor(ψ::SussmanBathe, λ⃗::Vector{T}, p; kwargs...) where {T} = ψ.w′.(λ⃗)
+NonlinearContinua.SecondPiolaKirchoffStressTensor(
+    ψ::SussmanBathe,
+    λ⃗::Vector{T},
+    p;
+    kwargs...,
+) where {T} = ψ.w′.(λ⃗)
 
 
-NonlinearContinua.CauchyStressTensor(ψ::SussmanBathe, λ⃗::Vector{T}, p; kwargs...) where {T} = ψ.w′.(λ⃗) .* λ⃗
+NonlinearContinua.CauchyStressTensor(
+    ψ::SussmanBathe,
+    λ⃗::Vector{T},
+    p;
+    kwargs...,
+) where {T} = ψ.w′.(λ⃗) .* λ⃗
 
 parameters(ψ::SussmanBathe) = ()

@@ -23,8 +23,13 @@ Fields:
 function predict(ψ::AbstractMaterialModel, test::AbstractMaterialTest, ps)
     @error "Method not implemented for model $(typeof(ψ)) and test $(typeof(test))"
 end
-function predict(ψ::AbstractMaterialModel, tests::Vector{<:AbstractMaterialTest}, ps, args...)
-    f(test) = predict(ψ, test, ps,args...)
+function predict(
+    ψ::AbstractMaterialModel,
+    tests::Vector{<:AbstractMaterialTest},
+    ps,
+    args...,
+)
+    f(test) = predict(ψ, test, ps, args...)
     results = map(f, tests)
     return results
 end
@@ -38,7 +43,7 @@ Structure for storing the behavior of a material as it evolves in time. Design t
 struct MaterialHistory{T} <: AbstractMaterialState
     value::VectorOfArray
     time::Vector{T}
-    function MaterialHistory(value::Vector, time::T) where { T}
+    function MaterialHistory(value::Vector, time::T) where {T}
         new{T}(VectorOfArray([value]), [time])
     end
     function MaterialHistory(value::Matrix, time::T) where {T}
@@ -47,10 +52,7 @@ struct MaterialHistory{T} <: AbstractMaterialState
 end
 
 ## Energy Models
-for Model ∈ [
-    :StrainEnergyDensity,
-    :StrainEnergyDensity!,
-]
+for Model ∈ [:StrainEnergyDensity, :StrainEnergyDensity!]
     @eval export $Model
     @eval @inline function $Model(M::AbstractMaterialModel, S, P; kwargs...) end
 end
@@ -64,7 +66,7 @@ for Tensor ∈ [
     :CauchyStressTensor!,
 ]
     @eval export $Tensor
-    @eval @inline function $Tensor(M::AbstractMaterialModel, S, P, ;kwargs...) end
+    @eval @inline function $Tensor(M::AbstractMaterialModel, S, P, ; kwargs...) end
 end
 
 ## Deformation Tensors
@@ -81,29 +83,37 @@ for Tensor ∈ [
     :InverseLeftCauchyGreenDeformationTensor!,
 ]
     @eval export $Tensor
-    @eval @inline function $Tensor(M::AbstractMaterialModel, S::AbstractMaterialState, P;kwargs...) end
+    @eval @inline function $Tensor(
+        M::AbstractMaterialModel,
+        S::AbstractMaterialState,
+        P;
+        kwargs...,
+    ) end
 end
 
 
 ## Strain Tensors
-for Tensor ∈ [
-    :GreenStrainTensor,
-    :AlmansiStrainTensor,
-    :GreenStrainTensor!,
-    :AlmansiStrainTensor!,
-]
+for Tensor ∈
+    [:GreenStrainTensor, :AlmansiStrainTensor, :GreenStrainTensor!, :AlmansiStrainTensor!]
     @eval export $Tensor
-    @eval @inline function $Tensor(M::AbstractMaterialModel, S::AbstractMaterialState, P;kwargs...) end
+    @eval @inline function $Tensor(
+        M::AbstractMaterialModel,
+        S::AbstractMaterialState,
+        P;
+        kwargs...,
+    ) end
 end
 
 ## Time Dependent Tensors
 # Deformation
-for Tensor ∈ [
-    :VelocityGradientTensor,
-    :VelocityGradientTensor!,
-]
+for Tensor ∈ [:VelocityGradientTensor, :VelocityGradientTensor!]
     @eval export $Tensor
-    @eval @inline function $Tensor(M::AbstractMaterialModel, S::AbstractMaterialState, P; kwargs...) end
+    @eval @inline function $Tensor(
+        M::AbstractMaterialModel,
+        S::AbstractMaterialState,
+        P;
+        kwargs...,
+    ) end
 end
 
 ## Electric Field Tensors

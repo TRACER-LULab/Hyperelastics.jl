@@ -5,7 +5,13 @@ using Hyperelastics
 using LinearAlgebra
 using ADTypes
 
-function Hyperelastics.∂ψ(ψ::Hyperelastics.AbstractHyperelasticModel, λ⃗::Vector{R}, p, ad_type::AutoZygote; kwargs...) where {R}
+function Hyperelastics.∂ψ(
+    ψ::Hyperelastics.AbstractHyperelasticModel,
+    λ⃗::Vector{R},
+    p,
+    ad_type::AutoZygote;
+    kwargs...,
+) where {R}
     W(λ⃗) = StrainEnergyDensity(ψ, λ⃗, p)
     ∂W∂λ = gradient(W, λ⃗, kwargs...)[1]
     return ∂W∂λ
