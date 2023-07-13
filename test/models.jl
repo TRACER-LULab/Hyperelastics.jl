@@ -6,13 +6,16 @@
     usemodel(model) = Base.isexported(Hyperelastics, Symbol(model))
 
     # collect all incompressible hyperelastic models
-    incompressible_models = filter(usemodel, subtypes(Hyperelastics.AbstractIncompressibleModel))
+    incompressible_models =
+        filter(usemodel, subtypes(Hyperelastics.AbstractIncompressibleModel))
 
     # Collect all compressible hyperelastics models
-    compressible_models = filter(usemodel, subtypes(Hyperelastics.AbstractCompressibleModel))
+    compressible_models =
+        filter(usemodel, subtypes(Hyperelastics.AbstractCompressibleModel))
 
     # Collect all available incompressible hyperelastic models with invariant forms
-    invariant_incompressible_models = filter(Base.Fix2(applicable, InvariantForm()), incompressible_models)
+    invariant_incompressible_models =
+        filter(Base.Fix2(applicable, InvariantForm()), incompressible_models)
 
     # Test the incompressible form of the model
     for model in incompressible_models
@@ -95,7 +98,7 @@
             ψ̄ = compressible_model(ψ)
             @test ψ̄ isa Hyperelastics.AbstractCompressibleModel
 
-            compressible_guess = (κ=1.1, ψ=guess)
+            compressible_guess = (κ = 1.1, ψ = guess)
 
             for compressible_deformation in [λ⃗_c, F_c]
 
@@ -106,34 +109,69 @@
 
                 for AD in ADs
                     # Second Piola Kirchoff Test
-                    s = SecondPiolaKirchoffStressTensor(ψ̄, compressible_deformation, compressible_guess; ad_type=AD)
+                    s = SecondPiolaKirchoffStressTensor(
+                        ψ̄,
+                        compressible_deformation,
+                        compressible_guess;
+                        ad_type = AD,
+                    )
                     @test sum(isnan.(s)) == 0
                     @test sum(isinf.(s)) == 0
 
                     # Cauchy Stress Test
-                    σ = CauchyStressTensor(ψ̄, compressible_deformation, compressible_guess; ad_type=AD)
+                    σ = CauchyStressTensor(
+                        ψ̄,
+                        compressible_deformation,
+                        compressible_guess;
+                        ad_type = AD,
+                    )
                     @test sum(isnan.(σ)) == 0
                     @test sum(isinf.(σ)) == 0
 
                     # Predict Test
-                    @test predict(ψ̄, Treloar1944Uniaxial(), compressible_guess, ad_type=AD) isa Hyperelastics.HyperelasticUniaxialTest
-                    @test predict(ψ̄, Kawabata1981(1.04), compressible_guess, ad_type=AD) isa Hyperelastics.HyperelasticBiaxialTest
+                    @test predict(
+                        ψ̄,
+                        Treloar1944Uniaxial(),
+                        compressible_guess,
+                        ad_type = AD,
+                    ) isa Hyperelastics.HyperelasticUniaxialTest
+                    @test predict(
+                        ψ̄,
+                        Kawabata1981(1.04),
+                        compressible_guess,
+                        ad_type = AD,
+                    ) isa Hyperelastics.HyperelasticBiaxialTest
                     # Strain Energy Density test for deformation gradient matrix
-                    if model in invariant_incompressible_models && compressible_deformation isa Matrix
+                    if model in invariant_incompressible_models &&
+                       compressible_deformation isa Matrix
                         ψ̄_inv = compressible_model(model(InvariantForm()))
 
                         # Strain Energy Density Test
-                        W = StrainEnergyDensity(ψ̄_inv, compressible_deformation, compressible_guess)
+                        W = StrainEnergyDensity(
+                            ψ̄_inv,
+                            compressible_deformation,
+                            compressible_guess,
+                        )
                         @test !isnan(W)
                         @test !isinf(W)
 
                         # Second Piola Kirchoff Test
-                        s = SecondPiolaKirchoffStressTensor(ψ̄_inv, compressible_deformation, compressible_guess; ad_type=AD)
+                        s = SecondPiolaKirchoffStressTensor(
+                            ψ̄_inv,
+                            compressible_deformation,
+                            compressible_guess;
+                            ad_type = AD,
+                        )
                         @test sum(isnan.(s)) == 0
                         @test sum(isinf.(s)) == 0
 
                         # Cauchy Stress Test
-                        σ = CauchyStressTensor(ψ̄_inv, compressible_deformation, compressible_guess; ad_type=AD)
+                        σ = CauchyStressTensor(
+                            ψ̄_inv,
+                            compressible_deformation,
+                            compressible_guess;
+                            ad_type = AD,
+                        )
                         @test sum(isnan.(σ)) == 0
                         @test sum(isinf.(σ)) == 0
                     end
@@ -143,7 +181,15 @@
                 if model in invariant_incompressible_models
                     ψ̄_inv = compressible_model(model(InvariantForm()))
                     # Strain Energy Density for vector of invariants
-                    W = StrainEnergyDensity(ψ̄_inv, [I₁(compressible_deformation), I₂(compressible_deformation), I₃(compressible_deformation)], compressible_guess)
+                    W = StrainEnergyDensity(
+                        ψ̄_inv,
+                        [
+                            I₁(compressible_deformation),
+                            I₂(compressible_deformation),
+                            I₃(compressible_deformation),
+                        ],
+                        compressible_guess,
+                    )
                     @test !isnan(W)
                     @test !isinf(W)
                 end
@@ -153,7 +199,7 @@
 
     # Test for unimplemented functions
     struct TestModel{T} <: Hyperelastics.AbstractIncompressibleModel{T}
-        TestModel(::R=PrincipalValueForm()) where {R} = new{R}()
+        TestModel(::R = PrincipalValueForm()) where {R} = new{R}()
     end
     ψ = TestModel()
     ψ_inv = TestModel(InvariantForm())
