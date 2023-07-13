@@ -8,7 +8,9 @@ Fields
 """
 function parameters(ψ::AbstractHyperelasticModel)
     # @error "$(typeof(ψ)) does not have a parameters function implemented"
-    return throw(ArgumentError("$(typeof(ψ)) does not have a parameters function implemented"))
+    return throw(
+        ArgumentError("$(typeof(ψ)) does not have a parameters function implemented"),
+    )
 end
 
 """
@@ -24,10 +26,13 @@ Fields
 function parameter_bounds(ψ::AbstractHyperelasticModel, test::AbstractHyperelasticTest)
     lb = nothing
     ub = nothing
-    return (lb=lb, ub=ub)
+    return (lb = lb, ub = ub)
 end
 
-function parameter_bounds(ψ::AbstractHyperelasticModel, tests::Vector{<:AbstractHyperelasticTest})
+function parameter_bounds(
+    ψ::AbstractHyperelasticModel,
+    tests::Vector{<:AbstractHyperelasticTest},
+)
     bounds = map(Base.Fix1(parameter_bounds, ψ), tests)
     lbs = getfield.(bounds, :lb)
     ubs = getfield.(bounds, :ub)
@@ -44,7 +49,7 @@ function parameter_bounds(ψ::AbstractHyperelasticModel, tests::Vector{<:Abstrac
     else
         ub = nothing
     end
-    return (lb=lb, ub=ub)
+    return (lb = lb, ub = ub)
 end
 
 # """
