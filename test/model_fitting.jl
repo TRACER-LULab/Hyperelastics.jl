@@ -19,7 +19,7 @@
 
 
     # Test the incompressible form of the model
-    for model in [AnsarriBenam]
+    for model in [NeoHookean]
         # Test the incompressible form of the model
         ψ = model()
         @show model
