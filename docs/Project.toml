@@ -14,3 +14,6 @@ OptimizationOptimJL = "36348300-93cb-4f02-beb5-3c3902f8871e"
 Pollen = "c88717ad-5130-4874-a664-5a9aba5ec443"
 SciMLExpectations = "afe9f18d-7609-4d0e-b7b7-af0cb72b8ea8"
 Turing = "fce5fe82-541a-59a6-adf8-730c64b5f9a0"
+
+[compat]
+OptimizationOptimJL = "0.1"
