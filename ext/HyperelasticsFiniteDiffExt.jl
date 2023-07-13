@@ -5,7 +5,14 @@ using Hyperelastics
 using LinearAlgebra
 using ADTypes
 
-function Hyperelastics.∂ψ(ψ::Hyperelastics.AbstractHyperelasticModel{T}, λ⃗::Vector{S}, p, ad_type::AutoFiniteDiff; return_type=eltype(λ⃗), kwargs...) where {T,S}
+function Hyperelastics.∂ψ(
+    ψ::Hyperelastics.AbstractHyperelasticModel{T},
+    λ⃗::Vector{S},
+    p,
+    ad_type::AutoFiniteDiff;
+    return_type = eltype(λ⃗),
+    kwargs...,
+) where {T,S}
     W(λ⃗) = StrainEnergyDensity(ψ, λ⃗, p)
     ∂W∂λ = finite_difference_gradient(W, λ⃗, ad_type.fdtype, return_type; kwargs...)
     return ∂W∂λ

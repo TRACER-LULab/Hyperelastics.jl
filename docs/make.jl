@@ -9,7 +9,9 @@ Use `./serve.jl` for interactive development.
 """
 
 # Create target folder
-length(ARGS) != 2 && error("Please pass a file path and a version tag to make.jl:\n\t> julia docs/make.jl \$DIR \$TAG ")
+length(ARGS) != 2 && error(
+    "Please pass a file path and a version tag to make.jl:\n\t> julia docs/make.jl \$DIR \$TAG ",
+)
 DIR = abspath(mkpath(ARGS[1]))
 TAG = ARGS[2]
 
@@ -21,10 +23,4 @@ project = createproject(tag = TAG)
 Pollen.rewritesources!(project)
 
 @info "Writing to disk at \"$DIR\"..."
-Pollen.build(
-    FileBuilder(
-        JSONFormat(),
-        DIR,
-    ),
-    project,
-)
+Pollen.build(FileBuilder(JSONFormat(), DIR), project)

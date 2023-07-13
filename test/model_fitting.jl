@@ -4,19 +4,22 @@
     usemodel(model) = Base.isexported(Hyperelastics, Symbol(model))
 
     # collect all incompressible hyperelastic models
-    incompressible_models = filter(usemodel, subtypes(Hyperelastics.AbstractIncompressibleModel))
+    incompressible_models =
+        filter(usemodel, subtypes(Hyperelastics.AbstractIncompressibleModel))
 
     # Collect all compressible hyperelastics models
-    compressible_models = filter(usemodel, subtypes(Hyperelastics.AbstractCompressibleModel))
+    compressible_models =
+        filter(usemodel, subtypes(Hyperelastics.AbstractCompressibleModel))
 
     # Collect all available incompressible hyperelastic models with invariant forms
-    invariant_incompressible_models = filter(Base.Fix2(applicable, InvariantForm()), incompressible_models)
+    invariant_incompressible_models =
+        filter(Base.Fix2(applicable, InvariantForm()), incompressible_models)
 
     # Create initial
 
 
     # Test the incompressible form of the model
-    for model in [AnsarriBenam]
+    for model in [NeoHookean]
         # Test the incompressible form of the model
         ψ = model()
         @show model
@@ -83,12 +86,8 @@
         end
         guess = ComponentVector(guess)
         display(guess)
-        prob = HyperelasticProblem(
-            ψ,
-            Treloar1944Uniaxial(),
-            guess;
-            ad_type=AutoFiniteDiff()
-        )
+        prob =
+            HyperelasticProblem(ψ, Treloar1944Uniaxial(), guess; ad_type = AutoFiniteDiff())
         display(prob.lb)
         sol = solve(prob, LBFGS())
         @test sol.retcode == ReturnCode.Success

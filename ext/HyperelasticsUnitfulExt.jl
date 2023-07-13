@@ -9,21 +9,24 @@ using Statistics
 using ADTypes
 using Optimization.SciMLBase
 
-display("Due to the state of the Unitful ecosystem, the only differentiation package supported by Hyperelastics.jl with Unitful.jl is FiniteDiff.jl. Use `AutoFiniteDiff()` to use the differentiation methods from FiniteDiff.jl")
+display(
+    "Due to the state of the Unitful ecosystem, the only differentiation package supported by Hyperelastics.jl with Unitful.jl is FiniteDiff.jl. Use `AutoFiniteDiff()` to use the differentiation methods from FiniteDiff.jl",
+)
 
 function Hyperelastics.HyperelasticProblem(
     ψ::Hyperelastics.AbstractHyperelasticModel,
     test::Hyperelastics.AbstractHyperelasticTest{T,S},
     u0::U,
     adtype::AutoFiniteDiff,
-    loss=L2DistLoss();
-    lb=parameter_bounds(ψ, test).lb,
-    ub=parameter_bounds(ψ, test).ub,
-    int=nothing,
-    lcons=nothing,
-    ucons=nothing,
-    sense=nothing,
-    kwargs...) where {T,S<:Quantity,U}
+    loss = L2DistLoss();
+    lb = parameter_bounds(ψ, test).lb,
+    ub = parameter_bounds(ψ, test).ub,
+    int = nothing,
+    lcons = nothing,
+    ucons = nothing,
+    sense = nothing,
+    kwargs...,
+) where {T,S<:Quantity,U}
 
     display("UNIT VERSION")
     a = typeof(adtype)
@@ -32,7 +35,7 @@ function Hyperelastics.HyperelasticProblem(
     optimization_AD_type = getfield(Optimization, b)()
 
     function f(ps, (; ψ, test, kwargs, loss, units))
-        pred = predict(ψ, test, ps.*units, adtype, kwargs...)
+        pred = predict(ψ, test, ps .* units, adtype, kwargs...)
         # res = sum(abs, value(loss, test.data.s, pred.data.s, AggMode.Mean()))
         res = map(i -> L2DistLoss().(i[1], i[2]), zip(pred.data.s, test.data.s)) |> mean
 
@@ -74,24 +77,56 @@ function Hyperelastics.HyperelasticProblem(
     end
 
     func = OptimizationFunction(f, optimization_AD_type)
-     # Check for Bounds
-    p = (ψ=ψ, test=test, loss=loss, kwargs=kwargs, units = unit.(u0))
+    # Check for Bounds
+    p = (ψ = ψ, test = test, loss = loss, kwargs = kwargs, units = unit.(u0))
     u0 = ustrip.(u0)
     lb = (isnothing(lb)) ? (lb) : (ustrip.(lb))
     ub = (isnothing(ub)) ? (ub) : (ustrip.(ub))
-    HyperelasticProblem{isinplace(func),typeof(func),typeof(u0),typeof(p),
-        typeof(lb),typeof(ub),typeof(int),typeof(lcons),typeof(ucons),
-        typeof(sense),typeof(kwargs)}(func, u0, p, lb, ub, int, lcons, ucons, sense,
-        kwargs)
+    HyperelasticProblem{
+        isinplace(func),
+        typeof(func),
+        typeof(u0),
+        typeof(p),
+        typeof(lb),
+        typeof(ub),
+        typeof(int),
+        typeof(lcons),
+        typeof(ucons),
+        typeof(sense),
+        typeof(kwargs),
+    }(
+        func,
+        u0,
+        p,
+        lb,
+        ub,
+        int,
+        lcons,
+        ucons,
+        sense,
+        kwargs,
+    )
 end
 
 function Optimization.SciMLBase.solve(
     prob::HyperelasticProblem,
     alg,
     args...;
-    kwargs...)::Optimization.SciMLBase.AbstractOptimizationSolution
+    kwargs...,
+)::Optimization.SciMLBase.AbstractOptimizationSolution
 
-    conv_prob = OptimizationProblem(prob.f, prob.u0, prob.p, lb=prob.lb, ub=prob.ub, int=prob.int, lcons=prob.lcons, ucons=prob.ucons, sense=prob.sense, prob.kwargs...)
+    conv_prob = OptimizationProblem(
+        prob.f,
+        prob.u0,
+        prob.p,
+        lb = prob.lb,
+        ub = prob.ub,
+        int = prob.int,
+        lcons = prob.lcons,
+        ucons = prob.ucons,
+        sense = prob.sense,
+        prob.kwargs...,
+    )
 
     sol = Optimization.SciMLBase.solve(conv_prob, alg, args...; kwargs...)
     Optimization.SciMLBase.OptimizationSolution{
@@ -103,7 +138,8 @@ function Optimization.SciMLBase.solve(
         typeof(sol.objective),
         typeof(sol.original),
         typeof(sol.solve_time),
-        typeof(sol.stats)}(
+        typeof(sol.stats),
+    }(
         sol.u,
         sol.cache,
         sol.alg,
@@ -111,7 +147,8 @@ function Optimization.SciMLBase.solve(
         sol.retcode,
         sol.original,
         sol.solve_time,
-        sol.stats)
+        sol.stats,
+    )
 end
 
 end
