@@ -9,12 +9,26 @@ Fields:
 - `λ⃗`: Vector of principal stretches
 - `p`: Model parameters
 """
-function NonlinearContinua.StrainEnergyDensity(ψ::AbstractHyperelasticModel{T}, ::Vector{R}, p) where {T, R}
-    return throw(ArgumentError("$(typeof(ψ)) does not have a Strain Energy Density implemented"))
+function NonlinearContinua.StrainEnergyDensity(
+    ψ::AbstractHyperelasticModel{T},
+    ::Vector{R},
+    p,
+) where {T,R}
+    return throw(
+        ArgumentError("$(typeof(ψ)) does not have a Strain Energy Density implemented"),
+    )
 end
 
-function NonlinearContinua.StrainEnergyDensity(ψ::AbstractHyperelasticModel{T}, ::Vector{R}, p) where {T<:InvariantForm,R}
-    return throw(ArgumentError("$(typeof(ψ)) does not have a stretch Invariant Form of Strain Energy Density implemented"))
+function NonlinearContinua.StrainEnergyDensity(
+    ψ::AbstractHyperelasticModel{T},
+    ::Vector{R},
+    p,
+) where {T<:InvariantForm,R}
+    return throw(
+        ArgumentError(
+            "$(typeof(ψ)) does not have a stretch Invariant Form of Strain Energy Density implemented",
+        ),
+    )
 end
 
 """
@@ -33,14 +47,22 @@ Fields:
 - `F`: Deformation gradient matrix
 - `p`: Model parameters
 """
-function NonlinearContinua.StrainEnergyDensity(ψ::AbstractHyperelasticModel{T}, F::Matrix{R}, p) where {T <: PrincipalValueForm, R}
+function NonlinearContinua.StrainEnergyDensity(
+    ψ::AbstractHyperelasticModel{T},
+    F::Matrix{R},
+    p,
+) where {T<:PrincipalValueForm,R}
     C = transpose(F) * F
     λ⃗² = eigvals(C)
     λ⃗ = sqrt.(abs.(λ⃗²))
     return StrainEnergyDensity(ψ, λ⃗::Vector{R}, p)
 end
 
-function NonlinearContinua.StrainEnergyDensity(ψ::AbstractHyperelasticModel{T}, F::Matrix{R}, p) where {T<:InvariantForm,R}
+function NonlinearContinua.StrainEnergyDensity(
+    ψ::AbstractHyperelasticModel{T},
+    F::Matrix{R},
+    p,
+) where {T<:InvariantForm,R}
     StrainEnergyDensity(ψ, [I₁(F), I₂(F), I₃(F)], p)
 end
 
@@ -54,7 +76,13 @@ Fields:
 - `λ⃗`: Vector of principal stretches
 - `p`: Model parameters
 """
-function NonlinearContinua.SecondPiolaKirchoffStressTensor(ψ::AbstractHyperelasticModel{T}, λ⃗::Vector{R}, p; ad_type=nothing, kwargs...) where {T<:PrincipalValueForm,R}
+function NonlinearContinua.SecondPiolaKirchoffStressTensor(
+    ψ::AbstractHyperelasticModel{T},
+    λ⃗::Vector{R},
+    p;
+    ad_type = nothing,
+    kwargs...,
+) where {T<:PrincipalValueForm,R}
     ∂ψ(ψ, λ⃗, p, ad_type; kwargs...)
 end
 
@@ -68,18 +96,29 @@ Fields:
 - `F`: Deformation gradient tensor
 - `p`: Model parameters
 """
-function NonlinearContinua.SecondPiolaKirchoffStressTensor(ψ::AbstractHyperelasticModel{T}, F::Matrix{R}, p; kwargs...) where {T<:PrincipalValueForm,R}
+function NonlinearContinua.SecondPiolaKirchoffStressTensor(
+    ψ::AbstractHyperelasticModel{T},
+    F::Matrix{R},
+    p;
+    kwargs...,
+) where {T<:PrincipalValueForm,R}
     σ = CauchyStressTensor(ψ, F, p; kwargs...)
     S = sqrt(det(F' * F)) * inv(F) * σ
     return S
 end
 
-function NonlinearContinua.SecondPiolaKirchoffStressTensor(ψ::AbstractHyperelasticModel{T}, F::Matrix{R}, p; ad_type=nothing, kwargs...) where {T<:InvariantForm,R}
+function NonlinearContinua.SecondPiolaKirchoffStressTensor(
+    ψ::AbstractHyperelasticModel{T},
+    F::Matrix{R},
+    p;
+    ad_type = nothing,
+    kwargs...,
+) where {T<:InvariantForm,R}
     I1 = I₁(F)
     I2 = I₂(F)
     I3 = I₃(F)
     ∂ψ∂I = ∂ψ(ψ, [I1, I2, I3], p, ad_type; kwargs...)
-    S = 2∂ψ∂I[1] * F' + 2∂ψ∂I[2] * (I1 * F' + F' * F * F') + 2I3*∂ψ∂I[3]*inv(F)
+    S = 2∂ψ∂I[1] * F' + 2∂ψ∂I[2] * (I1 * F' + F' * F * F') + 2I3 * ∂ψ∂I[3] * inv(F)
     return S
 end
 
@@ -103,7 +142,12 @@ Fields:
 - `p`: Model parameters
 - `adb`: Differentiation backend from `AbstractDifferentiation.jl`
     """
-function NonlinearContinua.CauchyStressTensor(ψ::Hyperelastics.AbstractHyperelasticModel{T}, λ⃗::Vector{R}, p; kwargs...) where {T<:PrincipalValueForm, R}
+function NonlinearContinua.CauchyStressTensor(
+    ψ::Hyperelastics.AbstractHyperelasticModel{T},
+    λ⃗::Vector{R},
+    p;
+    kwargs...,
+) where {T<:PrincipalValueForm,R}
     S = SecondPiolaKirchoffStressTensor(ψ, λ⃗::Vector{R}, p; kwargs...)
     σ = S .* λ⃗
     return σ
@@ -120,7 +164,12 @@ Fields:
 - `p`: Model parameters
 - `adb`: Differentiation backend from `AbstractDifferentiation.jl`
 """
-function NonlinearContinua.CauchyStressTensor(ψ::Hyperelastics.AbstractHyperelasticModel{T}, F::Matrix{S}, p; kwargs...) where {T<:PrincipalValueForm,S}
+function NonlinearContinua.CauchyStressTensor(
+    ψ::Hyperelastics.AbstractHyperelasticModel{T},
+    F::Matrix{S},
+    p;
+    kwargs...,
+) where {T<:PrincipalValueForm,S}
     B = F * F'
     a = eigvecs(B)'
     B_prin = Diagonal(a * B * a')
@@ -133,13 +182,21 @@ function NonlinearContinua.CauchyStressTensor(ψ::Hyperelastics.AbstractHyperela
     return σ
 end
 
-function NonlinearContinua.CauchyStressTensor(ψ::Hyperelastics.AbstractHyperelasticModel{T}, F::Matrix{S}, p; ad_type, kwargs...) where {T<:InvariantForm,S}
+function NonlinearContinua.CauchyStressTensor(
+    ψ::Hyperelastics.AbstractHyperelasticModel{T},
+    F::Matrix{S},
+    p;
+    ad_type,
+    kwargs...,
+) where {T<:InvariantForm,S}
     I1 = I₁(F)
     I2 = I₂(F)
     I3 = I₃(F)
     J = sqrt(I3)
     B = F * F'
     ∂ψ∂I = ∂ψ(ψ, [I1, I2, I3], p, ad_type; kwargs...)
-    σ = 2 * inv(J) * (∂ψ∂I[1] + I1 * ∂ψ∂I[2]) * B - 2 * inv(J) * ∂ψ∂I[2] * B^2 + 2 * J * ∂ψ∂I[3] * I
+    σ =
+        2 * inv(J) * (∂ψ∂I[1] + I1 * ∂ψ∂I[2]) * B - 2 * inv(J) * ∂ψ∂I[2] * B^2 +
+        2 * J * ∂ψ∂I[3] * I
     return σ
 end
