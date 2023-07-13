@@ -17,3 +17,5 @@ Turing = "fce5fe82-541a-59a6-adf8-730c64b5f9a0"
 
 [compat]
 MCMCChains = "6"
+ModuleInfo = "0.1"
+OptimizationOptimJL = "0.1"

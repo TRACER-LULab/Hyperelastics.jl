@@ -20,12 +20,15 @@ function createproject(; tag = "dev", package = m, modules = ms)
     pkgtags = Dict(string(package) => tag)
     packages = [
         ModuleInfo.getid(pkgindex.packages[1]),
-        [d for d in pkgindex.packages[1].dependencies
-        if d in [ModuleInfo.getid(p) for p in pkgindex.packages]]...]
+        [
+            d for d in pkgindex.packages[1].dependencies if
+            d in [ModuleInfo.getid(p) for p in pkgindex.packages]
+        ]...,
+    ]
 
     project = Project([
         # Add written documentation, source files, and symbol docstrings as pages
-        DocumentationFiles([package]; pkgtags=pkgtags, extensions = ["md", "html"]),
+        DocumentationFiles([package]; pkgtags = pkgtags, extensions = ["md", "html"]),
         SourceFiles(modules; pkgtags),
         ModuleReference(pkgindex),
 

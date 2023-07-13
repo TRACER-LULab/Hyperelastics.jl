@@ -18,7 +18,7 @@ Fields:
 struct HyperelasticUniaxialTest{T,S} <: AbstractHyperelasticTest{T,S}
     data::StructVector
     name::String
-    function HyperelasticUniaxialTest(λ₁, s₁; name, incompressible=true)
+    function HyperelasticUniaxialTest(λ₁, s₁; name, incompressible = true)
         @assert length(λ₁) == length(s₁) "Inputs must be the same length"
         if incompressible
             λ₂ = λ₃ = @. sqrt(1 / λ₁)
@@ -28,9 +28,9 @@ struct HyperelasticUniaxialTest{T,S} <: AbstractHyperelasticTest{T,S}
         λ = collect.(zip(λ₁, λ₂, λ₃))
         s = collect.(zip(s₁))
         data = StructArray{HyperelasticDataEntry}((λ, s))
-        new{eltype(eltype(λ)), eltype(eltype(s))}(data, name)
+        new{eltype(eltype(λ)),eltype(eltype(s))}(data, name)
     end
-    function HyperelasticUniaxialTest(λ₁; name, incompressible=true)
+    function HyperelasticUniaxialTest(λ₁; name, incompressible = true)
         if incompressible
             λ₂ = λ₃ = @. sqrt(1 / λ₁)
         else
@@ -39,7 +39,7 @@ struct HyperelasticUniaxialTest{T,S} <: AbstractHyperelasticTest{T,S}
         λ = collect.(zip(λ₁, λ₂, λ₃))
         s = collect.(zip(Vector{eltype(λ₁)}(undef, length(λ₁))))
         data = StructArray{HyperelasticDataEntry}((λ, s))
-        new{eltype(eltype(λ)), eltype(eltype(s))}(data, name)
+        new{eltype(eltype(λ)),eltype(eltype(s))}(data, name)
     end
 end
 
@@ -60,7 +60,7 @@ Fields:
 struct HyperelasticBiaxialTest{T,S} <: AbstractHyperelasticTest{T,S}
     data::StructVector
     name::String
-    function HyperelasticBiaxialTest(λ₁, λ₂, s₁, s₂; name, incompressible=true)
+    function HyperelasticBiaxialTest(λ₁, λ₂, s₁, s₂; name, incompressible = true)
         @assert length(λ₁) == length(λ₂) == length(s₁) == length(s₂) "Inputs must be the same length"
         if incompressible
             λ₃ = @. 1 / λ₁ / λ₂
@@ -74,7 +74,7 @@ struct HyperelasticBiaxialTest{T,S} <: AbstractHyperelasticTest{T,S}
         S = promote_type(eltype(eltype(s₁)), eltype(eltype(s₂)))
         new{T,S}(data, name)
     end
-    function HyperelasticBiaxialTest(λ₁, λ₂; name, incompressible=true)
+    function HyperelasticBiaxialTest(λ₁, λ₂; name, incompressible = true)
         @assert length(λ₁) == length(λ₂) "Inputs must be the same length"
         if incompressible
             λ₃ = @. 1 / λ₁ / λ₂
@@ -85,12 +85,23 @@ struct HyperelasticBiaxialTest{T,S} <: AbstractHyperelasticTest{T,S}
         λ = collect.(zip(λ₁, λ₂, λ₃))
         s = collect.(zip(s₁, s₂))
         data = StructArray{HyperelasticDataEntry}((λ, s))
-        new{promote_type(eltype(eltype(λ₁)), eltype(eltype(λ₂))),promote_type(eltype(eltype(s₁)), eltype(eltype(s₂)))}(data, name)
+        new{
+            promote_type(eltype(eltype(λ₁)), eltype(eltype(λ₂))),
+            promote_type(eltype(eltype(s₁)), eltype(eltype(s₂))),
+        }(
+            data,
+            name,
+        )
     end
 end
 
 ## Predict overloads
-function NonlinearContinua.predict(ψ::AbstractHyperelasticModel{A}, test::HyperelasticUniaxialTest{B,C}, p; kwargs...) where {A, B, C}
+function NonlinearContinua.predict(
+    ψ::AbstractHyperelasticModel{A},
+    test::HyperelasticUniaxialTest{B,C},
+    p;
+    kwargs...,
+) where {A,B,C}
     f(λ) = SecondPiolaKirchoffStressTensor(ψ, λ, p; kwargs...)
     λ = test.data.λ
     s = map(f, λ)
@@ -99,11 +110,16 @@ function NonlinearContinua.predict(ψ::AbstractHyperelasticModel{A}, test::Hyper
     λ₁ = getindex.(λ, 1)
     λ₃ = getindex.(λ, 3)
     Δs₁₃ = @. s₁ - s₃ * λ₃ / λ₁
-    pred = HyperelasticUniaxialTest(λ₁, Δs₁₃, name=test.name)
+    pred = HyperelasticUniaxialTest(λ₁, Δs₁₃, name = test.name)
     return pred
 end
 
-function NonlinearContinua.predict(ψ::AbstractHyperelasticModel{A}, test::HyperelasticBiaxialTest{B,C}, p; kwargs...) where {A, B, C}
+function NonlinearContinua.predict(
+    ψ::AbstractHyperelasticModel{A},
+    test::HyperelasticBiaxialTest{B,C},
+    p;
+    kwargs...,
+) where {A,B,C}
     f(λ) = SecondPiolaKirchoffStressTensor(ψ, λ, p; kwargs...)
     λ = test.data.λ
     s = map(f, λ)
@@ -115,6 +131,6 @@ function NonlinearContinua.predict(ψ::AbstractHyperelasticModel{A}, test::Hyper
     λ₃ = getindex.(λ, 3)
     Δs₂₃ = @. s₂ - s₃ * λ₃ / λ₁
     Δs₁₃ = @. s₁ - s₃ * λ₃ / λ₁
-    pred = HyperelasticBiaxialTest(λ₁, λ₂, Δs₁₃, Δs₂₃, name=test.name)
+    pred = HyperelasticBiaxialTest(λ₁, λ₂, Δs₁₃, Δs₂₃, name = test.name)
     return pred
 end
