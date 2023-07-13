@@ -167,6 +167,7 @@ using DataInterpolations
 using QuadGK
 using ComponentArrays, LabelledArrays, StructArrays
 using LinearAlgebra, Statistics
+# using SciMLBase
 
 export HyperelasticUniaxialTest, HyperelasticBiaxialTest
 export HyperelasticProblem
@@ -182,7 +183,7 @@ abstract type AbstractIncompressibleModel{T} <: AbstractHyperelasticModel{T} end
 abstract type AbstractCompressibleModel{T} <: AbstractHyperelasticModel{T} end
 abstract type AbstractDataDrivenHyperelasticModel{T} <: AbstractHyperelasticModel{T} end
 
-abstract type AbstractHyperelasticProblem end
+# abstract type AbstractHyperelasticProblem <: AbstractOptimizationProblem end
 
 struct InvariantForm end
 struct PrincipalValueForm end
@@ -205,18 +206,7 @@ Fields:
 - `adb`: Select differentiation type from [`ADTypes.jl`](https://github.com/SciML/ADTypes.jl). The type is automatically applied to the type of AD applied to the Optimization Problem also.
 - `loss`: Loss function from [`LossFunctions.jl`](https://github.com/JuliaML/LossFunctions.jl)
 """
-struct HyperelasticProblem{iip,F,uType,P,LB,UB,I,LC,UC,S,K}
-    f::F
-    u0::uType
-    p::P
-    lb::LB
-    ub::UB
-    int::I
-    lcons::LC
-    ucons::UC
-    sense::S
-    kwargs::K
-end
+function HyperelasticProblem end
 
 # include("../ext/HyperelasticsOptimizationExt.jl")
 include("invariants.jl")

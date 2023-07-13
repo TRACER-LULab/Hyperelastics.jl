@@ -24,7 +24,7 @@
         # Create an empty parameter set
         guess = Dict{Symbol,Union{Matrix{Float64},Vector{Float64},Float64}}()
 
-        # Get the parametrs for the model and check return type
+        # Get the parameters for the model and check return type
         ps = parameters(ψ)
         @test ps isa Tuple
 

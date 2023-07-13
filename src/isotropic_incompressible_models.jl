@@ -179,7 +179,6 @@ end
 function parameter_bounds(ψ::AffineMicroSphere, test::AbstractHyperelasticTest)
     λ = test.data.λ
     λr = maximum(x->map(Base.Fix1(ψ.λr, (λ=x, N=1)), ψ.r⃗), λ)
-    @show λr
     N_min = maximum(λr)
     lb = (μ = -Inf, N = N_min)
     ub = nothing

@@ -1,7 +1,6 @@
 @testset "Model Fitting" begin
-    using Optimization, OptimizationOptimJL, ComponentArrays, ForwardDiff, FiniteDiff
-
-   # Determine if the model is exported by hyperelastics.
+    using Optimization, OptimizationOptimJL, ComponentArrays, ForwardDiff, NaNMath
+    # Determine if the model is exported by hyperelastics.
     usemodel(model) = Base.isexported(Hyperelastics, Symbol(model))
 
     # collect all incompressible hyperelastic models
@@ -13,21 +12,18 @@
     # Collect all available incompressible hyperelastic models with invariant forms
     invariant_incompressible_models = filter(Base.Fix2(applicable, InvariantForm()), incompressible_models)
 
+    # Create initial
+
+
     # Test the incompressible form of the model
-    # Alexander, AnsarriBenam
-    for model in [ArrudaBoyce]
-        # Instantiate model
+    for model in [AnsarriBenam]
+        # Test the incompressible form of the model
         ψ = model()
         @show model
-        @test ψ isa Hyperelastics.AbstractIncompressibleModel
-
+        # Get the parameters for the model and check return type
+        ps = parameters(ψ)
         # Create an empty parameter set
         guess = Dict{Symbol,Union{Matrix{Float64},Vector{Float64},Float64}}()
-
-        # Get the parametrs for the model and check return type
-        ps = parameters(ψ)
-        @test ps isa Tuple
-
         # Use scalars, vectors, or matrices based on the symbol provided.
         for p in ps
             if ψ isa GeneralMooneyRivlin
@@ -77,6 +73,7 @@
             end
         elseif !isnothing(lb)
             for (k, v) in pairs(lb)
+                @show v
                 guess[k] = !isinf(v) && guess[k] < v ? (float(v) + 0.9) : (1.0)
             end
         elseif !isnothing(ub)
@@ -84,14 +81,19 @@
                 guess[k] = !isinf(v) && guess[k] > v ? (float(v) - 0.9) : (1.0)
             end
         end
-        guess = ComponentVector(NamedTuple(guess))
+        guess = ComponentVector(guess)
+        display(guess)
         prob = HyperelasticProblem(
             ψ,
             Treloar1944Uniaxial(),
             guess;
-            ad_type = AutoFiniteDiff(),
-            )
+            ad_type=AutoFiniteDiff()
+        )
+        display(prob.lb)
         sol = solve(prob, LBFGS())
         @test sol.retcode == ReturnCode.Success
+
+        # sol = solve(prob, LBFGS())
+        # @test sol.retcode == ReturnCode.Success
     end
 end
