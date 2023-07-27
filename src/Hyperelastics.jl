@@ -1,6 +1,11 @@
 
 module Hyperelastics
 
+using PackageExtensionCompat
+function __init__()
+    @require_extensions
+end
+
 using Reexport
 @reexport module NonlinearContinua
 

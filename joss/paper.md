@@ -23,17 +23,6 @@ bibliography: paper.bib
 
 The modelling of hyperelastic materials is of paramount importance for research areas including: soft robotics, cancer screening, and automobile tire modelling. The challenge in hyperelastic material modelling arises from the variety of material models available for predicting the stress-stretch behavior of the material. Commonly, the strain energy density (SED) function (SEDF) is used to predict the energy stored in the material. Derivatives of the SEDF provide measures for the stress-stretch relationship. The further challenge arises as the derivatives are often hand-derived and implemented in a finite element method software. The problem of hyperelastic material moodelling requires a high-performance set of SEDFs and the tools required to calibrate the models to material tests. `Hyperelastics.jl` is a Julia  [@Bezanson2017] package containing 70+ analytical SEDF along with 3 data-driven methods for predicting the force-deformation behavior.
 
-
-<!-- The forces on stars, galaxies, and dark matter under external gravitational
-fields lead to the dynamical evolution of structures in the universe. The orbits
-of these bodies are therefore key to understanding the formation, history, and
-future state of galaxies. The field of "galactic dynamics," which aims to model
-the gravitating components of galaxies to study their structure and evolution,
-is now well-established, commonly taught, and frequently used in astronomy.
-Aside from toy problems and demonstrations, the majority of problems require
-efficient numerical tools, many of which require the same base code (e.g., for
-performing numerical orbit integration). -->
-
 # Statement of need
 
 `Hyperelastics.jl` is part of the Multi-Scale Material Modelling ($M^3$) Suite being developed in the Translational Robotics and Controls Engineering Research (TRACER) Lab at Liberty University. A pure Julia implementation allows for the use of automatic differentiation (AD) packages to calculate the partial derivatives of the SEDF. `Hyperelastics.jl` is designed to leverage multiple-dispatch to define a common set of functions for calculating the SED, Second Piola Kirchoff Stress Tensor, and the Cauchy Stress Tensor. The package provides: 1) a material model library that is AD compatible and 2) a set of extensible methods for easily defining and testing new material models.
@@ -63,20 +52,24 @@ scientific explorations of forthcoming data releases from the *Gaia* mission
 
 # Mathematics
 
-Single dollars ($) are required for inline mathematics e.g. $f(x) = e^{\pi/x}$
+$S_{ij} = 2\frac{\partial W}{\partial C_{ij}} = \frac{1}{\lambda_i}\frac{\partial W}{\partial \lambda_i}$
 
-Double dollars make self-standing equations:
+$T_i = \frac{\partial W}{\partial \lambda_i}$
 
-$$\Theta(x) = \left\{\begin{array}{l}
-0\textrm{ if } x < 0\cr
-1\textrm{ else}
-\end{array}\right.$$
+$\sigma_i = \frac{\lambda_i}{J}\frac{\partial W}{\partial \lambda_i}$
 
-You can also use plain \LaTeX for equations
-\begin{equation}\label{eq:fourier}
-\hat f(\omega) = \int_{-\infty}^{\infty} f(x) e^{i\omega x} dx
-\end{equation}
-and refer to \autoref{eq:fourier} from text.
+# Nomenclature:
+
+| Variable | Term |
+| :---: | :---: |
+| $\psi$ | Strain energy density |
+| $S$, $[\mathbf{S}]$ | Second Piola Kirchoff stress |
+| $P$, $[\mathbf{P}]$ | First Piola Kirchoff stress |
+| $\sigma$ | Cauchy stress |
+| $\lambda_i$ | Principal stretch in direction $i$|
+| $[\mathbf{F}]$ | Deformation gradient tensor |
+| $[\mathbf{C}]$ | Right Cauchy-Green tensor |
+| $[\mathbf{B}]$ | Left Cauchy-Green tensor |
 
 # Citations
 
