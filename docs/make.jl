@@ -3,7 +3,7 @@ using Documenter
 using DocumenterCitations
 
 bib = CitationBibliography(
-    joinpath(@__DIR__, "src", "refs.bib");
+    joinpath(@__DIR__, "src", "paper.bib");
     style=:numeric
 )
 
