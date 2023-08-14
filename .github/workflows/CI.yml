@@ -26,12 +26,17 @@ jobs:
           - x64
     steps:
       - uses: actions/checkout@v3
-        with:
-          submodules: recursive
       - uses: julia-actions/setup-julia@v1
         with:
           version: ${{ matrix.version }}
           arch: ${{ matrix.arch }}
+      - name: Add packages InverseLangevinApproixmations and ContinuumMechanicsBase
+        run: |
+          julia --project -e '
+            using Pkg
+            Pkg.develop(PackageSpec(url="https://github.com/cfarm6/ContinuumMechanicsBase.jl.git"))
+            Pkg.develop(PackageSpec(url="https://github.com/cfarm6/InverseLangevinApproximations.jl.git"))
+            Pkg.instantiate()'
       - uses: julia-actions/cache@v1
       - uses: julia-actions/julia-buildpkg@v1
       - uses: julia-actions/julia-runtest@v1
@@ -43,8 +48,6 @@ jobs:
       statuses: write
     steps:
       - uses: actions/checkout@v3
-        with:
-          submodules: recursive
       - uses: julia-actions/setup-julia@v1
         with:
           version: '1'
@@ -53,6 +56,8 @@ jobs:
           julia --project=docs/ -e '
             using Pkg
             Pkg.develop(PackageSpec(path=pwd()))
+            Pkg.develop(PackageSpec(url="https://github.com/cfarm6/ContinuumMechanicsBase.jl.git"))
+            Pkg.develop(PackageSpec(url="https://github.com/cfarm6/InverseLangevinApproximations.jl.git"))
             Pkg.instantiate()'
       - uses: julia-actions/julia-buildpkg@v1
       - uses: julia-actions/julia-docdeploy@v1
