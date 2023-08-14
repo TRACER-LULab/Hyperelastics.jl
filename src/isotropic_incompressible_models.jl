@@ -2936,9 +2936,7 @@ Model:
 
 ```math
 W = G_c (I_1-3)+ \\frac{\\nu k T}{2}(\\sum\\limits_{i=1}^{3}\\kappa\\frac{\\lambda_i-1}{\\lambda_i^2+\\kappa}+\\log{\\frac{\\lambda_i^2+\\kappa}{1+\\kappa}}-\\log{\\lambda_i^2})
-```        if sum(contains.(string.(ps), "⃗")) > 0
-            @info model
-        end
+```
 
 Parameters:
 - Gc
