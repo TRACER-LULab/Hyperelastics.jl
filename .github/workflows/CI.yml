@@ -18,7 +18,6 @@ jobs:
       fail-fast: false
       matrix:
         version:
-          - '1.0'
           - '1.9'
           - 'nightly'
         os:
@@ -27,6 +26,8 @@ jobs:
           - x64
     steps:
       - uses: actions/checkout@v3
+        with:
+          submodules: recursive
       - uses: julia-actions/setup-julia@v1
         with:
           version: ${{ matrix.version }}
