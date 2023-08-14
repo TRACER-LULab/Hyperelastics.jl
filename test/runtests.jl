@@ -4,6 +4,7 @@ using Hyperelastics
 using Test
 using ForwardDiff, FiniteDiff, Zygote, Enzyme
 using InteractiveUtils
+using ADTypes
 
 @time include("helpers.jl")
 @time include("material_tests.jl")

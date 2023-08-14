@@ -33,7 +33,7 @@ function DataDrivenAverageChainBehavior(data::HyperelasticUniaxialTest; fchain =
     DataDrivenAverageChainBehavior{typeof(data.name),typeof(fch)}(data.name, fch)
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ψ::DataDrivenAverageChainBehavior,
     λ⃗::Vector,
     p,
@@ -43,7 +43,7 @@ function NonlinearContinua.StrainEnergyDensity(
     return W
 end
 
-function NonlinearContinua.SecondPiolaKirchoffStressTensor(
+function ContinuumMechanicsBase.SecondPiolaKirchoffStressTensor(
     ψ::DataDrivenAverageChainBehavior,
     λ⃗::Vector,
     p;
@@ -54,7 +54,7 @@ function NonlinearContinua.SecondPiolaKirchoffStressTensor(
     return sᵢ
 end
 
-function NonlinearContinua.CauchyStressTensor(
+function ContinuumMechanicsBase.CauchyStressTensor(
     ψ::DataDrivenAverageChainBehavior,
     λ⃗::Vector,
     p;

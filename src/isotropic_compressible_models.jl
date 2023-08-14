@@ -21,7 +21,7 @@ end
 # Definitions
 ## Vector Forms
 ### Principal Value Form
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ψ::GeneralCompressible{T},
     λ⃗::Vector{S},
     p;
@@ -32,7 +32,7 @@ function NonlinearContinua.StrainEnergyDensity(
     return ψ_vol + ψ_dev
 end
 
-function NonlinearContinua.SecondPiolaKirchoffStressTensor(
+function ContinuumMechanicsBase.SecondPiolaKirchoffStressTensor(
     ψ::GeneralCompressible{T},
     λ⃗::Vector{S},
     p;
@@ -48,7 +48,7 @@ function NonlinearContinua.SecondPiolaKirchoffStressTensor(
     return s_vol + s_dev
 end
 
-function NonlinearContinua.CauchyStressTensor(
+function ContinuumMechanicsBase.CauchyStressTensor(
     ψ::GeneralCompressible{T},
     λ⃗::Vector{S},
     p;
@@ -60,7 +60,7 @@ function NonlinearContinua.CauchyStressTensor(
 end
 
 ## Invariant Form
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ψ::GeneralCompressible{T},
     I⃗::Vector{S},
     p;
@@ -77,7 +77,7 @@ end
 
 ## Tensor Forms
 ### Principal Value Form
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ψ::GeneralCompressible{T},
     F::Matrix{S},
     p;
@@ -88,7 +88,7 @@ function NonlinearContinua.StrainEnergyDensity(
     StrainEnergyDensity(ψ.incompressible, F̄, p.ψ; kwargs...) + p.κ / 2 * (J - 1)^2
 end
 
-function NonlinearContinua.SecondPiolaKirchoffStressTensor(
+function ContinuumMechanicsBase.SecondPiolaKirchoffStressTensor(
     ψ::GeneralCompressible{T},
     F::Matrix{S},
     p;
@@ -115,7 +115,7 @@ function NonlinearContinua.SecondPiolaKirchoffStressTensor(
     return s_dev .+ s_vol
 end
 
-function NonlinearContinua.CauchyStressTensor(
+function ContinuumMechanicsBase.CauchyStressTensor(
     ψ::GeneralCompressible{T},
     F::Matrix{S},
     p;
@@ -143,7 +143,7 @@ end
 
 
 ### Invariant Form
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ψ::GeneralCompressible{T},
     F::Matrix{S},
     p;
@@ -155,7 +155,7 @@ function NonlinearContinua.StrainEnergyDensity(
     p.κ / 2 * (J - 1)^2
 end
 
-function NonlinearContinua.SecondPiolaKirchoffStressTensor(
+function ContinuumMechanicsBase.SecondPiolaKirchoffStressTensor(
     ψ::GeneralCompressible{T},
     F::Matrix{S},
     p;
@@ -175,7 +175,7 @@ function NonlinearContinua.SecondPiolaKirchoffStressTensor(
     return s_dev .+ s_vol
 end
 
-function NonlinearContinua.CauchyStressTensor(
+function ContinuumMechanicsBase.CauchyStressTensor(
     ψ::GeneralCompressible{T},
     F::Matrix{S},
     p;
@@ -217,7 +217,7 @@ end
 # Strain Energy Density Definitions
 ## Vector Definitions
 ### Principal Value Form
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ψ::LogarithmicCompressible{T},
     λ⃗::Vector{S},
     p,
@@ -226,7 +226,7 @@ function NonlinearContinua.StrainEnergyDensity(
     p.κ * (J(λ⃗) * log(J(λ⃗)) - J(λ⃗))
 end
 
-function NonlinearContinua.SecondPiolaKirchoffStressTensor(
+function ContinuumMechanicsBase.SecondPiolaKirchoffStressTensor(
     ψ::LogarithmicCompressible{T},
     λ⃗::Vector{S},
     p;
@@ -238,7 +238,7 @@ function NonlinearContinua.SecondPiolaKirchoffStressTensor(
     return s_vol + s_dev
 end
 
-function NonlinearContinua.CauchyStressTensor(
+function ContinuumMechanicsBase.CauchyStressTensor(
     ψ::LogarithmicCompressible{T},
     λ⃗::Vector{S},
     p;
@@ -251,7 +251,7 @@ function NonlinearContinua.CauchyStressTensor(
 end
 
 ### Invariant Form
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ψ::LogarithmicCompressible{T},
     I⃗::Vector{S},
     p,
@@ -266,7 +266,7 @@ end
 
 ## Tensor Definitions
 ### Principal Value Form
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ψ::LogarithmicCompressible{T},
     F::Matrix{S},
     p,
@@ -276,7 +276,7 @@ function NonlinearContinua.StrainEnergyDensity(
     StrainEnergyDensity(ψ.incompressible, F̄, p.ψ) + p.κ * (J * log(J) - J)
 end
 
-function NonlinearContinua.SecondPiolaKirchoffStressTensor(
+function ContinuumMechanicsBase.SecondPiolaKirchoffStressTensor(
     ψ::LogarithmicCompressible{T},
     F::Matrix{S},
     p;
@@ -303,7 +303,7 @@ function NonlinearContinua.SecondPiolaKirchoffStressTensor(
     return s_dev .+ s_vol
 end
 
-function NonlinearContinua.CauchyStressTensor(
+function ContinuumMechanicsBase.CauchyStressTensor(
     ψ::LogarithmicCompressible{T},
     F::Matrix{S},
     p;
@@ -331,7 +331,7 @@ function NonlinearContinua.CauchyStressTensor(
 end
 
 ### Invariant Form
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ψ::LogarithmicCompressible{T},
     F::Matrix{S},
     p,
@@ -341,7 +341,7 @@ function NonlinearContinua.StrainEnergyDensity(
     StrainEnergyDensity(ψ.incompressible, F̄, p.ψ) + p.κ * (J * log(J) - J)
 end
 
-function NonlinearContinua.SecondPiolaKirchoffStressTensor(
+function ContinuumMechanicsBase.SecondPiolaKirchoffStressTensor(
     ψ::LogarithmicCompressible{T},
     F::Matrix{S},
     p;
@@ -355,7 +355,7 @@ function NonlinearContinua.SecondPiolaKirchoffStressTensor(
     return s_dev + s_vol
 end
 
-function NonlinearContinua.CauchyStressTensor(
+function ContinuumMechanicsBase.CauchyStressTensor(
     ψ::LogarithmicCompressible{T},
     F::Matrix{S},
     p;

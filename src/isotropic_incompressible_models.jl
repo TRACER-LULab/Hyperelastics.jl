@@ -108,30 +108,30 @@ Fields:
 
 """
 struct ArrudaBoyce{T} <: AbstractIncompressibleModel{T}
-    ℒinv::Function
+    ℒinv::InverseLangevinApproximations.AbstractInverseLangevinApproximation
     ArrudaBoyce(
         ::T = PrincipalValueForm();
-        ℒinv::Function = TreloarApproximation,
+        ℒinv::InverseLangevinApproximations.AbstractInverseLangevinApproximation=TreloarApproximation()
     ) where {T<:Union{InvariantForm,PrincipalValueForm}} = new{T}(ℒinv)
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ψ::ArrudaBoyce,
     λ⃗::Vector{T},
     (; μ, N),
 ) where {T}
     rchain_Nl = √(I₁(λ⃗) / 3 / N)
-    β = ψ.ℒinv(rchain_Nl)
+    β = inverse_langevin_approximation(ψ.ℒinv,rchain_Nl)
     return μ * N * (rchain_Nl * β + log(β / sinh(β)))
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ψ::ArrudaBoyce{I},
     I⃗::Vector{T},
     (; μ, N),
 ) where {T,I<:InvariantForm}
     rchain_Nl = √(I⃗[1] / 3 / N)
-    β = ψ.ℒinv(rchain_Nl)
+    β = inverse_langevin_approximation(ψ.ℒinv,rchain_Nl)
     return μ * N * (rchain_Nl * β + log(β / sinh(β)))
 end
 
@@ -168,15 +168,15 @@ Fields:
 > Meissner B, Matějka L. A Langevin-elasticity-theory-based constitutive equation for rubberlike networks and its comparison with biaxial stress–strain data. Part I. Polymer. 2003 Jul 1;44(16):4599-610.
 """
 struct ABGI{T} <: AbstractIncompressibleModel{T}
-    ℒinv::Function
+    ℒinv::InverseLangevinApproximations.AbstractInverseLangevinApproximation
     AB::ArrudaBoyce
     ABGI(
         ::T = PrincipalValueForm();
-        ℒinv::Function = TreloarApproximation,
+        ℒinv::InverseLangevinApproximations.AbstractInverseLangevinApproximation = TreloarApproximation(),
     ) where {T<:PrincipalValueForm} = new{T}(ℒinv, ArrudaBoyce(T(), ℒinv = ℒinv))
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ψ::ABGI,
     λ⃗::Vector{T},
     (; μ, N, Ge, n),
@@ -214,13 +214,13 @@ Fields:
 > Miehe C, Göktepe S, Lulei F. A micro-macro approach to rubber-like materials—part I: the non-affine micro-sphere model of rubber elasticity. Journal of the Mechanics and Physics of Solids. 2004 Nov 1;52(11):2617-60.
 """
 struct AffineMicroSphere{T,R,S} <: AbstractIncompressibleModel{T}
-    ℒinv::Function
+    ℒinv::InverseLangevinApproximations.AbstractInverseLangevinApproximation
     r⃗::Vector{R}
     w::Vector{S}
     λr::Function
     function AffineMicroSphere(
         ::T = PrincipalValueForm();
-        ℒinv::Function = TreloarApproximation,
+        ℒinv::InverseLangevinApproximations.AbstractInverseLangevinApproximation = TreloarApproximation(),
         n = 21,
     ) where {T<:PrincipalValueForm}
         a = √(2) / 2
@@ -258,13 +258,13 @@ struct AffineMicroSphere{T,R,S} <: AbstractIncompressibleModel{T}
     end
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ψ::AffineMicroSphere,
     λ⃗::Vector{T},
     (; μ, N),
 ) where {T}
     λr = map(Base.Fix1(ψ.λr, (λ = λ⃗, N = N)), ψ.r⃗)
-    β = @. ψ.ℒinv(λr)
+    β = @. inverse_langevin_approximation(ψ.ℒinv, λr)
     ψf = @. μ * N * (λr * β + log(β / sinh(β))) * ψ.w
     return sum(ψf)
 end
@@ -304,7 +304,7 @@ struct Alexander{T} <: AbstractIncompressibleModel{T}
     Alexander(::T = PrincipalValueForm()) where {T<:PrincipalValueForm} = new{T}()
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ::Alexander{T},
     λ⃗::Vector{S},
     (; μ, C₁, C₂, C₃, k, γ),
@@ -316,7 +316,7 @@ function NonlinearContinua.StrainEnergyDensity(
     )
 end
 
-function NonlinearContinua.SecondPiolaKirchoffStressTensor(
+function ContinuumMechanicsBase.SecondPiolaKirchoffStressTensor(
     ::Alexander{T},
     λ⃗::Vector{S},
     (; μ, C₁, C₂, C₃, k, γ);
@@ -356,16 +356,16 @@ struct MooneyRivlin{T} <: AbstractIncompressibleModel{T}
     ) where {T<:Union{InvariantForm,PrincipalValueForm}} = new{T}(GeneralMooneyRivlin(T()))
 end
 
-# function NonlinearContinua.StrainEnergyDensity(::MooneyRivlin{T}, λ⃗::Vector{S}, (; C10, C01)) where {T<:PrincipalValueForm, S}
+# function ContinuumMechanicsBase.StrainEnergyDensity(::MooneyRivlin{T}, λ⃗::Vector{S}, (; C10, C01)) where {T<:PrincipalValueForm, S}
 #     return C10 * (I₁(λ⃗) - 3) + C01 * (I₂(λ⃗) - 3)
 # end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ψ::MooneyRivlin{T},
     I⃗::Vector{S},
     (; C10, C01),
 ) where {T,S}
-    NonlinearContinua.StrainEnergyDensity(ψ.GMR, I⃗, (C⃗ = [
+    ContinuumMechanicsBase.StrainEnergyDensity(ψ.GMR, I⃗, (C⃗ = [
         0.0 C10
         C01 0.0
     ],))
@@ -392,7 +392,7 @@ struct NeoHookean{T} <: AbstractIncompressibleModel{T}
         new{typeof(I)}()
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ::NeoHookean{T},
     λ⃗::Vector{S},
     (; μ),
@@ -400,7 +400,7 @@ function NonlinearContinua.StrainEnergyDensity(
     μ / 2 * (I₁(λ⃗) - 3)
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ::NeoHookean{T},
     I⃗::Vector{S},
     (; μ),
@@ -432,7 +432,7 @@ struct Isihara{T} <: AbstractIncompressibleModel{T}
         new{T}(GeneralMooneyRivlin(T()))
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ψ::Isihara{T},
     λ⃗::Vector{S},
     (; C10, C20, C01),
@@ -469,7 +469,7 @@ struct Biderman{T} <: AbstractIncompressibleModel{T}
     ) where {T<:Union{InvariantForm,PrincipalValueForm}} = new{T}()
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ψ::Biderman{T},
     λ⃗::Vector{S},
     (; C10, C01, C20, C30),
@@ -517,7 +517,7 @@ struct JamesGreenSimpson{T} <: AbstractIncompressibleModel{T}
     ) where {T<:Union{InvariantForm,PrincipalValueForm}} = new{T}(GeneralMooneyRivlin(T()))
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     W::JamesGreenSimpson{T},
     λ⃗::Vector{S},
     (; C10, C01, C11, C20, C30),
@@ -528,8 +528,8 @@ function NonlinearContinua.StrainEnergyDensity(
     ],))
 end
 
-# function NonlinearContinua.StrainEnergyDensity(::JamesGreenSimpson, I⃗::Vector{T}, (; C10, C01, C11, C20, C30), I::InvariantForm) where T
-#     NonlinearContinua.StrainEnergyDensity(
+# function ContinuumMechanicsBase.StrainEnergyDensity(::JamesGreenSimpson, I⃗::Vector{T}, (; C10, C01, C11, C20, C30), I::InvariantForm) where T
+#     ContinuumMechanicsBase.StrainEnergyDensity(
 #         GeneralMooneyRivlin(),
 #         I⃗,
 #         (C=[
@@ -569,7 +569,7 @@ struct HainesWilson{T} <: AbstractIncompressibleModel{T}
     ) where {T<:Union{InvariantForm,PrincipalValueForm}} = new{T}(GeneralMooneyRivlin(T()))
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ψ::HainesWilson{T},
     λ⃗::Vector{S},
     (; C10, C01, C11, C02, C20, C30),
@@ -581,8 +581,8 @@ function NonlinearContinua.StrainEnergyDensity(
     ],))
 end
 
-# function NonlinearContinua.StrainEnergyDensity(::HainesWilson, I⃗::Vector{T}, (; C10, C01, C11, C02, C20, C30), I::InvariantForm) where T
-#     NonlinearContinua.StrainEnergyDensity(
+# function ContinuumMechanicsBase.StrainEnergyDensity(::HainesWilson, I⃗::Vector{T}, (; C10, C01, C11, C02, C20, C30), I::InvariantForm) where T
+#     ContinuumMechanicsBase.StrainEnergyDensity(
 #         GeneralMooneyRivlin(),
 #         I⃗,
 #         (C=[
@@ -619,7 +619,7 @@ struct Yeoh{T} <: AbstractIncompressibleModel{T}
         new{T}(GeneralMooneyRivlin(T()))
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ψ::Yeoh{T},
     λ⃗::Vector{S},
     (; C10, C20, C30),
@@ -627,8 +627,8 @@ function NonlinearContinua.StrainEnergyDensity(
     StrainEnergyDensity(ψ.GMR, λ⃗, (C⃗ = [0.0 C10 C20 C30],))
 end
 
-# function NonlinearContinua.StrainEnergyDensity(::Yeoh, I⃗::Vector{T}, (; C10, C20, C30), I::InvariantForm) where T
-#     NonlinearContinua.StrainEnergyDensity(
+# function ContinuumMechanicsBase.StrainEnergyDensity(::Yeoh, I⃗::Vector{T}, (; C10, C20, C30), I::InvariantForm) where T
+#     ContinuumMechanicsBase.StrainEnergyDensity(
 #         GeneralMooneyRivlin(),
 #         I⃗,
 #         (C=[0 C10 C20 C30],),
@@ -660,7 +660,7 @@ struct Lion{T} <: AbstractIncompressibleModel{T}
         new{T}(GeneralMooneyRivlin(T()))
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ψ::Lion{T},
     λ⃗::Vector{S},
     (; C10, C01, C50),
@@ -671,8 +671,8 @@ function NonlinearContinua.StrainEnergyDensity(
     ],))
 end
 
-# function NonlinearContinua.StrainEnergyDensity(::Lion, I⃗::Vector{T}, (; C10, C01, C50), I::InvariantForm) where T
-#     NonlinearContinua.StrainEnergyDensity(
+# function ContinuumMechanicsBase.StrainEnergyDensity(::Lion, I⃗::Vector{T}, (; C10, C01, C50), I::InvariantForm) where T
+#     ContinuumMechanicsBase.StrainEnergyDensity(
 #         GeneralMooneyRivlin(),
 #         I⃗,
 #         (C=[
@@ -711,7 +711,7 @@ struct HauptSedlan{T} <: AbstractIncompressibleModel{T}
     ) where {T<:Union{InvariantForm,PrincipalValueForm}} = new{T}(GeneralMooneyRivlin(T()))
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ψ::HauptSedlan{T},
     λ⃗::Vector{S},
     (; C10, C01, C11, C02, C30),
@@ -723,8 +723,8 @@ function NonlinearContinua.StrainEnergyDensity(
     ],))
 end
 
-# function NonlinearContinua.StrainEnergyDensity(::HauptSedlan, I⃗::Vector{T}, (; C10, C01, C11, C02, C30), I::InvariantForm) where T
-#     NonlinearContinua.StrainEnergyDensity(
+# function ContinuumMechanicsBase.StrainEnergyDensity(::HauptSedlan, I⃗::Vector{T}, (; C10, C01, C11, C02, C30), I::InvariantForm) where T
+#     ContinuumMechanicsBase.StrainEnergyDensity(
 #         GeneralMooneyRivlin(),
 #         I⃗,
 #         (C=[
@@ -760,7 +760,7 @@ struct HartmannNeff{T} <: AbstractIncompressibleModel{T}
     ) where {T<:Union{InvariantForm,PrincipalValueForm}} = new{T}()
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ::HartmannNeff{T},
     λ⃗::Vector{S},
     (; α, Ci⃗0, C0j⃗),
@@ -774,7 +774,7 @@ function NonlinearContinua.StrainEnergyDensity(
     return sum(W1) + sum(W2) + α * (I1^3 - 3^3)
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ::HartmannNeff{T},
     I⃗::Vector{S},
     (; α, Ci⃗0, C0j⃗),
@@ -809,7 +809,7 @@ struct Carroll{T} <: AbstractIncompressibleModel{T}
         new{T}()
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ::Carroll{T},
     λ⃗::Vector{S},
     (; A, B, C),
@@ -817,7 +817,7 @@ function NonlinearContinua.StrainEnergyDensity(
     return A * I₁(λ⃗) + B * I₁(λ⃗)^4 + C * I₂(λ⃗)^(1 / 2)
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ::Carroll{T},
     I⃗::Vector{S},
     (; A, B, C),
@@ -851,7 +851,7 @@ struct BahremanDarijani{PrincipalValueForm} <:
         new{PrincipalValueForm}(GeneralDarijaniNaghdabadi(T()))
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     W::BahremanDarijani{T},
     λ⃗::Vector{S},
     (; A2, B2, A4, A6),
@@ -887,7 +887,7 @@ struct Zhao{T} <: AbstractIncompressibleModel{T}
         new{T}()
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ::Zhao{T},
     λ⃗::Vector{S},
     (; C₋₁¹, C₁¹, C₂¹, C₂²),
@@ -898,7 +898,7 @@ function NonlinearContinua.StrainEnergyDensity(
            C₂² * (I₁(λ⃗)^2 - 2I₂(λ⃗) - 3)^2
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ::Zhao{T},
     I⃗::Vector{S},
     (; C₋₁¹, C₁¹, C₂¹, C₂²),
@@ -932,7 +932,7 @@ struct Knowles{T} <: AbstractIncompressibleModel{T}
         new{T}()
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ::Knowles{T},
     λ⃗::Vector{S},
     (; μ, b, n),
@@ -940,7 +940,7 @@ function NonlinearContinua.StrainEnergyDensity(
     return μ / (2b) * ((1 + (b / n) * (I₁(λ⃗) - 3))^n - 1)
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ::Knowles{T},
     I⃗::Vector{S},
     (; μ, b, n),
@@ -979,7 +979,7 @@ struct Swanson{T} <: AbstractIncompressibleModel{T}
         new{T}()
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ::Swanson{T},
     λ⃗::Vector{S},
     (; A⃗, α⃗, B⃗, β⃗),
@@ -992,7 +992,7 @@ function NonlinearContinua.StrainEnergyDensity(
     )
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ::Swanson{T},
     I⃗::Vector{S},
     (; A⃗, α⃗, B⃗, β⃗),
@@ -1029,7 +1029,7 @@ struct YamashitaKawabata{T} <: AbstractIncompressibleModel{T}
     ) where {T<:Union{InvariantForm,PrincipalValueForm}} = new{T}()
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ::YamashitaKawabata{T},
     λ⃗::Vector{S},
     (; C1, C2, C3, N),
@@ -1037,7 +1037,7 @@ function NonlinearContinua.StrainEnergyDensity(
     return C1 * (I₁(λ⃗) - 3) + C2 * (I₂(λ⃗) - 3) + C3 / (N + 1) * (I₁(λ⃗) - 3)^(N + 1)
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ::YamashitaKawabata{T},
     I⃗::Vector{S},
     (; C1, C2, C3, N),
@@ -1070,7 +1070,7 @@ struct DavisDeThomas{T} <: AbstractIncompressibleModel{T}
     ) where {T<:Union{InvariantForm,PrincipalValueForm}} = new{T}()
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ::DavisDeThomas{T},
     λ⃗::Vector{S},
     (; A, n, C, k),
@@ -1078,7 +1078,7 @@ function NonlinearContinua.StrainEnergyDensity(
     return A / (2 * (1 - n / 2)) * (I₁(λ⃗) - 3 + C^2)^(1 - n / 2) + k * (I₁(λ⃗) - 3)^2
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ::DavisDeThomas{T},
     I⃗::Vector{S},
     (; A, n, C, k),
@@ -1113,7 +1113,7 @@ struct Gregory{T} <: AbstractIncompressibleModel{T}
         new{T}()
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ::Gregory{T},
     λ⃗::Vector{S},
     (; A, B, C, m, n),
@@ -1122,7 +1122,7 @@ function NonlinearContinua.StrainEnergyDensity(
            B / (2 + m) * (I₁(λ⃗) - 3 + C^2)^(1 + m / 2)
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ::Gregory{T},
     I⃗::Vector{S},
     (; A, B, C, m, n),
@@ -1160,7 +1160,7 @@ struct ModifiedGregory{T} <: AbstractIncompressibleModel{T}
     ) where {T<:Union{InvariantForm,PrincipalValueForm}} = new{T}()
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ::ModifiedGregory{T},
     λ⃗::Vector{S},
     (; A, α, M, B, β, N),
@@ -1169,7 +1169,7 @@ function NonlinearContinua.StrainEnergyDensity(
            B / (1 + β) * (I₁(λ⃗) - 3 + N^2)^(1 + β)
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ::ModifiedGregory{T},
     I⃗::Vector{S},
     (; A, α, M, B, β, N),
@@ -1207,7 +1207,7 @@ struct Beda{T} <: AbstractIncompressibleModel{T}
         new{T}(GeneralBeda(T()))
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ψ::Beda{T},
     λ⃗::Vector{S},
     (; C1, C2, C3, K1, α, β, ζ),
@@ -1220,7 +1220,7 @@ function NonlinearContinua.StrainEnergyDensity(
     return W
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ψ::Beda{T},
     I⃗::Vector{S},
     (; C1, C2, C3, K1, α, β, ζ),
@@ -1266,7 +1266,7 @@ struct Amin{T} <: AbstractIncompressibleModel{T}
         new{T}()
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ::Amin{T},
     λ⃗::Vector{S},
     (; C1, C2, C3, C4, N, M),
@@ -1277,7 +1277,7 @@ function NonlinearContinua.StrainEnergyDensity(
            C4 * (I₂(λ⃗) - 3)
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ::Amin{T},
     I⃗::Vector{S},
     (; C1, C2, C3, C4, N, M),
@@ -1313,7 +1313,7 @@ struct LopezPamies{T} <: AbstractIncompressibleModel{T}
     ) where {T<:Union{InvariantForm,PrincipalValueForm}} = new{T}()
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ::LopezPamies{T},
     λ⃗::Vector{S},
     (; α⃗, μ⃗),
@@ -1323,7 +1323,7 @@ function NonlinearContinua.StrainEnergyDensity(
     return sum(@. (3^(1 - α⃗)) / (2α⃗) * μ⃗ * (I1^(α⃗) - 3^(α⃗)))
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ::LopezPamies{T},
     I⃗::Vector{S},
     (; α⃗, μ⃗),
@@ -1360,7 +1360,7 @@ struct GenYeoh{T} <: AbstractIncompressibleModel{T}
         new{T}()
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ::GenYeoh{T},
     λ⃗::Vector{S},
     (; K1, K2, K3, m, p, q),
@@ -1368,7 +1368,7 @@ function NonlinearContinua.StrainEnergyDensity(
     return K1 * (I₁(λ⃗) - 3)^m + K2 * (I₁(λ⃗) - 3)^p + K3 * (I₁(λ⃗) - 3)^q
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ::GenYeoh{T},
     I⃗::Vector{S},
     (; K1, K2, K3, m, p, q),
@@ -1402,7 +1402,7 @@ struct HartSmith{T} <: AbstractIncompressibleModel{T}
     ) where {T<:Union{InvariantForm,PrincipalValueForm}} = new{T}()
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ::HartSmith{T},
     λ⃗::Vector{S},
     (; G, k₁, k₂),
@@ -1410,7 +1410,7 @@ function NonlinearContinua.StrainEnergyDensity(
     return G * exp(-9k₁ + k₁ * I₁(λ⃗)) / k₁ + G * k₂ * log(I₂(λ⃗))
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ::HartSmith{T},
     I⃗::Vector{S},
     (; G, k₁, k₂),
@@ -1444,7 +1444,7 @@ struct VerondaWestmann{T} <: AbstractIncompressibleModel{T}
     ) where {T<:Union{InvariantForm,PrincipalValueForm}} = new{T}()
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ::VerondaWestmann{T},
     λ⃗::Vector{S},
     (; C1, C2, α),
@@ -1452,7 +1452,7 @@ function NonlinearContinua.StrainEnergyDensity(
     return C1 * (exp(α * (I₁(λ⃗) - 3)) - 1) + C2 * (I₂(λ⃗) - 3)
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ::VerondaWestmann{T},
     I⃗::Vector{S},
     (; C1, C2, α),
@@ -1486,7 +1486,7 @@ struct FungDemiray{T} <: AbstractIncompressibleModel{T}
     ) where {T<:Union{InvariantForm,PrincipalValueForm}} = new{T}()
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ::FungDemiray{T},
     λ⃗::Vector{S},
     (; μ, b),
@@ -1494,7 +1494,7 @@ function NonlinearContinua.StrainEnergyDensity(
     return μ / (2 * b) * (exp(b * (I₁(λ⃗) - 3)) - 1)
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ::FungDemiray{T},
     I⃗::Vector{S},
     (; μ, b),
@@ -1527,7 +1527,7 @@ struct Vito{T} <: AbstractIncompressibleModel{T}
         new{T}()
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ::Vito{T},
     λ⃗::Vector{S},
     (; α, β, γ),
@@ -1535,7 +1535,7 @@ function NonlinearContinua.StrainEnergyDensity(
     return α * (exp(β * (I₁(λ⃗) - 3) + γ * (I₂(λ⃗) - 3)) - 1)
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ::Vito{T},
     I⃗::Vector{S},
     (; α, β, γ),
@@ -1571,7 +1571,7 @@ struct ModifiedYeoh{T} <: AbstractIncompressibleModel{T}
     ) where {T<:Union{InvariantForm,PrincipalValueForm}} = new{T}()
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ::ModifiedYeoh{T},
     λ⃗::Vector{S},
     (; C10, C20, C30, α, β),
@@ -1582,7 +1582,7 @@ function NonlinearContinua.StrainEnergyDensity(
            α / β * (1 - exp(-β * (I₁(λ⃗) - 3)))
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ::ModifiedYeoh{T},
     I⃗::Vector{S},
     (; C10, C20, C30, α, β),
@@ -1639,7 +1639,7 @@ struct ChevalierMarco{T} <: AbstractIncompressibleModel{T}
     end
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     W::ChevalierMarco{T},
     λ⃗::Vector{S},
     (; a⃗, b⃗),
@@ -1650,13 +1650,13 @@ function NonlinearContinua.StrainEnergyDensity(
            quadgk(Base.Fix2(W.∂W∂I2, b⃗), 3, I₂(λ⃗))[1]
 end
 
-# function NonlinearContinua.StrainEnergyDensity(W::ChevalierMarco{T}, I⃗::Vector{S}, (; a⃗, b⃗)) where {T<:InvariantForm, S}
+# function ContinuumMechanicsBase.StrainEnergyDensity(W::ChevalierMarco{T}, I⃗::Vector{S}, (; a⃗, b⃗)) where {T<:InvariantForm, S}
 #     # ∂W∂I1(I₁) = exp(sum(@tullio _ := a⃗[i] * (I₁ - 3)^(i - 1)))
 #     # ∂W∂I2(I₂) = @tullio _ := b⃗[i] / I₂^(i - 1)
 #     return quadgk(Base.Fix2(W.∂W∂I1,a⃗), 3, I⃗[1])[1] + quadgk(Base.Fix2(W.∂W∂I2,b⃗), 3, I⃗[2])[1]
 # end
 
-function NonlinearContinua.SecondPiolaKirchoffStressTensor(
+function ContinuumMechanicsBase.SecondPiolaKirchoffStressTensor(
     W::ChevalierMarco{T},
     λ⃗::Vector{S},
     (; a⃗, b⃗);
@@ -1668,13 +1668,13 @@ function NonlinearContinua.SecondPiolaKirchoffStressTensor(
     return sᵢ
 end
 
-function NonlinearContinua.CauchyStressTensor(
+function ContinuumMechanicsBase.CauchyStressTensor(
     W::ChevalierMarco{T},
     λ⃗::Vector{S},
     p;
     kwargs...,
 ) where {T<:PrincipalValueForm,S}
-    s = NonlinearContinua.SecondPiolaKirchoffStressTensor(W, λ⃗, p)
+    s = ContinuumMechanicsBase.SecondPiolaKirchoffStressTensor(W, λ⃗, p)
     σ = λ⃗ .* s
     return σ
 end
@@ -1707,7 +1707,7 @@ struct GornetDesmorat{T} <: AbstractIncompressibleModel{T}
     ) where {T<:Union{InvariantForm,PrincipalValueForm}} = new{T}()
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ::GornetDesmorat{T},
     λ⃗::Vector{S},
     (; h₁, h₂, h₃),
@@ -1715,7 +1715,7 @@ function NonlinearContinua.StrainEnergyDensity(
     return h₁ * √π * erfi(√h₃ * (I₁(λ⃗) - 3)^2) / 2 / √h₃ + 6 * h₂ * √(I₂(λ⃗))
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ::GornetDesmorat{T},
     I⃗::Vector{S},
     (; h₁, h₂, h₃),
@@ -1723,7 +1723,7 @@ function NonlinearContinua.StrainEnergyDensity(
     return h₁ * √π * erfi(√h₃ * (I⃗[1] - 3)^2) / 2 / √h₃ + 6 * h₂ * √(I⃗[2])
 end
 
-function NonlinearContinua.CauchyStressTensor(
+function ContinuumMechanicsBase.CauchyStressTensor(
     ::GornetDesmorat{T},
     λ⃗::Vector{S},
     (; h₁, h₂, h₃);
@@ -1738,7 +1738,7 @@ function NonlinearContinua.CauchyStressTensor(
     return σ
 end
 
-function NonlinearContinua.SecondPiolaKirchoffStressTensor(
+function ContinuumMechanicsBase.SecondPiolaKirchoffStressTensor(
     ψ::GornetDesmorat{T},
     λ⃗::Vector{S},
     ps;
@@ -1749,7 +1749,7 @@ function NonlinearContinua.SecondPiolaKirchoffStressTensor(
     return s
 end
 
-function NonlinearContinua.SecondPiolaKirchoffStressTensor(
+function ContinuumMechanicsBase.SecondPiolaKirchoffStressTensor(
     ψ::GornetDesmorat{T},
     F::Matrix{R},
     (; h₁, h₂, h₃);
@@ -1766,7 +1766,7 @@ function NonlinearContinua.SecondPiolaKirchoffStressTensor(
     return S
 end
 
-function NonlinearContinua.CauchyStressTensor(
+function ContinuumMechanicsBase.CauchyStressTensor(
     ψ::GornetDesmorat{T},
     F::Matrix{S},
     (; h₁, h₂, h₃);
@@ -1815,7 +1815,7 @@ struct MansouriDarijani{T} <: AbstractIncompressibleModel{T}
     ) where {T<:Union{InvariantForm,PrincipalValueForm}} = new{T}()
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ::MansouriDarijani{T},
     λ⃗::Vector{S},
     (; A1, m1, B1, n1),
@@ -1823,7 +1823,7 @@ function NonlinearContinua.StrainEnergyDensity(
     return A1 * (exp(m1 * (I₁(λ⃗) - 3)) - 1) + B1 * (exp(n1 * (I₂(λ⃗) - 3)) - 1)
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ::MansouriDarijani{T},
     I⃗::Vector{S},
     (; A1, m1, B1, n1),
@@ -1856,7 +1856,7 @@ struct GentThomas{T} <: AbstractIncompressibleModel{T}
     ) where {T<:Union{InvariantForm,PrincipalValueForm}} = new{T}()
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ::GentThomas{T},
     λ⃗::Vector{S},
     (; C1, C2),
@@ -1864,7 +1864,7 @@ function NonlinearContinua.StrainEnergyDensity(
     return C1 * (I₁(λ⃗) - 3) + C2 * log(I₂(λ⃗) / 3)
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ::GentThomas{T},
     I⃗::Vector{S},
     (; C1, C2),
@@ -1897,7 +1897,7 @@ struct LambertDianiRey{T} <: AbstractIncompressibleModel{T}
     ) where {T<:Union{InvariantForm,PrincipalValueForm}} = new{T}()
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ::LambertDianiRey{T},
     λ⃗::Vector{S},
     (; a⃗, b⃗),
@@ -1912,7 +1912,7 @@ function NonlinearContinua.StrainEnergyDensity(
     return quadgk(∂W∂I₁, 3, I₁(λ⃗))[1] + quadgk(∂W∂I₂, 3, I₂(λ⃗))[1]
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ::LambertDianiRey{T},
     I⃗::Vector{S},
     (; a⃗, b⃗),
@@ -1927,7 +1927,7 @@ function NonlinearContinua.StrainEnergyDensity(
 end
 
 
-function NonlinearContinua.SecondPiolaKirchoffStressTensor(
+function ContinuumMechanicsBase.SecondPiolaKirchoffStressTensor(
     ::LambertDianiRey{T},
     λ⃗::Vector{S},
     (; a⃗, b⃗);
@@ -1947,18 +1947,18 @@ function NonlinearContinua.SecondPiolaKirchoffStressTensor(
     return sᵢ
 end
 
-function NonlinearContinua.CauchyStressTensor(
+function ContinuumMechanicsBase.CauchyStressTensor(
     ψ::LambertDianiRey{T},
     λ⃗::Vector{S},
     ps;
     kwargs...,
 ) where {T<:PrincipalValueForm,S}
-    s = NonlinearContinua.SecondPiolaKirchoffStressTensor(ψ, λ⃗, ps)
+    s = ContinuumMechanicsBase.SecondPiolaKirchoffStressTensor(ψ, λ⃗, ps)
     σᵢ = λ⃗ .* s
     return σᵢ
 end
 
-function NonlinearContinua.SecondPiolaKirchoffStressTensor(
+function ContinuumMechanicsBase.SecondPiolaKirchoffStressTensor(
     ::LambertDianiRey{T},
     F::Matrix{R},
     p;
@@ -1976,7 +1976,7 @@ function NonlinearContinua.SecondPiolaKirchoffStressTensor(
     return S
 end
 
-function NonlinearContinua.CauchyStressTensor(
+function ContinuumMechanicsBase.CauchyStressTensor(
     ψ::LambertDianiRey{T},
     F::Matrix{S},
     p;
@@ -2031,7 +2031,7 @@ struct HossMarczakI{T} <: AbstractIncompressibleModel{T}
     ) where {T<:Union{InvariantForm,PrincipalValueForm}} = new{T}()
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ::HossMarczakI{T},
     λ⃗::Vector{S},
     (; α, β, μ, b, n),
@@ -2040,7 +2040,7 @@ function NonlinearContinua.StrainEnergyDensity(
            μ / (2b) * ((1 + b / n * (I₁(λ⃗) - 3))^n - 1)
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ::HossMarczakI{T},
     I⃗::Vector{S},
     (; α, β, μ, b, n),
@@ -2087,7 +2087,7 @@ struct HossMarczakII{T} <: AbstractIncompressibleModel{T}
     ) where {T<:Union{InvariantForm,PrincipalValueForm}} = new{T}()
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ::HossMarczakII{T},
     λ⃗::Vector{S},
     (; α, β, μ, b, n, C2),
@@ -2097,7 +2097,7 @@ function NonlinearContinua.StrainEnergyDensity(
            C2 * log(I₂(λ⃗) / 3)
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ::HossMarczakII{T},
     I⃗::Vector{S},
     (; α, β, μ, b, n, C2),
@@ -2139,7 +2139,7 @@ struct ExpLn{T} <: AbstractIncompressibleModel{T}
         new{T}()
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ::ExpLn{T},
     λ⃗::Vector{S},
     (; A, a, b),
@@ -2150,7 +2150,7 @@ function NonlinearContinua.StrainEnergyDensity(
     )
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ::ExpLn{T},
     I⃗::Vector{S},
     (; A, a, b),
@@ -2195,7 +2195,7 @@ struct VanDerWaals{T} <: AbstractIncompressibleModel{T}
     ) where {T<:Union{InvariantForm,PrincipalValueForm}} = new{T}()
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ::VanDerWaals{T},
     λ⃗::Vector{S},
     (; μ, λm, β, α),
@@ -2206,7 +2206,7 @@ function NonlinearContinua.StrainEnergyDensity(
     return W
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ::VanDerWaals{T},
     I⃗::Vector{S},
     (; μ, λm, β, α),
@@ -2255,7 +2255,7 @@ struct Gent{T} <: AbstractIncompressibleModel{T}
         new{T}()
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ::Gent{T},
     λ⃗::Vector{S},
     p,
@@ -2264,7 +2264,7 @@ function NonlinearContinua.StrainEnergyDensity(
     return -(μ * Jₘ) / 2 * log(1 - (I₁(λ⃗) - 3) / Jₘ)
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ::Gent{T},
     I⃗::Vector{S},
     (; μ, Jₘ),
@@ -2305,7 +2305,7 @@ struct TakamizawaHayashi{T} <: AbstractIncompressibleModel{T}
     ) where {T<:Union{InvariantForm,PrincipalValueForm}} = new{T}()
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ::TakamizawaHayashi{T},
     λ⃗::Vector{S},
     (; c, Jₘ),
@@ -2313,7 +2313,7 @@ function NonlinearContinua.StrainEnergyDensity(
     return -c * log(1 - ((I₁(λ⃗) - 3) / Jₘ)^2)
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ::TakamizawaHayashi{T},
     I⃗::Vector{S},
     (; c, Jₘ),
@@ -2356,7 +2356,7 @@ struct YeohFleming{T} <: AbstractIncompressibleModel{T}
     ) where {T<:Union{InvariantForm,PrincipalValueForm}} = new{T}()
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ::YeohFleming{T},
     λ⃗::Vector{S},
     (; A, B, C10, Im),
@@ -2365,7 +2365,7 @@ function NonlinearContinua.StrainEnergyDensity(
            C10 * (Im - 3) * log(1 - ((I₁(λ⃗) - 3) / (Im - 3)))
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ::YeohFleming{T},
     I⃗::Vector{S},
     (; A, B, C10, Im),
@@ -2407,7 +2407,7 @@ struct PucciSaccomandi{T} <: AbstractIncompressibleModel{T}
     ) where {T<:Union{InvariantForm,PrincipalValueForm}} = new{T}()
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ::PucciSaccomandi{T},
     λ⃗::Vector{S},
     (; K, μ, Jₘ),
@@ -2415,7 +2415,7 @@ function NonlinearContinua.StrainEnergyDensity(
     return K * log(I₂(λ⃗) / 3) - μ * Jₘ / 2 * log(1 - (I₁(λ⃗) - 3) / Jₘ)
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ::PucciSaccomandi{T},
     I⃗::Vector{S},
     (; K, μ, Jₘ),
@@ -2457,7 +2457,7 @@ struct HorganSaccomandi{T} <: AbstractIncompressibleModel{T}
     ) where {T<:Union{InvariantForm,PrincipalValueForm}} = new{T}()
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ::HorganSaccomandi{T},
     λ⃗::Vector{S},
     (; μ, J),
@@ -2465,7 +2465,7 @@ function NonlinearContinua.StrainEnergyDensity(
     return -μ * J / 2 * log((J^3 - J^2 * I₁(λ⃗) + J * I₂(λ⃗) - 1) / (J - 1)^3)
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ::HorganSaccomandi{T},
     I⃗::Vector{S},
     (; μ, J),
@@ -2514,7 +2514,7 @@ struct Beatty{T} <: AbstractIncompressibleModel{T}
         new{T}()
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ::Beatty{T},
     λ⃗::Vector{S},
     (; G₀, Iₘ),
@@ -2523,7 +2523,7 @@ function NonlinearContinua.StrainEnergyDensity(
            log((1 - (I₁(λ⃗) - 3) / (Iₘ - 3)) / (1 + (I₁(λ⃗) - 3) / (Iₘ)))
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ::Beatty{T},
     I⃗::Vector{S},
     (; G₀, Iₘ),
@@ -2562,7 +2562,7 @@ struct HorganMurphy{T} <: AbstractIncompressibleModel{T}
     HorganMurphy(::T = PrincipalValueForm()) where {T<:PrincipalValueForm} = new{T}()
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ::HorganMurphy{T},
     λ⃗::Vector{S},
     (; μ, Jₘ, c),
@@ -2602,7 +2602,7 @@ struct ValanisLandel{T} <: AbstractIncompressibleModel{T}
     ValanisLandel(::T = PrincipalValueForm()) where {T<:PrincipalValueForm} = new{T}()
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ::ValanisLandel{T},
     λ⃗::Vector{S},
     (; μ),
@@ -2632,7 +2632,7 @@ struct PengLandel{T} <: AbstractIncompressibleModel{T}
     PengLandel(::T = PrincipalValueForm()) where {T<:PrincipalValueForm} = new{T}()
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ::PengLandel{T},
     λ⃗::Vector{S},
     (; E),
@@ -2667,7 +2667,7 @@ struct Ogden{T} <: AbstractIncompressibleModel{T}
     Ogden(::T = PrincipalValueForm()) where {T<:PrincipalValueForm} = new{T}()
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ::Ogden{T},
     λ⃗::Vector{S},
     (; μ⃗, α⃗),
@@ -2705,7 +2705,7 @@ struct Attard{T} <: AbstractIncompressibleModel{T}
     end
 end
 
-function NonlinearContinua.StrainEnergyDensity(ψ::Attard{T}, λ⃗::Vector{S}, p) where {T,S}
+function ContinuumMechanicsBase.StrainEnergyDensity(ψ::Attard{T}, λ⃗::Vector{S}, p) where {T,S}
     @assert length(p.A⃗) == length(p.B⃗) "Length of A and B are not equal"
     W = sum(Base.Fix2(ψ.Wi, (λ⃗ = λ⃗, p = p)), 1:length(p.A⃗))
     return W
@@ -2763,7 +2763,7 @@ struct Shariff{T} <: AbstractIncompressibleModel{T}
     end
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ψ::Shariff{T},
     λ⃗::Vector{S},
     (; E, α⃗),
@@ -2775,7 +2775,7 @@ function NonlinearContinua.StrainEnergyDensity(
     return E * W
 end
 
-function NonlinearContinua.CauchyStressTensor(
+function ContinuumMechanicsBase.CauchyStressTensor(
     ψ::Shariff{T},
     λ⃗::Vector{S},
     (; E, α⃗);
@@ -2788,7 +2788,7 @@ function NonlinearContinua.CauchyStressTensor(
     return E .* σ
 end
 
-function NonlinearContinua.SecondPiolaKirchoffStressTensor(
+function ContinuumMechanicsBase.SecondPiolaKirchoffStressTensor(
     ψ::Shariff{T},
     λ⃗::Vector{S},
     (; E, α⃗);
@@ -2834,7 +2834,7 @@ struct ArmanNarooei{T} <: AbstractIncompressibleModel{T}
     end
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ψ::ArmanNarooei{T},
     λ⃗::Vector{S},
     p,
@@ -2876,7 +2876,7 @@ struct ContinuumHybrid{T} <: AbstractIncompressibleModel{T}
     ContinuumHybrid(::T = PrincipalValueForm()) where {T<:PrincipalValueForm} = new{T}()
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ::ContinuumHybrid{T},
     λ⃗::Vector{S},
     (; K₁, K₂, α, μ),
@@ -2909,7 +2909,7 @@ struct Bechir4Term{T} <: AbstractIncompressibleModel{T}
     Bechir4Term(::T = PrincipalValueForm()) where {T<:PrincipalValueForm} = new{T}()
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ::Bechir4Term{T},
     λ⃗::Vector{S},
     (; C11, C12, C21, C22),
@@ -2952,7 +2952,7 @@ struct ConstrainedJunction{T} <: AbstractIncompressibleModel{T}
     ConstrainedJunction(::T = PrincipalValueForm()) where {T<:PrincipalValueForm} = new{T}()
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ::ConstrainedJunction{T},
     λ⃗::Vector{S},
     (; Gc, μkT, κ),
@@ -2999,7 +2999,7 @@ struct EdwardVilgis{T} <: AbstractIncompressibleModel{T}
     EdwardVilgis(::T = PrincipalValueForm()) where {T<:PrincipalValueForm} = new{T}()
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ::EdwardVilgis{T},
     λ⃗::Vector{S},
     (; Ns, Nc, α, η),
@@ -3067,7 +3067,7 @@ struct MCC{T} <: AbstractIncompressibleModel{T}
     MCC(::T = PrincipalValueForm()) where {T<:PrincipalValueForm} = new{T}()
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ::MCC{T},
     λ⃗::Vector{S},
     (; ζkT, μkT, κ),
@@ -3110,7 +3110,7 @@ struct Tube{T} <: AbstractIncompressibleModel{T}
     Tube(::T = PrincipalValueForm()) where {T<:PrincipalValueForm} = new{T}()
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ::Tube{T},
     λ⃗::Vector{S},
     (; Gc, Ge, β),
@@ -3141,7 +3141,7 @@ struct NonaffineTube{T} <: AbstractIncompressibleModel{T}
     NonaffineTube(::T = PrincipalValueForm()) where {T<:PrincipalValueForm} = new{T}()
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ::NonaffineTube{T},
     λ⃗::Vector{S},
     (; Gc, Ge),
@@ -3172,19 +3172,19 @@ Fields:
 > James HM, Guth E. Theory of the elastic properties of rubber. The Journal of Chemical Physics. 1943 Oct;11(10):455-81.
 """
 struct ThreeChainModel{T} <: AbstractIncompressibleModel{T}
-    ℒinv::Function
+    ℒinv::InverseLangevinApproximations.AbstractInverseLangevinApproximation
     ThreeChainModel(
         ::T = PrincipalValueForm();
-        ℒinv::Function = TreloarApproximation,
+        ℒinv::InverseLangevinApproximations.AbstractInverseLangevinApproximation = TreloarApproximation(),
     ) where {T<:PrincipalValueForm} = new{T}(ℒinv)
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ψ::ThreeChainModel{T},
     λ⃗::Vector{S},
     (; μ, N),
 ) where {T,S}
-    β = @. ψ.ℒinv(λ⃗ / sqrt(N))
+    β = @. inverse_langevin_approximation(ψ.ℒinv, λ⃗ / sqrt(N))
     return μ * sqrt(N) / 3 * sum(@. λ⃗ * β + sqrt(N) * log(β / sinh(β)))
 end
 
@@ -3220,17 +3220,17 @@ Fields:
 > Edwards SF. The statistical mechanics of polymerized material. Proceedings of the Physical Society (1958-1967). 1967 Sep 1;92(1):9.
 """
 struct ModifiedFloryErman{T} <: AbstractIncompressibleModel{T}
-    # ℒinv::Function
+    # ℒinv::InverseLangevinApproximations.AbstractInverseLangevinApproximation
     Chain8::ArrudaBoyce
     function ModifiedFloryErman(
         ::T = PrincipalValueForm();
-        ℒinv::Function = TreloarApproximation,
+        ℒinv::InverseLangevinApproximations.AbstractInverseLangevinApproximation = TreloarApproximation(),
     ) where {T<:PrincipalValueForm}
         new{T}(ArrudaBoyce(T(), ℒinv = ℒinv))
     end
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     W::ModifiedFloryErman{T},
     λ⃗::Vector{S},
     p,
@@ -3276,7 +3276,7 @@ struct ExtendedTubeModel{T} <: AbstractIncompressibleModel{T}
     ExtendedTubeModel(::T = PrincipalValueForm()) where {T<:PrincipalValueForm} = new{T}()
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ::ExtendedTubeModel{T},
     λ⃗::Vector{S},
     (; Gc, Ge, δ, β),
@@ -3317,12 +3317,12 @@ Fields:
 > Miehe C, Göktepe S, Lulei F. A micro-macro approach to rubber-like materials—part I: the non-affine micro-sphere model of rubber elasticity. Journal of the Mechanics and Physics of Solids. 2004 Nov 1;52(11):2617-60.
 """
 struct NonaffineMicroSphere{T} <: AbstractIncompressibleModel{T}
-    ℒinv::Function
+    ℒinv::InverseLangevinApproximations.AbstractInverseLangevinApproximation
     r⃗²::Vector{Vector{Float64}}
     w::Vector{Float64}
     function NonaffineMicroSphere(
         ::T = PrincipalValueForm();
-        ℒinv::Function = CohenRounded3_2,
+        ℒinv::InverseLangevinApproximations.AbstractInverseLangevinApproximation = CohenRounded3_2(),
         n = 21,
     ) where {T<:PrincipalValueForm}
         a = √(2) / 2
@@ -3359,7 +3359,7 @@ struct NonaffineMicroSphere{T} <: AbstractIncompressibleModel{T}
     end
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ψ::NonaffineMicroSphere{T},
     λ⃗::Vector{S},
     (; μ, N, p, U, q),
@@ -3380,7 +3380,7 @@ function NonlinearContinua.StrainEnergyDensity(
 
     λ = sum((λ⃗²_r⃗² .^ p) .* ψ.w)
     λr = λ^(1 / p) / √N
-    β = ψ.ℒinv(λr)
+    β = inverse_langevin_approximation(ψ.ℒinv, λr)
     ψf = μ * N * (λr * β + log(β / sinh(β)))
 
     ν = sum((sqrt.(inv_λ⃗²_r⃗²) .^ q) .* ψ.w)
@@ -3434,21 +3434,21 @@ Fields:
 
 """
 struct Bootstrapped8Chain{T} <: AbstractIncompressibleModel{T}
-    ℒinv::Function
+    ℒinv::InverseLangevinApproximations.AbstractInverseLangevinApproximation
     W8::Function
     function Bootstrapped8Chain(
         ::T = PrincipalValueForm();
-        ℒinv::Function = TreloarApproximation,
+        ℒinv::InverseLangevinApproximations.AbstractInverseLangevinApproximation = TreloarApproximation(),
     ) where {T<:PrincipalValueForm}
         function W8(x, (; μ, N))
-            β = ℒinv(x)
+            β = inverse_langevin_approximation(ℒinv, x)
             μ * N * (x * β + log(β / sinh(β)))
         end
         new{T}(ℒinv, W8)
     end
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     W::Bootstrapped8Chain,
     λ⃗::Vector{T},
     p,
@@ -3489,7 +3489,7 @@ struct DavidsonGoulbourne{T} <: AbstractIncompressibleModel{T}
     DavidsonGoulbourne(::T = PrincipalValueForm()) where {T<:PrincipalValueForm} = new{T}()
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ::DavidsonGoulbourne{T},
     λ⃗::Vector{S},
     (; Gc, Ge, λmax),
@@ -3533,7 +3533,7 @@ struct KhiemItskov{T} <: AbstractIncompressibleModel{T}
     ) where {T<:Union{PrincipalValueForm,InvariantForm}} = new{T}()
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ::KhiemItskov{T},
     λ⃗::Vector{S},
     (; μcκ, n, q, μt),
@@ -3545,7 +3545,7 @@ function NonlinearContinua.StrainEnergyDensity(
     return μcκ * n * log(num / denom) + μt * ((I₂(λ⃗) / 3)^(1 / 2) - 1)
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ::KhiemItskov{T},
     I⃗::Vector{S},
     (; μcκ, n, q, μt),
@@ -3578,7 +3578,7 @@ struct GeneralConstitutiveModel_Network{T} <: AbstractIncompressibleModel{T}
     ) where {T<:Union{PrincipalValueForm,InvariantForm}} = new{T}()
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ::GeneralConstitutiveModel_Network{T},
     λ⃗::Vector{S},
     (; Gc, N),
@@ -3587,7 +3587,7 @@ function NonlinearContinua.StrainEnergyDensity(
     return Gc * N * log((3 * N + 0.5 * I1) / (3 * N - I1))
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ::GeneralConstitutiveModel_Network{T},
     I⃗::Vector{S},
     (; Gc, N),
@@ -3617,7 +3617,7 @@ struct GeneralConstitutiveModel_Tube{T} <: AbstractIncompressibleModel{T}
     ) where {T<:PrincipalValueForm} = new{T}()
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ::GeneralConstitutiveModel_Tube{T},
     λ⃗::Vector{S},
     (; Ge),
@@ -3652,7 +3652,7 @@ struct GeneralConstitutiveModel{T} <: AbstractIncompressibleModel{T}
         new{T}(GeneralConstitutiveModel_Tube(T()), GeneralConstitutiveModel_Network(T()))
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     W::GeneralConstitutiveModel{T},
     λ⃗::Vector{S},
     ps,
@@ -3695,18 +3695,18 @@ Fields
 > Wu PD, Van Der Giessen E. On improved network models for rubber elasticity and their applications to orientation hardening in glassy polymers. Journal of the Mechanics and Physics of Solids. 1993 Mar 1;41(3):427-56.
 """
 struct FullNetwork{T} <: AbstractIncompressibleModel{T}
-    ℒinv::Function
+    ℒinv::InverseLangevinApproximations.AbstractInverseLangevinApproximation
     Chain3::ThreeChainModel
     Chain8::ArrudaBoyce
     function FullNetwork(
         ::T = PrincipalValueForm();
-        ℒinv::Function = TreloarApproximation,
+        ℒinv::InverseLangevinApproximations.AbstractInverseLangevinApproximation = TreloarApproximation(),
     ) where {T<:PrincipalValueForm}
         new{T}(ℒinv, ThreeChainModel(T(); ℒinv), ArrudaBoyce(T(); ℒinv))
     end
 end
 
-function NonlinearContinua.StrainEnergyDensity(W::FullNetwork, λ⃗::Vector{T}, p) where {T}
+function ContinuumMechanicsBase.StrainEnergyDensity(W::FullNetwork, λ⃗::Vector{T}, p) where {T}
     W3 = StrainEnergyDensity(W.Chain3, λ⃗, p)
     W8 = StrainEnergyDensity(W.Chain8, λ⃗, p)
     return (1 - p.ρ) * W3 + p.ρ * W8
@@ -3747,18 +3747,18 @@ Fields:
 > Elı́as-Zúñiga A, Beatty MF. Constitutive equations for amended non-Gaussian network models of rubber elasticity. International journal of engineering science. 2002 Dec 1;40(20):2265-94.
 """
 struct ZunigaBeatty{T} <: AbstractIncompressibleModel{T}
-    ℒinv::Function
+    ℒinv::InverseLangevinApproximations.AbstractInverseLangevinApproximation
     Chain3::ThreeChainModel
     Chain8::ArrudaBoyce
     function ZunigaBeatty(
         ::T = PrincipalValueForm();
-        ℒinv::Function = TreloarApproximation,
+        ℒinv::InverseLangevinApproximations.AbstractInverseLangevinApproximation = TreloarApproximation(),
     ) where {T<:PrincipalValueForm}
         new{T}(ℒinv, ThreeChainModel(T(); ℒinv), ArrudaBoyce(T(); ℒinv))
     end
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     W::ZunigaBeatty{T},
     λ⃗::Vector{S},
     (; μ, N₃, N₈),
@@ -3806,20 +3806,20 @@ Fields:
 > Lim GT. Scratch behavior of polymers. Texas A&M University; 2005.
 """
 struct Lim{T} <: AbstractIncompressibleModel{T}
-    ℒinv::Function
+    ℒinv::InverseLangevinApproximations.AbstractInverseLangevinApproximation
     F::Function
     NH::NeoHookean
     AB::ArrudaBoyce
     function Lim(
         form::T = PrincipalValueForm();
-        ℒinv::Function = TreloarApproximation,
+        ℒinv::InverseLangevinApproximations.AbstractInverseLangevinApproximation = TreloarApproximation(),
     ) where {T<:Union{InvariantForm,PrincipalValueForm}}
         f(x) = x^3 * (10 - 15x + 6x^2)
         new{T}(ℒinv, f, NeoHookean(form), ArrudaBoyce(form; ℒinv))
     end
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     W::Lim{T},
     λ⃗::Vector{S},
     (; μ₁, μ₂, N, Î₁),
@@ -3830,7 +3830,7 @@ function NonlinearContinua.StrainEnergyDensity(
     return (1 - W.F(ζ)) * Wg + W.F(ζ) * W8
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     W::Lim{T},
     I⃗::Vector{S},
     (; μ₁, μ₂, N, Î₁),
@@ -3890,18 +3890,18 @@ Fields:
 > Bechir H, Chevalier L, Idjeri M. A three-dimensional network model for rubber elasticity: The effect of local entanglements constraints. International journal of engineering science. 2010 Mar 1;48(3):265-74.
 """
 struct BechirChevalier{T} <: AbstractIncompressibleModel{T}
-    ℒinv::Function
+    ℒinv::InverseLangevinApproximations.AbstractInverseLangevinApproximation
     Chain3::ThreeChainModel
     Chain8::ArrudaBoyce
     function BechirChevalier(
         ::T = PrincipalValueForm();
-        ℒinv::Function = TreloarApproximation,
+        ℒinv::InverseLangevinApproximations.AbstractInverseLangevinApproximation = TreloarApproximation(),
     ) where {T<:PrincipalValueForm}
         new{T}(ℒinv, ThreeChainModel(T(), ℒinv = ℒinv), ArrudaBoyce(T(), ℒinv = ℒinv))
     end
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     W::BechirChevalier{T},
     λ⃗::Vector{S},
     (; μ₀, η, ρ, N₃, N₈),
@@ -3956,7 +3956,7 @@ struct AnsarriBenam{T} <: AbstractIncompressibleModel{T}
     end
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     W::AnsarriBenam{T},
     λ⃗::Vector{S},
     (; μ, N, C₂, γ),
@@ -3968,7 +3968,7 @@ function NonlinearContinua.StrainEnergyDensity(
            C₂ * log((I₂(λ⃗) / 3)^γ)
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     W::AnsarriBenam{T},
     I⃗::Vector{S},
     (; μ, N, C₂, γ),

@@ -9,7 +9,7 @@ Fields:
 - `λ⃗`: Vector of principal stretches
 - `p`: Model parameters
 """
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ψ::AbstractHyperelasticModel{T},
     ::Vector{R},
     p,
@@ -19,7 +19,7 @@ function NonlinearContinua.StrainEnergyDensity(
     )
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ψ::AbstractHyperelasticModel{T},
     ::Vector{R},
     p,
@@ -47,7 +47,7 @@ Fields:
 - `F`: Deformation gradient matrix
 - `p`: Model parameters
 """
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ψ::AbstractHyperelasticModel{T},
     F::Matrix{R},
     p,
@@ -58,7 +58,7 @@ function NonlinearContinua.StrainEnergyDensity(
     return StrainEnergyDensity(ψ, λ⃗::Vector{R}, p)
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ψ::AbstractHyperelasticModel{T},
     F::Matrix{R},
     p,
@@ -76,7 +76,7 @@ Fields:
 - `λ⃗`: Vector of principal stretches
 - `p`: Model parameters
 """
-function NonlinearContinua.SecondPiolaKirchoffStressTensor(
+function ContinuumMechanicsBase.SecondPiolaKirchoffStressTensor(
     ψ::AbstractHyperelasticModel{T},
     λ⃗::Vector{R},
     p;
@@ -96,7 +96,7 @@ Fields:
 - `F`: Deformation gradient tensor
 - `p`: Model parameters
 """
-function NonlinearContinua.SecondPiolaKirchoffStressTensor(
+function ContinuumMechanicsBase.SecondPiolaKirchoffStressTensor(
     ψ::AbstractHyperelasticModel{T},
     F::Matrix{R},
     p;
@@ -107,7 +107,7 @@ function NonlinearContinua.SecondPiolaKirchoffStressTensor(
     return S
 end
 
-function NonlinearContinua.SecondPiolaKirchoffStressTensor(
+function ContinuumMechanicsBase.SecondPiolaKirchoffStressTensor(
     ψ::AbstractHyperelasticModel{T},
     F::Matrix{R},
     p;
@@ -142,7 +142,7 @@ Fields:
 - `p`: Model parameters
 - `adb`: Differentiation backend from `AbstractDifferentiation.jl`
     """
-function NonlinearContinua.CauchyStressTensor(
+function ContinuumMechanicsBase.CauchyStressTensor(
     ψ::Hyperelastics.AbstractHyperelasticModel{T},
     λ⃗::Vector{R},
     p;
@@ -164,7 +164,7 @@ Fields:
 - `p`: Model parameters
 - `adb`: Differentiation backend from `AbstractDifferentiation.jl`
 """
-function NonlinearContinua.CauchyStressTensor(
+function ContinuumMechanicsBase.CauchyStressTensor(
     ψ::Hyperelastics.AbstractHyperelasticModel{T},
     F::Matrix{S},
     p;
@@ -182,7 +182,7 @@ function NonlinearContinua.CauchyStressTensor(
     return σ
 end
 
-function NonlinearContinua.CauchyStressTensor(
+function ContinuumMechanicsBase.CauchyStressTensor(
     ψ::Hyperelastics.AbstractHyperelasticModel{T},
     F::Matrix{S},
     p;

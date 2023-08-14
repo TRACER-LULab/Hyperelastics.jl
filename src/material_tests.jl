@@ -96,7 +96,7 @@ struct HyperelasticBiaxialTest{T,S} <: AbstractHyperelasticTest{T,S}
 end
 
 ## Predict overloads
-function NonlinearContinua.predict(
+function ContinuumMechanicsBase.predict(
     ψ::AbstractHyperelasticModel{A},
     test::HyperelasticUniaxialTest{B,C},
     p;
@@ -114,7 +114,7 @@ function NonlinearContinua.predict(
     return pred
 end
 
-function NonlinearContinua.predict(
+function ContinuumMechanicsBase.predict(
     ψ::AbstractHyperelasticModel{A},
     test::HyperelasticBiaxialTest{B,C},
     p;

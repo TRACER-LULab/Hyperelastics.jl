@@ -36,15 +36,15 @@ function SussmanBathe(
     SussmanBathe{typeof(k),typeof(σ̂)}(w′, data, k, σ̂)
 end
 
-NonlinearContinua.StrainEnergyDensity(ψ::SussmanBathe, λ⃗::Vector{T}, p) where {T} =
+ContinuumMechanicsBase.StrainEnergyDensity(ψ::SussmanBathe, λ⃗::Vector{T}, p) where {T} =
     sum(x -> quadgk(ψ.w′, 1.0, x)[1], λ⃗)
 
-function NonlinearContinua.StrainEnergyDensity(ψ::SussmanBathe, F::Matrix{T}, p) where {T}
+function ContinuumMechanicsBase.StrainEnergyDensity(ψ::SussmanBathe, F::Matrix{T}, p) where {T}
     λ⃗ = eigvals(F)
     return StrainEnergyDensity(ψ, λ⃗, p)
 end
 
-NonlinearContinua.SecondPiolaKirchoffStressTensor(
+ContinuumMechanicsBase.SecondPiolaKirchoffStressTensor(
     ψ::SussmanBathe,
     λ⃗::Vector{T},
     p;
@@ -52,7 +52,7 @@ NonlinearContinua.SecondPiolaKirchoffStressTensor(
 ) where {T} = ψ.w′.(λ⃗)
 
 
-NonlinearContinua.CauchyStressTensor(
+ContinuumMechanicsBase.CauchyStressTensor(
     ψ::SussmanBathe,
     λ⃗::Vector{T},
     p;

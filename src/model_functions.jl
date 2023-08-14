@@ -23,7 +23,7 @@ Fields
 - `ψ`: Hyperelastic model
 - `test` or `tests`: The test or vector of tests to use in finding the parameter bounds.
 """
-function parameter_bounds(ψ::AbstractHyperelasticModel, test::AbstractHyperelasticTest)
+function parameter_bounds(::AbstractHyperelasticModel, ::AbstractHyperelasticTest)
     lb = nothing
     ub = nothing
     return (lb = lb, ub = ub)

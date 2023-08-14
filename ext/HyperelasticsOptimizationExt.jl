@@ -6,27 +6,8 @@ using Hyperelastics
 using LossFunctions
 using Statistics
 using ADTypes
-# using Optimization.SciMLBase
 
 export HyperelasticProblem
-
-# include(joinpath(@__DIR__, "..", "src", "macro_micro_macro_model.jl"))
-
-# Optimization.SciMLBase.@add_kwonly function HyperelasticProblem{iip}(
-#     f::OptimizationFunction{iip},
-#     u0,
-#     p=NullParameters();
-#     lb=nothing, ub=nothing, int=nothing,
-#     lcons=nothing, ucons=nothing,
-#     sense=nothing, kwargs...) where {iip}
-
-#     if xor(lb === nothing, ub === nothing)
-#         error("If any of `lb` or `ub` is provided, both must be provided.")
-#     end
-
-#     OptimizationProblem(f, u0, p, lb, ub, int, lcons, ucons, sense,
-#             kwargs)
-# end
 
 function Hyperelastics.HyperelasticProblem(
     ψ::Hyperelastics.AbstractHyperelasticModel,
@@ -156,16 +137,5 @@ function Hyperelastics.HyperelasticProblem(
 
     OptimizationProblem(func, u0, p; lb, ub, int, lcons, ucons, sense)
 end
-
-# function Optimization.SciMLBase.solve(
-#     prob::HyperelasticProblem,
-#     alg,
-#     args...;
-#     kwargs...)::Optimization.SciMLBase.AbstractOptimizationSolution
-
-#     conv_prob = OptimizationProblem(prob.f, prob.u0, prob.p, lb=prob.lb, ub=prob.ub, int=prob.int, lcons=prob.lcons, ucons=prob.ucons, sense=prob.sense, prob.kwargs...)
-
-#     Optimization.SciMLBase.solve(conv_prob <: AbstractOptimizationProblem, alg, args...; kwargs...)::Optimization.SciMLBase.AbstractOptimizationSolution
-# end
 
 end

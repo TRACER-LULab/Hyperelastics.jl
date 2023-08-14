@@ -1,6 +1,6 @@
 @testset failfast = true showtiming = true "Hyperelastics Models" begin
     # AD Backends to test.
-    ADs = [AutoForwardDiff(), AutoFiniteDiff(), AutoZygote(), AutoEnzyme()]
+    ADs = [AutoForwardDiff(), AutoFiniteDiff(), AutoZygote(), AutoEnzyme(Forward)]
 
     # Determine if the model is exported by hyperelastics.
     usemodel(model) = Base.isexported(Hyperelastics, Symbol(model))

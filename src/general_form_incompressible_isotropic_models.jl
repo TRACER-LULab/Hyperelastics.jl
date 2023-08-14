@@ -26,7 +26,7 @@ struct GeneralMooneyRivlin{T} <: AbstractIncompressibleModel{T}
     end
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ψ::GeneralMooneyRivlin{I},
     λ⃗::Vector{T},
     (; C⃗),
@@ -39,7 +39,7 @@ function NonlinearContinua.StrainEnergyDensity(
     return W
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ψ::GeneralMooneyRivlin{I},
     I⃗::Vector{T},
     (; C⃗),
@@ -72,7 +72,7 @@ struct GeneralDarijaniNaghdabadi{T} <: AbstractIncompressibleModel{T}
         new{T}()
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ::GeneralDarijaniNaghdabadi,
     λ⃗::Vector{T},
     (; A⃗, B⃗, m⃗, n⃗),
@@ -111,7 +111,7 @@ struct GeneralBeda{T} <: AbstractIncompressibleModel{T}
         new{typeof(I)}()
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ::GeneralBeda{I},
     λ⃗::Vector{T},
     (; C⃗, K⃗, α⃗, β⃗),
@@ -126,7 +126,7 @@ function NonlinearContinua.StrainEnergyDensity(
     return W
 end
 
-function NonlinearContinua.StrainEnergyDensity(
+function ContinuumMechanicsBase.StrainEnergyDensity(
     ::GeneralBeda{I},
     I⃗::Vector{T},
     (; C⃗, K⃗, α⃗, β⃗),
