@@ -1,4 +1,6 @@
 [deps]
+ContinuumMechanicsBase = "3a778109-d974-46c8-ac54-09f30d605bdf"
 Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
 DocumenterCitations = "daee34ce-89f3-4625-b898-19384cb65244"
 Hyperelastics = "c20c605d-adbe-46e4-9db6-e2b04c3ba023"
+InverseLangevinApproximations = "b82787f2-62be-403e-9078-6d9feafd7ee3"
