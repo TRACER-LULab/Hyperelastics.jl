@@ -54,8 +54,7 @@ jobs:
         run: |
           julia --project=docs/ -e '
             using Pkg
-            Pkg.develop([PackageSpec(url="https://github.com/cfarm6/ContinuumMechanicsBase.jl.git"),PackageSpec(url="https://github.com/cfarm6/InverseLangevinApproximations.jl.git")])
-            Pkg.develop(PackageSpec(path=pwd()))
+            Pkg.develop([PackageSpec(url="https://github.com/cfarm6/ContinuumMechanicsBase.jl.git"),PackageSpec(url="https://github.com/cfarm6/InverseLangevinApproximations.jl.git"),PackageSpec(path=pwd())])
             Pkg.instantiate()'
       - uses: julia-actions/julia-buildpkg@v1
       - uses: julia-actions/julia-docdeploy@v1
