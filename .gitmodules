@@ -1,6 +1,0 @@
-[submodule "InverseLangevinApproximations"]
-	path = InverseLangevinApproximations
-	url = git@github.com:cfarm6/InverseLangevinApproximations.jl.git
-[submodule "ContinuumMechanicsBase"]
-	path = ContinuumMechanicsBase
-	url = git@github.com:cfarm6/ContinuumMechanicsBase.jl.git
