@@ -48,6 +48,7 @@ HyperelasticsZygoteExt = "Zygote"
 [compat]
 ADTypes = "0.1"
 QuadGK = "2"
+RecursiveArrayTools = "2"
 Reexport = "1"
 SciMLBase = "1"
 SpecialFunctions = "2"
