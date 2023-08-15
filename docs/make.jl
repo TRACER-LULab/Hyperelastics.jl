@@ -22,7 +22,8 @@ makedocs(bib;
     ),
     pages=[
         "Home" => "index.md",
-        "API" => "API.md"
+        "API" => "API.md",
+        "Example" => "example.md",
     ],
 )
 
