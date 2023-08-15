@@ -2,6 +2,7 @@
 <html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Example · Hyperelastics.jl</title><script data-outdated-warner src="../assets/warner.js"></script><link rel="canonical" href="https://cfarm6.github.io/Hyperelastics.jl/example/"/><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.045/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.13.24/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL=".."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../assets/documenter.js"></script><script src="../siteinfo.js"></script><script src="../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit"><a href="../">Hyperelastics.jl</a></span></div><form class="docs-search" action="../search/"><input class="docs-search-query" id="documenter-search-query" name="q" type="text" placeholder="Search docs"/></form><ul class="docs-menu"><li><a class="tocitem" href="../">Home</a></li><li><a class="tocitem" href="../API/">API</a></li><li class="is-active"><a class="tocitem" href>Example</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><nav class="breadcrumb"><ul class="is-hidden-mobile"><li class="is-active"><a href>Example</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Example</a></li></ul></nav><div class="docs-right"><a class="docs-edit-link" href="https://github.com/cfarm6/Hyperelastics.jl/blob/main/docs/src/example.md#" title="Edit on GitHub"><span class="docs-icon fab"></span><span class="docs-label is-hidden-touch">Edit on GitHub</span></a><a class="docs-settings-button fas fa-cog" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-sidebar-button fa fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a></div></header><article class="content" id="documenter-page"><h1 id="Package-Imports"><a class="docs-heading-anchor" href="#Package-Imports">Package Imports</a><a id="Package-Imports-1"></a><a class="docs-heading-anchor-permalink" href="#Package-Imports" title="Permalink"></a></h1><pre><code class="language-julia hljs">using Hyperelastics
 using Optimization, OptimizationOptimJL
 using ComponentArrays: ComponentVector
+using ForwardDiff
 using CairoMakie, MakiePublication
 set_theme!(theme_web(width = 800))</code></pre><p>For commonly used datasets in hyperelastic modelling, such as the <code>Treloar1944Uniaxial</code> data, functions are available for getting the datasets:</p><pre><code class="language-julia hljs">f = Figure()
 ax = Makie.Axis(f[1,1])
@@ -19,9 +20,8 @@ save(&quot;treloar_data.png&quot;, f)</code></pre><pre class="documenter-example
 p = (μ = 10.0, )
 W = StrainEnergyDensity(ψ, λ⃗, p)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">10.0</code></pre><p>or</p><pre><code class="language-julia hljs">F = rand(3,3)
 p = (μ = 20.0, )
-W = StrainEnergyDensity(ψ, F, p)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">6.810301055277375</code></pre><p>A method for creating an <code>OptimizationProblem</code> compatible with <code>Optimization.jl</code> is provided. To fit the NeoHookean model to the Treloar data previously loaded, an additional field-indexed array is used as the initial guess to <code>HyperelasticProblem</code>. It is recommendedto use ComponentArrays.jl for optimization of model parameters.</p><pre><code class="language- hljs">prob = HyperelasticProblem(ψ, treloar_data, ComponentVector(μ = 0.2))
-sol = solve(prob, LBFGS())
-return sol # hide</code></pre><p>For fiting multiple models to the same dataset, </p><pre><code class="language- hljs">models = Dict(
+W = StrainEnergyDensity(ψ, F, p)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">10.072813846255908</code></pre><p>A method for creating an <code>OptimizationProblem</code> compatible with <code>Optimization.jl</code> is provided. To fit the NeoHookean model to the Treloar data previously loaded, an additional field-indexed array is used as the initial guess to <code>HyperelasticProblem</code>. It is recommendedto use ComponentArrays.jl for optimization of model parameters.</p><pre><code class="language-julia hljs">prob = HyperelasticProblem(ψ, treloar_data, ComponentVector(μ = 0.2), ad_type = AutoForwardDiff())
+sol = solve(prob, LBFGS())</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">u: ComponentVector{Float64}(μ = 0.5665481963398753)</code></pre><p>For fiting multiple models to the same dataset, </p><pre><code class="language- hljs">models = Dict(
     Gent =&gt; ComponentVector(μ=240e-3, Jₘ=80.0),
     EdwardVilgis =&gt; ComponentVector(Ns=0.10, Nc=0.20, α=0.001, η=0.001),
     ModifiedFloryErman =&gt; ComponentVector(μ=0.24, N=50.0, κ=10.0),
@@ -32,7 +32,7 @@ return sol # hide</code></pre><p>For fiting multiple models to the same dataset,
 
 sol = Dict{DataType, SciMLSolution}()
 for (ψ, p₀) in models
-    HEProblem = HyperelasticProblem(ψ(), treloar_data, p₀)
+    HEProblem = HyperelasticProblem(ψ(), treloar_data, p₀,  ad_type = AutoForwardDiff())
     sol[ψ] = solve(HEProblem, NelderMead())
     @show ψ, sol[ψ].u
 end
@@ -44,7 +44,7 @@ for (ψ, p) in sol
 end
 scatter!(ax, getindex.(treloar_data.data.λ, 1), getindex.(treloar_data.data.s, 1), label = &quot;Treloar 1944 Experimental&quot;, color = :black)
 axislegend(position = :lt)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">CairoMakie.Screen{IMAGE}
-</code></pre><p><img src="../treloar_data_fits.png" alt/></p><p>While the majority of the models provided by <code>Hyperelastics.jl</code> are based on closed form strain energy density functions, a selection of data-driven models are proivded. For example, the <code>SussmanBathe</code> model is created with:</p><pre><code class="language- hljs">using DataInterpolations
+</code></pre><p><img src="../treloar_data_fits.png" alt/></p><p>While the majority of the models provided by <code>Hyperelastics.jl</code> are based on closed form strain energy density functions, a selection of data-driven models are proivded. For example, the <code>SussmanBathe</code> model is created with:</p><pre><code class="language-julia hljs">using DataInterpolations
 ψ = SussmanBathe(treloar_data, k=4, interpolant = QuadraticSpline)
 λ₁ = range(extrema(getindex.(treloar_data.data.λ, 1))..., length = 100)
 uniaxial_prediction = HyperelasticUniaxialTest(λ₁, name = &quot;Prediction&quot;)
@@ -55,18 +55,18 @@ s₁ = getindex.(treloar_data.data.s, 1)
 ŝ₁ = getindex.(pred.data.s, 1)
 
 
-f, ax, p = lines( 
-    λ̂₁, 
-    ŝ₁, 
+f, ax, p = lines(
+    λ̂₁,
+    ŝ₁,
     label = &quot;Sussman-Bathe Approximation&quot;
 )
 
 scatter!(
         ax,
-        λ₁, 
-        s₁, 
+        λ₁,
+        s₁,
         label = &quot;Treloar 1944 Experimental&quot;,
         color = :black
     )
-axislegend(position = :lt)
-save(&quot;sussman_bathe.png&quot;, f) # hide</code></pre><p><img src="sussman_bathe.png" alt/></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../API/">« API</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.25 on <span class="colophon-date" title="Tuesday 15 August 2023 14:04">Tuesday 15 August 2023</span>. Using Julia version 1.9.2.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+axislegend(position = :lt)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">CairoMakie.Screen{IMAGE}
+</code></pre><p><img src="../sussman_bathe.png" alt/></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../API/">« API</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.25 on <span class="colophon-date" title="Tuesday 15 August 2023 15:04">Tuesday 15 August 2023</span>. Using Julia version 1.9.2.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
