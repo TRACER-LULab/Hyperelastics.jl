@@ -60,7 +60,6 @@ For fiting multiple models to the same dataset,
 models = Dict(
     Gent => ComponentVector(μ=240e-3, Jₘ=80.0),
     EdwardVilgis => ComponentVector(Ns=0.10, Nc=0.20, α=0.001, η=0.001),
-    ModifiedFloryErman => ComponentVector(μ=0.24, N=50.0, κ=10.0),
     NeoHookean => ComponentVector(μ=200e-3),
     NonaffineMicroSphere => ComponentVector(μ=0.292, N=22.5, p=1.471, U=0.744, q=0.1086),
     Beda => ComponentVector(C1=0.1237, C2=0.0424, C3=7.84e-5, K1=0.0168, α=0.9, β=0.68, ζ=3.015)
@@ -70,7 +69,6 @@ sol = Dict{DataType, SciMLSolution}()
 for (ψ, p₀) in models
     HEProblem = HyperelasticProblem(ψ(), treloar_data, p₀,  ad_type = AutoForwardDiff())
     sol[ψ] = solve(HEProblem, NelderMead())
-    @show ψ, sol[ψ].u
 end
 return sol # hide
 ```
