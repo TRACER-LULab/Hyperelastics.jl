@@ -18,16 +18,16 @@ makedocs(bib;
         prettyurls=get(ENV, "CI", "false") == "true",
         canonical="https://cfarm6.github.io/Hyperelastics.jl",
         edit_link="main",
-        assets=String[],
+        assets=String[]
     ),
     pages=[
         "Home" => "index.md",
         "API" => "API.md",
         "Example" => "example.md",
-    ],
+    ]
 )
 
 deploydocs(;
     repo="github.com/cfarm6/Hyperelastics.jl",
-    devbranch="main",
+    devbranch="main"
 )

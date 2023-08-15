@@ -24,8 +24,8 @@ end
 
 function SussmanBathe(
     data::HyperelasticUniaxialTest;
-    interpolant = CubicSpline,
-    k::Integer = 5,
+    interpolant=CubicSpline,
+    k::Integer=5
 )
     σ̂ = interpolant(
         getindex.(data.data.s, 1) .* getindex.(data.data.λ, 1),
@@ -48,7 +48,7 @@ ContinuumMechanicsBase.SecondPiolaKirchoffStressTensor(
     ψ::SussmanBathe,
     λ⃗::Vector{T},
     p;
-    kwargs...,
+    kwargs...
 ) where {T} = ψ.w′.(λ⃗)
 
 
@@ -56,7 +56,7 @@ ContinuumMechanicsBase.CauchyStressTensor(
     ψ::SussmanBathe,
     λ⃗::Vector{T},
     p;
-    kwargs...,
+    kwargs...
 ) where {T} = ψ.w′.(λ⃗) .* λ⃗
 
 parameters(ψ::SussmanBathe) = ()

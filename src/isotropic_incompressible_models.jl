@@ -110,7 +110,7 @@ Fields:
 struct ArrudaBoyce{T} <: AbstractIncompressibleModel{T}
     ℒinv::InverseLangevinApproximations.AbstractInverseLangevinApproximation
     ArrudaBoyce(
-        ::T = PrincipalValueForm();
+        ::T=PrincipalValueForm();
         ℒinv::InverseLangevinApproximations.AbstractInverseLangevinApproximation=TreloarApproximation()
     ) where {T<:Union{InvariantForm,PrincipalValueForm}} = new{T}(ℒinv)
 end
@@ -121,7 +121,7 @@ function ContinuumMechanicsBase.StrainEnergyDensity(
     (; μ, N),
 ) where {T}
     rchain_Nl = √(I₁(λ⃗) / 3 / N)
-    β = inverse_langevin_approximation(ψ.ℒinv,rchain_Nl)
+    β = inverse_langevin_approximation(ψ.ℒinv, rchain_Nl)
     return μ * N * (rchain_Nl * β + log(β / sinh(β)))
 end
 
@@ -131,7 +131,7 @@ function ContinuumMechanicsBase.StrainEnergyDensity(
     (; μ, N),
 ) where {T,I<:InvariantForm}
     rchain_Nl = √(I⃗[1] / 3 / N)
-    β = inverse_langevin_approximation(ψ.ℒinv,rchain_Nl)
+    β = inverse_langevin_approximation(ψ.ℒinv, rchain_Nl)
     return μ * N * (rchain_Nl * β + log(β / sinh(β)))
 end
 
@@ -142,9 +142,9 @@ end
 function parameter_bounds(::ArrudaBoyce, data::AbstractHyperelasticTest)
     I₁_max = maximum(I₁.(data.data.λ))
     N_max = I₁_max / 3
-    lb = (μ = -Inf, N = N_max)
+    lb = (μ=-Inf, N=N_max)
     ub = nothing
-    return (lb = lb, ub = ub)
+    return (lb=lb, ub=ub)
 end
 
 """
@@ -171,9 +171,9 @@ struct ABGI{T} <: AbstractIncompressibleModel{T}
     ℒinv::InverseLangevinApproximations.AbstractInverseLangevinApproximation
     AB::ArrudaBoyce
     ABGI(
-        ::T = PrincipalValueForm();
-        ℒinv::InverseLangevinApproximations.AbstractInverseLangevinApproximation = TreloarApproximation(),
-    ) where {T<:PrincipalValueForm} = new{T}(ℒinv, ArrudaBoyce(T(), ℒinv = ℒinv))
+        ::T=PrincipalValueForm();
+        ℒinv::InverseLangevinApproximations.AbstractInverseLangevinApproximation=TreloarApproximation()
+    ) where {T<:PrincipalValueForm} = new{T}(ℒinv, ArrudaBoyce(T(), ℒinv=ℒinv))
 end
 
 function ContinuumMechanicsBase.StrainEnergyDensity(
@@ -181,7 +181,7 @@ function ContinuumMechanicsBase.StrainEnergyDensity(
     λ⃗::Vector{T},
     (; μ, N, Ge, n),
 ) where {T}
-    WAB = StrainEnergyDensity(ψ.AB, λ⃗, (μ = μ, N = N))
+    WAB = StrainEnergyDensity(ψ.AB, λ⃗, (μ=μ, N=N))
     WGI = Ge * (λ⃗[1]^n + λ⃗[2]^n + λ⃗[3]^n - 3) / n
     return WAB + WGI
 end
@@ -192,9 +192,9 @@ end
 
 function parameter_bounds(::ABGI, data::AbstractHyperelasticTest)
     I₁_max = maximum(I₁.(data.data.λ))
-    lb = (μ = -Inf, N = 11 / 35 * I₁_max, Ge = -Inf, n = 0.0)
+    lb = (μ=-Inf, N=11 / 35 * I₁_max, Ge=-Inf, n=0.0)
     ub = nothing
-    return (lb = lb, ub = ub)
+    return (lb=lb, ub=ub)
 end
 
 """
@@ -219,9 +219,9 @@ struct AffineMicroSphere{T,R,S} <: AbstractIncompressibleModel{T}
     w::Vector{S}
     λr::Function
     function AffineMicroSphere(
-        ::T = PrincipalValueForm();
-        ℒinv::InverseLangevinApproximations.AbstractInverseLangevinApproximation = TreloarApproximation(),
-        n = 21,
+        ::T=PrincipalValueForm();
+        ℒinv::InverseLangevinApproximations.AbstractInverseLangevinApproximation=TreloarApproximation(),
+        n=21
     ) where {T<:PrincipalValueForm}
         a = √(2) / 2
         b = 0.836095596749
@@ -263,7 +263,7 @@ function ContinuumMechanicsBase.StrainEnergyDensity(
     λ⃗::Vector{T},
     (; μ, N),
 ) where {T}
-    λr = map(Base.Fix1(ψ.λr, (λ = λ⃗, N = N)), ψ.r⃗)
+    λr = map(Base.Fix1(ψ.λr, (λ=λ⃗, N=N)), ψ.r⃗)
     β = @. inverse_langevin_approximation(ψ.ℒinv, λr)
     ψf = @. μ * N * (λr * β + log(β / sinh(β))) * ψ.w
     return sum(ψf)
@@ -275,11 +275,11 @@ end
 
 function parameter_bounds(ψ::AffineMicroSphere, test::AbstractHyperelasticTest)
     λ = test.data.λ
-    λr = maximum(x -> map(Base.Fix1(ψ.λr, (λ = x, N = 1)), ψ.r⃗), λ)
+    λr = maximum(x -> map(Base.Fix1(ψ.λr, (λ=x, N=1)), ψ.r⃗), λ)
     N_min = maximum(λr)
-    lb = (μ = -Inf, N = N_min)
+    lb = (μ=-Inf, N=N_min)
     ub = nothing
-    (lb = lb, ub = ub)
+    (lb=lb, ub=ub)
 end
 """
 Alexander
@@ -301,7 +301,7 @@ Parameters:
 > Alexander H. A constitutive relation for rubber-like materials. International Journal of Engineering Science. 1968 Sep 1;6(9):549-63.
 """
 struct Alexander{T} <: AbstractIncompressibleModel{T}
-    Alexander(::T = PrincipalValueForm()) where {T<:PrincipalValueForm} = new{T}()
+    Alexander(::T=PrincipalValueForm()) where {T<:PrincipalValueForm} = new{T}()
 end
 
 function ContinuumMechanicsBase.StrainEnergyDensity(
@@ -320,7 +320,7 @@ function ContinuumMechanicsBase.SecondPiolaKirchoffStressTensor(
     ::Alexander{T},
     λ⃗::Vector{S},
     (; μ, C₁, C₂, C₃, k, γ);
-    kwargs...,
+    kwargs...
 ) where {T<:PrincipalValueForm,S}
     I1 = I₁(λ⃗)
     I2 = I₂(λ⃗)
@@ -352,7 +352,7 @@ Parameters:
 struct MooneyRivlin{T} <: AbstractIncompressibleModel{T}
     GMR::GeneralMooneyRivlin{T}
     MooneyRivlin(
-        ::T = PrincipalValueForm(),
+        ::T=PrincipalValueForm(),
     ) where {T<:Union{InvariantForm,PrincipalValueForm}} = new{T}(GeneralMooneyRivlin(T()))
 end
 
@@ -365,7 +365,7 @@ function ContinuumMechanicsBase.StrainEnergyDensity(
     I⃗::Vector{S},
     (; C10, C01),
 ) where {T,S}
-    ContinuumMechanicsBase.StrainEnergyDensity(ψ.GMR, I⃗, (C⃗ = [
+    ContinuumMechanicsBase.StrainEnergyDensity(ψ.GMR, I⃗, (C⃗=[
         0.0 C10
         C01 0.0
     ],))
@@ -388,7 +388,7 @@ Parameters:
 > Treloar LR. The elasticity of a network of long-chain molecules—II. Transactions of the Faraday Society. 1943;39:241-6.
 """
 struct NeoHookean{T} <: AbstractIncompressibleModel{T}
-    NeoHookean(I::Union{InvariantForm,PrincipalValueForm} = PrincipalValueForm()) =
+    NeoHookean(I::Union{InvariantForm,PrincipalValueForm}=PrincipalValueForm()) =
         new{typeof(I)}()
 end
 
@@ -428,7 +428,7 @@ Parameters:
 """
 struct Isihara{T} <: AbstractIncompressibleModel{T}
     GMR::GeneralMooneyRivlin{T}
-    Isihara(::T = PrincipalValueForm()) where {T<:Union{InvariantForm,PrincipalValueForm}} =
+    Isihara(::T=PrincipalValueForm()) where {T<:Union{InvariantForm,PrincipalValueForm}} =
         new{T}(GeneralMooneyRivlin(T()))
 end
 
@@ -437,7 +437,7 @@ function ContinuumMechanicsBase.StrainEnergyDensity(
     λ⃗::Vector{S},
     (; C10, C20, C01),
 ) where {T,S}
-    StrainEnergyDensity(ψ.GMR, λ⃗, (C⃗ = [
+    StrainEnergyDensity(ψ.GMR, λ⃗, (C⃗=[
         0.0 C10 C20
         C01 0.0 0.0
     ],))
@@ -465,7 +465,7 @@ Parameters:
 struct Biderman{T} <: AbstractIncompressibleModel{T}
     GMR::GeneralMooneyRivlin{T}
     Biderman(
-        ::T = PrincipalValueForm(),
+        ::T=PrincipalValueForm(),
     ) where {T<:Union{InvariantForm,PrincipalValueForm}} = new{T}()
 end
 
@@ -513,7 +513,7 @@ Parameters:
 struct JamesGreenSimpson{T} <: AbstractIncompressibleModel{T}
     GMR::GeneralMooneyRivlin{T}
     JamesGreenSimpson(
-        ::T = PrincipalValueForm(),
+        ::T=PrincipalValueForm(),
     ) where {T<:Union{InvariantForm,PrincipalValueForm}} = new{T}(GeneralMooneyRivlin(T()))
 end
 
@@ -522,7 +522,7 @@ function ContinuumMechanicsBase.StrainEnergyDensity(
     λ⃗::Vector{S},
     (; C10, C01, C11, C20, C30),
 ) where {T,S}
-    StrainEnergyDensity(W.GMR, λ⃗, (C⃗ = [
+    StrainEnergyDensity(W.GMR, λ⃗, (C⃗=[
         0.0 C10 C20 C30
         C01 0.0 0.0 0.0
     ],))
@@ -565,7 +565,7 @@ Parameters:
 struct HainesWilson{T} <: AbstractIncompressibleModel{T}
     GMR::GeneralMooneyRivlin{T}
     HainesWilson(
-        ::T = PrincipalValueForm(),
+        ::T=PrincipalValueForm(),
     ) where {T<:Union{InvariantForm,PrincipalValueForm}} = new{T}(GeneralMooneyRivlin(T()))
 end
 
@@ -574,7 +574,7 @@ function ContinuumMechanicsBase.StrainEnergyDensity(
     λ⃗::Vector{S},
     (; C10, C01, C11, C02, C20, C30),
 ) where {T,S}
-    StrainEnergyDensity(ψ.GMR, λ⃗, (C⃗ = [
+    StrainEnergyDensity(ψ.GMR, λ⃗, (C⃗=[
         0.0 C10 C20 C30
         C01 C11 0.0 0.0
         C02 0.0 0.0 0.0
@@ -615,7 +615,7 @@ Parameters:
 """
 struct Yeoh{T} <: AbstractIncompressibleModel{T}
     GMR::GeneralMooneyRivlin{T}
-    Yeoh(::T = PrincipalValueForm()) where {T<:Union{InvariantForm,PrincipalValueForm}} =
+    Yeoh(::T=PrincipalValueForm()) where {T<:Union{InvariantForm,PrincipalValueForm}} =
         new{T}(GeneralMooneyRivlin(T()))
 end
 
@@ -624,7 +624,7 @@ function ContinuumMechanicsBase.StrainEnergyDensity(
     λ⃗::Vector{S},
     (; C10, C20, C30),
 ) where {T,S}
-    StrainEnergyDensity(ψ.GMR, λ⃗, (C⃗ = [0.0 C10 C20 C30],))
+    StrainEnergyDensity(ψ.GMR, λ⃗, (C⃗=[0.0 C10 C20 C30],))
 end
 
 # function ContinuumMechanicsBase.StrainEnergyDensity(::Yeoh, I⃗::Vector{T}, (; C10, C20, C30), I::InvariantForm) where T
@@ -656,7 +656,7 @@ Parameters:
 """
 struct Lion{T} <: AbstractIncompressibleModel{T}
     GMR::GeneralMooneyRivlin{T}
-    Lion(::T = PrincipalValueForm()) where {T<:Union{InvariantForm,PrincipalValueForm}} =
+    Lion(::T=PrincipalValueForm()) where {T<:Union{InvariantForm,PrincipalValueForm}} =
         new{T}(GeneralMooneyRivlin(T()))
 end
 
@@ -665,7 +665,7 @@ function ContinuumMechanicsBase.StrainEnergyDensity(
     λ⃗::Vector{S},
     (; C10, C01, C50),
 ) where {T,S}
-    StrainEnergyDensity(ψ.GMR, λ⃗, (C⃗ = [
+    StrainEnergyDensity(ψ.GMR, λ⃗, (C⃗=[
         0.0 C10 0.0 0.0 0.0 C50
         C01 0.0 0.0 0.0 0.0 0.0
     ],))
@@ -707,7 +707,7 @@ Parameters:
 struct HauptSedlan{T} <: AbstractIncompressibleModel{T}
     GMR::GeneralMooneyRivlin{T}
     HauptSedlan(
-        ::T = PrincipalValueForm(),
+        ::T=PrincipalValueForm(),
     ) where {T<:Union{InvariantForm,PrincipalValueForm}} = new{T}(GeneralMooneyRivlin(T()))
 end
 
@@ -716,7 +716,7 @@ function ContinuumMechanicsBase.StrainEnergyDensity(
     λ⃗::Vector{S},
     (; C10, C01, C11, C02, C30),
 ) where {T,S}
-    StrainEnergyDensity(ψ.GMR, λ⃗, (C⃗ = [
+    StrainEnergyDensity(ψ.GMR, λ⃗, (C⃗=[
         0.0 C10 0.0 C30
         C01 C11 0.0 0.0
         C02 0.0 0.0 0.0
@@ -756,7 +756,7 @@ Parameters:
 """
 struct HartmannNeff{T} <: AbstractIncompressibleModel{T}
     HartmannNeff(
-        ::T = PrincipalValueForm(),
+        ::T=PrincipalValueForm(),
     ) where {T<:Union{InvariantForm,PrincipalValueForm}} = new{T}()
 end
 
@@ -805,7 +805,7 @@ Parameters:
 > Carroll M. A strain energy function for vulcanized rubbers. Journal of Elasticity. 2011 Apr;103(2):173-87.
 """
 struct Carroll{T} <: AbstractIncompressibleModel{T}
-    Carroll(::T = PrincipalValueForm()) where {T<:Union{InvariantForm,PrincipalValueForm}} =
+    Carroll(::T=PrincipalValueForm()) where {T<:Union{InvariantForm,PrincipalValueForm}} =
         new{T}()
 end
 
@@ -847,7 +847,7 @@ Parameters:
 struct BahremanDarijani{PrincipalValueForm} <:
        AbstractIncompressibleModel{PrincipalValueForm}
     GDN::GeneralDarijaniNaghdabadi
-    BahremanDarijani(::T = PrincipalValueForm()) where {T<:PrincipalValueForm} =
+    BahremanDarijani(::T=PrincipalValueForm()) where {T<:PrincipalValueForm} =
         new{PrincipalValueForm}(GeneralDarijaniNaghdabadi(T()))
 end
 
@@ -859,7 +859,7 @@ function ContinuumMechanicsBase.StrainEnergyDensity(
     StrainEnergyDensity(
         W.GDN,
         λ⃗,
-        (A⃗ = [0, A2, 0, A4, 0, A6], B⃗ = [0, B2], m⃗ = [0, 2, 0, 4, 0, 6], n⃗ = [0, 2]),
+        (A⃗=[0, A2, 0, A4, 0, A6], B⃗=[0, B2], m⃗=[0, 2, 0, 4, 0, 6], n⃗=[0, 2]),
     )
 end
 
@@ -883,7 +883,7 @@ Parameters:
 > Zhao Z, Mu X, Du F. Modeling and verification of a new hyperelastic model for rubber-like materials. Mathematical Problems in Engineering. 2019 May 2;2019.
 """
 struct Zhao{T} <: AbstractIncompressibleModel{T}
-    Zhao(::T = PrincipalValueForm()) where {T<:Union{InvariantForm,PrincipalValueForm}} =
+    Zhao(::T=PrincipalValueForm()) where {T<:Union{InvariantForm,PrincipalValueForm}} =
         new{T}()
 end
 
@@ -928,7 +928,7 @@ Parameters:
 > Knowles JK. The finite anti-plane shear field near the tip of a crack for a class of incompressible elastic solids. International Journal of Fracture. 1977 Oct;13(5):611-39.
 """
 struct Knowles{T} <: AbstractIncompressibleModel{T}
-    Knowles(::T = PrincipalValueForm()) where {T<:Union{InvariantForm,PrincipalValueForm}} =
+    Knowles(::T=PrincipalValueForm()) where {T<:Union{InvariantForm,PrincipalValueForm}} =
         new{T}()
 end
 
@@ -952,9 +952,9 @@ end
 parameters(::Knowles) = (:μ, :b, :n)
 
 function parameter_bounds(::Knowles, data::AbstractHyperelasticTest)
-    lb = (μ = -Inf, b = 0, n = 0)
+    lb = (μ=-Inf, b=0, n=0)
     ub = nothing
-    return (lb = lb, ub = ub)
+    return (lb=lb, ub=ub)
 end
 
 """
@@ -975,7 +975,7 @@ Parameters:
 > Swanson SR. A constitutive model for high elongation elastic materials.
 """
 struct Swanson{T} <: AbstractIncompressibleModel{T}
-    Swanson(::T = PrincipalValueForm()) where {T<:Union{InvariantForm,PrincipalValueForm}} =
+    Swanson(::T=PrincipalValueForm()) where {T<:Union{InvariantForm,PrincipalValueForm}} =
         new{T}()
 end
 
@@ -1025,7 +1025,7 @@ Parameters:
 """
 struct YamashitaKawabata{T} <: AbstractIncompressibleModel{T}
     YamashitaKawabata(
-        ::T = PrincipalValueForm(),
+        ::T=PrincipalValueForm(),
     ) where {T<:Union{InvariantForm,PrincipalValueForm}} = new{T}()
 end
 
@@ -1066,7 +1066,7 @@ Parameters:
 """
 struct DavisDeThomas{T} <: AbstractIncompressibleModel{T}
     DavisDeThomas(
-        ::T = PrincipalValueForm(),
+        ::T=PrincipalValueForm(),
     ) where {T<:Union{InvariantForm,PrincipalValueForm}} = new{T}()
 end
 
@@ -1109,7 +1109,7 @@ Parameters:
 > Gregory IH, Muhr AH, Stephens IJ. Engineering applications of rubber in simple extension. Plastics rubber and composites processing and applications. 1997;26(3):118-22.
 """
 struct Gregory{T} <: AbstractIncompressibleModel{T}
-    Gregory(::T = PrincipalValueForm()) where {T<:Union{InvariantForm,PrincipalValueForm}} =
+    Gregory(::T=PrincipalValueForm()) where {T<:Union{InvariantForm,PrincipalValueForm}} =
         new{T}()
 end
 
@@ -1156,7 +1156,7 @@ Parameters:
 """
 struct ModifiedGregory{T} <: AbstractIncompressibleModel{T}
     ModifiedGregory(
-        ::T = PrincipalValueForm(),
+        ::T=PrincipalValueForm(),
     ) where {T<:Union{InvariantForm,PrincipalValueForm}} = new{T}()
 end
 
@@ -1203,7 +1203,7 @@ Parameters:
 """
 struct Beda{T} <: AbstractIncompressibleModel{T}
     GB::GeneralBeda
-    Beda(::T = PrincipalValueForm()) where {T<:Union{InvariantForm,PrincipalValueForm}} =
+    Beda(::T=PrincipalValueForm()) where {T<:Union{InvariantForm,PrincipalValueForm}} =
         new{T}(GeneralBeda(T()))
 end
 
@@ -1238,9 +1238,9 @@ function parameters(::Beda)
 end
 
 function parameter_bounds(::Beda, data::AbstractHyperelasticTest)
-    lb = (C1 = -Inf, C2 = -Inf, C3 = -Inf, K1 = -Inf, α = 0.0, β = 0.0, ζ = 1.0)
-    ub = (C1 = Inf, C2 = Inf, C3 = Inf, K1 = Inf, α = 1.0, β = 1.0, ζ = Inf)
-    return (lb = lb, ub = ub)
+    lb = (C1=-Inf, C2=-Inf, C3=-Inf, K1=-Inf, α=0.0, β=0.0, ζ=1.0)
+    ub = (C1=Inf, C2=Inf, C3=Inf, K1=Inf, α=1.0, β=1.0, ζ=Inf)
+    return (lb=lb, ub=ub)
 end
 """
 Amin
@@ -1262,7 +1262,7 @@ Parameters:
 > Amin AF, Wiraguna SI, Bhuiyan AR, Okui Y. Hyperelasticity model for finite element analysis of natural and high damping rubbers in compression and shear. Journal of engineering mechanics. 2006 Jan;132(1):54-64.
 """
 struct Amin{T} <: AbstractIncompressibleModel{T}
-    Amin(::T = PrincipalValueForm()) where {T<:Union{InvariantForm,PrincipalValueForm}} =
+    Amin(::T=PrincipalValueForm()) where {T<:Union{InvariantForm,PrincipalValueForm}} =
         new{T}()
 end
 
@@ -1309,7 +1309,7 @@ Parameters:
 """
 struct LopezPamies{T} <: AbstractIncompressibleModel{T}
     LopezPamies(
-        ::T = PrincipalValueForm(),
+        ::T=PrincipalValueForm(),
     ) where {T<:Union{InvariantForm,PrincipalValueForm}} = new{T}()
 end
 
@@ -1356,7 +1356,7 @@ Parameters:
 > Hohenberger TW, Windslow RJ, Pugno NM, Busfield JJ. A constitutive model for both low and high strain nonlinearities in highly filled elastomers and implementation with user-defined material subroutines in ABAQUS. Rubber Chemistry and Technology. 2019;92(4):653-86.
 """
 struct GenYeoh{T} <: AbstractIncompressibleModel{T}
-    GenYeoh(::T = PrincipalValueForm()) where {T<:Union{InvariantForm,PrincipalValueForm}} =
+    GenYeoh(::T=PrincipalValueForm()) where {T<:Union{InvariantForm,PrincipalValueForm}} =
         new{T}()
 end
 
@@ -1398,7 +1398,7 @@ Parameters:
 """
 struct HartSmith{T} <: AbstractIncompressibleModel{T}
     HartSmith(
-        ::T = PrincipalValueForm(),
+        ::T=PrincipalValueForm(),
     ) where {T<:Union{InvariantForm,PrincipalValueForm}} = new{T}()
 end
 
@@ -1440,7 +1440,7 @@ Parameters:
 """
 struct VerondaWestmann{T} <: AbstractIncompressibleModel{T}
     VerondaWestmann(
-        ::T = PrincipalValueForm(),
+        ::T=PrincipalValueForm(),
     ) where {T<:Union{InvariantForm,PrincipalValueForm}} = new{T}()
 end
 
@@ -1482,7 +1482,7 @@ Parameters:
 """
 struct FungDemiray{T} <: AbstractIncompressibleModel{T}
     FungDemiray(
-        ::T = PrincipalValueForm(),
+        ::T=PrincipalValueForm(),
     ) where {T<:Union{InvariantForm,PrincipalValueForm}} = new{T}()
 end
 
@@ -1523,7 +1523,7 @@ Parameters:
 > Vito R. A note on arterial elasticity. Journal of Biomechanics. 1973 Sep 1;6(5):561-4.
 """
 struct Vito{T} <: AbstractIncompressibleModel{T}
-    Vito(::T = PrincipalValueForm()) where {T<:Union{InvariantForm,PrincipalValueForm}} =
+    Vito(::T=PrincipalValueForm()) where {T<:Union{InvariantForm,PrincipalValueForm}} =
         new{T}()
 end
 
@@ -1567,7 +1567,7 @@ Parameters:
 """
 struct ModifiedYeoh{T} <: AbstractIncompressibleModel{T}
     ModifiedYeoh(
-        ::T = PrincipalValueForm(),
+        ::T=PrincipalValueForm(),
     ) where {T<:Union{InvariantForm,PrincipalValueForm}} = new{T}()
 end
 
@@ -1626,7 +1626,7 @@ Note:
 struct ChevalierMarco{T} <: AbstractIncompressibleModel{T}
     ∂W∂I1::Function
     ∂W∂I2::Function
-    function ChevalierMarco(::T = PrincipalValueForm()) where {T<:Union{PrincipalValueForm}}
+    function ChevalierMarco(::T=PrincipalValueForm()) where {T<:Union{PrincipalValueForm}}
         function ∂W∂I1(I₁, a⃗)
             L_a = size(a⃗, 1)
             return exp(sum(@. a⃗ * (I₁ - 3)^(1:L_a)))
@@ -1660,7 +1660,7 @@ function ContinuumMechanicsBase.SecondPiolaKirchoffStressTensor(
     W::ChevalierMarco{T},
     λ⃗::Vector{S},
     (; a⃗, b⃗);
-    kwargs...,
+    kwargs...
 ) where {T<:PrincipalValueForm,S}
     𝐒 = 2 * (I(3) * W.∂W∂I1(I₁(λ⃗), a⃗) - diagm(λ⃗ .^ 2)^(-2) * W.∂W∂I2(I₂(λ⃗), b⃗))
     sᵢ = diag(𝐒)
@@ -1672,7 +1672,7 @@ function ContinuumMechanicsBase.CauchyStressTensor(
     W::ChevalierMarco{T},
     λ⃗::Vector{S},
     p;
-    kwargs...,
+    kwargs...
 ) where {T<:PrincipalValueForm,S}
     s = ContinuumMechanicsBase.SecondPiolaKirchoffStressTensor(W, λ⃗, p)
     σ = λ⃗ .* s
@@ -1703,7 +1703,7 @@ Note:
 """
 struct GornetDesmorat{T} <: AbstractIncompressibleModel{T}
     GornetDesmorat(
-        ::T = PrincipalValueForm(),
+        ::T=PrincipalValueForm(),
     ) where {T<:Union{InvariantForm,PrincipalValueForm}} = new{T}()
 end
 
@@ -1727,7 +1727,7 @@ function ContinuumMechanicsBase.CauchyStressTensor(
     ::GornetDesmorat{T},
     λ⃗::Vector{S},
     (; h₁, h₂, h₃);
-    kwargs...,
+    kwargs...
 ) where {T<:PrincipalValueForm,S}
     B = λ⃗ .^ 2
     _I₁ = I₁(λ⃗)
@@ -1742,7 +1742,7 @@ function ContinuumMechanicsBase.SecondPiolaKirchoffStressTensor(
     ψ::GornetDesmorat{T},
     λ⃗::Vector{S},
     ps;
-    kwargs...,
+    kwargs...
 ) where {T<:PrincipalValueForm,S}
     σ = CauchyStressTensor(ψ, λ⃗, ps; kwargs...)
     s = σ ./ λ⃗
@@ -1753,8 +1753,8 @@ function ContinuumMechanicsBase.SecondPiolaKirchoffStressTensor(
     ψ::GornetDesmorat{T},
     F::Matrix{R},
     (; h₁, h₂, h₃);
-    ad_type = nothing,
-    kwargs...,
+    ad_type=nothing,
+    kwargs...
 ) where {T<:InvariantForm,R}
     I1 = I₁(F)
     I2 = I₂(F)
@@ -1771,7 +1771,7 @@ function ContinuumMechanicsBase.CauchyStressTensor(
     F::Matrix{S},
     (; h₁, h₂, h₃);
     ad_type,
-    kwargs...,
+    kwargs...
 ) where {T<:InvariantForm,S}
     I1 = I₁(F)
     I2 = I₂(F)
@@ -1811,7 +1811,7 @@ Parameters:
 """
 struct MansouriDarijani{T} <: AbstractIncompressibleModel{T}
     MansouriDarijani(
-        ::T = PrincipalValueForm(),
+        ::T=PrincipalValueForm(),
     ) where {T<:Union{InvariantForm,PrincipalValueForm}} = new{T}()
 end
 
@@ -1852,7 +1852,7 @@ Paramters:
 """
 struct GentThomas{T} <: AbstractIncompressibleModel{T}
     GentThomas(
-        ::T = PrincipalValueForm(),
+        ::T=PrincipalValueForm(),
     ) where {T<:Union{InvariantForm,PrincipalValueForm}} = new{T}()
 end
 
@@ -1893,7 +1893,7 @@ Parameters:
 """
 struct LambertDianiRey{T} <: AbstractIncompressibleModel{T}
     LambertDianiRey(
-        ::T = PrincipalValueForm(),
+        ::T=PrincipalValueForm(),
     ) where {T<:Union{InvariantForm,PrincipalValueForm}} = new{T}()
 end
 
@@ -1931,7 +1931,7 @@ function ContinuumMechanicsBase.SecondPiolaKirchoffStressTensor(
     ::LambertDianiRey{T},
     λ⃗::Vector{S},
     (; a⃗, b⃗);
-    kwargs...,
+    kwargs...
 ) where {T<:PrincipalValueForm,S}
     # ∂W∂I₁ = exp(@tullio _ := a⃗[i] .* (I₁(λ⃗) .- 3) .^ i)
     # ∂W∂I₂ = exp(@tullio _ := b⃗[i] .* log(I₂(λ⃗)) .^ i)
@@ -1951,7 +1951,7 @@ function ContinuumMechanicsBase.CauchyStressTensor(
     ψ::LambertDianiRey{T},
     λ⃗::Vector{S},
     ps;
-    kwargs...,
+    kwargs...
 ) where {T<:PrincipalValueForm,S}
     s = ContinuumMechanicsBase.SecondPiolaKirchoffStressTensor(ψ, λ⃗, ps)
     σᵢ = λ⃗ .* s
@@ -1962,7 +1962,7 @@ function ContinuumMechanicsBase.SecondPiolaKirchoffStressTensor(
     ::LambertDianiRey{T},
     F::Matrix{R},
     p;
-    kwargs...,
+    kwargs...
 ) where {T<:InvariantForm,R}
     (; a⃗, b⃗) = p
     I⃗ = [I₁(F), I₂(F), I₃(F)]
@@ -1980,7 +1980,7 @@ function ContinuumMechanicsBase.CauchyStressTensor(
     ψ::LambertDianiRey{T},
     F::Matrix{S},
     p;
-    kwargs...,
+    kwargs...
 ) where {T<:InvariantForm,S}
     (; a⃗, b⃗) = p
     I⃗ = [I₁(F), I₂(F), I₃(F)]
@@ -2027,7 +2027,7 @@ Note:
 """
 struct HossMarczakI{T} <: AbstractIncompressibleModel{T}
     HossMarczakI(
-        ::T = PrincipalValueForm(),
+        ::T=PrincipalValueForm(),
     ) where {T<:Union{InvariantForm,PrincipalValueForm}} = new{T}()
 end
 
@@ -2054,9 +2054,9 @@ function parameters(::HossMarczakI)
 end
 
 function parameter_bounds(::HossMarczakI, data::AbstractHyperelasticTest)
-    lb = (α = -Inf, β = 0, μ = -Inf, b = 0, n = 0)
+    lb = (α=-Inf, β=0, μ=-Inf, b=0, n=0)
     ub = nothing
-    return (lb = lb, ub = ub)
+    return (lb=lb, ub=ub)
 end
 
 """
@@ -2083,7 +2083,7 @@ Note:
 """
 struct HossMarczakII{T} <: AbstractIncompressibleModel{T}
     HossMarczakII(
-        ::T = PrincipalValueForm(),
+        ::T=PrincipalValueForm(),
     ) where {T<:Union{InvariantForm,PrincipalValueForm}} = new{T}()
 end
 
@@ -2112,9 +2112,9 @@ function parameters(::HossMarczakII)
 end
 
 function parameter_bounds(::HossMarczakII, data::AbstractHyperelasticTest)
-    lb = (α = -Inf, β = 0, μ = -Inf, b = 0, n = 0, C2 = -Inf)
+    lb = (α=-Inf, β=0, μ=-Inf, b=0, n=0, C2=-Inf)
     ub = nothing
-    return (lb = lb, ub = ub)
+    return (lb=lb, ub=ub)
 end
 
 
@@ -2135,7 +2135,7 @@ Parameters:
 > Khajehsaeid H, Arghavani J, Naghdabadi R. A hyperelastic constitutive model for rubber-like materials. European Journal of Mechanics-A/Solids. 2013 Mar 1;38:144-51.
 """
 struct ExpLn{T} <: AbstractIncompressibleModel{T}
-    ExpLn(::T = PrincipalValueForm()) where {T<:Union{InvariantForm,PrincipalValueForm}} =
+    ExpLn(::T=PrincipalValueForm()) where {T<:Union{InvariantForm,PrincipalValueForm}} =
         new{T}()
 end
 
@@ -2191,7 +2191,7 @@ Parameters:
 """
 struct VanDerWaals{T} <: AbstractIncompressibleModel{T}
     VanDerWaals(
-        ::T = PrincipalValueForm(),
+        ::T=PrincipalValueForm(),
     ) where {T<:Union{InvariantForm,PrincipalValueForm}} = new{T}()
 end
 
@@ -2220,9 +2220,9 @@ function parameter_bounds(::VanDerWaals, data::AbstractHyperelasticTest)
     _I2 = data.data.λ .|> I₂
     _I1 = data.data.λ .|> I₁
     β_min = maximum(@. (3 - _I2) / (_I1 - _I2))
-    lb = (μ = 0.0, λm = sqrt(3), β = β_min, α = 0.0)
-    ub = (μ = Inf, λm = Inf, β = 1.0, α = Inf)
-    return (ub = ub, lb = lb)
+    lb = (μ=0.0, λm=sqrt(3), β=β_min, α=0.0)
+    ub = (μ=Inf, λm=Inf, β=1.0, α=Inf)
+    return (ub=ub, lb=lb)
 end
 
 function parameters(::VanDerWaals)
@@ -2251,7 +2251,7 @@ Parameters:
 > Gent AN. A new constitutive relation for rubber. Rubber chemistry and technology. 1996 Mar;69(1):59-61.
 """
 struct Gent{T} <: AbstractIncompressibleModel{T}
-    Gent(::T = PrincipalValueForm()) where {T<:Union{InvariantForm,PrincipalValueForm}} =
+    Gent(::T=PrincipalValueForm()) where {T<:Union{InvariantForm,PrincipalValueForm}} =
         new{T}()
 end
 
@@ -2279,9 +2279,9 @@ end
 function parameter_bounds(::Gent, test::AbstractHyperelasticTest{S,T}) where {S,T}
     I₁_max = maximum(I₁.(test.data.λ))
     Jₘ_min = I₁_max - 3
-    lb = (μ = zero(T), Jₘ = Jₘ_min)
+    lb = (μ=zero(T), Jₘ=Jₘ_min)
     ub = nothing
-    return (lb = lb, ub = ub)
+    return (lb=lb, ub=ub)
 end
 
 """
@@ -2301,7 +2301,7 @@ Parameters:
 """
 struct TakamizawaHayashi{T} <: AbstractIncompressibleModel{T}
     TakamizawaHayashi(
-        ::T = PrincipalValueForm(),
+        ::T=PrincipalValueForm(),
     ) where {T<:Union{InvariantForm,PrincipalValueForm}} = new{T}()
 end
 
@@ -2328,9 +2328,9 @@ end
 function parameter_bounds(::TakamizawaHayashi, data::AbstractHyperelasticTest)
     I₁_max = maximum(I₁.(data.data.λ))
     Jₘ_min = I₁_max - 3
-    lb = (c = -Inf, Jₘ = Jₘ_min)
+    lb = (c=-Inf, Jₘ=Jₘ_min)
     ub = nothing
-    return (lb = lb, ub = ub)
+    return (lb=lb, ub=ub)
 end
 
 """
@@ -2352,7 +2352,7 @@ Parameters:
 """
 struct YeohFleming{T} <: AbstractIncompressibleModel{T}
     YeohFleming(
-        ::T = PrincipalValueForm(),
+        ::T=PrincipalValueForm(),
     ) where {T<:Union{InvariantForm,PrincipalValueForm}} = new{T}()
 end
 
@@ -2380,9 +2380,9 @@ end
 
 function parameter_bounds(::YeohFleming, data::AbstractHyperelasticTest)
     Iₘ_min = maximum(I₁, data.data.λ)
-    lb = (A = -Inf, B = -Inf, C10 = -Inf, Im = Iₘ_min)
+    lb = (A=-Inf, B=-Inf, C10=-Inf, Im=Iₘ_min)
     ub = nothing
-    return (lb = lb, ub = ub)
+    return (lb=lb, ub=ub)
 end
 
 """
@@ -2403,7 +2403,7 @@ Parameters:
 """
 struct PucciSaccomandi{T} <: AbstractIncompressibleModel{T}
     PucciSaccomandi(
-        ::T = PrincipalValueForm(),
+        ::T=PrincipalValueForm(),
     ) where {T<:Union{InvariantForm,PrincipalValueForm}} = new{T}()
 end
 
@@ -2430,9 +2430,9 @@ end
 function parameter_bounds(::PucciSaccomandi, data::AbstractHyperelasticTest)
     I₁_max = maximum(I₁.(data.data.λ))
     Jₘ_min = I₁_max - 3
-    lb = (K = -Inf, μ = -Inf, Jₘ = Jₘ_min)
+    lb = (K=-Inf, μ=-Inf, Jₘ=Jₘ_min)
     ub = nothing
-    return (lb = lb, ub = ub)
+    return (lb=lb, ub=ub)
 end
 
 """
@@ -2453,7 +2453,7 @@ Parameters:
 """
 struct HorganSaccomandi{T} <: AbstractIncompressibleModel{T}
     HorganSaccomandi(
-        ::T = PrincipalValueForm(),
+        ::T=PrincipalValueForm(),
     ) where {T<:Union{InvariantForm,PrincipalValueForm}} = new{T}()
 end
 
@@ -2489,9 +2489,9 @@ function parameter_bounds(::HorganSaccomandi, data::AbstractHyperelasticTest)
 
     J_min = maximum(Js[(!isnan).(Js)])
 
-    lb = (μ = -Inf, J = J_min)
+    lb = (μ=-Inf, J=J_min)
     ub = nothing
-    return (lb = lb, ub = ub)
+    return (lb=lb, ub=ub)
 end
 
 """
@@ -2510,7 +2510,7 @@ Parameters:
 > Beatty MF. On constitutive models for limited elastic, molecular based materials. Mathematics and mechanics of solids. 2008 Jul;13(5):375-87.
 """
 struct Beatty{T} <: AbstractIncompressibleModel{T}
-    Beatty(::T = PrincipalValueForm()) where {T<:Union{InvariantForm,PrincipalValueForm}} =
+    Beatty(::T=PrincipalValueForm()) where {T<:Union{InvariantForm,PrincipalValueForm}} =
         new{T}()
 end
 
@@ -2538,9 +2538,9 @@ end
 
 function parameter_bounds(::Beatty, data::AbstractHyperelasticTest)
     Iₘ_min = maximum(I₁, data.data.λ)
-    lb = (G₀ = -Inf, Iₘ = Iₘ_min)
+    lb = (G₀=-Inf, Iₘ=Iₘ_min)
     ub = nothing
-    return (lb = lb, ub = ub)
+    return (lb=lb, ub=ub)
 end
 """
 Horgan Murphy Model
@@ -2559,7 +2559,7 @@ Parameters:
 > Horgan CO, Murphy JG. Limiting chain extensibility constitutive models of Valanis–Landel type. Journal of Elasticity. 2007 Feb;86(2):101-11.
 """
 struct HorganMurphy{T} <: AbstractIncompressibleModel{T}
-    HorganMurphy(::T = PrincipalValueForm()) where {T<:PrincipalValueForm} = new{T}()
+    HorganMurphy(::T=PrincipalValueForm()) where {T<:PrincipalValueForm} = new{T}()
 end
 
 function ContinuumMechanicsBase.StrainEnergyDensity(
@@ -2599,7 +2599,7 @@ Parameters:
 > Valanis KC, Landel RF. The strain‐energy function of a hyperelastic material in terms of the extension ratios. Journal of Applied Physics. 1967 Jun;38(7):2997-3002.
 """
 struct ValanisLandel{T} <: AbstractIncompressibleModel{T}
-    ValanisLandel(::T = PrincipalValueForm()) where {T<:PrincipalValueForm} = new{T}()
+    ValanisLandel(::T=PrincipalValueForm()) where {T<:PrincipalValueForm} = new{T}()
 end
 
 function ContinuumMechanicsBase.StrainEnergyDensity(
@@ -2629,7 +2629,7 @@ Parameters:
 > Peng TJ, Landel RF. Stored energy function of rubberlike materials derived from simple tensile data. Journal of Applied Physics. 1972 Jul;43(7):3064-7.
 """
 struct PengLandel{T} <: AbstractIncompressibleModel{T}
-    PengLandel(::T = PrincipalValueForm()) where {T<:PrincipalValueForm} = new{T}()
+    PengLandel(::T=PrincipalValueForm()) where {T<:PrincipalValueForm} = new{T}()
 end
 
 function ContinuumMechanicsBase.StrainEnergyDensity(
@@ -2664,7 +2664,7 @@ Parameters:
 > Ogden RW. Large deformation isotropic elasticity–on the correlation of theory and experiment for incompressible rubberlike solids. Proceedings of the Royal Society of London. A. Mathematical and Physical Sciences. 1972 Feb 1;326(1567):565-84.
 """
 struct Ogden{T} <: AbstractIncompressibleModel{T}
-    Ogden(::T = PrincipalValueForm()) where {T<:PrincipalValueForm} = new{T}()
+    Ogden(::T=PrincipalValueForm()) where {T<:PrincipalValueForm} = new{T}()
 end
 
 function ContinuumMechanicsBase.StrainEnergyDensity(
@@ -2697,7 +2697,7 @@ Parameters:
 """
 struct Attard{T} <: AbstractIncompressibleModel{T}
     Wi::Function
-    function Attard(::T = PrincipalValueForm()) where {T<:PrincipalValueForm}
+    function Attard(::T=PrincipalValueForm()) where {T<:PrincipalValueForm}
         f(i, (; λ⃗, p)) =
             p.A⃗[i] / 2 / i * (sum(λ⃗ .^ (2i)) - 3) +
             p.B⃗[i] / 2 / i * (sum(λ⃗ .^ (-2i)) - 3)
@@ -2707,7 +2707,7 @@ end
 
 function ContinuumMechanicsBase.StrainEnergyDensity(ψ::Attard{T}, λ⃗::Vector{S}, p) where {T,S}
     @assert length(p.A⃗) == length(p.B⃗) "Length of A and B are not equal"
-    W = sum(Base.Fix2(ψ.Wi, (λ⃗ = λ⃗, p = p)), 1:length(p.A⃗))
+    W = sum(Base.Fix2(ψ.Wi, (λ⃗=λ⃗, p=p)), 1:length(p.A⃗))
     return W
 end
 
@@ -2733,7 +2733,7 @@ Parameters:
 struct Shariff{T} <: AbstractIncompressibleModel{T}
     ϕ::Vector{Function}
     Φ::Vector{Function}
-    function Shariff(::T = PrincipalValueForm()) where {T<:PrincipalValueForm}
+    function Shariff(::T=PrincipalValueForm()) where {T<:PrincipalValueForm}
         ϕ1(x) = 2 * log(x) / 3
         ϕ2(x) = exp(1 - x) + x - 2
         ϕ3(x) = exp(x - 1) - x
@@ -2779,7 +2779,7 @@ function ContinuumMechanicsBase.CauchyStressTensor(
     ψ::Shariff{T},
     λ⃗::Vector{S},
     (; E, α⃗);
-    kwargs...,
+    kwargs...
 ) where {T<:PrincipalValueForm,S}
     n = length(α⃗)
     σ1 = sum(i -> α⃗[i] .* ψ.ϕ[i].(λ⃗), 1:minimum([4, n]))
@@ -2792,7 +2792,7 @@ function ContinuumMechanicsBase.SecondPiolaKirchoffStressTensor(
     ψ::Shariff{T},
     λ⃗::Vector{S},
     (; E, α⃗);
-    kwargs...,
+    kwargs...
 ) where {T<:PrincipalValueForm,S}
     n = length(α⃗)
     s1 = sum(i -> α⃗[i] .* ψ.ϕ[i].(λ⃗), 1:minimum([4, n]))
@@ -2826,7 +2826,7 @@ Parameters:
 """
 struct ArmanNarooei{T} <: AbstractIncompressibleModel{T}
     Wi::Function
-    function ArmanNarooei(::T = PrincipalValueForm()) where {T<:PrincipalValueForm}
+    function ArmanNarooei(::T=PrincipalValueForm()) where {T<:PrincipalValueForm}
         f(i, (; λ⃗, p)) =
             p.A⃗[i] * (exp(p.m⃗[i] * (sum(λ⃗ .^ p.α⃗[i]) - 3)) - 1) +
             p.B⃗[i] * (exp(p.n⃗[i] * (sum(λ⃗ .^ (-p.β⃗[i])) - 3)) - 1)
@@ -2846,7 +2846,7 @@ function ContinuumMechanicsBase.StrainEnergyDensity(
             length(p.α⃗) ==
             length(p.β⃗) "Length of A, B, m, n, α. and β are not equal"
     # (; A⃗, B⃗, m⃗, n⃗, α⃗, β⃗)
-    W = sum(Base.Fix2(ψ.Wi, (λ⃗ = λ⃗, p = p)), 1:length(p.A⃗))
+    W = sum(Base.Fix2(ψ.Wi, (λ⃗=λ⃗, p=p)), 1:length(p.A⃗))
     # @tullio W := A⃗[i] * (exp(m⃗[i] * (sum(λ⃗ .^ α⃗[i]) - 3)) - 1) + B⃗[i] * (exp(n⃗[i] * (sum(λ⃗ .^ (-β⃗[i])) - 3)) - 1)
     return W
 end
@@ -2873,7 +2873,7 @@ Parameters:
 > Beda T, Chevalier Y. Hybrid continuum model for large elastic deformation of rubber. Journal of applied physics. 2003 Aug 15;94(4):2701-6.
 """
 struct ContinuumHybrid{T} <: AbstractIncompressibleModel{T}
-    ContinuumHybrid(::T = PrincipalValueForm()) where {T<:PrincipalValueForm} = new{T}()
+    ContinuumHybrid(::T=PrincipalValueForm()) where {T<:PrincipalValueForm} = new{T}()
 end
 
 function ContinuumMechanicsBase.StrainEnergyDensity(
@@ -2906,7 +2906,7 @@ Parameters:
 > Khajehsaeid H, Arghavani J, Naghdabadi R. A hyperelastic constitutive model for rubber-like materials. European Journal of Mechanics-A/Solids. 2013 Mar 1;38:144-51.
 """
 struct Bechir4Term{T} <: AbstractIncompressibleModel{T}
-    Bechir4Term(::T = PrincipalValueForm()) where {T<:PrincipalValueForm} = new{T}()
+    Bechir4Term(::T=PrincipalValueForm()) where {T<:PrincipalValueForm} = new{T}()
 end
 
 function ContinuumMechanicsBase.StrainEnergyDensity(
@@ -2947,7 +2947,7 @@ Parameters:
 > Erman B, Flory PJ. Relationships between stress, strain, and molecular constitution of polymer networks. Comparison of theory with experiments. Macromolecules. 1982 May;15(3):806-11.
 """
 struct ConstrainedJunction{T} <: AbstractIncompressibleModel{T}
-    ConstrainedJunction(::T = PrincipalValueForm()) where {T<:PrincipalValueForm} = new{T}()
+    ConstrainedJunction(::T=PrincipalValueForm()) where {T<:PrincipalValueForm} = new{T}()
 end
 
 function ContinuumMechanicsBase.StrainEnergyDensity(
@@ -2969,9 +2969,9 @@ end
 function parameter_bounds(::ConstrainedJunction, data::AbstractHyperelasticTest)
     λ_min = minimum(minimum.(collect.(data.data.λ)))
     κ_min = -λ_min^2
-    lb = (Gc = -Inf, μkT = -Inf, κ = κ_min)
+    lb = (Gc=-Inf, μkT=-Inf, κ=κ_min)
     ub = nothing
-    return (lb = lb, ub = ub)
+    return (lb=lb, ub=ub)
 end
 """
 Edward-Vilgis
@@ -2994,7 +2994,7 @@ Note:
 > Edwards SF, Vilgis T. The effect of entanglements in rubber elasticity. Polymer. 1986 Apr 1;27(4):483-92.
 """
 struct EdwardVilgis{T} <: AbstractIncompressibleModel{T}
-    EdwardVilgis(::T = PrincipalValueForm()) where {T<:PrincipalValueForm} = new{T}()
+    EdwardVilgis(::T=PrincipalValueForm()) where {T<:PrincipalValueForm} = new{T}()
 end
 
 function ContinuumMechanicsBase.StrainEnergyDensity(
@@ -3028,9 +3028,9 @@ function parameter_bounds(::EdwardVilgis, data::AbstractHyperelasticTest)
     λ_max = maximum(maximum.(data.data.λ))
     η_min = -1 / λ_max^2
     α_max = minimum(@. sqrt(1 / I₁(data.data.λ)))
-    lb = (Ns = -Inf, Nc = -Inf, α = 0.0, η = 0.0)
-    ub = (Ns = Inf, Nc = Inf, α = α_max, η = Inf)
-    return (lb = lb, ub = ub)
+    lb = (Ns=-Inf, Nc=-Inf, α=0.0, η=0.0)
+    ub = (Ns=Inf, Nc=Inf, α=α_max, η=Inf)
+    return (lb=lb, ub=ub)
 end
 
 """
@@ -3062,7 +3062,7 @@ Parameters:
 > Erman B, Monnerie L. Theory of elasticity of amorphous networks: effect of constraints along chains. Macromolecules. 1989 Aug;22(8):3342-8.
 """
 struct MCC{T} <: AbstractIncompressibleModel{T}
-    MCC(::T = PrincipalValueForm()) where {T<:PrincipalValueForm} = new{T}()
+    MCC(::T=PrincipalValueForm()) where {T<:PrincipalValueForm} = new{T}()
 end
 
 function ContinuumMechanicsBase.StrainEnergyDensity(
@@ -3083,9 +3083,9 @@ function parameters(::MCC)
 end
 
 function parameter_bounds(::MCC, data::AbstractHyperelasticTest)
-    lb = (ζkT = -Inf, μkT = -Inf, κ = 0)
+    lb = (ζkT=-Inf, μkT=-Inf, κ=0)
     ub = nothing
-    return (lb = lb, ub = ub)
+    return (lb=lb, ub=ub)
 end
 
 """
@@ -3105,7 +3105,7 @@ Parameters:
 > Heinrich G, Kaliske M. Theoretical and numerical formulation of a molecular based constitutive tube-model of rubber elasticity. Computational and Theoretical Polymer Science. 1997 Jan 1;7(3-4):227-41.
 """
 struct Tube{T} <: AbstractIncompressibleModel{T}
-    Tube(::T = PrincipalValueForm()) where {T<:PrincipalValueForm} = new{T}()
+    Tube(::T=PrincipalValueForm()) where {T<:PrincipalValueForm} = new{T}()
 end
 
 function ContinuumMechanicsBase.StrainEnergyDensity(
@@ -3136,7 +3136,7 @@ Parameters:
 > Rubinstein M, Panyukov S. Nonaffine deformation and elasticity of polymer networks. Macromolecules. 1997 Dec 15;30(25):8036-44.
 """
 struct NonaffineTube{T} <: AbstractIncompressibleModel{T}
-    NonaffineTube(::T = PrincipalValueForm()) where {T<:PrincipalValueForm} = new{T}()
+    NonaffineTube(::T=PrincipalValueForm()) where {T<:PrincipalValueForm} = new{T}()
 end
 
 function ContinuumMechanicsBase.StrainEnergyDensity(
@@ -3172,8 +3172,8 @@ Fields:
 struct ThreeChainModel{T} <: AbstractIncompressibleModel{T}
     ℒinv::InverseLangevinApproximations.AbstractInverseLangevinApproximation
     ThreeChainModel(
-        ::T = PrincipalValueForm();
-        ℒinv::InverseLangevinApproximations.AbstractInverseLangevinApproximation = TreloarApproximation(),
+        ::T=PrincipalValueForm();
+        ℒinv::InverseLangevinApproximations.AbstractInverseLangevinApproximation=TreloarApproximation()
     ) where {T<:PrincipalValueForm} = new{T}(ℒinv)
 end
 
@@ -3193,9 +3193,9 @@ end
 function parameter_bounds(::ThreeChainModel, data::AbstractHyperelasticTest)
     λ_max = maximum(maximum.(collect.(data.data.λ)))
     N_min = λ_max^2
-    lb = (μ = -Inf, N = N_min)
+    lb = (μ=-Inf, N=N_min)
     ub = nothing
-    return (lb = lb, ub = ub)
+    return (lb=lb, ub=ub)
 end
 
 """
@@ -3221,10 +3221,10 @@ struct ModifiedFloryErman{T} <: AbstractIncompressibleModel{T}
     # ℒinv::InverseLangevinApproximations.AbstractInverseLangevinApproximation
     Chain8::ArrudaBoyce
     function ModifiedFloryErman(
-        ::T = PrincipalValueForm();
-        ℒinv::InverseLangevinApproximations.AbstractInverseLangevinApproximation = TreloarApproximation(),
+        ::T=PrincipalValueForm();
+        ℒinv::InverseLangevinApproximations.AbstractInverseLangevinApproximation=TreloarApproximation()
     ) where {T<:PrincipalValueForm}
-        new{T}(ArrudaBoyce(T(), ℒinv = ℒinv))
+        new{T}(ArrudaBoyce(T(), ℒinv=ℒinv))
     end
 end
 
@@ -3248,9 +3248,9 @@ function parameter_bounds(::ModifiedFloryErman, data::AbstractHyperelasticTest)
     I₁_max = maximum(I₁.(data.data.λ))
     # N_max = 11 / 35 * I₁_max # old
     N_max = I₁_max / 3
-    lb = (μ = -Inf, N = N_max, κ = 0)
+    lb = (μ=-Inf, N=N_max, κ=0)
     ub = nothing
-    return (lb = lb, ub = ub)
+    return (lb=lb, ub=ub)
 end
 
 """
@@ -3271,7 +3271,7 @@ Parameters:
 > Kaliske M, Heinrich G. An extended tube-model for rubber elasticity: statistical-mechanical theory and finite element implementation. Rubber Chemistry and Technology. 1999 Sep;72(4):602-32.
 """
 struct ExtendedTubeModel{T} <: AbstractIncompressibleModel{T}
-    ExtendedTubeModel(::T = PrincipalValueForm()) where {T<:PrincipalValueForm} = new{T}()
+    ExtendedTubeModel(::T=PrincipalValueForm()) where {T<:PrincipalValueForm} = new{T}()
 end
 
 function ContinuumMechanicsBase.StrainEnergyDensity(
@@ -3292,9 +3292,9 @@ function parameter_bounds(::ExtendedTubeModel, data::AbstractHyperelasticTest)
     I₁_max = maximum(I₁.(data.data.λ))
 
     δ_max = sqrt(1 / (I₁_max - 3))
-    lb = (Gc = -Inf, Ge = -Inf, δ = -δ_max, β = 0)
-    ub = (Gc = Inf, Ge = Inf, δ = δ_max, β = Inf)
-    return (lb = lb, ub = ub)
+    lb = (Gc=-Inf, Ge=-Inf, δ=-δ_max, β=0)
+    ub = (Gc=Inf, Ge=Inf, δ=δ_max, β=Inf)
+    return (lb=lb, ub=ub)
 end
 
 """
@@ -3319,9 +3319,9 @@ struct NonaffineMicroSphere{T} <: AbstractIncompressibleModel{T}
     r⃗²::Vector{Vector{Float64}}
     w::Vector{Float64}
     function NonaffineMicroSphere(
-        ::T = PrincipalValueForm();
-        ℒinv::InverseLangevinApproximations.AbstractInverseLangevinApproximation = CohenRounded3_2(),
-        n = 21,
+        ::T=PrincipalValueForm();
+        ℒinv::InverseLangevinApproximations.AbstractInverseLangevinApproximation=CohenRounded3_2(),
+        n=21
     ) where {T<:PrincipalValueForm}
         a = √(2) / 2
         b = 0.836095596749
@@ -3392,9 +3392,9 @@ function parameters(::NonaffineMicroSphere)
 end
 
 function parameter_bounds(::NonaffineMicroSphere, data::AbstractHyperelasticTest)
-    lb = (μ = -Inf, N = 0, p = 0, U = 0, q = 0)
+    lb = (μ=-Inf, N=0, p=0, U=0, q=0)
     ub = nothing
-    return (lb = lb, ub = ub)
+    return (lb=lb, ub=ub)
 end
 
 
@@ -3435,8 +3435,8 @@ struct Bootstrapped8Chain{T} <: AbstractIncompressibleModel{T}
     ℒinv::InverseLangevinApproximations.AbstractInverseLangevinApproximation
     W8::Function
     function Bootstrapped8Chain(
-        ::T = PrincipalValueForm();
-        ℒinv::InverseLangevinApproximations.AbstractInverseLangevinApproximation = TreloarApproximation(),
+        ::T=PrincipalValueForm();
+        ℒinv::InverseLangevinApproximations.AbstractInverseLangevinApproximation=TreloarApproximation()
     ) where {T<:PrincipalValueForm}
         function W8(x, (; μ, N))
             β = inverse_langevin_approximation(ℒinv, x)
@@ -3462,9 +3462,9 @@ end
 function parameter_bounds(::Bootstrapped8Chain, data::AbstractHyperelasticTest)
     I₁_max = maximum(I₁.(data.data.λ))
     N_min = I₁_max / 3
-    lb = (μ = -Inf, N = N_min)
+    lb = (μ=-Inf, N=N_min)
     ub = nothing
-    return (lb = lb, ub = ub)
+    return (lb=lb, ub=ub)
 end
 
 """
@@ -3484,7 +3484,7 @@ Parameters:
 > Davidson JD, Goulbourne NC. A nonaffine network model for elastomers undergoing finite deformations. Journal of the Mechanics and Physics of Solids. 2013 Aug 1;61(8):1784-97.
 """
 struct DavidsonGoulbourne{T} <: AbstractIncompressibleModel{T}
-    DavidsonGoulbourne(::T = PrincipalValueForm()) where {T<:PrincipalValueForm} = new{T}()
+    DavidsonGoulbourne(::T=PrincipalValueForm()) where {T<:PrincipalValueForm} = new{T}()
 end
 
 function ContinuumMechanicsBase.StrainEnergyDensity(
@@ -3503,9 +3503,9 @@ end
 function parameter_bounds(::DavidsonGoulbourne, data::AbstractHyperelasticTest)
     I₁_max = maximum(I₁.(data.data.λ))
     λmax_min = sqrt(I₁_max / 3)
-    lb = (Gc = 0, Ge = 0, λmax = λmax_min)
+    lb = (Gc=0, Ge=0, λmax=λmax_min)
     ub = nothing
-    return (lb = lb, ub = ub)
+    return (lb=lb, ub=ub)
 end
 
 """
@@ -3527,7 +3527,7 @@ Parameters:
 """
 struct KhiemItskov{T} <: AbstractIncompressibleModel{T}
     KhiemItskov(
-        ::T = PrincipalValueForm(),
+        ::T=PrincipalValueForm(),
     ) where {T<:Union{PrincipalValueForm,InvariantForm}} = new{T}()
 end
 
@@ -3559,9 +3559,9 @@ function parameters(::KhiemItskov)
 end
 
 function parameter_bounds(::KhiemItskov, data::AbstractHyperelasticTest)
-    lb = (n = 0, μcκ = -Inf, μt = Inf, q = 0)
-    ub = (n = Inf, μcκ = -Inf, μt = Inf, q = Inf)
-    return (lb = lb, ub = ub)
+    lb = (n=0, μcκ=-Inf, μt=Inf, q=0)
+    ub = (n=Inf, μcκ=-Inf, μt=Inf, q=Inf)
+    return (lb=lb, ub=ub)
 end
 # function constraints(::KhiemItskov, data::AbstractHyperelasticTest)
 #     I₁_max = maximum(I₁.(data.data.λ))
@@ -3572,7 +3572,7 @@ end
 
 struct GeneralConstitutiveModel_Network{T} <: AbstractIncompressibleModel{T}
     GeneralConstitutiveModel_Network(
-        ::T = PrincipalValueForm(),
+        ::T=PrincipalValueForm(),
     ) where {T<:Union{PrincipalValueForm,InvariantForm}} = new{T}()
 end
 
@@ -3604,14 +3604,14 @@ function parameter_bounds(
 )
     I₁_max = maximum(I₁.(data.data.λ))
     N_min = I₁_max / 3
-    lb = (Gc = -Inf, N = N_min)
+    lb = (Gc=-Inf, N=N_min)
     ub = nothing
-    return (lb = lb, ub = ub)
+    return (lb=lb, ub=ub)
 end
 
 struct GeneralConstitutiveModel_Tube{T} <: AbstractIncompressibleModel{T}
     GeneralConstitutiveModel_Tube(
-        ::T = PrincipalValueForm(),
+        ::T=PrincipalValueForm(),
     ) where {T<:PrincipalValueForm} = new{T}()
 end
 
@@ -3646,7 +3646,7 @@ Parameters:
 struct GeneralConstitutiveModel{T} <: AbstractIncompressibleModel{T}
     Tube::GeneralConstitutiveModel_Tube
     Network::GeneralConstitutiveModel_Network
-    GeneralConstitutiveModel(::T = PrincipalValueForm()) where {T<:PrincipalValueForm} =
+    GeneralConstitutiveModel(::T=PrincipalValueForm()) where {T<:PrincipalValueForm} =
         new{T}(GeneralConstitutiveModel_Tube(T()), GeneralConstitutiveModel_Network(T()))
 end
 
@@ -3665,9 +3665,9 @@ end
 function parameter_bounds(W::GeneralConstitutiveModel, data::AbstractHyperelasticTest)
     I₁_max = maximum(I₁.(data.data.λ))
     N_min = I₁_max / 3
-    lb = (Gc = -Inf, Ge = -Inf, N = N_min)
+    lb = (Gc=-Inf, Ge=-Inf, N=N_min)
     ub = nothing
-    return (lb = lb, ub = ub)
+    return (lb=lb, ub=ub)
 end
 
 
@@ -3697,8 +3697,8 @@ struct FullNetwork{T} <: AbstractIncompressibleModel{T}
     Chain3::ThreeChainModel
     Chain8::ArrudaBoyce
     function FullNetwork(
-        ::T = PrincipalValueForm();
-        ℒinv::InverseLangevinApproximations.AbstractInverseLangevinApproximation = TreloarApproximation(),
+        ::T=PrincipalValueForm();
+        ℒinv::InverseLangevinApproximations.AbstractInverseLangevinApproximation=TreloarApproximation()
     ) where {T<:PrincipalValueForm}
         new{T}(ℒinv, ThreeChainModel(T(); ℒinv), ArrudaBoyce(T(); ℒinv))
     end
@@ -3720,9 +3720,9 @@ function parameter_bounds(::FullNetwork, data::AbstractHyperelasticTest)
     N₁ = λ_max^2
     N₂ = I₁_max / 3
     N_min = (N₁ > N₂) ? N₁ : N₂
-    lb = (μ = -Inf, N = N_min, ρ = 0.0)
-    ub = (μ = Inf, N = Inf, ρ = 1.0)
-    return (lb = lb, ub = ub)
+    lb = (μ=-Inf, N=N_min, ρ=0.0)
+    ub = (μ=Inf, N=Inf, ρ=1.0)
+    return (lb=lb, ub=ub)
 end
 
 """
@@ -3749,8 +3749,8 @@ struct ZunigaBeatty{T} <: AbstractIncompressibleModel{T}
     Chain3::ThreeChainModel
     Chain8::ArrudaBoyce
     function ZunigaBeatty(
-        ::T = PrincipalValueForm();
-        ℒinv::InverseLangevinApproximations.AbstractInverseLangevinApproximation = TreloarApproximation(),
+        ::T=PrincipalValueForm();
+        ℒinv::InverseLangevinApproximations.AbstractInverseLangevinApproximation=TreloarApproximation()
     ) where {T<:PrincipalValueForm}
         new{T}(ℒinv, ThreeChainModel(T(); ℒinv), ArrudaBoyce(T(); ℒinv))
     end
@@ -3763,8 +3763,8 @@ function ContinuumMechanicsBase.StrainEnergyDensity(
 ) where {T,S}
     ΛL = √((N₃ + N₈) / 2)
     ρ₃ = ΛL / √(N₃)
-    W3 = StrainEnergyDensity(W.Chain3, λ⃗, (μ = μ, N = N₃))
-    W8 = StrainEnergyDensity(W.Chain8, λ⃗, (μ = μ, N = N₈))
+    W3 = StrainEnergyDensity(W.Chain3, λ⃗, (μ=μ, N=N₃))
+    W8 = StrainEnergyDensity(W.Chain8, λ⃗, (μ=μ, N=N₈))
     Λch = 1 / √(3) * √(I₁(λ⃗))
     ρ₈ = Λch / √(N₈)
     return ρ₃ * W3 + ρ₈ * W8
@@ -3779,9 +3779,9 @@ function parameter_bounds(::ZunigaBeatty, data::AbstractHyperelasticTest)
     I₁_max = maximum(I₁.(data.data.λ))
     N₃_min = λ_max^2
     N₈_min = I₁_max / 3
-    lb = (μ = -Inf, N₃ = N₃_min, N₈ = N₈_min)
+    lb = (μ=-Inf, N₃=N₃_min, N₈=N₈_min)
     ub = nothing
-    return (lb = lb, ub = ub)
+    return (lb=lb, ub=ub)
 end
 """
 Lim
@@ -3809,8 +3809,8 @@ struct Lim{T} <: AbstractIncompressibleModel{T}
     NH::NeoHookean
     AB::ArrudaBoyce
     function Lim(
-        form::T = PrincipalValueForm();
-        ℒinv::InverseLangevinApproximations.AbstractInverseLangevinApproximation = TreloarApproximation(),
+        form::T=PrincipalValueForm();
+        ℒinv::InverseLangevinApproximations.AbstractInverseLangevinApproximation=TreloarApproximation()
     ) where {T<:Union{InvariantForm,PrincipalValueForm}}
         f(x) = x^3 * (10 - 15x + 6x^2)
         new{T}(ℒinv, f, NeoHookean(form), ArrudaBoyce(form; ℒinv))
@@ -3822,8 +3822,8 @@ function ContinuumMechanicsBase.StrainEnergyDensity(
     λ⃗::Vector{S},
     (; μ₁, μ₂, N, Î₁),
 ) where {T<:PrincipalValueForm,S}
-    Wg = StrainEnergyDensity(W.NH, λ⃗, (μ = μ₁,))
-    W8 = StrainEnergyDensity(W.AB, λ⃗, (μ = μ₂, N = N))
+    Wg = StrainEnergyDensity(W.NH, λ⃗, (μ=μ₁,))
+    W8 = StrainEnergyDensity(W.AB, λ⃗, (μ=μ₂, N=N))
     ζ = (I₁(λ⃗) - 3) / (Î₁ - 3)
     return (1 - W.F(ζ)) * Wg + W.F(ζ) * W8
 end
@@ -3833,8 +3833,8 @@ function ContinuumMechanicsBase.StrainEnergyDensity(
     I⃗::Vector{S},
     (; μ₁, μ₂, N, Î₁),
 ) where {T<:InvariantForm,S}
-    Wg = StrainEnergyDensity(W.NH, I⃗, (μ = μ₁,))
-    W8 = StrainEnergyDensity(W.AB, I⃗, (μ = μ₂, N = N))
+    Wg = StrainEnergyDensity(W.NH, I⃗, (μ=μ₁,))
+    W8 = StrainEnergyDensity(W.AB, I⃗, (μ=μ₂, N=N))
     ζ = (I⃗[1] - 3) / (Î₁ - 3)
     return (1 - W.F(ζ)) * Wg + W.F(ζ) * W8
 end
@@ -3846,9 +3846,9 @@ end
 function parameter_bounds(::Lim, data::AbstractHyperelasticTest)
     I₁_max = maximum(I₁.(data.data.λ))
     N_min = I₁_max / 3
-    lb = (μ₁ = -Inf, μ₂ = -Inf, N = N_min, Î₁ = 3)
+    lb = (μ₁=-Inf, μ₂=-Inf, N=N_min, Î₁=3)
     ub = nothing
-    return (lb = lb, ub = ub)
+    return (lb=lb, ub=ub)
 end
 
 """
@@ -3892,10 +3892,10 @@ struct BechirChevalier{T} <: AbstractIncompressibleModel{T}
     Chain3::ThreeChainModel
     Chain8::ArrudaBoyce
     function BechirChevalier(
-        ::T = PrincipalValueForm();
-        ℒinv::InverseLangevinApproximations.AbstractInverseLangevinApproximation = TreloarApproximation(),
+        ::T=PrincipalValueForm();
+        ℒinv::InverseLangevinApproximations.AbstractInverseLangevinApproximation=TreloarApproximation()
     ) where {T<:PrincipalValueForm}
-        new{T}(ℒinv, ThreeChainModel(T(), ℒinv = ℒinv), ArrudaBoyce(T(), ℒinv = ℒinv))
+        new{T}(ℒinv, ThreeChainModel(T(), ℒinv=ℒinv), ArrudaBoyce(T(), ℒinv=ℒinv))
     end
 end
 
@@ -3905,10 +3905,10 @@ function ContinuumMechanicsBase.StrainEnergyDensity(
     (; μ₀, η, ρ, N₃, N₈),
 ) where {T,S}
     μf = ρ * √(I₁(λ⃗) / 3 / N₈)
-    W3 = StrainEnergyDensity(W.Chain3, λ⃗, (μ = μf, N = N₃))
+    W3 = StrainEnergyDensity(W.Chain3, λ⃗, (μ=μf, N=N₃))
     α = maximum(λ⃗)
     μc = (1 - η * α / √(N₃)) * μ₀
-    W8 = StrainEnergyDensity(W.Chain8, λ⃗, (μ = μc / 3, N = N₈))
+    W8 = StrainEnergyDensity(W.Chain8, λ⃗, (μ=μc / 3, N=N₈))
     return W3 + W8
 end
 
@@ -3917,9 +3917,9 @@ function parameters(::BechirChevalier)
 end
 
 function parameter_bounds(::BechirChevalier, data::AbstractHyperelasticTest)
-    lb = (μ₀ = -Inf, η = -Inf, ρ = -Inf, N₃ = 0, N₈ = 0)
+    lb = (μ₀=-Inf, η=-Inf, ρ=-Inf, N₃=0, N₈=0)
     ub = nothing
-    return (lb = lb, ub = ub)
+    return (lb=lb, ub=ub)
 end
 
 """
@@ -3946,8 +3946,8 @@ Fields:
 struct AnsarriBenam{T} <: AbstractIncompressibleModel{T}
     n::Int
     function AnsarriBenam(
-        ::T = PrincipalValueForm();
-        n::Int = 3,
+        ::T=PrincipalValueForm();
+        n::Int=3
     ) where {T<:Union{PrincipalValueForm,InvariantForm}}
         @assert n > 1
         new{T}(n)
@@ -3984,7 +3984,7 @@ end
 
 function parameter_bounds(::AnsarriBenam, test::AbstractHyperelasticTest)
     N_min = maximum(I₁, test.data.λ)
-    lb = (μ = -Inf, N = N_min, C₂ = -Inf, γ = -Inf)
+    lb = (μ=-Inf, N=N_min, C₂=-Inf, γ=-Inf)
     ub = nothing
-    return (lb = lb, ub = ub)
+    return (lb=lb, ub=ub)
 end
