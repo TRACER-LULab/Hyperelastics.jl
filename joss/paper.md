@@ -21,9 +21,12 @@ bibliography: paper.bib
 
 # Summary
 
-The modelling of hyperelastic materials is of paramount importance for research areas including: soft robotics, cancer screening, and automobile tire modelling. The challenge in hyperelastic material modelling arises from the variety of material models available for predicting the stress-stretch behavior of the material. Commonly, the strain energy density (SED) function (SEDF) is used to predict the energy stored in the material. Derivatives of the SEDF provide measures for the stress-stretch relationship. The further challenge arises as the derivatives are often hand-derived and implemented in a finite element method software. The problem of hyperelastic material moodelling requires a high-performance set of SEDFs and the tools required to calibrate the models to material tests. `Hyperelastics.jl` is a Julia  [@Bezanson2017] package containing 70+ analytical SEDF along with 3 data-driven methods for predicting the force-deformation behavior.
+`Hyperelastics.jl` is a Julia [@Bezanson2017]  implementation for the largest (70+) collection of hyperelastic material models. The package provides a set of analytical and data-driven strain energy density functions (SEDF) and the tools required to calibrate the models to material tests. The package is designed to leverage multiple-dispatch to define a common set of functions for calculating the SEDF, Second Piola Kirchoff stress tensor, and the Cauchy stress tensor. The package provides: 1) a material model library that is AD compatible and 2) a set of extensible methods for easily defining and testing new material models. The package leverages the `ContinuumMechanicsBase.jl` pacakge for defining the continuum scale quantities and their corresponding relationships.
 
 # Statement of need
+
+The development of `Hyperelastics.jl` began as a study of the accuracy for a variety of material models for a set of experimental data. Often, researcher rely on custom implementations of material models and the data fitting process to find material parameters that match their experimental data. 
+
 
 `Hyperelastics.jl` is part of the Multi-Scale Material Modelling ($M^3$) Suite being developed in the Translational Robotics and Controls Engineering Research (TRACER) Lab at Liberty University. A pure Julia implementation allows for the use of automatic differentiation (AD) packages to calculate the partial derivatives of the SEDF. `Hyperelastics.jl` is designed to leverage multiple-dispatch to define a common set of functions for calculating the SED, Second Piola Kirchoff Stress Tensor, and the Cauchy Stress Tensor. The package provides: 1) a material model library that is AD compatible and 2) a set of extensible methods for easily defining and testing new material models.
 
@@ -82,6 +85,10 @@ For a quick reference, the following citation commands can be used:
 <!-- - `[@author:2001]` -> "(Author et al., 2001)" -->
 <!-- - `[@author1:2001; @author2:2001]` -> "(Author1 et al., 2001; Author2 et al., 2002)" -->
 
+# Availability
+
+Hyperelastics.jl can be found on [github]
+
 # Figures
 
 Figures can be included like this:
@@ -93,7 +100,6 @@ Figure sizes can be customized by adding an optional second parameter:
 
 # Acknowledgements
 
-We acknowledge contributions from Brigitta Sipocz, Syrtis Major, and Semyeong Oh, and support from Kathryn Johnston during the genesis of this project.
+The TRACER Lab is supported by the School of Engineering and the Center for Engineering Research and Education (CERE) at Liberty University.
 
 # References
-Example paper.bib file:

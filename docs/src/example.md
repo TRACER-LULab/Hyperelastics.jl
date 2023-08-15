@@ -21,8 +21,10 @@ scatter!(ax,
     color = :black
 )
 axislegend(position = :lt)
-f
+save("treloar_data.png", f)
 ```
+
+![](treloar_data.png)
 
 Multiple dispatch is used on the corresponding function to calculate the values. Based on the model passed to the function, the correct method will be used in the calculation. StrainEnergyDensity, SecondPiolaKirchoffStressTensor, and CauchyStressTensor accept the deformation state as either the principal components in a vector, `[λ₁, λ₂, λ₃]` or as the deformation gradient matrix, `Fᵢⱼ`. The returned value matches the type of the input. Parameters are accessed by field allowing for `structs`, `NamedTuples`, or other field-based data-types such as those in ComponentArrays.jl and LabelledArrays.jl. For example, the NeoHookean model is accessed with:
 
@@ -30,22 +32,25 @@ Multiple dispatch is used on the corresponding function to calculate the values.
 ψ = NeoHookean()
 λ⃗ = [2.0, sqrt(1/2), sqrt(1/2)]
 p = (μ = 10.0, )
-StrainEnergyDensity(ψ, λ⃗, p)
+W = StrainEnergyDensity(ψ, λ⃗, p)
+return W # hide
 ```
 
-or 
+or
 
 ```@example 1
 F = rand(3,3)
 p = (μ = 20.0, )
-StrainEnergyDensity(ψ, F, p)
+W = StrainEnergyDensity(ψ, F, p)
+return W # hide
 ```
 
 A method for creating an `OptimizationProblem` compatible with `Optimization.jl` is provided. To fit the NeoHookean model to the Treloar data previously loaded, an additional field-indexed array is used as the initial guess to `HyperelasticProblem`. It is recommendedto use ComponentArrays.jl for optimization of model parameters.
 
 ```@example 1
 prob = HyperelasticProblem(ψ, treloar_data, ComponentVector(μ = 0.2))
-solve(prob, LBFGS())
+sol = solve(prob, LBFGS())
+return sol # hide
 ```
 
 For fiting multiple models to the same dataset, 
@@ -66,6 +71,7 @@ for (ψ, p₀) in models
     sol[ψ] = solve(HEProblem, NelderMead())
     @show ψ, sol[ψ].u
 end
+return sol # hide
 ```
 
 To predict the reponse of a model to a proivded dataset and parameters, a `predict` function is provided:
@@ -79,8 +85,10 @@ for (ψ, p) in sol
 end
 scatter!(ax, getindex.(treloar_data.data.λ, 1), getindex.(treloar_data.data.s, 1), label = "Treloar 1944 Experimental", color = :black)
 axislegend(position = :lt)
-f
+save("treloar_data_fits.png", f) # hide
 ```
+
+![](treloar_data_fits.png)
 
 While the majority of the models provided by `Hyperelastics.jl` are based on closed form strain energy density functions, a selection of data-driven models are proivded. For example, the `SussmanBathe` model is created with:
 
@@ -110,5 +118,6 @@ scatter!(
         color = :black
     )
 axislegend(position = :lt)
-f
+save("sussman_bathe.png", f) # hide
 ```
+![](sussman_bathe.png)

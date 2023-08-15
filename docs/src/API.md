@@ -11,14 +11,14 @@ CurrentModule = Hyperelastics
 
 ```@autodocs
 Modules = [Hyperelastics]
-Filter = x -> typeof(x) === DataType && t <: Hyperelastics.AbstractIncompressibleModel
+Filter = x -> typeof(x) === DataType && x <: Hyperelastics.AbstractIncompressibleModel
 ```
 
 # Compressible Models
 
 ```@autodocs
 Modules = [Hyperelastics]
-Filter = x -> typeof(x) === DataType && t <: Hyperelastics.AbstractCompressibleModel
+Filter = x -> typeof(x) === DataType && x <: Hyperelastics.AbstractCompressibleModel
 
 ```
 
