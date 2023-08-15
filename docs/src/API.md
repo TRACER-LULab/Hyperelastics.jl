@@ -11,21 +11,21 @@ CurrentModule = Hyperelastics
 
 ```@autodocs
 Modules = [Hyperelastics]
-Filter = x -> x <: Hyperelastics.AbstractIncompressibleModel
+Filter = x -> x∈subtypes(Hyperelastics.AbstractIncompressibleModel)
 ```
 
 # Compressible Models
 
 ```@autodocs
 Modules = [Hyperelastics]
-Filter = x -> x <: Hyperelastics.AbstractCompressibleModel
+Filter = x -> x∈subtypes(Hyperelastics.AbstractCompressibleModel)
 ```
 
 # Data Driven Models
 
 ```@autodocs
 Modules = [Hyperelastics]
-Filter = x -> x <: Hyperelastics.AbstractDataDrivenHyperelasticModel
+Filter = x -> x∈subtypes(Hyperelastics.AbstractDataDrivenHyperelasticModel)
 ```
 
 # Helper Functions
