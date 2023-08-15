@@ -4,6 +4,7 @@
 using Hyperelastics
 using Optimization, OptimizationOptimJL
 using ComponentArrays: ComponentVector
+using ForwardDiff
 using CairoMakie, MakiePublication
 set_theme!(theme_web(width = 800))
 ```
@@ -48,7 +49,7 @@ return W # hide
 A method for creating an `OptimizationProblem` compatible with `Optimization.jl` is provided. To fit the NeoHookean model to the Treloar data previously loaded, an additional field-indexed array is used as the initial guess to `HyperelasticProblem`. It is recommendedto use ComponentArrays.jl for optimization of model parameters.
 
 ```@example 1
-prob = HyperelasticProblem(ψ, treloar_data, ComponentVector(μ = 0.2))
+prob = HyperelasticProblem(ψ, treloar_data, ComponentVector(μ = 0.2), ad_type = AutoForwardDiff())
 sol = solve(prob, LBFGS())
 return sol # hide
 ```
@@ -67,7 +68,7 @@ models = Dict(
 
 sol = Dict{DataType, SciMLSolution}()
 for (ψ, p₀) in models
-    HEProblem = HyperelasticProblem(ψ(), treloar_data, p₀)
+    HEProblem = HyperelasticProblem(ψ(), treloar_data, p₀,  ad_type = AutoForwardDiff())
     sol[ψ] = solve(HEProblem, NelderMead())
     @show ψ, sol[ψ].u
 end

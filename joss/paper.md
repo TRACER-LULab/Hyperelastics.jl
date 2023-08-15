@@ -25,17 +25,17 @@ bibliography: paper.bib
 
 # Statement of need
 
-The development of `Hyperelastics.jl` began as a study of the accuracy for a variety of material models for a set of experimental data. Often, researcher rely on custom implementations of material models and the data fitting process to find material parameters that match their experimental data. 
+The development of `Hyperelastics.jl` began as a study of the accuracy for a variety of material models for a set of experimental data. Often, researcher rely on custom implementations of material models and the data fitting process to find material parameters that match their experimental data. The SEDFs included in the package cover most of the available analytical models from the literature to date. Furthermore, a selection of data-driven models are incldued as a starting point for the development of new methods. 
 
 
-`Hyperelastics.jl` is part of the Multi-Scale Material Modelling ($M^3$) Suite being developed in the Translational Robotics and Controls Engineering Research (TRACER) Lab at Liberty University. A pure Julia implementation allows for the use of automatic differentiation (AD) packages to calculate the partial derivatives of the SEDF. `Hyperelastics.jl` is designed to leverage multiple-dispatch to define a common set of functions for calculating the SED, Second Piola Kirchoff Stress Tensor, and the Cauchy Stress Tensor. The package provides: 1) a material model library that is AD compatible and 2) a set of extensible methods for easily defining and testing new material models.
+`Hyperelastics.jl` is part of the Multi-Scale Material Modelling ($M^3$) Suite being developed in the Translational Robotics and Controls Engineering Research (TRACER) Lab at Liberty University. A pure Julia implementation allows for the use of automatic differentiation (AD) packages to calculate the partial derivatives of the SEDF. `Hyperelastics.jl` is designed to leverage multiple-dispatch to define a common set of functions for calculating the SED, Second Piola Kirchoff Stress Tensor, and the Cauchy Stress Tensor. 
 
-# Functionality
+<!-- # Functionality
 The most basic definition in `Hyperelastics.jl` is the SEDF. The material models are implemented primarily by the SEDF with AD rules being defined to generate the Nominal, $S$, and True, $\sigma$ stresses felt in the material
 
 $S_{ij} = 2\frac{\partial W}{\partial C_{ij}} = \frac{\partial W}{\partial \lambda_i}$
 
-$\sigma_i = \frac{\lambda_i}{J}\frac{\partial W}{\partial \lambda_i}$
+$\sigma_i = \frac{\lambda_i}{J}\frac{\partial W}{\partial \lambda_i}$--!>
 <!-- `Gala` is an Astropy-affiliated Python package for galactic dynamics. Python
 enables wrapping low-level languages (e.g., C) for speed without losing
 flexibility or ease-of-use in the user-interface. The API for `Gala` was
