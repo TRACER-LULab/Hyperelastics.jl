@@ -44,6 +44,7 @@ struct DataDrivenForm end
 
 """
 $(SIGNATURES)
+
 Creates an `OptimizationProblem` for use in [`Optimization.jl`](https://docs.sciml.ai/Optimization/stable/) to find the optimal parameters.
 
 Fields:

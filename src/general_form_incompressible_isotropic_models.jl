@@ -1,7 +1,7 @@
 export GeneralMooneyRivlin, GeneralDarijaniNaghdabadi, GeneralBeda
 
 """
-`GeneralMooneyRivlin`
+$(TYPEDEF)
 
 Model:
 
@@ -51,7 +51,7 @@ end
 parameters(::GeneralMooneyRivlin) = (:C⃗,)
 
 """
-`GeneralDarijaniNaghdabadi`
+$(TYPEDEF)
 
 Model:
 
@@ -90,7 +90,7 @@ function parameters(::GeneralDarijaniNaghdabadi)
 end
 
 """
-`GeneralBeda`
+$(TYPEDEF)
 
 Model:
 

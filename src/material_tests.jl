@@ -3,21 +3,20 @@ struct HyperelasticDataEntry{T,S}
     s::Vector{S}
 end
 
-"""
-`HyperelasticUniaxialTest(λ₁, s₁; name, incompressible=true)`
-`HyperelasticUniaxialTest(λ₁; name, incompressible=true)`
-
-Creates an object storing results from a uniaxial test of a hyperelatic  material.
-
-Fields:
-- `λ₁`: Vector of uniaxial stretches
-- `s₁`: Vector of experiemntal stresses (optional)
-- `name`: string for the name of the test
-- `incompressible`: `true` if the material can be assumed to be incompressible.
-"""
 struct HyperelasticUniaxialTest{T,S} <: AbstractHyperelasticTest{T,S}
     data::StructVector
     name::String
+    """
+    $(SIGNATURES)
+
+    Creates an object storing results from a uniaxial test of a hyperelatic  material.
+
+    Fields:
+    - `λ₁`: Vector of uniaxial stretches
+    - `s₁`: Vector of experiemntal stresses (optional)
+    - `name`: string for the name of the test
+    - `incompressible`: `true` if the material can be assumed to be incompressible.
+    """
     function HyperelasticUniaxialTest(λ₁, s₁; name, incompressible = true)
         @assert length(λ₁) == length(s₁) "Inputs must be the same length"
         if incompressible
@@ -43,23 +42,22 @@ struct HyperelasticUniaxialTest{T,S} <: AbstractHyperelasticTest{T,S}
     end
 end
 
-"""
-`HyperelasticBiaxialTest(λ₁, λ₂, s₁, s₂; name, incompressible=true)`
-`HyperelasticBiaxialTest(λ₁, λ₂; name, incompressible=true)`
-
-Creates an object storing results from a biaxial test of a hyperelatic material.
-
-Fields:
-- `λ₁`: Vector of 1-direction stretches
-- `λ₂`: Vector of 2-direction stretchs
-- `s₁`: Vector of experiemntal stresses (optional)
-- `s₂`: Vector of experiemntal stresses (optional)
-- `name`: string for the name of the test
-- `incompressible`: `true` if the material can be assumed to be incompressible.
-"""
 struct HyperelasticBiaxialTest{T,S} <: AbstractHyperelasticTest{T,S}
     data::StructVector
     name::String
+    """
+    $(SIGNATURES)
+
+    Creates an object storing results from a biaxial test of a hyperelatic material.
+
+    Fields:
+    - `λ₁`: Vector of 1-direction stretches
+    - `λ₂`: Vector of 2-direction stretchs
+    - `s₁`: Vector of experiemntal stresses (optional)
+    - `s₂`: Vector of experiemntal stresses (optional)
+    - `name`: string for the name of the test
+    - `incompressible`: `true` if the material can be assumed to be incompressible.
+    """
     function HyperelasticBiaxialTest(λ₁, λ₂, s₁, s₂; name, incompressible = true)
         @assert length(λ₁) == length(λ₂) == length(s₁) == length(s₂) "Inputs must be the same length"
         if incompressible

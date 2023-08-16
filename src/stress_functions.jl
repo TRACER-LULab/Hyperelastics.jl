@@ -67,7 +67,7 @@ function ContinuumMechanicsBase.StrainEnergyDensity(
 end
 
 """
-`SecondPiolaKirchoffStressTensor(ψ::AbstractHyperelasticModel, λ⃗::AbstractVector, p; ad_type=AD.ForwardDiffBackend())`
+`SecondPiolaKirchoffStressTensor(ψ::AbstractHyperelasticModel, λ⃗::AbstractVector, p; ad_type<:AbstractADType=nothing)`
 
 Returns the second PK stress tensor for the hyperelastic model `ψ` with the principle stretches `λ⃗` with parameters `p`.
 
@@ -80,7 +80,7 @@ function ContinuumMechanicsBase.SecondPiolaKirchoffStressTensor(
     ψ::AbstractHyperelasticModel{T},
     λ⃗::Vector{R},
     p;
-    ad_type = nothing,
+    ad_type <: AbstractADType=nothing,
     kwargs...,
 ) where {T<:PrincipalValueForm,R}
     ∂ψ(ψ, λ⃗, p, ad_type; kwargs...)

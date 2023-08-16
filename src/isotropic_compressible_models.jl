@@ -1,5 +1,7 @@
 export GeneralCompressible, LogarithmicCompressible
+
 """
+$(TYPEDEF)
 Generic Compressible Model
 
 Model:
@@ -196,6 +198,8 @@ function ContinuumMechanicsBase.CauchyStressTensor(
 end
 
 """
+$(TYPEDEF)
+
 Logarithmic Compressible Model
 
 Model:
