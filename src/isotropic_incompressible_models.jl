@@ -77,6 +77,8 @@ export HorganMurphy, KhiemItskov
 export GeneralConstitutiveModel_Network, GeneralConstitutiveModel_Tube
 
 """
+$(TYPEDEF)
+$(FIELDS)
 ArrudaBoyce
 
 Model:
@@ -148,6 +150,8 @@ function parameter_bounds(::ArrudaBoyce, data::AbstractHyperelasticTest)
 end
 
 """
+$(TYPEDEF)
+$(FIELDS)
 ABGI
 
 Model:
@@ -198,6 +202,8 @@ function parameter_bounds(::ABGI, data::AbstractHyperelasticTest)
 end
 
 """
+$(TYPEDEF)
+$(FIELDS)
 Affine Micro-Sphere
 
 Model:
@@ -282,6 +288,8 @@ function parameter_bounds(ψ::AffineMicroSphere, test::AbstractHyperelasticTest)
     (lb=lb, ub=ub)
 end
 """
+$(TYPEDEF)
+$(FIELDS)
 Alexander
 
 Model:
@@ -335,6 +343,8 @@ parameters(::Alexander) = (:μ, :C₁, :C₂, :C₃, :k, :γ)
 
 
 """
+$(TYPEDEF)
+$(FIELDS)
 Mooney Rivlin Model
 
 Model:
@@ -374,6 +384,8 @@ end
 parameters(::MooneyRivlin) = (:C10, :C01)
 
 """
+$(TYPEDEF)
+$(FIELDS)
 NeoHookean
 
 Model:
@@ -411,6 +423,8 @@ end
 parameters(::NeoHookean) = (:μ,)
 
 """
+$(TYPEDEF)
+$(FIELDS)
 Isihara
 
 Model:
@@ -446,6 +460,8 @@ end
 parameters(ψ::Isihara) = (:C10, :C20, :C01)
 
 """
+$(TYPEDEF)
+$(FIELDS)
 Biderman
 
 Model:
@@ -493,6 +509,8 @@ end
 parameters(::Biderman) = (:C10, :C01, :C20, :C30)
 
 """
+$(TYPEDEF)
+$(FIELDS)
 James-Green-Simpson
 
 Model:
@@ -544,6 +562,8 @@ end
 parameters(ψ::JamesGreenSimpson) = (:C10, :C01, :C11, :C20, :C30)
 
 """
+$(TYPEDEF)
+$(FIELDS)
 Haines-Wilson
 
 Model:
@@ -598,6 +618,8 @@ end
 parameters(::HainesWilson) = (:C10, :C01, :C11, :C02, :C20, :C30)
 
 """
+$(TYPEDEF)
+$(FIELDS)
 Yeoh
 
 Model:
@@ -639,6 +661,8 @@ end
 parameters(ψ::Yeoh) = (:C10, :C20, :C30)
 
 """
+$(TYPEDEF)
+$(FIELDS)
 Lion
 
 Model:
@@ -687,6 +711,8 @@ parameters(::Lion) = (:C10, :C01, :C50)
 
 
 """
+$(TYPEDEF)
+$(FIELDS)
 Haupt Sedlan
 
 Model:
@@ -739,6 +765,8 @@ end
 parameters(::HauptSedlan) = (:C10, :C01, :C11, :C02, :C30)
 
 """
+$(TYPEDEF)
+$(FIELDS)
 Hartmann-Neff
 
 Model:
@@ -789,6 +817,8 @@ end
 parameters(::HartmannNeff) = (:α, :Ci⃗0, :C0j⃗)
 
 """
+$(TYPEDEF)
+$(FIELDS)
 Carroll
 
 Model:
@@ -828,6 +858,8 @@ end
 parameters(::Carroll) = (:A, :B, :C)
 
 """
+$(TYPEDEF)
+$(FIELDS)
 Bahreman Darijani
 
 Model:
@@ -866,6 +898,8 @@ end
 parameters(::BahremanDarijani) = (:A2, :B2, :A4, :A6)
 
 """
+$(TYPEDEF)
+$(FIELDS)
 Zhao
 
 Model:
@@ -912,6 +946,8 @@ end
 parameters(::Zhao) = (:C₋₁¹, :C₁¹, :C₂¹, :C₂²)
 
 """
+$(TYPEDEF)
+$(FIELDS)
 Knowles
 
 Model:
@@ -958,6 +994,8 @@ function parameter_bounds(::Knowles, data::AbstractHyperelasticTest)
 end
 
 """
+$(TYPEDEF)
+$(FIELDS)
 Swanson
 
 Model:
@@ -1007,6 +1045,8 @@ end
 parameters(::Swanson) = (:A⃗, :α⃗, :B⃗, :β⃗)
 
 """
+$(TYPEDEF)
+$(FIELDS)
 Yamashita-Kawabata
 
 Model:
@@ -1048,6 +1088,8 @@ end
 parameters(::YamashitaKawabata) = (:C1, :C2, :C3, :N)
 
 """
+$(TYPEDEF)
+$(FIELDS)
 Davis-DeThomas
 
 Model:
@@ -1091,6 +1133,8 @@ function parameters(::DavisDeThomas)
 end
 
 """
+$(TYPEDEF)
+$(FIELDS)
 Gregory
 
 Model:
@@ -1136,6 +1180,8 @@ function parameters(::Gregory)
 end
 
 """
+$(TYPEDEF)
+$(FIELDS)
 Modified Gregory
 
 Model:
@@ -1182,6 +1228,8 @@ function parameters(::ModifiedGregory)
 end
 
 """
+$(TYPEDEF)
+$(FIELDS)
 Beda
 
 Model:
@@ -1243,6 +1291,8 @@ function parameter_bounds(::Beda, data::AbstractHyperelasticTest)
     return (lb=lb, ub=ub)
 end
 """
+$(TYPEDEF)
+$(FIELDS)
 Amin
 
 Model:
@@ -1293,6 +1343,8 @@ function parameters(::Amin)
 end
 
 """
+$(TYPEDEF)
+$(FIELDS)
 Lopez-Pamies
 
 Model:
@@ -1337,6 +1389,8 @@ function parameters(::LopezPamies)
 end
 
 """
+$(TYPEDEF)
+$(FIELDS)
 GenYeoh
 
 Model:
@@ -1381,6 +1435,8 @@ function parameters(::GenYeoh)
 end
 
 """
+$(TYPEDEF)
+$(FIELDS)
 Hart-Smith
 
 Model:
@@ -1423,6 +1479,8 @@ function parameters(::HartSmith)
 end
 
 """
+$(TYPEDEF)
+$(FIELDS)
 Veronda-Westmann
 
 Model:
@@ -1465,6 +1523,8 @@ function parameters(::VerondaWestmann)
 end
 
 """
+$(TYPEDEF)
+$(FIELDS)
 Fung-Demiray
 
 Model:
@@ -1507,6 +1567,8 @@ function parameters(::FungDemiray)
 end
 
 """
+$(TYPEDEF)
+$(FIELDS)
 Vito
 
 Model:
@@ -1548,6 +1610,8 @@ function parameters(::Vito)
 end
 
 """
+$(TYPEDEF)
+$(FIELDS)
 Modified Yeoh
 
 Model:
@@ -1598,6 +1662,8 @@ function parameters(::ModifiedYeoh)
 end
 
 """
+$(TYPEDEF)
+$(FIELDS)
 Chevalier-Marco
 
 Model:
@@ -1684,6 +1750,8 @@ function parameters(::ChevalierMarco)
 end
 
 """
+$(TYPEDEF)
+$(FIELDS)
 Gornet - Desmorat
 
 Model:
@@ -1793,6 +1861,8 @@ function parameters(::GornetDesmorat)
 end
 
 """
+$(TYPEDEF)
+$(FIELDS)
 Mansouri-Darijani
 
 Model:
@@ -1836,6 +1906,8 @@ function parameters(::MansouriDarijani)
 end
 
 """
+$(TYPEDEF)
+$(FIELDS)
 Gent Thomas
 
 Model:
@@ -1877,6 +1949,8 @@ function parameters(::GentThomas)
 end
 
 """
+$(TYPEDEF)
+$(FIELDS)
 Lambert-Diani Rey
 
 Model:
@@ -2005,6 +2079,8 @@ function parameters(::LambertDianiRey)
 end
 
 """
+$(TYPEDEF)
+$(FIELDS)
 Hoss Marczak I
 
 Model:
@@ -2060,6 +2136,8 @@ function parameter_bounds(::HossMarczakI, data::AbstractHyperelasticTest)
 end
 
 """
+$(TYPEDEF)
+$(FIELDS)
 Hoss Marczak II
 
 Model:
@@ -2119,6 +2197,8 @@ end
 
 
 """
+$(TYPEDEF)
+$(FIELDS)
 Exp-Ln
 
 Model:
@@ -2165,6 +2245,8 @@ function parameters(::ExpLn)
 end
 
 """
+$(TYPEDEF)
+$(FIELDS)
 Van der Waals
 
 Model:
@@ -2236,6 +2318,8 @@ end
 # end
 
 """
+$(TYPEDEF)
+$(FIELDS)
 Gent
 
 Model:
@@ -2285,6 +2369,8 @@ function parameter_bounds(::Gent, test::AbstractHyperelasticTest{S,T}) where {S,
 end
 
 """
+$(TYPEDEF)
+$(FIELDS)
 Takamizawa-Hayashi
 
 Model:
@@ -2334,6 +2420,8 @@ function parameter_bounds(::TakamizawaHayashi, data::AbstractHyperelasticTest)
 end
 
 """
+$(TYPEDEF)
+$(FIELDS)
 Yeoh-Fleming
 
 Model:
@@ -2386,6 +2474,8 @@ function parameter_bounds(::YeohFleming, data::AbstractHyperelasticTest)
 end
 
 """
+$(TYPEDEF)
+$(FIELDS)
 Pucci-Saccomandi
 
 Model:
@@ -2436,6 +2526,8 @@ function parameter_bounds(::PucciSaccomandi, data::AbstractHyperelasticTest)
 end
 
 """
+$(TYPEDEF)
+$(FIELDS)
 Horgan Saccomandi Model
 
 Model:
@@ -2495,6 +2587,8 @@ function parameter_bounds(::HorganSaccomandi, data::AbstractHyperelasticTest)
 end
 
 """
+$(TYPEDEF)
+$(FIELDS)
 Beatty Model
 
 Model:
@@ -2543,6 +2637,8 @@ function parameter_bounds(::Beatty, data::AbstractHyperelasticTest)
     return (lb=lb, ub=ub)
 end
 """
+$(TYPEDEF)
+$(FIELDS)
 Horgan Murphy Model
 
 Model:
@@ -2585,6 +2681,8 @@ end
 # end
 
 """
+$(TYPEDEF)
+$(FIELDS)
 Valanis-Landel
 
 Model:
@@ -2615,6 +2713,8 @@ function parameters(::ValanisLandel)
 end
 
 """
+$(TYPEDEF)
+$(FIELDS)
 Peng - Landel
 
 Model:
@@ -2649,6 +2749,8 @@ function parameters(::PengLandel)
 end
 
 """
+$(TYPEDEF)
+$(FIELDS)
 Ogden
 
 Model:
@@ -2681,6 +2783,8 @@ function parameters(::Ogden)
 end
 
 """
+$(TYPEDEF)
+$(FIELDS)
 Attard
 
 Model:
@@ -2716,6 +2820,8 @@ function parameters(::Attard)
 end
 
 """
+$(TYPEDEF)
+$(FIELDS)
 Shariff
 
 Model:
@@ -2806,6 +2912,8 @@ function parameters(::Shariff)
 end
 
 """
+$(TYPEDEF)
+$(FIELDS)
 Arman - Narooei
 
 Model:
@@ -2856,6 +2964,8 @@ function parameters(::ArmanNarooei)
 end
 
 """
+$(TYPEDEF)
+$(FIELDS)
 Continuum Hybrid
 
 Model:
@@ -2889,6 +2999,8 @@ function parameters(::ContinuumHybrid)
 end
 
 """
+$(TYPEDEF)
+$(FIELDS)
 Bechir-4 Term
 
 Model:
@@ -2930,6 +3042,8 @@ function parameters(::Bechir4Term)
 end
 
 """
+$(TYPEDEF)
+$(FIELDS)
 Constrained Junction [^2]
 
 Model:
@@ -2974,6 +3088,8 @@ function parameter_bounds(::ConstrainedJunction, data::AbstractHyperelasticTest)
     return (lb=lb, ub=ub)
 end
 """
+$(TYPEDEF)
+$(FIELDS)
 Edward-Vilgis
 
 Model:
@@ -3034,6 +3150,8 @@ function parameter_bounds(::EdwardVilgis, data::AbstractHyperelasticTest)
 end
 
 """
+$(TYPEDEF)
+$(FIELDS)
 MCC (modified constrained chain)
 
 Model:
@@ -3089,6 +3207,8 @@ function parameter_bounds(::MCC, data::AbstractHyperelasticTest)
 end
 
 """
+$(TYPEDEF)
+$(FIELDS)
 Tube
 
 Model:
@@ -3121,6 +3241,8 @@ function parameters(::Tube)
 end
 
 """
+$(TYPEDEF)
+$(FIELDS)
 Nonaffine - Tube
 
 Model:
@@ -3152,6 +3274,8 @@ function parameters(::NonaffineTube)
 end
 
 """
+$(TYPEDEF)
+$(FIELDS)
 Three Chain Model
 
 Model:
@@ -3199,6 +3323,8 @@ function parameter_bounds(::ThreeChainModel, data::AbstractHyperelasticTest)
 end
 
 """
+$(TYPEDEF)
+$(FIELDS)
 Modified Flory Erman
 
 Model:
@@ -3254,6 +3380,8 @@ function parameter_bounds(::ModifiedFloryErman, data::AbstractHyperelasticTest)
 end
 
 """
+$(TYPEDEF)
+$(FIELDS)
 Extended Tube Model
 
 Model:
@@ -3298,6 +3426,8 @@ function parameter_bounds(::ExtendedTubeModel, data::AbstractHyperelasticTest)
 end
 
 """
+$(TYPEDEF)
+$(FIELDS)
 Non-Affine Micro-Sphere
 
 Model: See Paper
@@ -3400,6 +3530,8 @@ end
 
 
 """
+$(TYPEDEF)
+$(FIELDS)
 Bootstrapped 8Chain Model
 
 Model:
@@ -3468,6 +3600,8 @@ function parameter_bounds(::Bootstrapped8Chain, data::AbstractHyperelasticTest)
 end
 
 """
+$(TYPEDEF)
+$(FIELDS)
 Davidson - Goulbourne
 
 Model:
@@ -3509,6 +3643,8 @@ function parameter_bounds(::DavidsonGoulbourne, data::AbstractHyperelasticTest)
 end
 
 """
+$(TYPEDEF)
+$(FIELDS)
 Khiêm-Itskov Model
 
 Model:
@@ -3628,6 +3764,8 @@ function parameters(::GeneralConstitutiveModel_Tube)
 end
 
 """
+$(TYPEDEF)
+$(FIELDS)
 General Constitutive Model
 
 Model:
@@ -3672,6 +3810,8 @@ end
 
 
 """
+$(TYPEDEF)
+$(FIELDS)
 Full Network - Wu Geisson
 
 Model:
@@ -3726,6 +3866,8 @@ function parameter_bounds(::FullNetwork, data::AbstractHyperelasticTest)
 end
 
 """
+$(TYPEDEF)
+$(FIELDS)
 Zuniga - Beatty
 
 Model:
@@ -3784,6 +3926,8 @@ function parameter_bounds(::ZunigaBeatty, data::AbstractHyperelasticTest)
     return (lb=lb, ub=ub)
 end
 """
+$(TYPEDEF)
+$(FIELDS)
 Lim
 
 Model:
@@ -3852,6 +3996,8 @@ function parameter_bounds(::Lim, data::AbstractHyperelasticTest)
 end
 
 """
+$(TYPEDEF)
+$(FIELDS)
 Bechir Chevalier
 
 Model:
@@ -3923,6 +4069,8 @@ function parameter_bounds(::BechirChevalier, data::AbstractHyperelasticTest)
 end
 
 """
+$(TYPEDEF)
+$(FIELDS)
 Ansarri-Benam
 
 Model:

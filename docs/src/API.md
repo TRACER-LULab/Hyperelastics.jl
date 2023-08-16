@@ -11,21 +11,21 @@ CurrentModule = Hyperelastics
 
 ```@autodocs
 Modules = [Hyperelastics]
-Filter = x -> x∈subtypes(Hyperelastics.AbstractIncompressibleModel)
+Filter = x -> typeof(x) === UnionAll && x <:Hyperelastics.AbstractIncompressibleModel
 ```
 
 # Compressible Models
 
 ```@autodocs
 Modules = [Hyperelastics]
-Filter = x -> x∈subtypes(Hyperelastics.AbstractCompressibleModel)
+Filter = x -> typeof(x) === UnionAll && x <:Hyperelastics.AbstractCompressibleModel
 ```
 
 # Data Driven Models
 
 ```@autodocs
 Modules = [Hyperelastics]
-Filter = x -> x∈subtypes(Hyperelastics.AbstractDataDrivenHyperelasticModel)
+Filter = x -> typeof(x) === UnionAll && x <:Hyperelastics.AbstractDataDrivenHyperelasticModel
 ```
 
 # Helper Functions

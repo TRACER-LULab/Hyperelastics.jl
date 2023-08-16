@@ -1,5 +1,9 @@
-
+"""
+$(DocStringExtensions.README)
+"""
 module Hyperelastics
+
+using DocStringExtensions
 
 using PackageExtensionCompat
 function __init__()
@@ -26,7 +30,6 @@ export parameters, parameter_bounds
 export InvariantForm, PrincipalValueForm, DataDrivenForm
 
 abstract type AbstractHyperelasticTest{T,S} <: ContinuumMechanicsBase.AbstractMaterialTest end
-
 abstract type AbstractHyperelasticModel{T} <: ContinuumMechanicsBase.AbstractMaterialModel end
 
 abstract type AbstractIncompressibleModel{T} <: AbstractHyperelasticModel{T} end
@@ -40,12 +43,7 @@ struct PrincipalValueForm end
 struct DataDrivenForm end
 
 """
-`HyperelasticProblem(ψ::AbstractHyperelasticModel, test::AbstractHyperelasticTest, u₀, ps=Nothing;
-    adb=AD.ForwardDiffBackend(), loss=L2DistLoss(), adtype=Optimization.AutoForwardDiff())`
-
-`HyperelasticProblem(ψ::AbstractHyperelasticModel, tests::Vector{<:AbstractHyperelasticTest}, u₀, ps=Nothing;
-    adb=AD.ForwardDiffBackend(), loss=L2DistLoss(), adtype=Optimization.AutoForwardDiff())`
-
+$(SIGNATURES)
 Creates an `OptimizationProblem` for use in [`Optimization.jl`](https://docs.sciml.ai/Optimization/stable/) to find the optimal parameters.
 
 Fields:
