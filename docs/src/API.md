@@ -2,11 +2,6 @@
 CurrentModule = Hyperelastics
 ```
 
-# API
-
-```@index
-```
-
 # Incompressible Models
 
 ```@autodocs
@@ -34,6 +29,14 @@ Filter = x -> typeof(x) === UnionAll && x <:Hyperelastics.AbstractDataDrivenHype
 Modules = [Hyperelastics]
 Order = [:function]
 ```
+
+# Miscellaneous
+
+```@autodocs
+Modules = [Hyperelastics]
+Order = [:module, :constant, :type, :macro]
+```
+
 
 ```@bibliography
 ```
