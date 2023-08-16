@@ -80,7 +80,7 @@ function ContinuumMechanicsBase.SecondPiolaKirchoffStressTensor(
     ψ::AbstractHyperelasticModel{T},
     λ⃗::Vector{R},
     p;
-    ad_type <: AbstractADType=nothing,
+    ad_type <: AbstractADType = nothing,
     kwargs...,
 ) where {T<:PrincipalValueForm,R}
     ∂ψ(ψ, λ⃗, p, ad_type; kwargs...)
