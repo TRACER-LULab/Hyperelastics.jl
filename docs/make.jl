@@ -21,7 +21,7 @@ makedocs(
     pages = [
         "Home" => "index.md",
         "API" => "API.md",
-        # "Example" => "example.md",
+        "Example" => "example.md",
     ],
 )
 
