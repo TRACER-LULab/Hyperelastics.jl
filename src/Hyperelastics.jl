@@ -68,7 +68,7 @@ include("general_form_incompressible_isotropic_models.jl")
 include("isotropic_incompressible_models.jl")
 include("isotropic_compressible_models.jl")
 
-include("data_driven.jl")
-include("average_chain_behavior.jl")
+include("data_driven_models/sussman_bathe.jl")
+include("data_driven_models/average_chain_behavior.jl")
 
 end
