@@ -1,23 +1,26 @@
 export GeneralCompressible, LogarithmicCompressible
 
-"""
-$(TYPEDEF)
-Generic Compressible Model
-
-Model:
-```math
-\\psi_{compressible} = \\psi_{incompressible}(\\vec{\\lambda}_{incompressible})+\\kappa(J-1)^2
-```
-
-Parameters:
-- ψ
-    - Incompressible model parameters (see model selected for parameter names)
-- κ
-
-"""
 struct GeneralCompressible{T} <: AbstractCompressibleModel{T}
     incompressible::AbstractHyperelasticModel{T}
-    GeneralCompressible(W::AbstractIncompressibleModel{T}) where {T} = new{T}(W)
+    """
+    $(SIGNATURES)
+    Generic Compressible Model
+
+    # Model:
+    ```math
+    \\psi_{compressible} = \\psi_{incompressible}(\\vec{\\lambda}_{incompressible})+\\kappa(J-1)^2
+    ```
+
+    # Arguments:
+    - ψ
+        - Incompressible model
+
+    # Parameters:
+    - ψ
+        - Incompressible model parameters (see model selected for parameter names)
+    - κ
+    """
+    GeneralCompressible(ψ::AbstractIncompressibleModel{T}) where {T} = new{T}(ψ)
 end
 
 # Definitions
@@ -197,25 +200,30 @@ function ContinuumMechanicsBase.CauchyStressTensor(
     return σ_dev + σ_vol
 end
 
-"""
-$(TYPEDEF)
-
-Logarithmic Compressible Model
-
-Model:
-```math
-\\psi_{compressible} = \\psi_{incompressible}(\\vec{\\lambda}_{incompressible})+\\kappa(J\\log{J} - J)
-```
-
-Parameters:
-- ψ
-    - See Selected hyperelastic model for the required parameters.
-- κ
-
-"""
 struct LogarithmicCompressible{T} <: AbstractCompressibleModel{T}
     incompressible::AbstractHyperelasticModel
-    LogarithmicCompressible(W::AbstractIncompressibleModel{T}) where {T} = new{T}(W)
+
+    """
+    $(SIGNATURES)
+
+    Logarithmic Compressible Model
+
+    # Model:
+    ```math
+    \\psi_{compressible} = \\psi_{incompressible}(\\vec{\\lambda}_{incompressible})+\\kappa(J\\log{J} - J)
+    ```
+
+    # Arguments:
+    - ψ
+        - Incompressible model
+
+    # Parameters:
+    - ψ
+        - See Selected hyperelastic model for the required parameters.
+    - κ
+
+    """
+    LogarithmicCompressible(ψ::AbstractIncompressibleModel{T}) where {T} = new{T}(ψ)
 end
 
 # Strain Energy Density Definitions

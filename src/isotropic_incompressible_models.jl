@@ -76,12 +76,14 @@ export HorganMurphy, KhiemItskov
 
 export GeneralConstitutiveModel_Network, GeneralConstitutiveModel_Tube
 
+struct ArrudaBoyce{T} <: AbstractIncompressibleModel{T}
+    ℒinv::InverseLangevinApproximations.AbstractInverseLangevinApproximation
+end
+
 """
-$(TYPEDEF)
+$(SIGNATURES)
 
-ArrudaBoyce
-
-Model:
+# Model:
 
 ```math
 W = \\mu N \\left( \\frac{\\lambda_{chain}}{\\sqrt{N}} \\beta + \\log\\left(\\frac{\\beta}{\\sinh\\beta}\\right) \\right)
@@ -99,23 +101,21 @@ and
 \\lambda_{chain} = \\sqrt{\\frac{I_1}{3}}
 ```
 
-Parameters:
-- μ: Small strain shear modulus
-- N: Square of the locking stretch of the network.
+# Arguments:
+- `type=PrincipalValueForm()`: Sets the form of the strain energy density function. Either `PrincipalValueForm()` or `InvariantForm()`
+- `ℒinv=TreloarApproximation()`: Sets the inverse Langevin approxamation used
 
-Fields:
-- ℒinv: Sets the inverse Langevin approxamation used
+# Parameters:
+- `μ`: Small strain shear modulus
+- `N`: Square of the locking stretch of the network.
 
 > Arruda EM, Boyce MC. A three-dimensional constitutive model for the large stretch behavior of rubber elastic materials. Journal of the Mechanics and Physics of Solids. 1993 Feb 1;41(2):389-412.
 
 """
-struct ArrudaBoyce{T} <: AbstractIncompressibleModel{T}
-    ℒinv::InverseLangevinApproximations.AbstractInverseLangevinApproximation
-    ArrudaBoyce(
-        ::T = PrincipalValueForm();
-        ℒinv::InverseLangevinApproximations.AbstractInverseLangevinApproximation = TreloarApproximation(),
-    ) where {T<:Union{InvariantForm,PrincipalValueForm}} = new{T}(ℒinv)
-end
+ArrudaBoyce(
+    type::T = PrincipalValueForm();
+    ℒinv::InverseLangevinApproximations.AbstractInverseLangevinApproximation = TreloarApproximation(),
+) where {T<:Union{InvariantForm,PrincipalValueForm}} = ArrudaBoyce{T}(ℒinv)
 
 function ContinuumMechanicsBase.StrainEnergyDensity(
     ψ::ArrudaBoyce,
@@ -149,36 +149,36 @@ function parameter_bounds(::ArrudaBoyce, data::AbstractHyperelasticTest)
     return (lb = lb, ub = ub)
 end
 
-"""
-$(TYPEDEF)
-
-ABGI
-
-Model:
-
-```math
-W = W_{Arruda-Boyce} + \\frac{G_e}{n}\\left(\\sum\\limits_{i=1}^{3}\\lambda_i^n-3\\right)
-```
-
-Parameters:
-- μ
-- N
-- Ge
-- n
-
-Fields:
-- ℒinv: Sets the inverse Langevin approxamation used (default = `TreloarApproximation()`)
-
-> Meissner B, Matějka L. A Langevin-elasticity-theory-based constitutive equation for rubberlike networks and its comparison with biaxial stress–strain data. Part I. Polymer. 2003 Jul 1;44(16):4599-610.
-"""
 struct ABGI{T} <: AbstractIncompressibleModel{T}
     ℒinv::InverseLangevinApproximations.AbstractInverseLangevinApproximation
     AB::ArrudaBoyce
-    ABGI(
-        ::T = PrincipalValueForm();
-        ℒinv::InverseLangevinApproximations.AbstractInverseLangevinApproximation = TreloarApproximation(),
-    ) where {T<:PrincipalValueForm} = new{T}(ℒinv, ArrudaBoyce(T(), ℒinv = ℒinv))
 end
+
+"""
+$(SIGNATURES)
+
+# Model:
+
+```math
+W = W_{Arruda-Boyce} + \\frac{G_e}{n}\\left(\\sum\\limits_{i=1}^{3\\lambda_i^n-3\\right)
+```
+
+# Arguments:
+
+- `ℒinv = TreloarApproximation()`: Sets the inverse Langevin approxamationused (default = `TreloarApproximation()`)
+
+# Parameters:
+
+- `μ`
+- `N`
+- `Ge`
+- `n`
+
+> Meissner B, Matějka L. A Langevin-elasticity-theory-based constitutiveequation for rubberlike networks and its comparison with biaxialstress–strain data. Part I. Polymer. 2003 Jul 1;44(16):4599-610.
+"""
+ABGI(
+    ℒinv::InverseLangevinApproximations.AbstractInverseLangevinApproximation = TreloarApproximation(),
+) = ABGI{PrincipalValueForm}(ℒinv, ArrudaBoyce(PrincipalValueForm(), ℒinv = ℒinv))
 
 function ContinuumMechanicsBase.StrainEnergyDensity(
     ψ::ABGI,
@@ -201,67 +201,65 @@ function parameter_bounds(::ABGI, data::AbstractHyperelasticTest)
     return (lb = lb, ub = ub)
 end
 
-"""
-$(TYPEDEF)
-
-Affine Micro-Sphere
-
-Model:
-- See Paper
-
-Parameters:
-- μ
-- N
-
-Fields:
-- ℒinv: Sets the inverse Langevin approxamation used (default = `TreloarApproximation()`)
-
----
-> Miehe C, Göktepe S, Lulei F. A micro-macro approach to rubber-like materials—part I: the non-affine micro-sphere model of rubber elasticity. Journal of the Mechanics and Physics of Solids. 2004 Nov 1;52(11):2617-60.
-"""
 struct AffineMicroSphere{T,R,S} <: AbstractIncompressibleModel{T}
     ℒinv::InverseLangevinApproximations.AbstractInverseLangevinApproximation
     r⃗::Vector{R}
     w::Vector{S}
     λr::Function
-    function AffineMicroSphere(
-        ::T = PrincipalValueForm();
-        ℒinv::InverseLangevinApproximations.AbstractInverseLangevinApproximation = TreloarApproximation(),
-        n = 21,
-    ) where {T<:PrincipalValueForm}
-        a = √(2) / 2
-        b = 0.836095596749
-        c = 0.387907304067
-        r⃗ = [
-            [0, 0, 1],
-            [0, 1, 0],
-            [1, 0, 0],
-            [0, a, a],
-            [0, -a, a],
-            [a, 0, a],
-            [-a, 0, a],
-            [a, a, 0],
-            [-a, a, 0],
-            [b, c, c],
-            [-b, c, c],
-            [b, -c, c],
-            [-b, -c, c],
-            [c, b, c],
-            [-c, b, c],
-            [c, -b, c],
-            [-c, -b, c],
-            [c, c, b],
-            [-c, c, b],
-            [c, -c, b],
-            [-c, -c, b],
-        ]
-        w1 = 0.02652142440932
-        w2 = 0.0199301476312
-        w3 = 0.0250712367487
-        w = 2 .* [fill(w1, 3); fill(w2, 6); fill(w3, 12)] # Multiply by two since integration is over the half-sphere
-        λr((; λ, N), r) = sqrt(sum(λ .^ 2 .* r .^ 2)) / √N
-        new{T,eltype(r⃗),eltype(w)}(ℒinv, r⃗, w, λr)
-    end
+end
+
+"""
+$(SIGNATURES)
+
+# Model:
+- See Paper
+
+# Arguments:
+- `ℒinv=TreloarApproximation()`: Sets the inverse Langevin approxamation used
+- `n::Int = 21`: Number of quadrature points for the spherical integration
+
+# Parameters:
+- `μ`
+- `N`
+
+> Miehe C, Göktepe S, Lulei F. A micro-macro approach to rubber-like materials—part I: the non-affine micro-sphere model of rubber elasticity. Journal of the Mechanics and Physics of Solids. 2004 Nov 1;52(11):2617-60.
+"""
+function AffineMicroSphere(;
+    ℒinv::InverseLangevinApproximations.AbstractInverseLangevinApproximation = TreloarApproximation(),
+    n = 21,
+)
+    a = √(2) / 2
+    b = 0.836095596749
+    c = 0.387907304067
+    r⃗ = [
+        [0, 0, 1],
+        [0, 1, 0],
+        [1, 0, 0],
+        [0, a, a],
+        [0, -a, a],
+        [a, 0, a],
+        [-a, 0, a],
+        [a, a, 0],
+        [-a, a, 0],
+        [b, c, c],
+        [-b, c, c],
+        [b, -c, c],
+        [-b, -c, c],
+        [c, b, c],
+        [-c, b, c],
+        [c, -b, c],
+        [-c, -b, c],
+        [c, c, b],
+        [-c, c, b],
+        [c, -c, b],
+        [-c, -c, b],
+    ]
+    w1 = 0.02652142440932
+    w2 = 0.0199301476312
+    w3 = 0.0250712367487
+    w = 2 .* [fill(w1, 3); fill(w2, 6); fill(w3, 12)] # Multiply by two since integration is over the half-sphere
+    λr((; λ, N), r) = sqrt(sum(λ .^ 2 .* r .^ 2)) / √N
+    AffineMicroSphere{PrincipalValueForm,eltype(r⃗),eltype(w)}(ℒinv, r⃗, w, λr)
 end
 
 function ContinuumMechanicsBase.StrainEnergyDensity(
@@ -287,30 +285,29 @@ function parameter_bounds(ψ::AffineMicroSphere, test::AbstractHyperelasticTest)
     ub = nothing
     (lb = lb, ub = ub)
 end
+
+struct Alexander{T} <: AbstractIncompressibleModel{T} end
+
 """
-$(TYPEDEF)
+$(SIGNATURES)
 
-Alexander
-
-Model:
+# Model:
 
 ```math
 W = \\frac{C_1 \\sqrt{\\pi}\\text{erfi}\\big(\\sqrt{k}(I_1-3)\\big)}{2\\sqrt{k}}+C_2\\log{\\frac{I_2-3+\\gamma}{\\gamma}}+C_3(I_2-3)
 ```
 
-Parameters:
-- μ
-- C₁
-- C₂
-- C₃
-- k
-- γ
+# Parameters:
+- `μ`
+- `C₁`
+- `C₂`
+- `C₃`
+- `k`
+- `γ`
 
 > Alexander H. A constitutive relation for rubber-like materials. International Journal of Engineering Science. 1968 Sep 1;6(9):549-63.
 """
-struct Alexander{T} <: AbstractIncompressibleModel{T}
-    Alexander(::T = PrincipalValueForm()) where {T<:PrincipalValueForm} = new{T}()
-end
+Alexander() = Alexander{PrincipalValueForm}()
 
 function ContinuumMechanicsBase.StrainEnergyDensity(
     ::Alexander{T},
@@ -341,34 +338,33 @@ end
 
 parameters(::Alexander) = (:μ, :C₁, :C₂, :C₃, :k, :γ)
 
+struct MooneyRivlin{T} <: AbstractIncompressibleModel{T}
+    GMR::GeneralMooneyRivlin{T}
+
+end
 
 """
-$(TYPEDEF)
+$(SIGNATURES)
 
-Mooney Rivlin Model
-
-Model:
+# Model:
 
 ```math
 W = C_{10}(I_1-3)+C_{01}(I_2-3)
 ```
 
-Parameters:
-- C01
-- C10
+# Arguments:
+- `type=PrincipalValueForm()`: Sets the form of the strain energy density function. Either `PrincipalValueForm()` or `InvariantForm()`
+
+# Parameters:
+- `C01`
+- `C10`
 
 > Mooney M. A theory of large elastic deformation. Journal of applied physics. 1940 Sep;11(9):582-92.
 """
-struct MooneyRivlin{T} <: AbstractIncompressibleModel{T}
-    GMR::GeneralMooneyRivlin{T}
-    MooneyRivlin(
-        ::T = PrincipalValueForm(),
-    ) where {T<:Union{InvariantForm,PrincipalValueForm}} = new{T}(GeneralMooneyRivlin(T()))
-end
-
-# function ContinuumMechanicsBase.StrainEnergyDensity(::MooneyRivlin{T}, λ⃗::Vector{S}, (; C10, C01)) where {T<:PrincipalValueForm, S}
-#     return C10 * (I₁(λ⃗) - 3) + C01 * (I₂(λ⃗) - 3)
-# end
+MooneyRivlin(
+    type::T = PrincipalValueForm(),
+) where {T<:Union{InvariantForm,PrincipalValueForm}} =
+    MooneyRivlin{T}(GeneralMooneyRivlin(T()))
 
 function ContinuumMechanicsBase.StrainEnergyDensity(
     ψ::MooneyRivlin{T},
@@ -383,26 +379,27 @@ end
 
 parameters(::MooneyRivlin) = (:C10, :C01)
 
+struct NeoHookean{T} <: AbstractIncompressibleModel{T} end
+
 """
-$(TYPEDEF)
+$(SIGNATURES)
 
-NeoHookean
-
-Model:
+# Model:
 
 ```math
 W = \\frac{\\mu}{2}(I_1-3)
 ```
 
-Parameters:
-- μ: Small strain shear modulus
+# Arguments
+- `type = PrincipalValueForm()`: Sets the form of the strain energy density function. Either `PrincipalValueForm()` or `InvariantForm()
+
+# Parameters:
+- `μ`: Small strain shear modulus
 
 > Treloar LR. The elasticity of a network of long-chain molecules—II. Transactions of the Faraday Society. 1943;39:241-6.
 """
-struct NeoHookean{T} <: AbstractIncompressibleModel{T}
-    NeoHookean(I::Union{InvariantForm,PrincipalValueForm} = PrincipalValueForm()) =
-        new{typeof(I)}()
-end
+NeoHookean(type::Union{InvariantForm,PrincipalValueForm} = PrincipalValueForm()) =
+    NeoHookean{T}()
 
 function ContinuumMechanicsBase.StrainEnergyDensity(
     ::NeoHookean{T},
@@ -422,29 +419,31 @@ end
 
 parameters(::NeoHookean) = (:μ,)
 
+struct Isihara{T} <: AbstractIncompressibleModel{T}
+    GMR::GeneralMooneyRivlin{T}
+end
+
 """
-$(TYPEDEF)
+$(SIGNATURES)
 
-Isihara
-
-Model:
+# Model:
 
 ```math
 W = \\sum\\limits_{i,j=0}^{2, 1}C_{i,j}(I_1-3)^i(I_2-3)^j
 ```
 
-Parameters:
-- C10
-- C20
-- C01
+# Arguments:
+- `type=PrincipalValueForm()`: Sets the form of the strain energy density function. Either `PrincipalValueForm()` or `InvariantForm()`
+
+# Parameters:
+- `C10`
+- `C20`
+- `C01`
 
 > Isihara A, Hashitsume N, Tatibana M. Statistical theory of rubber‐like elasticity. IV.(two‐dimensional stretching). The Journal of Chemical Physics. 1951 Dec;19(12):1508-12.
 """
-struct Isihara{T} <: AbstractIncompressibleModel{T}
-    GMR::GeneralMooneyRivlin{T}
-    Isihara(::T = PrincipalValueForm()) where {T<:Union{InvariantForm,PrincipalValueForm}} =
-        new{T}(GeneralMooneyRivlin(T()))
-end
+Isihara(type::T = PrincipalValueForm()) where {T<:Union{InvariantForm,PrincipalValueForm}} =
+    Isihara{T}(GeneralMooneyRivlin(type))
 
 function ContinuumMechanicsBase.StrainEnergyDensity(
     ψ::Isihara{T},
@@ -459,31 +458,34 @@ end
 
 parameters(ψ::Isihara) = (:C10, :C20, :C01)
 
+struct Biderman{T} <: AbstractIncompressibleModel{T}
+    GMR::GeneralMooneyRivlin{T}
+end
+
+
 """
-$(TYPEDEF)
+$(SIGNATURES)
 
-Biderman
-
-Model:
+# Model:
 
 ```math
 W = \\sum\\limits_{i,j=0}^{3, 1}C_{i,j}(I_1-3)^i(I_2-3)^j
 ```
 
-Parameters:
-- C10
-- C01
-- C20
-- C30
+# Arguments:
+- `type=PrincipalValueForm()`: Sets the form of the strain energy density function. Either `PrincipalValueForm()` or `InvariantForm()`
+
+# Parameters:
+- `C10`
+- `C01`
+- `C20`
+- `C30`
 
 > Biderman VL. Calculation of rubber parts. Rascheti na prochnost. 1958;40.
 """
-struct Biderman{T} <: AbstractIncompressibleModel{T}
-    GMR::GeneralMooneyRivlin{T}
-    Biderman(
-        ::T = PrincipalValueForm(),
-    ) where {T<:Union{InvariantForm,PrincipalValueForm}} = new{T}()
-end
+Biderman(
+    type::T = PrincipalValueForm(),
+) where {T<:Union{InvariantForm,PrincipalValueForm}} = Biderman{T}()
 
 function ContinuumMechanicsBase.StrainEnergyDensity(
     ψ::Biderman{T},
@@ -492,48 +494,42 @@ function ContinuumMechanicsBase.StrainEnergyDensity(
 ) where {T,S}
     I1 = I₁(λ⃗)
     I2 = I₂(λ⃗)
-    W = C10 * I1 + C20 * I1^2 + C30 * I1^3 + C01 * I2
-    # W = StrainEnergyDensity(
-    #     ψ.GMR,
-    #     λ⃗,
-    #     (
-    #     C=[
-    #         0.0 C10 C20 C30
-    #         C01 0.0 0.0 0.0
-    #     ],
-    #     )
-    # )
+    W = C10 * (I1 - 3) + C20 * (I1 - 3)^2 + C30 * (I1 - 3)^3 + C01 * (I2 - 3)
     return W
 end
 
 parameters(::Biderman) = (:C10, :C01, :C20, :C30)
 
+struct JamesGreenSimpson{T} <: AbstractIncompressibleModel{T}
+    GMR::GeneralMooneyRivlin{T}
+end
+
+
 """
-$(TYPEDEF)
+$(SIGNATURES)
 
-James-Green-Simpson
-
-Model:
+# Model:
 
 ```math
 W = \\sum\\limits_{i,j=0}^{3, 1}C_{i,j}(I_1-3)^i(I_2-3)^j
 ```
 
-Parameters:
-- C10
-- C01
-- C11
-- C20
-- C30
+# Arguments:
+- `type=PrincipalValueForm()`: Sets the form of the strain energy density function. Either `PrincipalValueForm()` or `InvariantForm()`
+
+# Parameters:
+- `C10`
+- `C01`
+- `C11`
+- `C20`
+- `C30`
 
 > James AG, Green A, Simpson GM. Strain energy functions of rubber. I. Characterization of gum vulcanizates. Journal of Applied Polymer Science. 1975 Jul;19(7):2033-58.
 """
-struct JamesGreenSimpson{T} <: AbstractIncompressibleModel{T}
-    GMR::GeneralMooneyRivlin{T}
-    JamesGreenSimpson(
-        ::T = PrincipalValueForm(),
-    ) where {T<:Union{InvariantForm,PrincipalValueForm}} = new{T}(GeneralMooneyRivlin(T()))
-end
+JamesGreenSimpson(
+    type::T = PrincipalValueForm(),
+) where {T<:Union{InvariantForm,PrincipalValueForm}} =
+    JamesGreenSimpson{T}(GeneralMooneyRivlin(type))
 
 function ContinuumMechanicsBase.StrainEnergyDensity(
     W::JamesGreenSimpson{T},
@@ -546,48 +542,38 @@ function ContinuumMechanicsBase.StrainEnergyDensity(
     ],))
 end
 
-# function ContinuumMechanicsBase.StrainEnergyDensity(::JamesGreenSimpson, I⃗::Vector{T}, (; C10, C01, C11, C20, C30), I::InvariantForm) where T
-#     ContinuumMechanicsBase.StrainEnergyDensity(
-#         GeneralMooneyRivlin(),
-#         I⃗,
-#         (C=[
-#             0 C10 C20 C30
-#             C01 0 0 0
-#         ],
-#         ),
-#         I
-#     )
-# end
-
 parameters(ψ::JamesGreenSimpson) = (:C10, :C01, :C11, :C20, :C30)
 
+struct HainesWilson{T} <: AbstractIncompressibleModel{T}
+    GMR::GeneralMooneyRivlin{T}
+end
+
 """
-$(TYPEDEF)
+$(SIGNATURES)
 
-Haines-Wilson
-
-Model:
+# Model:
 
 ```math
 W = \\sum\\limits_{i,j=0}^{3, 2}C_{i,j}(I_1-3)^i(I_2-3)^j
 ```
 
-Parameters:
-- C10
-- C01
-- C11
-- C02
-- C20
-- C30
+# Arguments:
+- `type=PrincipalValueForm()`: Sets the form of the strain energy density function. Either `PrincipalValueForm()` or `InvariantForm()`
+
+# Parameters:
+- `C10`
+- `C01`
+- `C11`
+- `C02`
+- `C20`
+- `C30`
 
 > Haines DW, Wilson WD. Strain-energy density function for rubberlike materials. Journal of the Mechanics and Physics of Solids. 1979 Aug 1;27(4):345-60.
 """
-struct HainesWilson{T} <: AbstractIncompressibleModel{T}
-    GMR::GeneralMooneyRivlin{T}
-    HainesWilson(
-        ::T = PrincipalValueForm(),
-    ) where {T<:Union{InvariantForm,PrincipalValueForm}} = new{T}(GeneralMooneyRivlin(T()))
-end
+HainesWilson(
+    type::T = PrincipalValueForm(),
+) where {T<:Union{InvariantForm,PrincipalValueForm}} =
+    HainesWilson{T}(GeneralMooneyRivlin(type))
 
 function ContinuumMechanicsBase.StrainEnergyDensity(
     ψ::HainesWilson{T},
@@ -601,45 +587,33 @@ function ContinuumMechanicsBase.StrainEnergyDensity(
     ],))
 end
 
-# function ContinuumMechanicsBase.StrainEnergyDensity(::HainesWilson, I⃗::Vector{T}, (; C10, C01, C11, C02, C20, C30), I::InvariantForm) where T
-#     ContinuumMechanicsBase.StrainEnergyDensity(
-#         GeneralMooneyRivlin(),
-#         I⃗,
-#         (C=[
-#             0 C10 C20 C30
-#             C01 C11 0 0
-#             C02 0 0 0
-#         ],
-#         ),
-#         I
-#     )
-# end
-
 parameters(::HainesWilson) = (:C10, :C01, :C11, :C02, :C20, :C30)
 
+struct Yeoh{T} <: AbstractIncompressibleModel{T}
+    GMR::GeneralMooneyRivlin{T}
+end
+
 """
-$(TYPEDEF)
+$(SIGNATURES)
 
-Yeoh
-
-Model:
+# Model:
 
 ```math
 W = \\sum\\limits_{i,j=0}^{3, 0}C_{i,j}(I_1-3)^i(I_2-3)^j
 ```
 
-Parameters:
+# Arguments:
+- `type=PrincipalValueForm()`: Sets the form of the strain energy density function. Either `PrincipalValueForm()` or `InvariantForm()`
+
+# Parameters:
 - C10
 - C20
 - C30
 
 > Yeoh OH. Characterization of elastic properties of carbon-black-filled rubber vulcanizates. Rubber chemistry and technology. 1990 Nov;63(5):792-805.
 """
-struct Yeoh{T} <: AbstractIncompressibleModel{T}
-    GMR::GeneralMooneyRivlin{T}
-    Yeoh(::T = PrincipalValueForm()) where {T<:Union{InvariantForm,PrincipalValueForm}} =
-        new{T}(GeneralMooneyRivlin(T()))
-end
+Yeoh(type::T = PrincipalValueForm()) where {T<:Union{InvariantForm,PrincipalValueForm}} =
+    Yeoh{T}(GeneralMooneyRivlin(type))
 
 function ContinuumMechanicsBase.StrainEnergyDensity(
     ψ::Yeoh{T},
@@ -649,40 +623,33 @@ function ContinuumMechanicsBase.StrainEnergyDensity(
     StrainEnergyDensity(ψ.GMR, λ⃗, (C⃗ = [0.0 C10 C20 C30],))
 end
 
-# function ContinuumMechanicsBase.StrainEnergyDensity(::Yeoh, I⃗::Vector{T}, (; C10, C20, C30), I::InvariantForm) where T
-#     ContinuumMechanicsBase.StrainEnergyDensity(
-#         GeneralMooneyRivlin(),
-#         I⃗,
-#         (C=[0 C10 C20 C30],),
-#         I
-#     )
-# end
-
 parameters(ψ::Yeoh) = (:C10, :C20, :C30)
 
+struct Lion{T} <: AbstractIncompressibleModel{T}
+    GMR::GeneralMooneyRivlin{T}
+end
+
 """
-$(TYPEDEF)
+$(SIGNATURES)
 
-Lion
-
-Model:
+# Model:
 
 ```math
 W = \\sum\\limits_{i,j=0}^{5,1}C_{i,j}(I_1-3)^i(I_2-3)^j
 ```
 
-Parameters:
-- C10
-- C01
-- C50
+# Arguments:
+- `type=PrincipalValueForm()`: Sets the form of the strain energy density function. Either `PrincipalValueForm()` or `InvariantForm()`
+
+# Parameters:
+- `C10`
+- `C01`
+- `C50`
 
 > Lion A. On the large deformation behaviour of reinforced rubber at different temperatures. Journal of the Mechanics and Physics of Solids. 1997 Nov 1;45(11-12):1805-34.
 """
-struct Lion{T} <: AbstractIncompressibleModel{T}
-    GMR::GeneralMooneyRivlin{T}
-    Lion(::T = PrincipalValueForm()) where {T<:Union{InvariantForm,PrincipalValueForm}} =
-        new{T}(GeneralMooneyRivlin(T()))
-end
+Lion(type::T = PrincipalValueForm()) where {T<:Union{InvariantForm,PrincipalValueForm}} =
+    Lion{T}(GeneralMooneyRivlin(type))
 
 function ContinuumMechanicsBase.StrainEnergyDensity(
     ψ::Lion{T},
@@ -695,47 +662,37 @@ function ContinuumMechanicsBase.StrainEnergyDensity(
     ],))
 end
 
-# function ContinuumMechanicsBase.StrainEnergyDensity(::Lion, I⃗::Vector{T}, (; C10, C01, C50), I::InvariantForm) where T
-#     ContinuumMechanicsBase.StrainEnergyDensity(
-#         GeneralMooneyRivlin(),
-#         I⃗,
-#         (C=[
-#             0 C10 0 0 0 C50
-#             C01 0 0 0 0 0
-#         ],),
-#         I
-#     )
-# end
-
 parameters(::Lion) = (:C10, :C01, :C50)
 
+struct HauptSedlan{T} <: AbstractIncompressibleModel{T}
+    GMR::GeneralMooneyRivlin{T}
+end
 
 """
-$(TYPEDEF)
+$(SIGNATURES)
 
-Haupt Sedlan
-
-Model:
+# Model:
 
 ```math
 W = \\sum\\limits_{i,j=0}^{3, 2}C_{i,j}(I_1-3)^i(I_2-3)^j
 ```
 
-Parameters:
-- C10
-- C01
-- C11
-- C02
-- C30
+# Arguments:
+- `type=PrincipalValueForm()`: Sets the form of the strain energy density function. Either `PrincipalValueForm()` or `InvariantForm()`
+
+# Parameters:
+- `C10`
+- `C01`
+- `C11`
+- `C02`
+- `C30`
 
 > Haupt P, Sedlan K. Viscoplasticity of elastomeric materials: experimental facts and constitutive modelling. Archive of Applied Mechanics. 2001 Mar;71(2):89-109.
 """
-struct HauptSedlan{T} <: AbstractIncompressibleModel{T}
-    GMR::GeneralMooneyRivlin{T}
-    HauptSedlan(
-        ::T = PrincipalValueForm(),
-    ) where {T<:Union{InvariantForm,PrincipalValueForm}} = new{T}(GeneralMooneyRivlin(T()))
-end
+HauptSedlan(
+    type::T = PrincipalValueForm(),
+) where {T<:Union{InvariantForm,PrincipalValueForm}} =
+    HauptSedlan{T}(GeneralMooneyRivlin(type))
 
 function ContinuumMechanicsBase.StrainEnergyDensity(
     ψ::HauptSedlan{T},
@@ -749,44 +706,32 @@ function ContinuumMechanicsBase.StrainEnergyDensity(
     ],))
 end
 
-# function ContinuumMechanicsBase.StrainEnergyDensity(::HauptSedlan, I⃗::Vector{T}, (; C10, C01, C11, C02, C30), I::InvariantForm) where T
-#     ContinuumMechanicsBase.StrainEnergyDensity(
-#         GeneralMooneyRivlin(),
-#         I⃗,
-#         (C=[
-#             0 C10 0 C30
-#             C01 C11 0 0
-#             C02 0 0 0
-#         ],),
-#         I
-#     )
-# end
-
 parameters(::HauptSedlan) = (:C10, :C01, :C11, :C02, :C30)
 
+struct HartmannNeff{T} <: AbstractIncompressibleModel{T} end
+
 """
-$(TYPEDEF)
+$(SIGNATURES)
 
-Hartmann-Neff
-
-Model:
+# Model:
 
 ```math
 W = \\sum\\limits_{i,j=0}^{M,N}C_{i,0}(I_1-3)^i -3\\sqrt{3}^j+\\alpha(I_1-3)
 ```
 
-Parameters:
-- α
-- Ci⃗0
-- C0j⃗
+# Arguments:
+- `type=PrincipalValueForm()`: Sets the form of the strain energy density function. Either `PrincipalValueForm()` or `InvariantForm()`
+
+# Parameters:
+- `α`
+- `Ci⃗0`
+- `C0j⃗`
 
 > Hartmann S, Neff P. Polyconvexity of generalized polynomial-type hyperelastic strain energy functions for near-incompressibility. International journal of solids and structures. 2003 Jun 1;40(11):2767-91.
 """
-struct HartmannNeff{T} <: AbstractIncompressibleModel{T}
-    HartmannNeff(
-        ::T = PrincipalValueForm(),
-    ) where {T<:Union{InvariantForm,PrincipalValueForm}} = new{T}()
-end
+HartmannNeff(
+    type::T = PrincipalValueForm(),
+) where {T<:Union{InvariantForm,PrincipalValueForm}} = HartmannNeff{T}()
 
 function ContinuumMechanicsBase.StrainEnergyDensity(
     ::HartmannNeff{T},
@@ -816,28 +761,29 @@ end
 
 parameters(::HartmannNeff) = (:α, :Ci⃗0, :C0j⃗)
 
+struct Carroll{T} <: AbstractIncompressibleModel{T} end
+
 """
-$(TYPEDEF)
+$(SIGNATURES)
 
-Carroll
-
-Model:
+# Model:
 
 ```math
 W = AI_1+BI_1^4+C\\sqrt{I_2}
 ```
 
-Parameters:
-- A
-- B
-- C
+# Arguments:
+- `type=PrincipalValueForm()`: Sets the form of the strain energy density function. Either `PrincipalValueForm()` or `InvariantForm()`
+
+# Parameters:
+- `A`
+- `B`
+- `C`
 
 > Carroll M. A strain energy function for vulcanized rubbers. Journal of Elasticity. 2011 Apr;103(2):173-87.
 """
-struct Carroll{T} <: AbstractIncompressibleModel{T}
-    Carroll(::T = PrincipalValueForm()) where {T<:Union{InvariantForm,PrincipalValueForm}} =
-        new{T}()
-end
+Carroll(type::T = PrincipalValueForm()) where {T<:Union{InvariantForm,PrincipalValueForm}} =
+    Carroll{T}()
 
 function ContinuumMechanicsBase.StrainEnergyDensity(
     ::Carroll{T},
@@ -857,31 +803,32 @@ end
 
 parameters(::Carroll) = (:A, :B, :C)
 
+struct BahremanDarijani{PrincipalValueForm} <:
+       AbstractIncompressibleModel{PrincipalValueForm}
+    GDN::GeneralDarijaniNaghdabadi
+end
+
 """
-$(TYPEDEF)
+$(SIGNATURES)
 
-Bahreman Darijani
-
-Model:
+# Model:
 
 ```math
 W = \\sum\\limits_{i = 1}{3}\\sum\\limits_{j=0}^{N} A_j (\\lambda_i^{m_j}-1) + B_j(\\lambda_i^{-n_j}-1)
 ```
+# Arguments:
+- `type=PrincipalValueForm()`: Sets the form of the strain energy density function. Either `PrincipalValueForm()` or `InvariantForm()`
 
-Parameters:
-- A2
-- B2
-- A4
-- A6
+# Parameters:
+- `A2`
+- `B2`
+- `A4`
+- `A6`
 
 > Bahreman M, Darijani H. New polynomial strain energy function; application to rubbery circular cylinders under finite extension and torsion. Journal of Applied Polymer Science. 2015 Apr 5;132(13).
 """
-struct BahremanDarijani{PrincipalValueForm} <:
-       AbstractIncompressibleModel{PrincipalValueForm}
-    GDN::GeneralDarijaniNaghdabadi
-    BahremanDarijani(::T = PrincipalValueForm()) where {T<:PrincipalValueForm} =
-        new{PrincipalValueForm}(GeneralDarijaniNaghdabadi(T()))
-end
+BahremanDarijani(type::T = PrincipalValueForm()) where {T<:PrincipalValueForm} =
+    new{PrincipalValueForm}(GeneralDarijaniNaghdabadi(type))
 
 function ContinuumMechanicsBase.StrainEnergyDensity(
     W::BahremanDarijani{T},
@@ -897,29 +844,28 @@ end
 
 parameters(::BahremanDarijani) = (:A2, :B2, :A4, :A6)
 
+struct Zhao{T} <: AbstractIncompressibleModel{T} end
 """
-$(TYPEDEF)
+$(SIGNATURES)
 
-Zhao
-
-Model:
+# Model:
 
 ```math
-W = C_{-1}^1*(I_2-3)+C_{1}^{1}(I_1-3)+C_{2}^{1}(I_1^2-2I_2-3)+C_{2}^{2}(I_1^2-2I_2-3)^2
+W = C_{-1}^1*(I_2-3)+C_{1}^{1}(I_1-3)+C_{2}^{1}(I_1^2-2I_2-3)+C_{2}^{2(I_1^2-2I_2-3)^2
 ```
 
-Parameters:
-- C₋₁¹
-- C₁¹
-- C₂¹
-- C₂²
+# Arguments:
+- `type=PrincipalValueForm()`: Sets the form of the strain energy density function. Either `PrincipalValueForm()` or `InvariantForm()`
 
-> Zhao Z, Mu X, Du F. Modeling and verification of a new hyperelastic model for rubber-like materials. Mathematical Problems in Engineering. 2019 May 2;2019.
+# Parameters:
+- `C₋₁¹`
+- `C₁¹`
+- `C₂¹`
+- `C₂²`
+> Zhao Z, Mu X, Du F. Modeling and verification of a new hyperelastic modelfor rubber-like materials. Mathematical Problems in Engineering. 2019 May 22019.
 """
-struct Zhao{T} <: AbstractIncompressibleModel{T}
-    Zhao(::T = PrincipalValueForm()) where {T<:Union{InvariantForm,PrincipalValueForm}} =
-        new{T}()
-end
+Zhao(type::T = PrincipalValueForm()) where {T<:Union{InvariantForm,PrincipalValueForm}} =
+    Zhao{T}()
 
 function ContinuumMechanicsBase.StrainEnergyDensity(
     ::Zhao{T},
@@ -945,28 +891,28 @@ end
 
 parameters(::Zhao) = (:C₋₁¹, :C₁¹, :C₂¹, :C₂²)
 
+struct Knowles{T} <: AbstractIncompressibleModel{T} end
 """
-$(TYPEDEF)
+$(SIGNATURES)
 
-Knowles
-
-Model:
+# Model:
 
 ```math
 W = \\frac{\\mu}{2b}((1+\\frac{b}{n}(I_1-3))^n-1)
 ```
 
-Parameters:
+# Arguments:
+- `type=PrincipalValueForm()`: Sets the form of the strain energy density function. Either `PrincipalValueForm()` or `InvariantForm()
+
+# Parameters:
 - μ
 - b
 - n
 
 > Knowles JK. The finite anti-plane shear field near the tip of a crack for a class of incompressible elastic solids. International Journal of Fracture. 1977 Oct;13(5):611-39.
 """
-struct Knowles{T} <: AbstractIncompressibleModel{T}
-    Knowles(::T = PrincipalValueForm()) where {T<:Union{InvariantForm,PrincipalValueForm}} =
-        new{T}()
-end
+Knowles(type::T = PrincipalValueForm()) where {T<:Union{InvariantForm,PrincipalValueForm}} =
+    Knowles{T}()
 
 function ContinuumMechanicsBase.StrainEnergyDensity(
     ::Knowles{T},
@@ -984,7 +930,6 @@ function ContinuumMechanicsBase.StrainEnergyDensity(
     return μ / (2b) * ((1 + (b / n) * (I⃗[1] - 3))^n - 1)
 end
 
-
 parameters(::Knowles) = (:μ, :b, :n)
 
 function parameter_bounds(::Knowles, data::AbstractHyperelasticTest)
@@ -993,29 +938,30 @@ function parameter_bounds(::Knowles, data::AbstractHyperelasticTest)
     return (lb = lb, ub = ub)
 end
 
+struct Swanson{T} <: AbstractIncompressibleModel{T} end
+
 """
-$(TYPEDEF)
+$(SIGNATURES)
 
-Swanson
-
-Model:
+# Model:
 
 ```math
 W = \\sum\\limits_{i=1}^{N} \\frac{3}{2}(\\frac{A_i}{1+\\alpha_i}(\\frac{I_1}{3})^{1+\\alpha_i}+\\frac{B_i}{1+\\beta_i}(\\frac{I_2}{3})^{1+\\beta_i}
 ```
 
-Parameters:
-- A⃗
-- α⃗
-- B⃗
-- β⃗
+# Arguments:
+- `type=PrincipalValueForm()`: Sets the form of the strain energy density function. Either `PrincipalValueForm()` or `InvariantForm()
+
+# Parameters:
+- `A⃗`
+- `α⃗`
+- `B⃗`
+- `β⃗`
 
 > Swanson SR. A constitutive model for high elongation elastic materials.
 """
-struct Swanson{T} <: AbstractIncompressibleModel{T}
-    Swanson(::T = PrincipalValueForm()) where {T<:Union{InvariantForm,PrincipalValueForm}} =
-        new{T}()
-end
+Swanson(type::T = PrincipalValueForm()) where {T<:Union{InvariantForm,PrincipalValueForm}} =
+    Swanson{T}()
 
 function ContinuumMechanicsBase.StrainEnergyDensity(
     ::Swanson{T},
@@ -1044,18 +990,21 @@ end
 
 parameters(::Swanson) = (:A⃗, :α⃗, :B⃗, :β⃗)
 
+struct YamashitaKawabata{T} <: AbstractIncompressibleModel{T} end
+
 """
-$(TYPEDEF)
+$(SIGNATURES)
 
-Yamashita-Kawabata
-
-Model:
+# Model:
 
 ```math
 W = C_1(I_1-3)+C_2(I_2-3)+\\frac{C_3}{N+1}(I_1-3)^{N+1}
 ```
 
-Parameters:
+# Arguments:
+- `type=PrincipalValueForm()`: Sets the form of the strain energy density function. Either `PrincipalValueForm()` or `InvariantForm()
+
+# Parameters:
 - C1
 - C2
 - C3
@@ -1063,11 +1012,9 @@ Parameters:
 
 > Yamashita Y, Kawabata S. Approximated form of the strain energy-density function of carbon-black filled rubbers for industrial applications. Nippon Gomu Kyokaishi(Journal of the Society of Rubber Industry, Japan)(Japan). 1992;65(9):517-28.
 """
-struct YamashitaKawabata{T} <: AbstractIncompressibleModel{T}
-    YamashitaKawabata(
-        ::T = PrincipalValueForm(),
-    ) where {T<:Union{InvariantForm,PrincipalValueForm}} = new{T}()
-end
+YamashitaKawabata(
+    type::T = PrincipalValueForm(),
+) where {T<:Union{InvariantForm,PrincipalValueForm}} = YamashitaKawabata{T}()
 
 function ContinuumMechanicsBase.StrainEnergyDensity(
     ::YamashitaKawabata{T},
@@ -1087,30 +1034,31 @@ end
 
 parameters(::YamashitaKawabata) = (:C1, :C2, :C3, :N)
 
+
+struct DavisDeThomas{T} <: AbstractIncompressibleModel{T} end
 """
-$(TYPEDEF)
+$(SIGNATURES)
 
-Davis-DeThomas
-
-Model:
+# Model:
 
 ```math
 W = \\frac{A}{2(1-\\frac{n}{2})}(I_1-3+C^2)^{1-\\frac{n}{2}}+k(I_1-3)^2
 ```
 
-Parameters:
-- A
-- n
-- C
-- k
+# Arguments
+- `type=PrincipalValueForm()`: Sets the form of the strain energy density function. Either `PrincipalValueForm()` or `InvariantForm()
+
+# Parameters:
+- `A`
+- `n`
+- `C`
+- `k`
 
 > Davies CK, De DK, Thomas AG. Characterization of the behavior of rubber for engineering design purposes. 1. Stress-strain relations. Rubber chemistry and technology. 1994 Sep;67(4):716-28.
 """
-struct DavisDeThomas{T} <: AbstractIncompressibleModel{T}
-    DavisDeThomas(
-        ::T = PrincipalValueForm(),
-    ) where {T<:Union{InvariantForm,PrincipalValueForm}} = new{T}()
-end
+DavisDeThomas(
+    type::T = PrincipalValueForm(),
+) where {T<:Union{InvariantForm,PrincipalValueForm}} = DavisDeThomas{T}()
 
 function ContinuumMechanicsBase.StrainEnergyDensity(
     ::DavisDeThomas{T},
@@ -1132,30 +1080,31 @@ function parameters(::DavisDeThomas)
     return (:A, :n, :C, :k)
 end
 
+struct Gregory{T} <: AbstractIncompressibleModel{T} end
+
 """
-$(TYPEDEF)
+$(SIGNATURES)
 
-Gregory
-
-Model:
+# Model:
 
 ```math
 W = \\frac{A}{2-n}(I_1-3+C^2)^{1-\\frac{n}{2}}+\\frac{B}{2+m}(I_1-3+C^2)^{1+\\frac{m}{2}}
 ```
 
-Parameters:
-- A
-- B
-- C
-- m
-- n
+# Arguments:
+- `type=PrincipalValueForm()`: Sets the form of the strain energy density function. Either `PrincipalValueForm()` or `InvariantForm()
+
+# Parameters:
+- `A`
+- `B`
+- `C`
+- `m`
+- `n`
 
 > Gregory IH, Muhr AH, Stephens IJ. Engineering applications of rubber in simple extension. Plastics rubber and composites processing and applications. 1997;26(3):118-22.
 """
-struct Gregory{T} <: AbstractIncompressibleModel{T}
-    Gregory(::T = PrincipalValueForm()) where {T<:Union{InvariantForm,PrincipalValueForm}} =
-        new{T}()
-end
+Gregory(type::T = PrincipalValueForm()) where {T<:Union{InvariantForm,PrincipalValueForm}} =
+    Gregory{T}()
 
 function ContinuumMechanicsBase.StrainEnergyDensity(
     ::Gregory{T},
@@ -1179,32 +1128,33 @@ function parameters(::Gregory)
     return (:A, :B, :C, :m, :n)
 end
 
+struct ModifiedGregory{T} <: AbstractIncompressibleModel{T} end
+
 """
-$(TYPEDEF)
+$(SIGNATURES)
 
-Modified Gregory
-
-Model:
+# Model:
 
 ```math
 W = \\frac{A}{1+\\alpha}(I_1-3+M^2)^{1+\\alpha}+\\frac{B}{1+\\beta}(I_1-3+N^2)^{1+\\beta}
 ```
 
-Parameters:
-- A
-- α
-- M
-- B
-- β
-- N
+# Arguments:
+- `type=PrincipalValueForm()`: Sets the form of the strain energy density function. Either `PrincipalValueForm()` or `InvariantForm()
+
+# Parameters:
+- `A`
+- `α`
+- `M`
+- `B`
+- `β`
+- `N`
 
 > He H, Zhang Q, Zhang Y, Chen J, Zhang L, Li F. A comparative study of 85 hyperelastic constitutive models for both unfilled rubber and highly filled rubber nanocomposite material. Nano Materials Science. 2021 Jul 16.
 """
-struct ModifiedGregory{T} <: AbstractIncompressibleModel{T}
-    ModifiedGregory(
-        ::T = PrincipalValueForm(),
-    ) where {T<:Union{InvariantForm,PrincipalValueForm}} = new{T}()
-end
+ModifiedGregory(
+    type::T = PrincipalValueForm(),
+) where {T<:Union{InvariantForm,PrincipalValueForm}} = ModifiedGregory{T}()
 
 function ContinuumMechanicsBase.StrainEnergyDensity(
     ::ModifiedGregory{T},
@@ -1227,33 +1177,35 @@ function parameters(::ModifiedGregory)
     return (:A, :α, :M, :B, :β, :N)
 end
 
+struct Beda{T} <: AbstractIncompressibleModel{T}
+    GB::GeneralBeda
+end
+
 """
-$(TYPEDEF)
+$(SIGNATURES)
 
-Beda
-
-Model:
+# Model:
 
 ```math
 W = \\frac{C_1}{\\alpha}(I_1-3)^{\\alpha}+C_2(I_1-3)+\\frac{C_3}{\\zeta}(I_1-3)^{\\zeta}+\\frac{K_1}{\\beta}(I_2-3)^\\beta
 ```
 
-Parameters:
-- C1
-- C2
-- C3
-- K1
-- α
-- β
-- ζ
+# Arguments:
+- `type=PrincipalValueForm()`: Sets the form of the strain energy density function. Either `PrincipalValueForm()` or `InvariantForm()
+
+# Parameters:
+- `C1`
+- `C2`
+- `C3`
+- `K1`
+- `α`
+- `β`
+- `ζ`
 
 > Beda T. Reconciling the fundamental phenomenological expression of the strain energy of rubber with established experimental facts. Journal of Polymer Science Part B: Polymer Physics. 2005 Jan 15;43(2):125-34.
 """
-struct Beda{T} <: AbstractIncompressibleModel{T}
-    GB::GeneralBeda
-    Beda(::T = PrincipalValueForm()) where {T<:Union{InvariantForm,PrincipalValueForm}} =
-        new{T}(GeneralBeda(T()))
-end
+Beda(type::T = PrincipalValueForm()) where {T<:Union{InvariantForm,PrincipalValueForm}} =
+    Beda{T}(GeneralBeda(type))
 
 function ContinuumMechanicsBase.StrainEnergyDensity(
     ψ::Beda{T},
@@ -1290,31 +1242,32 @@ function parameter_bounds(::Beda, data::AbstractHyperelasticTest)
     ub = (C1 = Inf, C2 = Inf, C3 = Inf, K1 = Inf, α = 1.0, β = 1.0, ζ = Inf)
     return (lb = lb, ub = ub)
 end
+
+struct Amin{T} <: AbstractIncompressibleModel{T} end
 """
-$(TYPEDEF)
+$(SIGNATURES)
 
-Amin
-
-Model:
+# Model:
 
 ```math
 W = C_1 (I_1 - 3) + \\frac{C_2}{N + 1} (I_1 - 3)^{N + 1} + \\frac{C_3}{M + 1} (I_1 - 3)^{M + 1} + C_4 (I_2 - 3)
 ```
 
-Parameters:
-- C1
-- C2
-- C3
-- C4
-- N
-- M
+# Arguments:
+- `type=PrincipalValueForm()`: Sets the form of the strain energy density function. Either `PrincipalValueForm()` or `InvariantForm()
+
+# Parameters:
+- `C1`
+- `C2`
+- `C3`
+- `C4`
+- `N`
+- `M`
 
 > Amin AF, Wiraguna SI, Bhuiyan AR, Okui Y. Hyperelasticity model for finite element analysis of natural and high damping rubbers in compression and shear. Journal of engineering mechanics. 2006 Jan;132(1):54-64.
 """
-struct Amin{T} <: AbstractIncompressibleModel{T}
-    Amin(::T = PrincipalValueForm()) where {T<:Union{InvariantForm,PrincipalValueForm}} =
-        new{T}()
-end
+Amin(type::T = PrincipalValueForm()) where {T<:Union{InvariantForm,PrincipalValueForm}} =
+    Amin{T}()
 
 function ContinuumMechanicsBase.StrainEnergyDensity(
     ::Amin{T},
@@ -1342,28 +1295,28 @@ function parameters(::Amin)
     return (:C1, :C2, :C3, :C4, :N, :M)
 end
 
+struct LopezPamies{T} <: AbstractIncompressibleModel{T} end
 """
-$(TYPEDEF)
+$(SIGNATURES)
 
-Lopez-Pamies
-
-Model:
+# Model:
 
 ```math
 W = \\frac{3^{1 - \\alpha_i}}{2\\alpha_i} \\mu_i (I_1^{\\alpha_i} - 3^{\\alpha_i})
 ```
 
-Parameters:
-- α⃗
-- μ⃗
+# Arguments:
+- `type=PrincipalValueForm()`: Sets the form of the strain energy density function. Either `PrincipalValueForm()` or `InvariantForm()
+
+# Parameters:
+- `α⃗`
+- `μ⃗`
 
 > Lopez-Pamies O. A new I1-based hyperelastic model for rubber elastic materials. Comptes Rendus Mecanique. 2010 Jan 1;338(1):3-11.
 """
-struct LopezPamies{T} <: AbstractIncompressibleModel{T}
-    LopezPamies(
-        ::T = PrincipalValueForm(),
-    ) where {T<:Union{InvariantForm,PrincipalValueForm}} = new{T}()
-end
+LopezPamies(
+    type::T = PrincipalValueForm(),
+) where {T<:Union{InvariantForm,PrincipalValueForm}} = LopezPamies{T}()
 
 function ContinuumMechanicsBase.StrainEnergyDensity(
     ::LopezPamies{T},
@@ -1388,31 +1341,32 @@ function parameters(::LopezPamies)
     return (:α⃗, :μ⃗)
 end
 
+struct GenYeoh{T} <: AbstractIncompressibleModel{T} end
+
 """
-$(TYPEDEF)
+$(SIGNATURES)
 
-GenYeoh
-
-Model:
+# Model:
 
 ```math
 W = K_1 (I_1 - 3)^m + K_2 * (I_1 - 3)^p + K_3 * (I_1 - 3)^q
 ```
 
-Parameters:
-- K1
-- K2
-- K3
-- m
-- p
-- q
+# Arguments:
+- `type=PrincipalValueForm()`: Sets the form of the strain energy density function. Either `PrincipalValueForm()` or `InvariantForm()
+
+# Parameters:
+- `K1`
+- `K2`
+- `K3`
+- `m`
+- `p`
+- `q`
 
 > Hohenberger TW, Windslow RJ, Pugno NM, Busfield JJ. A constitutive model for both low and high strain nonlinearities in highly filled elastomers and implementation with user-defined material subroutines in ABAQUS. Rubber Chemistry and Technology. 2019;92(4):653-86.
 """
-struct GenYeoh{T} <: AbstractIncompressibleModel{T}
-    GenYeoh(::T = PrincipalValueForm()) where {T<:Union{InvariantForm,PrincipalValueForm}} =
-        new{T}()
-end
+GenYeoh(type::T = PrincipalValueForm()) where {T<:Union{InvariantForm,PrincipalValueForm}} =
+    GenYeoh{T}()
 
 function ContinuumMechanicsBase.StrainEnergyDensity(
     ::GenYeoh{T},
@@ -1434,29 +1388,29 @@ function parameters(::GenYeoh)
     return (:K1, :K2, :K3, :m, :p, :q)
 end
 
+struct HartSmith{T} <: AbstractIncompressibleModel{T} end
 """
-$(TYPEDEF)
+$(SIGNATURES)
 
-Hart-Smith
-
-Model:
+# Model:
 
 ```math
 W = \\frac{G\\exp{(-9k_1+k_1I_1)}}{k_1}+Gk_2\\log{I_2}
 ```
 
-Parameters:
-- G
-- k₁
-- k₂
+# Arguments:
+- `type=PrincipalValueForm()`: Sets the form of the strain energy density function. Either `PrincipalValueForm()` or `InvariantForm()
+
+# Parameters:
+- `G`
+- `k₁`
+- `k₂`
 
 > Hart-Smith LJ. Elasticity parameters for finite deformations of rubber-like materials. Zeitschrift für angewandte Mathematik und Physik ZAMP. 1966 Sep;17(5):608-26.
 """
-struct HartSmith{T} <: AbstractIncompressibleModel{T}
-    HartSmith(
-        ::T = PrincipalValueForm(),
-    ) where {T<:Union{InvariantForm,PrincipalValueForm}} = new{T}()
-end
+HartSmith(
+    type::T = PrincipalValueForm(),
+) where {T<:Union{InvariantForm,PrincipalValueForm}} = HartSmith{T}()
 
 function ContinuumMechanicsBase.StrainEnergyDensity(
     ::HartSmith{T},
@@ -1478,29 +1432,30 @@ function parameters(::HartSmith)
     return (:G, :k₁, :k₂)
 end
 
+struct VerondaWestmann{T} <: AbstractIncompressibleModel{T} end
+
 """
-$(TYPEDEF)
+$(SIGNATURES)
 
-Veronda-Westmann
-
-Model:
+# Model:
 
 ```math
 W = C_1 (\\exp(\\alpha(I_1 - 3)) - 1) + C_2 (I_2 - 3)
 ```
 
-Parameters:
-- C1
-- C2
-- α
+# Arguments:
+- `type=PrincipalValueForm()`: Sets the form of the strain energy density function. Either `PrincipalValueForm()` or `InvariantForm()
+
+# Parameters:
+- `C1`
+- `C2`
+- `α`
 
 > Veronda DR, Westmann RA. Mechanical characterization of skin—finite deformations. Journal of biomechanics. 1970 Jan 1;3(1):111-24.
 """
-struct VerondaWestmann{T} <: AbstractIncompressibleModel{T}
-    VerondaWestmann(
-        ::T = PrincipalValueForm(),
-    ) where {T<:Union{InvariantForm,PrincipalValueForm}} = new{T}()
-end
+VerondaWestmann(
+    type::T = PrincipalValueForm(),
+) where {T<:Union{InvariantForm,PrincipalValueForm}} = VerondaWestmann{T}()
 
 function ContinuumMechanicsBase.StrainEnergyDensity(
     ::VerondaWestmann{T},
@@ -1522,29 +1477,30 @@ function parameters(::VerondaWestmann)
     return (:C1, :C2, :α)
 end
 
+struct FungDemiray{T} <: AbstractIncompressibleModel{T} end
+
 """
-$(TYPEDEF)
+$(SIGNATURES)
 
-Fung-Demiray
-
-Model:
+# Model:
 
 ```math
 W = \\frac{\\mu}{2 * b} (\\exp(b(I_1 - 3)) - 1)
 ```
 
-Parameters:
-- μ
-- b
+# Arguments:
+- `type=PrincipalValueForm()`: Sets the form of the strain energy density function. Either `PrincipalValueForm()` or `InvariantForm()
+
+# Parameters:
+- `μ`
+- `b`
 
 > Fung YC. Elasticity of soft tissues in simple elongation. American Journal of Physiology-Legacy Content. 1967 Dec 1;213(6):1532-44.
 > Demiray H. A note on the elasticity of soft biological tissues. Journal of biomechanics. 1972 May 1;5(3):309-11.
 """
-struct FungDemiray{T} <: AbstractIncompressibleModel{T}
-    FungDemiray(
-        ::T = PrincipalValueForm(),
-    ) where {T<:Union{InvariantForm,PrincipalValueForm}} = new{T}()
-end
+FungDemiray(
+    type::T = PrincipalValueForm(),
+) where {T<:Union{InvariantForm,PrincipalValueForm}} = FungDemiray{T}()
 
 function ContinuumMechanicsBase.StrainEnergyDensity(
     ::FungDemiray{T},
@@ -1566,28 +1522,28 @@ function parameters(::FungDemiray)
     return (:μ, :b)
 end
 
+struct Vito{T} <: AbstractIncompressibleModel{T} end
 """
-$(TYPEDEF)
+$(SIGNATURES)
 
-Vito
-
-Model:
+# Model:
 
 ```math
 W = \\alpha (\\exp\\bigg(\\beta (I_1 - 3)\\bigg) + \\gamma  (I_2 - 3)) - 1)
 ```
 
-Parameters:
-- α
-- β
-- γ
+# Arguments:
+- `type=PrincipalValueForm()`: Sets the form of the strain energy density function. Either `PrincipalValueForm()` or `InvariantForm()
+
+# Parameters:
+- `α`
+- `β`
+- `γ`
 
 > Vito R. A note on arterial elasticity. Journal of Biomechanics. 1973 Sep 1;6(5):561-4.
 """
-struct Vito{T} <: AbstractIncompressibleModel{T}
-    Vito(::T = PrincipalValueForm()) where {T<:Union{InvariantForm,PrincipalValueForm}} =
-        new{T}()
-end
+Vito(type::T = PrincipalValueForm()) where {T<:Union{InvariantForm,PrincipalValueForm}} =
+    Vito{T}()
 
 function ContinuumMechanicsBase.StrainEnergyDensity(
     ::Vito{T},
@@ -1609,31 +1565,31 @@ function parameters(::Vito)
     return (:α, :β, :γ)
 end
 
+struct ModifiedYeoh{T} <: AbstractIncompressibleModel{T} end
 """
-$(TYPEDEF)
+$(SIGNATURES)
 
-Modified Yeoh
-
-Model:
+# Model:
 
 ```math
 W = C_{10} * (I_1 - 3) + C_{20} * (I_1 - 3)^2 + C_{30} * (I_1 - 3)^3 + \\alpha / \\beta * (1 - \\exp{-\\beta * (I_1 - 3)})
 ```
 
-Parameters:
-- C10
-- C20
-- C30
-- α
-- β
+# Arguments:
+- `type=PrincipalValueForm()`: Sets the form of the strain energy density function. Either `PrincipalValueForm()` or `InvariantForm()
+
+# Parameters:
+- `C10`
+- `C20`
+- `C30`
+- `α`
+- `β`
 
 > He H, Zhang Q, Zhang Y, Chen J, Zhang L, Li F. A comparative study of 85 hyperelastic constitutive models for both unfilled rubber and highly filled rubber nanocomposite material. Nano Materials Science. 2021 Jul 16.
 """
-struct ModifiedYeoh{T} <: AbstractIncompressibleModel{T}
-    ModifiedYeoh(
-        ::T = PrincipalValueForm(),
-    ) where {T<:Union{InvariantForm,PrincipalValueForm}} = new{T}()
-end
+ModifiedYeoh(
+    type::T = PrincipalValueForm(),
+) where {T<:Union{InvariantForm,PrincipalValueForm}} = ModifiedYeoh{T}()
 
 function ContinuumMechanicsBase.StrainEnergyDensity(
     ::ModifiedYeoh{T},
@@ -1661,12 +1617,15 @@ function parameters(::ModifiedYeoh)
     return (:C10, :C20, :C30, :α, :β)
 end
 
+struct ChevalierMarco{T} <: AbstractIncompressibleModel{T}
+    ∂W∂I1::Function
+    ∂W∂I2::Function
+end
+
 """
-$(TYPEDEF)
+$(SIGNATURES)
 
-Chevalier-Marco
-
-Model:
+# Model:
 
 ```math
 W = \\int\\limits_{3}^{I_1(\\vec\\lambda)} \\exp\\bigg(\\sum\\limits_{i=0}^{N}a_i(I_1-3)^i\\bigg)\\text{d}I_1+ \\int\\limits_{3}^{I_2(\\vec\\lambda)} \\sum\\limits_{i=0}^{n}\\frac{b_i}{I_2^i}\\text{d}I_2
@@ -1680,29 +1639,25 @@ W = \\int\\limits_{3}^{I_1(\\vec\\lambda)} \\exp\\bigg(\\sum\\limits_{i=0}^{N}a_
 [\\mathbf{\\sigma}] = \\mathbf{F} \\cdot \\mathbf{S}
 ```
 
-Parameters:
-- a⃗
-- b⃗
+# Parameters:
+- `a⃗`
+- `b⃗`
 
 Note:
 - Model is not compatible with AD. A method for accessing the Second Piola Kirchoff Tensor and Cauchy Stress Tensor have been implemented.
 
 > Chevalier L, Marco Y. Tools for multiaxial validation of behavior laws chosen for modeling hyper‐elasticity of rubber‐like materials. Polymer Engineering & Science. 2002 Feb;42(2):280-98.
 """
-struct ChevalierMarco{T} <: AbstractIncompressibleModel{T}
-    ∂W∂I1::Function
-    ∂W∂I2::Function
-    function ChevalierMarco(::T = PrincipalValueForm()) where {T<:Union{PrincipalValueForm}}
-        function ∂W∂I1(I₁, a⃗)
-            L_a = size(a⃗, 1)
-            return exp(sum(@. a⃗ * (I₁ - 3)^(1:L_a)))
-        end
-        function ∂W∂I2(I₂, b⃗)
-            L_b = size(b⃗, 1)
-            return sum(@. b⃗ / I₂^(1:L_b))
-        end
-        new{T}(∂W∂I1, ∂W∂I2)
+function ChevalierMarco(::T = PrincipalValueForm()) where {T<:Union{PrincipalValueForm}}
+    function ∂W∂I1(I₁, a⃗)
+        L_a = size(a⃗, 1)
+        return exp(sum(@. a⃗ * (I₁ - 3)^(1:L_a)))
     end
+    function ∂W∂I2(I₂, b⃗)
+        L_b = size(b⃗, 1)
+        return sum(@. b⃗ / I₂^(1:L_b))
+    end
+    new{T}(∂W∂I1, ∂W∂I2)
 end
 
 function ContinuumMechanicsBase.StrainEnergyDensity(
@@ -1710,8 +1665,6 @@ function ContinuumMechanicsBase.StrainEnergyDensity(
     λ⃗::Vector{S},
     (; a⃗, b⃗),
 ) where {T<:PrincipalValueForm,S}
-    # ∂W∂I1(I₁) = exp(sum(@tullio _ := a⃗[i] * (I₁ - 3)^(i - 1)))
-    # ∂W∂I2(I₂) = @tullio _ := b⃗[i] / I₂^(i - 1)
     return quadgk(Base.Fix2(W.∂W∂I1, a⃗), 3, I₁(λ⃗))[1] +
            quadgk(Base.Fix2(W.∂W∂I2, b⃗), 3, I₂(λ⃗))[1]
 end
@@ -1749,31 +1702,31 @@ function parameters(::ChevalierMarco)
     return (:a⃗, :b⃗)
 end
 
+struct GornetDesmorat{T} <: AbstractIncompressibleModel{T} end
 """
-$(TYPEDEF)
+$(SIGNATURES)
 
-Gornet - Desmorat
-
-Model:
+# Model:
 ```math
 W = h_1\\int\\exp{h_3(I_1-3)^2}\\text{d}I_1+3h_2\\int\\frac{1}{\\sqrt{I_2}}\\text{d}I_2 = \\frac{h_1 \\sqrt{\\pi} \\text{erfi}(\\sqrt{h_3}(I_1-3)^2)}{2\\sqrt{h_3}}+6h_2\\sqrt{I_2}
 ```
 
-Parameters:
+# Arguments:
+- `type=PrincipalValueForm()`: Sets the form of the strain energy density function. Either `PrincipalValueForm()` or `InvariantForm()
+
+# Parameters:
 - h₁
 - h₂
 - h₃
 
-Note:
+# Notes:
 - The differential form was original form and the closed form SEF was determine via symbolic integration in Mathematica. The model is not compatible with AD and has methods for the Second Piola Kirchoff Stress Tensor and Cauchy Stress Tensor implemented.
 
 > Gornet L, Marckmann G, Desmorat R, Charrier P. A new isotropic hyperelastic strain energy function in terms of invariants and its derivation into a pseudo-elastic model for Mullins effect: application to finite element analysis. Constitutive Models for Rubbers VII. 2012:265-71.
 """
-struct GornetDesmorat{T} <: AbstractIncompressibleModel{T}
-    GornetDesmorat(
-        ::T = PrincipalValueForm(),
-    ) where {T<:Union{InvariantForm,PrincipalValueForm}} = new{T}()
-end
+GornetDesmorat(
+    type::T = PrincipalValueForm(),
+) where {T<:Union{InvariantForm,PrincipalValueForm}} = GornetDesmorat{T}()
 
 function ContinuumMechanicsBase.StrainEnergyDensity(
     ::GornetDesmorat{T},
@@ -1860,30 +1813,30 @@ function parameters(::GornetDesmorat)
     return (:h₁, :h₂, :h₃)
 end
 
+struct MansouriDarijani{T} <: AbstractIncompressibleModel{T} end
 """
-$(TYPEDEF)
+$(SIGNATURES)
 
-Mansouri-Darijani
-
-Model:
+# Model:
 
 ```math
 W = A_1\\exp{m_1(I_1-3)-1}+B_1\\exp{n_1(I_2-3)-1}
 ```
 
-Parameters:
-- A1
-- m1
-- B1
-- n1
+# Arguments:
+- `type=PrincipalValueForm()`: Sets the form of the strain energy density function. Either `PrincipalValueForm()` or `InvariantForm()
+
+# Parameters:
+- `A1`
+- `m1`
+- `B1`
+- `n1`
 
 > Mansouri MR, Darijani H. Constitutive modeling of isotropic hyperelastic materials in an exponential framework using a self-contained approach. International Journal of Solids and Structures. 2014 Dec 1;51(25-26):4316-26.
 """
-struct MansouriDarijani{T} <: AbstractIncompressibleModel{T}
-    MansouriDarijani(
-        ::T = PrincipalValueForm(),
-    ) where {T<:Union{InvariantForm,PrincipalValueForm}} = new{T}()
-end
+MansouriDarijani(
+    type::T = PrincipalValueForm(),
+) where {T<:Union{InvariantForm,PrincipalValueForm}} = MansouriDarijani{T}()
 
 function ContinuumMechanicsBase.StrainEnergyDensity(
     ::MansouriDarijani{T},
@@ -1905,28 +1858,28 @@ function parameters(::MansouriDarijani)
     return (:A1, :m1, :B1, :n1)
 end
 
+struct GentThomas{T} <: AbstractIncompressibleModel{T} end
 """
-$(TYPEDEF)
+$(SIGNATURES)
 
-Gent Thomas
-
-Model:
+# Model:
 
 ```math
 W = C_1(I_1-3)+C_2\\log(\\frac{I_2}{3})
 ```
 
-Paramters:
-- C1
-- C2
+# Arguments:
+- `type=PrincipalValueForm()`: Sets the form of the strain energy density function. Either `PrincipalValueForm()` or `InvariantForm()
+
+# Paramters:
+- `C1`
+- `C2`
 
 > Gent AN, Thomas AG. Forms for the stored (strain) energy function for vulcanized rubber. Journal of Polymer Science. 1958 Apr;28(118):625-8.
 """
-struct GentThomas{T} <: AbstractIncompressibleModel{T}
-    GentThomas(
-        ::T = PrincipalValueForm(),
-    ) where {T<:Union{InvariantForm,PrincipalValueForm}} = new{T}()
-end
+GentThomas(
+    type::T = PrincipalValueForm(),
+) where {T<:Union{InvariantForm,PrincipalValueForm}} = GentThomas{T}()
 
 function ContinuumMechanicsBase.StrainEnergyDensity(
     ::GentThomas{T},
@@ -1948,28 +1901,28 @@ function parameters(::GentThomas)
     return (:C1, :C2)
 end
 
+struct LambertDianiRey{T} <: AbstractIncompressibleModel{T} end
 """
-$(TYPEDEF)
+$(SIGNATURES)
 
-Lambert-Diani Rey
-
-Model:
+# Model:
 
 ```math
 W = \\int\\limits_{3}^{I_1}\\exp\\bigg(\\sum\\limits_{i=0}^{n}a_i(I_1-3)^i\\bigg)\\text{d}I_1+\\int\\limits_{3}^{I_2}\\sum\\limits_{j=0}^{m}b_i\\log(I_2)^i\\text{d}I_2
 ```
 
-Parameters:
-- aᵢ
-- bᵢ
+# Arguments:
+- `type=PrincipalValueForm()`: Sets the form of the strain energy density function. Either `PrincipalValueForm()` or `InvariantForm()
+
+# Parameters:
+- `a⃗`
+- `b⃗`
 
 > Lambert-Diani J, Rey C. New phenomenological behavior laws for rubbers and thermoplastic elastomers. European Journal of Mechanics-A/Solids. 1999 Nov 1;18(6):1027-43.
 """
-struct LambertDianiRey{T} <: AbstractIncompressibleModel{T}
-    LambertDianiRey(
-        ::T = PrincipalValueForm(),
-    ) where {T<:Union{InvariantForm,PrincipalValueForm}} = new{T}()
-end
+LambertDianiRey(
+    type::T = PrincipalValueForm(),
+) where {T<:Union{InvariantForm,PrincipalValueForm}} = LambertDianiRey{T}()
 
 function ContinuumMechanicsBase.StrainEnergyDensity(
     ::LambertDianiRey{T},
@@ -2078,34 +2031,34 @@ function parameters(::LambertDianiRey)
     return (:a⃗, :b⃗)
 end
 
+struct HossMarczakI{T} <: AbstractIncompressibleModel{T} end
 """
-$(TYPEDEF)
+$(SIGNATURES)
 
-Hoss Marczak I
-
-Model:
+# Model:
 
 ```math
 W = \\frac{\\alpha}{\\beta}(1-\\exp{-\\beta(I_1-3)})+\\frac{\\mu}{2b}\\bigg((1+\\frac{b}{n}(I_1-3))^n -1\\bigg)
 ```
 
-Parameters:
-- α
-- β
-- μ
-- b
-- n
+# Arguments:
+- `type=PrincipalValueForm()`: Sets the form of the strain energy density function. Either `PrincipalValueForm()` or `InvariantForm()
 
-Note:
+# Parameters:
+- `α`
+- `β`
+- `μ`
+- `b`
+- `n`
+
+# Note:
 - The authors suggested this model for low strains.
 
 > Hoss L, Marczak RJ. A new constitutive model for rubber-like materials. Mecánica Computacional. 2010;29(28):2759-73.
 """
-struct HossMarczakI{T} <: AbstractIncompressibleModel{T}
-    HossMarczakI(
-        ::T = PrincipalValueForm(),
-    ) where {T<:Union{InvariantForm,PrincipalValueForm}} = new{T}()
-end
+HossMarczakI(
+    type::T = PrincipalValueForm(),
+) where {T<:Union{InvariantForm,PrincipalValueForm}} = HossMarczakI{T}()
 
 function ContinuumMechanicsBase.StrainEnergyDensity(
     ::HossMarczakI{T},
@@ -2135,35 +2088,35 @@ function parameter_bounds(::HossMarczakI, data::AbstractHyperelasticTest)
     return (lb = lb, ub = ub)
 end
 
+struct HossMarczakII{T} <: AbstractIncompressibleModel{T} end
 """
-$(TYPEDEF)
+$(SIGNATURES)
 
-Hoss Marczak II
-
-Model:
+# Model:
 
 ```math
 W = \\frac{\\alpha}{\\beta}(1-\\exp{-\\beta(I_1-3)})+\\frac{\\mu}{2b}\\bigg((1+\\frac{b}{n}(I_1-3))^n -1\\bigg)+C_2\\log(\\frac{I_2}{3})
 ```
 
-Parameters:
-- α
-- β
-- μ
-- b
-- n
-- C2
+# Arguments:
+- `type=PrincipalValueForm()`: Sets the form of the strain energy density function. Either `PrincipalValueForm()` or `InvariantForm()
 
-Note:
+# Parameters:
+- `α`
+- `β`
+- `μ`
+- `b`
+- `n`
+- `C2`
+
+# Note:
 - The authors suggests this model for high strains.
 
 > Hoss L, Marczak RJ. A new constitutive model for rubber-like materials. Mecánica Computacional. 2010;29(28):2759-73.
 """
-struct HossMarczakII{T} <: AbstractIncompressibleModel{T}
-    HossMarczakII(
-        ::T = PrincipalValueForm(),
-    ) where {T<:Union{InvariantForm,PrincipalValueForm}} = new{T}()
-end
+HossMarczakII(
+    type::T = PrincipalValueForm(),
+) where {T<:Union{InvariantForm,PrincipalValueForm}} = HossMarczakII{T}()
 
 function ContinuumMechanicsBase.StrainEnergyDensity(
     ::HossMarczakII{T},
@@ -2195,29 +2148,28 @@ function parameter_bounds(::HossMarczakII, data::AbstractHyperelasticTest)
     return (lb = lb, ub = ub)
 end
 
-
+struct ExpLn{T} <: AbstractIncompressibleModel{T} end
 """
-$(TYPEDEF)
+$(SIGNATURES)
 
-Exp-Ln
-
-Model:
+# Model:
 
 ```math
 W = A\\bigg[\\frac{1}{a}\\exp{(a(I_1-3))}+b(I_1-2)(1-\\log{I_1-2})-\\frac{1}{a}-b\\bigg]
 ```
 
-Parameters:
-- A
-- a
-- b
+# Arguments:
+- `type=PrincipalValueForm()`: Sets the form of the strain energy density function. Either `PrincipalValueForm()` or `InvariantForm()
+
+# Parameters:
+- `A`
+- `a`
+- `b`
 
 > Khajehsaeid H, Arghavani J, Naghdabadi R. A hyperelastic constitutive model for rubber-like materials. European Journal of Mechanics-A/Solids. 2013 Mar 1;38:144-51.
 """
-struct ExpLn{T} <: AbstractIncompressibleModel{T}
-    ExpLn(::T = PrincipalValueForm()) where {T<:Union{InvariantForm,PrincipalValueForm}} =
-        new{T}()
-end
+ExpLn(type::T = PrincipalValueForm()) where {T<:Union{InvariantForm,PrincipalValueForm}} =
+    ExpLn{T}()
 
 function ContinuumMechanicsBase.StrainEnergyDensity(
     ::ExpLn{T},
@@ -2244,12 +2196,12 @@ function parameters(::ExpLn)
     return (:A, :a, :b)
 end
 
+struct VanDerWaals{T} <: AbstractIncompressibleModel{T} end
+
 """
-$(TYPEDEF)
+$(SIGNATURES)
 
-Van der Waals
-
-Model:
+# Model:
 
 ```math
 W = -\\mu\\{(\\lambda_m^2-3)\\log(1-\\Theta)+\\Theta\\}-\\frac{2\\alpha}{3}\\bigg(\\frac{I-3}{2}\\bigg)^{3/2}
@@ -2261,7 +2213,10 @@ where:
 \\Theta = \\frac{\\beta I_1 + (1-\\beta)I_2-3}{\\lambda_m^2-3)}
 ```
 
-Parameters:
+# Arguments:
+- `type=PrincipalValueForm()`: Sets the form of the strain energy density function. Either `PrincipalValueForm()` or `InvariantForm()
+
+# Parameters:
 - μ
 - λm
 - β
@@ -2271,11 +2226,9 @@ Parameters:
 > Ambacher H, Enderle HF, Kilian HG, Sauter A. Relaxation in permanent networks. InRelaxation in Polymers 1989 (pp. 209-220). Steinkopff.
 > Kilian HG. A molecular interpretation of the parameters of the van der Waals equation of state for real networks. Polymer Bulletin. 1980 Sep;3(3):151-8.
 """
-struct VanDerWaals{T} <: AbstractIncompressibleModel{T}
-    VanDerWaals(
-        ::T = PrincipalValueForm(),
-    ) where {T<:Union{InvariantForm,PrincipalValueForm}} = new{T}()
-end
+VanDerWaals(
+    type::T = PrincipalValueForm(),
+) where {T<:Union{InvariantForm,PrincipalValueForm}} = VanDerWaals{T}()
 
 function ContinuumMechanicsBase.StrainEnergyDensity(
     ::VanDerWaals{T},
@@ -2317,27 +2270,27 @@ end
 #     return f(u, p) = [1 - (u.β * I₁_max + (1 - u.β) * I₂_max - 3) / (u.λm^2 - 3)]
 # end
 
+struct Gent{T} <: AbstractIncompressibleModel{T} end
 """
-$(TYPEDEF)
+$(SIGNATURES)
 
-Gent
-
-Model:
+# Model:
 
 ```math
 W = -\\frac{\\mu J_m}{2}\\log{\\bigg(1-\\frac{I_1-3}{J_m}\\bigg)}
 ```
 
-Parameters:
-- μ:  Small strain shear modulus
-- Jₘ: Limiting stretch invariant
+# Arguments:
+- `type=PrincipalValueForm()`: Sets the form of the strain energy density function. Either `PrincipalValueForm()` or `InvariantForm()
+
+# Parameters:
+- `μ`:  Small strain shear modulus
+- `Jₘ`: Limiting stretch invariant
 
 > Gent AN. A new constitutive relation for rubber. Rubber chemistry and technology. 1996 Mar;69(1):59-61.
 """
-struct Gent{T} <: AbstractIncompressibleModel{T}
-    Gent(::T = PrincipalValueForm()) where {T<:Union{InvariantForm,PrincipalValueForm}} =
-        new{T}()
-end
+Gent(type::T = PrincipalValueForm()) where {T<:Union{InvariantForm,PrincipalValueForm}} =
+    Gent{T}()
 
 function ContinuumMechanicsBase.StrainEnergyDensity(
     ::Gent{T},
@@ -2368,28 +2321,29 @@ function parameter_bounds(::Gent, test::AbstractHyperelasticTest{S,T}) where {S,
     return (lb = lb, ub = ub)
 end
 
+
+struct TakamizawaHayashi{T} <: AbstractIncompressibleModel{T} end
 """
-$(TYPEDEF)
+$(SIGNATURES)
 
-Takamizawa-Hayashi
-
-Model:
+# Model:
 
 ```math
 W = -c\\log{1-\\big(\\frac{I_1-3}{J_m}\\big)^2}
 ```
 
-Parameters:
-- c
-- Jₘ
+# Arguments:
+- `type=PrincipalValueForm()`: Sets the form of the strain energy density function. Either `PrincipalValueForm()` or `InvariantForm()
+
+# Parameters:
+- `c`
+- `Jₘ`
 
 > Takamizawa K, Hayashi K. Strain energy density function and uniform strain hypothesis for arterial mechanics. Journal of biomechanics. 1987 Jan 1;20(1):7-17.
 """
-struct TakamizawaHayashi{T} <: AbstractIncompressibleModel{T}
-    TakamizawaHayashi(
-        ::T = PrincipalValueForm(),
-    ) where {T<:Union{InvariantForm,PrincipalValueForm}} = new{T}()
-end
+TakamizawaHayashi(
+    type::T = PrincipalValueForm(),
+) where {T<:Union{InvariantForm,PrincipalValueForm}} = TakamizawaHayashi{T}()
 
 function ContinuumMechanicsBase.StrainEnergyDensity(
     ::TakamizawaHayashi{T},
@@ -2419,30 +2373,30 @@ function parameter_bounds(::TakamizawaHayashi, data::AbstractHyperelasticTest)
     return (lb = lb, ub = ub)
 end
 
+struct YeohFleming{T} <: AbstractIncompressibleModel{T} end
 """
-$(TYPEDEF)
+$(SIGNATURES)
 
-Yeoh-Fleming
-
-Model:
+# Model:
 
 ```math
 W = \\frac{A}{B}(1-\\exp{-B(I_1-3)}) - C_{10}(I_m-3)\\log{1-\\frac{I_1-3}{I_m-3}}
 ```
 
-Parameters:
-- A
-- B
-- C10
-- Im
+# Arguments:
+- `type=PrincipalValueForm()`: Sets the form of the strain energy density function. Either `PrincipalValueForm()` or `InvariantForm()
+
+# Parameters:
+- `A`
+- `B`
+- `C10`
+- `Im`
 
 >  Yeoh OH, Fleming PD. A new attempt to reconcile the statistical and phenomenological theories of rubber elasticity. Journal of Polymer Science Part B: Polymer Physics. 1997 Sep 15;35(12):1919-31.
 """
-struct YeohFleming{T} <: AbstractIncompressibleModel{T}
-    YeohFleming(
-        ::T = PrincipalValueForm(),
-    ) where {T<:Union{InvariantForm,PrincipalValueForm}} = new{T}()
-end
+YeohFleming(
+    type::T = PrincipalValueForm(),
+) where {T<:Union{InvariantForm,PrincipalValueForm}} = YeohFleming{T}()
 
 function ContinuumMechanicsBase.StrainEnergyDensity(
     ::YeohFleming{T},
@@ -2473,29 +2427,29 @@ function parameter_bounds(::YeohFleming, data::AbstractHyperelasticTest)
     return (lb = lb, ub = ub)
 end
 
+struct PucciSaccomandi{T} <: AbstractIncompressibleModel{T} end
 """
-$(TYPEDEF)
+$(SIGNATURES)
 
-Pucci-Saccomandi
-
-Model:
+# Model:
 
 ```math
 W = K\\log{\\frac{I_2}{3}}-\\frac{\\mu J_m}{2}\\log{1-\\frac{I_1-3}{J-m}}
 ```
 
-Parameters:
-- K
-- μ
-- Jₘ
+# Arguments:
+- `type=PrincipalValueForm()`: Sets the form of the strain energy density function. Either `PrincipalValueForm()` or `InvariantForm()
+
+# Parameters:
+- `K`
+- `μ`
+- `Jₘ`
 
 > Pucci E, Saccomandi G. A note on the Gent model for rubber-like materials. Rubber chemistry and technology. 2002 Nov;75(5):839-52.
 """
-struct PucciSaccomandi{T} <: AbstractIncompressibleModel{T}
-    PucciSaccomandi(
-        ::T = PrincipalValueForm(),
-    ) where {T<:Union{InvariantForm,PrincipalValueForm}} = new{T}()
-end
+PucciSaccomandi(
+    type::T = PrincipalValueForm(),
+) where {T<:Union{InvariantForm,PrincipalValueForm}} = PucciSaccomandi{T}()
 
 function ContinuumMechanicsBase.StrainEnergyDensity(
     ::PucciSaccomandi{T},
@@ -2525,29 +2479,29 @@ function parameter_bounds(::PucciSaccomandi, data::AbstractHyperelasticTest)
     return (lb = lb, ub = ub)
 end
 
+struct HorganSaccomandi{T} <: AbstractIncompressibleModel{T} end
 """
-$(TYPEDEF)
+$(SIGNATURES)
 
-Horgan Saccomandi Model
-
-Model:
+# Model:
 
 ```math
 W = -\\frac{\\mu J}{2}\\log\\bigg(\\frac{J^3-J^2I_1+JI_2-1}{(J-1)^3}\\bigg)
 ```
 
-Parameters:
-- μ
-- J
+# Arguments:
+- `type=PrincipalValueForm()`: Sets the form of the strain energy density function. Either `PrincipalValueForm()` or `InvariantForm()
+
+# Parameters:
+- `μ`
+- `J`
 
 > Horgan CO, Saccomandi G. Constitutive models for compressible nonlinearly elastic materials with limiting chain extensibility. Journal of Elasticity. 2004 Nov;77(2):123-38.\
 > Horgan CO, Saccomandi G. Constitutive models for atactic elastomers. InWaves And Stability In Continuous Media 2004 (pp. 281-294).
 """
-struct HorganSaccomandi{T} <: AbstractIncompressibleModel{T}
-    HorganSaccomandi(
-        ::T = PrincipalValueForm(),
-    ) where {T<:Union{InvariantForm,PrincipalValueForm}} = new{T}()
-end
+HorganSaccomandi(
+    type::T = PrincipalValueForm(),
+) where {T<:Union{InvariantForm,PrincipalValueForm}} = HorganSaccomandi{T}()
 
 function ContinuumMechanicsBase.StrainEnergyDensity(
     ::HorganSaccomandi{T},
@@ -2586,27 +2540,27 @@ function parameter_bounds(::HorganSaccomandi, data::AbstractHyperelasticTest)
     return (lb = lb, ub = ub)
 end
 
+struct Beatty{T} <: AbstractIncompressibleModel{T} end
 """
-$(TYPEDEF)
+$(SIGNATURES)
 
-Beatty Model
-
-Model:
+# Model:
 
 ```math
 W = -\\frac{G_0 I_m(I_m-3)}{2(2I_m-3)}\\log\\bigg(\\frac{1-\\frac{I_1-3}{I_m-3}}{1+\\frac{I_1-3}{I_m}} \\bigg)
 ```
 
-Parameters:
-- G₀
-- Iₘ
+# Arguments:
+- `type=PrincipalValueForm()`: Sets the form of the strain energy density function. Either `PrincipalValueForm()` or `InvariantForm()
+
+# Parameters:
+- `G₀`
+- `Iₘ`
 
 > Beatty MF. On constitutive models for limited elastic, molecular based materials. Mathematics and mechanics of solids. 2008 Jul;13(5):375-87.
 """
-struct Beatty{T} <: AbstractIncompressibleModel{T}
-    Beatty(::T = PrincipalValueForm()) where {T<:Union{InvariantForm,PrincipalValueForm}} =
-        new{T}()
-end
+Beatty(type::T = PrincipalValueForm()) where {T<:Union{InvariantForm,PrincipalValueForm}} =
+    Beatty{T}()
 
 function ContinuumMechanicsBase.StrainEnergyDensity(
     ::Beatty{T},
@@ -2636,27 +2590,26 @@ function parameter_bounds(::Beatty, data::AbstractHyperelasticTest)
     ub = nothing
     return (lb = lb, ub = ub)
 end
+
+struct HorganMurphy{T} <: AbstractIncompressibleModel{T} end
+
 """
-$(TYPEDEF)
+$(SIGNATURES)
 
-Horgan Murphy Model
-
-Model:
+# Model:
 
 ```math
 W = -\\frac{2\\mu J_m}{c^2}\\log\\bigg(1-\\frac{\\lambda_1^c+\\lambda_2^c+\\lambda_3^c-3}{J_m})
 ```
 
-Parameters:
-- μ
-- Jₘ
-- c
+# Parameters:
+- `μ`
+- `Jₘ`
+- `c`
 
 > Horgan CO, Murphy JG. Limiting chain extensibility constitutive models of Valanis–Landel type. Journal of Elasticity. 2007 Feb;86(2):101-11.
 """
-struct HorganMurphy{T} <: AbstractIncompressibleModel{T}
-    HorganMurphy(::T = PrincipalValueForm()) where {T<:PrincipalValueForm} = new{T}()
-end
+HorganMurphy() = HorganMurphy{PrincipalValueForm}()
 
 function ContinuumMechanicsBase.StrainEnergyDensity(
     ::HorganMurphy{T},
@@ -2680,25 +2633,22 @@ end
 #     return (cons=f, lcons=[-Inf], ucons=[0.0])
 # end
 
+struct ValanisLandel{T} <: AbstractIncompressibleModel{T} end
 """
-$(TYPEDEF)
+$(SIGNATURES)
 
-Valanis-Landel
-
-Model:
+# Model:
 
 ```math
 W = 2\\mu\\sum\\limits_{1}^{3}(\\lambda_i(\\log\\lambda_i -1))
 ```
 
-Parameters:
-- μ
+# Parameters:
+- `μ`
 
 > Valanis KC, Landel RF. The strain‐energy function of a hyperelastic material in terms of the extension ratios. Journal of Applied Physics. 1967 Jun;38(7):2997-3002.
 """
-struct ValanisLandel{T} <: AbstractIncompressibleModel{T}
-    ValanisLandel(::T = PrincipalValueForm()) where {T<:PrincipalValueForm} = new{T}()
-end
+ValanisLandel() = ValanisLandel{PrincipalValueForm}()
 
 function ContinuumMechanicsBase.StrainEnergyDensity(
     ::ValanisLandel{T},
@@ -2712,25 +2662,22 @@ function parameters(::ValanisLandel)
     return (:μ,)
 end
 
+struct PengLandel{T} <: AbstractIncompressibleModel{T} end
 """
-$(TYPEDEF)
+$(SIGNATURES)
 
-Peng - Landel
-
-Model:
+# Model:
 
 ```math
 W = E\\sum\\limits_{i=1}^{3}\\bigg[\\lambda_i - 1 - \\log(\\lambda_i) - \\frac{1}{6}\\log(\\lambda_i)^2 + \\frac{1}{18}\\log(\\lambda_i)^3-\\frac{1}{216}\\log(\\lambda_i)^4\\bigg]
 ```
 
-Parameters:
-- E
+# Parameters:
+- `E`
 
 > Peng TJ, Landel RF. Stored energy function of rubberlike materials derived from simple tensile data. Journal of Applied Physics. 1972 Jul;43(7):3064-7.
 """
-struct PengLandel{T} <: AbstractIncompressibleModel{T}
-    PengLandel(::T = PrincipalValueForm()) where {T<:PrincipalValueForm} = new{T}()
-end
+PengLandel() = PengLandel{PrincipalValueForm}()
 
 function ContinuumMechanicsBase.StrainEnergyDensity(
     ::PengLandel{T},
@@ -2748,26 +2695,23 @@ function parameters(::PengLandel)
     return (:E,)
 end
 
+struct Ogden{T} <: AbstractIncompressibleModel{T} end
 """
-$(TYPEDEF)
+$(SIGNATURES)
 
-Ogden
-
-Model:
+# Model:
 
 ```math
 W = \\sum\\limits_{i=1}^{N}\\frac{\\mu_i}{\\alpha_i}(\\lambda_1^{\\alpha_i}+\\lambda_2^{\\alpha_i}+\\lambda_3^{\\alpha_i}-3)
 ```
 
-Parameters:
+# Parameters:
 - μ⃗
 - α⃗
 
 > Ogden RW. Large deformation isotropic elasticity–on the correlation of theory and experiment for incompressible rubberlike solids. Proceedings of the Royal Society of London. A. Mathematical and Physical Sciences. 1972 Feb 1;326(1567):565-84.
 """
-struct Ogden{T} <: AbstractIncompressibleModel{T}
-    Ogden(::T = PrincipalValueForm()) where {T<:PrincipalValueForm} = new{T}()
-end
+Ogden() = Ogden{PrincipalValueForm}()
 
 function ContinuumMechanicsBase.StrainEnergyDensity(
     ::Ogden{T},
@@ -2782,31 +2726,29 @@ function parameters(::Ogden)
     return (:μ⃗, :α⃗)
 end
 
+struct Attard{T} <: AbstractIncompressibleModel{T}
+    Wi::Function
+end
+
 """
-$(TYPEDEF)
+$(SIGNATURES)
 
-Attard
-
-Model:
+# Model:
 
 ```math
 W = \\sum\\limits_{i=1}^N\\frac{A_i}{2i}(\\lambda_1^{2i}+\\lambda_2^{2i}+\\lambda_3^{2i}-3) + \\frac{B_i}{2i}(\\lambda_1^{-2i}+\\lambda_2^{-2i}+\\lambda_3^{-2i}-3)
 ```
 
-Parameters:
-- A⃗
-- B⃗
+# Parameters:
+- `A⃗`
+- `B⃗`
 
 > Attard MM, Hunt GW. Hyperelastic constitutive modeling under finite strain. International Journal of Solids and Structures. 2004 Sep 1;41(18-19):5327-50.
 """
-struct Attard{T} <: AbstractIncompressibleModel{T}
-    Wi::Function
-    function Attard(::T = PrincipalValueForm()) where {T<:PrincipalValueForm}
-        f(i, (; λ⃗, p)) =
-            p.A⃗[i] / 2 / i * (sum(λ⃗ .^ (2i)) - 3) +
-            p.B⃗[i] / 2 / i * (sum(λ⃗ .^ (-2i)) - 3)
-        new{T}(f)
-    end
+function Attard()
+    f(i, (; λ⃗, p)) =
+        p.A⃗[i] / 2 / i * (sum(λ⃗ .^ (2i)) - 3) + p.B⃗[i] / 2 / i * (sum(λ⃗ .^ (-2i)) - 3)
+    Attard{PrincipalValueForm}(f)
 end
 
 function ContinuumMechanicsBase.StrainEnergyDensity(
@@ -2823,10 +2765,13 @@ function parameters(::Attard)
     return (:A⃗, :B⃗)
 end
 
-"""
-$(TYPEDEF)
+struct Shariff{T} <: AbstractIncompressibleModel{T}
+    ϕ::Vector{Function}
+    Φ::Vector{Function}
+end
 
-Shariff
+"""
+$(SIGNATURES)
 
 Model:
 
@@ -2835,42 +2780,38 @@ W = E\\sum\\limits_{i=1}^3\\sum\\limits_{j=1}^{N}|\\alpha_j| \\Phi_j(\\lambda_i)
 ```
 
 Parameters:
-- E
-- α⃗
+- `E`
+- `α⃗`
 
 > Shariff MH. Strain energy function for filled and unfilled rubberlike material. Rubber chemistry and technology. 2000 Mar;73(1):1-8.
 """
-struct Shariff{T} <: AbstractIncompressibleModel{T}
-    ϕ::Vector{Function}
-    Φ::Vector{Function}
-    function Shariff(::T = PrincipalValueForm()) where {T<:PrincipalValueForm}
-        ϕ1(x) = 2 * log(x) / 3
-        ϕ2(x) = exp(1 - x) + x - 2
-        ϕ3(x) = exp(x - 1) - x
-        ϕ4(x) = (x - 1)^3 / x^3.6
-        ϕj(x, j) = (x - 1)^(j - 1)
+function Shariff()
+    ϕ1(x) = 2 * log(x) / 3
+    ϕ2(x) = exp(1 - x) + x - 2
+    ϕ3(x) = exp(x - 1) - x
+    ϕ4(x) = (x - 1)^3 / x^3.6
+    ϕj(x, j) = (x - 1)^(j - 1)
 
-        ϕ = [ϕ1, ϕ2, ϕ3, ϕ4, ϕj]
+    ϕ = [ϕ1, ϕ2, ϕ3, ϕ4, ϕj]
 
-        c(j, r) = factorial(j) / factorial(r) / factorial(j - r)
-        Φ1(x) = log(x)^2 / 3
+    c(j, r) = factorial(j) / factorial(r) / factorial(j - r)
+    Φ1(x) = log(x)^2 / 3
 
-        Φ2(x) = -exp(1.0) * expinti(-1.0) + exp(1.0) * expinti(-x) + x - 2 * log(x) - 1
+    Φ2(x) = -exp(1.0) * expinti(-1.0) + exp(1.0) * expinti(-x) + x - 2 * log(x) - 1
 
-        Φ3(x) = (expinti(x) - expinti(1.0)) / exp(1.0) - x + 1
+    Φ3(x) = (expinti(x) - expinti(1.0)) / exp(1.0) - x + 1
 
-        # # Φ4(x) = -1 / (0.6 * x^(0.6)) + 3 / (1.6 * x^(1.6)) - 3 / (2.6 * x^(2.6)) + 1 / (5.6 * x^(5.6)) + 107200 / 139776
-        Φ4(x) = 5 / 936 * (125 + (52 - 216 * x + 351 * (x^2) - 312 * (x^3)) / (x^(18 / 5)))
+    # # Φ4(x) = -1 / (0.6 * x^(0.6)) + 3 / (1.6 * x^(1.6)) - 3 / (2.6 * x^(2.6)) + 1 / (5.6 * x^(5.6)) + 107200 / 139776
+    Φ4(x) = 5 / 936 * (125 + (52 - 216 * x + 351 * (x^2) - 312 * (x^3)) / (x^(18 / 5)))
 
-        Φj(x, j) =
-            (-1)^(j - 1) * log(x) +
-            (-1)^(j - 1) * sum(r -> (-1)^r * c(j - 1, r) * x^r / r, range(1, j - 1)) -
-            (-1)^(j - 1) * sum(r -> (-1)^r * c(j - 1, r) / r, range(1, j - 1))
+    Φj(x, j) =
+        (-1)^(j - 1) * log(x) +
+        (-1)^(j - 1) * sum(r -> (-1)^r * c(j - 1, r) * x^r / r, range(1, j - 1)) -
+        (-1)^(j - 1) * sum(r -> (-1)^r * c(j - 1, r) / r, range(1, j - 1))
 
-        Φ = [Φ1, Φ2, Φ3, Φ4, Φj]
+    Φ = [Φ1, Φ2, Φ3, Φ4, Φj]
 
-        return new{T}(ϕ, Φ)
-    end
+    return Shariff{PrincipalValueForm}(ϕ, Φ)
 end
 
 function ContinuumMechanicsBase.StrainEnergyDensity(
@@ -2915,35 +2856,34 @@ function parameters(::Shariff)
     return (:E, :α⃗)
 end
 
+struct ArmanNarooei{T} <: AbstractIncompressibleModel{T}
+    Wi::Function
+end
+
 """
-$(TYPEDEF)
+$(SIGNATURES)
 
-Arman - Narooei
-
-Model:
+# Model:
 
 ```math
 W = \\sum\\limits_{i=1}^{N} A_i\\big[\\exp{m_i(\\lambda_1^{\\alpha_i}+\\lambda_2^{\\alpha_i}+\\lambda_3^{\\alpha_i}-3)}-1] + B_i\\big[\\exp{n_i(\\lambda_1^{-\\beta_i}+\\lambda_2^{-\\beta_i}+\\lambda_3^{-\\beta_i}-3)}-1]
 ```
 
-Parameters:
-- A⃗
-- B⃗
-- m⃗
-- n⃗
-- α⃗
-- β⃗
+# Parameters:
+- `A⃗`
+- `B⃗`
+- `m⃗`
+- `n⃗`
+- `α⃗`
+- `β⃗`
 
 > Narooei K, Arman M. Modification of exponential based hyperelastic strain energy to consider free stress initial configuration and Constitutive modeling. Journal of Computational Applied Mechanics. 2018 Jun 1;49(1):189-96.
 """
-struct ArmanNarooei{T} <: AbstractIncompressibleModel{T}
-    Wi::Function
-    function ArmanNarooei(::T = PrincipalValueForm()) where {T<:PrincipalValueForm}
-        f(i, (; λ⃗, p)) =
-            p.A⃗[i] * (exp(p.m⃗[i] * (sum(λ⃗ .^ p.α⃗[i]) - 3)) - 1) +
-            p.B⃗[i] * (exp(p.n⃗[i] * (sum(λ⃗ .^ (-p.β⃗[i])) - 3)) - 1)
-        new{T}(f)
-    end
+function ArmanNarooei()
+    f(i, (; λ⃗, p)) =
+        p.A⃗[i] * (exp(p.m⃗[i] * (sum(λ⃗ .^ p.α⃗[i]) - 3)) - 1) +
+        p.B⃗[i] * (exp(p.n⃗[i] * (sum(λ⃗ .^ (-p.β⃗[i])) - 3)) - 1)
+    ArmanNarooei{PrincipalValueForm}(f)
 end
 
 function ContinuumMechanicsBase.StrainEnergyDensity(
@@ -2967,28 +2907,26 @@ function parameters(::ArmanNarooei)
     return (:A⃗, :B⃗, :m⃗, :n⃗, :α⃗, :β⃗)
 end
 
+struct ContinuumHybrid{T} <: AbstractIncompressibleModel{T} end
+
 """
-$(TYPEDEF)
+$(SIGNATURES)
 
-Continuum Hybrid
-
-Model:
+# Model:
 
 ```math
 W = K_1(I_1-3)+K_2\\log\\frac{I_2}{3}+\\frac{\\mu}{\\alpha}(\\lambda_1^\\alpha+\\lambda_2^\\alpha+\\lambda^\\alpha-3)
 ```
 
-Parameters:
-- K₁
-- K₂
-- α
-- μ
+# Parameters:
+- `K₁`
+- `K₂`
+- `α`
+- `μ`
 
 > Beda T, Chevalier Y. Hybrid continuum model for large elastic deformation of rubber. Journal of applied physics. 2003 Aug 15;94(4):2701-6.
 """
-struct ContinuumHybrid{T} <: AbstractIncompressibleModel{T}
-    ContinuumHybrid(::T = PrincipalValueForm()) where {T<:PrincipalValueForm} = new{T}()
-end
+ContinuumHybrid() = ContinuumHybrid{PrincipalValueForm}()
 
 function ContinuumMechanicsBase.StrainEnergyDensity(
     ::ContinuumHybrid{T},
@@ -3002,28 +2940,25 @@ function parameters(::ContinuumHybrid)
     return (:K₁, :K₂, :α, :μ)
 end
 
+struct Bechir4Term{T} <: AbstractIncompressibleModel{T} end
 """
-$(TYPEDEF)
+$(SIGNATURES)
 
-Bechir-4 Term
-
-Model:
+# Model:
 
 ```
 W = C_1^1(I_1-3)+\\sum\\limits_{n=1}^{2}\\sum\\limits_{r=1}^{2}C_n^{r}(\\lambda_1^{2n}+\\lambda_2^{2n}+\\lambda_3^{2n}-3)^r
 ```
 
-Parameters:
-- C11
-- C12
-- C21
-- C22
+# Parameters:
+- `C11`
+- `C12`
+- `C21`
+- `C22`
 
 > Khajehsaeid H, Arghavani J, Naghdabadi R. A hyperelastic constitutive model for rubber-like materials. European Journal of Mechanics-A/Solids. 2013 Mar 1;38:144-51.
 """
-struct Bechir4Term{T} <: AbstractIncompressibleModel{T}
-    Bechir4Term(::T = PrincipalValueForm()) where {T<:PrincipalValueForm} = new{T}()
-end
+Bechir4Term() = Bechir4Term{PrincipalValueForm}()
 
 function ContinuumMechanicsBase.StrainEnergyDensity(
     ::Bechir4Term{T},
@@ -3045,28 +2980,25 @@ function parameters(::Bechir4Term)
     return (:C11, :C12, :C21, :C22)
 end
 
+struct ConstrainedJunction{T} <: AbstractIncompressibleModel{T} end
 """
-$(TYPEDEF)
+$(SIGNATURES)
 
-Constrained Junction [^2]
-
-Model:
+# Model:
 
 ```math
 W = G_c (I_1-3)+ \\frac{\\nu k T}{2}(\\sum\\limits_{i=1}^{3}\\kappa\\frac{\\lambda_i-1}{\\lambda_i^2+\\kappa}+\\log{\\frac{\\lambda_i^2+\\kappa}{1+\\kappa}}-\\log{\\lambda_i^2})
 ```
 
-Parameters:
-- Gc
-- νkT
-- κ
+# Parameters:
+- `Gc`
+- `νkT`
+- `κ`
 
 > Flory PJ, Erman B. Theory of elasticity of polymer networks. 3. Macromolecules. 1982 May;15(3):800-6.
 > Erman B, Flory PJ. Relationships between stress, strain, and molecular constitution of polymer networks. Comparison of theory with experiments. Macromolecules. 1982 May;15(3):806-11.
 """
-struct ConstrainedJunction{T} <: AbstractIncompressibleModel{T}
-    ConstrainedJunction(::T = PrincipalValueForm()) where {T<:PrincipalValueForm} = new{T}()
-end
+ConstrainedJunction() = ConstrainedJunction{PrincipalValueForm}()
 
 function ContinuumMechanicsBase.StrainEnergyDensity(
     ::ConstrainedJunction{T},
@@ -3091,31 +3023,29 @@ function parameter_bounds(::ConstrainedJunction, data::AbstractHyperelasticTest)
     ub = nothing
     return (lb = lb, ub = ub)
 end
+
+struct EdwardVilgis{T} <: AbstractIncompressibleModel{T} end
 """
-$(TYPEDEF)
+$(SIGNATURES)
 
-Edward-Vilgis
-
-Model:
+# Model:
 
 ```math
 W = \\frac{1}{2}N_C\\Bigg[\\frac{(1-\\alpha^2)I_1}{1-\\alpha^2I_1}+\\log(1-\\alpha^2I_1)\\Bigg]+\\frac{1}{2}N_S\\Bigg[\\sum_{i=1}^{3}\\Big\\{\\frac{(1+\\eta)(1-\\alpha^2)\\lambda_i^2}{( 1+\\eta\\lambda_i^2)(1-\\alpha^2I_1)}+\\log(1+\\eta\\lambda_i^2)\\Big\\}+\\log(1-\\alpha^2I_1)\\Bigg]
 ```
 
-Parameters:
-- Ns: Number of sliplinks
-- Nc: Number of crosslinks
-- α: A measure of chain inextensibility
-- η: A measure of the amount of chain slippage
+# Parameters:
+- `Ns`: Number of sliplinks
+- `Nc`: Number of crosslinks
+- `α`: A measure of chain inextensibility
+- `η`: A measure of the amount of chain slippage
 
-Note:
+# Note:
 - Since α and η result from the same mechanism, they should be of approximately the same order of magnitude. Large differences between the two may indicate an issue with the optimizer or initial guess.
 
 > Edwards SF, Vilgis T. The effect of entanglements in rubber elasticity. Polymer. 1986 Apr 1;27(4):483-92.
 """
-struct EdwardVilgis{T} <: AbstractIncompressibleModel{T}
-    EdwardVilgis(::T = PrincipalValueForm()) where {T<:PrincipalValueForm} = new{T}()
-end
+EdwardVilgis() = EdwardVilgis{PrincipalValueForm}()
 
 function ContinuumMechanicsBase.StrainEnergyDensity(
     ::EdwardVilgis{T},
@@ -3153,12 +3083,11 @@ function parameter_bounds(::EdwardVilgis, data::AbstractHyperelasticTest)
     return (lb = lb, ub = ub)
 end
 
+struct MCC{T} <: AbstractIncompressibleModel{T} end
 """
-$(TYPEDEF)
+$(SIGNATURES)
 
-MCC (modified constrained chain)
-
-Model:
+# Model:
 
 ```math
 W = \\frac{1}{2}\\zeta k T \\sum\\limits_{i=1}^{3}(\\lambda_i^2-1)+\\frac{1}{2}\\mu k T\\sum\\limits_{i=1}^{3}[B_i+D_i-\\log{(1+B_i)}-\\log{(1+D_i)}]
@@ -3176,16 +3105,14 @@ and
 D_i = \\frac{\\lambda_i^2 B_i}{\\kappa}
 ```
 
-Parameters:
-- ζkT
-- μkT
-- κ
+# Parameters:
+- `ζkT`
+- `μkT`
+- `κ`
 
 > Erman B, Monnerie L. Theory of elasticity of amorphous networks: effect of constraints along chains. Macromolecules. 1989 Aug;22(8):3342-8.
 """
-struct MCC{T} <: AbstractIncompressibleModel{T}
-    MCC(::T = PrincipalValueForm()) where {T<:PrincipalValueForm} = new{T}()
-end
+MCC() = MCC{PrincipalValueForm}()
 
 function ContinuumMechanicsBase.StrainEnergyDensity(
     ::MCC{T},
@@ -3210,27 +3137,24 @@ function parameter_bounds(::MCC, data::AbstractHyperelasticTest)
     return (lb = lb, ub = ub)
 end
 
+struct Tube{T} <: AbstractIncompressibleModel{T} end
 """
-$(TYPEDEF)
+$(SIGNATURES)
 
-Tube
-
-Model:
+# Model:
 
 ```math
 W = \\sum\\limits_{i=1}^{3}\\frac{G_c}{2}(\\lambda_i^2-1)+\\frac{2Ge}{\\beta^2}(\\lambda_i^{-\\beta}-1)
 ```
 
-Parameters:
-- Gc
-- Ge
-- β
+# Parameters:
+- `Gc`
+- `Ge`
+- `β`
 
 > Heinrich G, Kaliske M. Theoretical and numerical formulation of a molecular based constitutive tube-model of rubber elasticity. Computational and Theoretical Polymer Science. 1997 Jan 1;7(3-4):227-41.
 """
-struct Tube{T} <: AbstractIncompressibleModel{T}
-    Tube(::T = PrincipalValueForm()) where {T<:PrincipalValueForm} = new{T}()
-end
+Tube() = Tube{PrincipalValueForm}()
 
 function ContinuumMechanicsBase.StrainEnergyDensity(
     ::Tube{T},
@@ -3244,26 +3168,23 @@ function parameters(::Tube)
     return (:Gc, :Ge, :β)
 end
 
+struct NonaffineTube{T} <: AbstractIncompressibleModel{T} end
 """
-$(TYPEDEF)
+$(SIGNATURES)
 
-Nonaffine - Tube
-
-Model:
+# Model:
 
 ```math
 W = G_c \\sum\\limits_{i=1}^{3}\\frac{\\lambda_i^2}{2}+G_e\\sum\\limits_{i=1}^{3}\\lambda_i+\\frac{1}{\\lambda_i}
 ```
 
-Parameters:
-- Gc
-- Ge
+# Parameters:
+- `Gc`
+- `Ge`
 
 > Rubinstein M, Panyukov S. Nonaffine deformation and elasticity of polymer networks. Macromolecules. 1997 Dec 15;30(25):8036-44.
 """
-struct NonaffineTube{T} <: AbstractIncompressibleModel{T}
-    NonaffineTube(::T = PrincipalValueForm()) where {T<:PrincipalValueForm} = new{T}()
-end
+NonaffineTube() = NonaffineTube{PrincipalValueForm}()
 
 function ContinuumMechanicsBase.StrainEnergyDensity(
     ::NonaffineTube{T},
@@ -3277,33 +3198,31 @@ function parameters(::NonaffineTube)
     return (:Gc, :Ge)
 end
 
+struct ThreeChainModel{T} <: AbstractIncompressibleModel{T}
+    ℒinv::InverseLangevinApproximations.AbstractInverseLangevinApproximation
+end
+
 """
-$(TYPEDEF)
+$(SIGNATURES)
 
-Three Chain Model
-
-Model:
+# Model:
 
 ```math
 W = \\frac{\\mu\\sqrt{N}}{3}\\sum\\limits_{i=1}^{3}\\bigg(\\lambda_i\\beta_i+\\sqrt{N}\\log\\bigg(\\frac{\\beta_i}{\\sinh \\beta_i}\\bigg)\\bigg)
 ```
 
-Parameters:
-- μ: Small strain shear modulus
-- N: Square of the locking stretch of the network.
+# Arguments:
+- `ℒinv=TreloarApproximation()`: Sets the inverse Langevin approxamation used
 
-Fields:
-- ℒinv: Sets the inverse Langevin approxamation used (default = `TreloarApproximation()`)
+# Parameters:
+- `μ`: Small strain shear modulus
+- `N`: Square of the locking stretch of the network.
 
 > James HM, Guth E. Theory of the elastic properties of rubber. The Journal of Chemical Physics. 1943 Oct;11(10):455-81.
 """
-struct ThreeChainModel{T} <: AbstractIncompressibleModel{T}
-    ℒinv::InverseLangevinApproximations.AbstractInverseLangevinApproximation
-    ThreeChainModel(
-        ::T = PrincipalValueForm();
-        ℒinv::InverseLangevinApproximations.AbstractInverseLangevinApproximation = TreloarApproximation(),
-    ) where {T<:PrincipalValueForm} = new{T}(ℒinv)
-end
+ThreeChainModel(;
+    ℒinv::InverseLangevinApproximations.AbstractInverseLangevinApproximation = TreloarApproximation(),
+) = ThreeChainModel{PrincipalValueForm}(ℒinv)
 
 function ContinuumMechanicsBase.StrainEnergyDensity(
     ψ::ThreeChainModel{T},
@@ -3326,36 +3245,33 @@ function parameter_bounds(::ThreeChainModel, data::AbstractHyperelasticTest)
     return (lb = lb, ub = ub)
 end
 
+struct ModifiedFloryErman{T} <: AbstractIncompressibleModel{T}
+    # ℒinv::InverseLangevinApproximations.AbstractInverseLangevinApproximation
+    Chain8::ArrudaBoyce
+end
 """
-$(TYPEDEF)
+$(SIGNATURES)
 
-Modified Flory Erman
-
-Model:
+# Model:
 
 ```math
 W = W_{\\text{Arruda-Boyce}}+\\sum\\limits_{i=1}^{3}\\frac{\\mu}{2}[B_i+D_i]
 ```
 
-Parameters:
-- μ
-- N
-- κ
+# Arguments:
+- `ℒinv=TreloarApproximation()`: Sets the inverse Langevin approxamation used
 
-Fields:
-- ℒinv: Sets the inverse Langevin approxamation used (default = `TreloarApproximation()`)
+# Parameters:
+- `μ`
+- `N`
+- `κ`
 
 > Edwards SF. The statistical mechanics of polymerized material. Proceedings of the Physical Society (1958-1967). 1967 Sep 1;92(1):9.
 """
-struct ModifiedFloryErman{T} <: AbstractIncompressibleModel{T}
-    # ℒinv::InverseLangevinApproximations.AbstractInverseLangevinApproximation
-    Chain8::ArrudaBoyce
-    function ModifiedFloryErman(
-        ::T = PrincipalValueForm();
-        ℒinv::InverseLangevinApproximations.AbstractInverseLangevinApproximation = TreloarApproximation(),
-    ) where {T<:PrincipalValueForm}
-        new{T}(ArrudaBoyce(T(), ℒinv = ℒinv))
-    end
+function ModifiedFloryErman(;
+    ℒinv::InverseLangevinApproximations.AbstractInverseLangevinApproximation = TreloarApproximation(),
+)
+    ModifiedFloryErman{PrincipalValueForm}(ArrudaBoyce(PrincipalValueForm(), ℒinv = ℒinv))
 end
 
 function ContinuumMechanicsBase.StrainEnergyDensity(
@@ -3383,28 +3299,25 @@ function parameter_bounds(::ModifiedFloryErman, data::AbstractHyperelasticTest)
     return (lb = lb, ub = ub)
 end
 
+struct ExtendedTubeModel{T} <: AbstractIncompressibleModel{T} end
 """
-$(TYPEDEF)
+$(SIGNATURES)
 
-Extended Tube Model
-
-Model:
+# Model:
 
 ```math
 W = \\frac{G_c}{2}\\bigg[\\frac{(1-\\delta^2)(I_1-3)}{1-\\delta^2(I_1-3)}+\\log{(1-\\delta^2(I_1-3))}\\bigg]+\\frac{2G_e}{\\beta^2}\\sum\\limits_{i=1}^{3}(\\lambda_i^{-\\beta}-1)
 ```
 
-Parameters:
-- Gc
-- Ge
-- δ
-- β
+# Parameters:
+- `Gc`
+- `Ge`
+- `δ`
+- `β`
 
 > Kaliske M, Heinrich G. An extended tube-model for rubber elasticity: statistical-mechanical theory and finite element implementation. Rubber Chemistry and Technology. 1999 Sep;72(4):602-32.
 """
-struct ExtendedTubeModel{T} <: AbstractIncompressibleModel{T}
-    ExtendedTubeModel(::T = PrincipalValueForm()) where {T<:PrincipalValueForm} = new{T}()
-end
+ExtendedTubeModel() = ExtendedTubeModel{PrincipalValueForm}()
 
 function ContinuumMechanicsBase.StrainEnergyDensity(
     ::ExtendedTubeModel{T},
@@ -3429,66 +3342,65 @@ function parameter_bounds(::ExtendedTubeModel, data::AbstractHyperelasticTest)
     return (lb = lb, ub = ub)
 end
 
+struct NonaffineMicroSphere{T} <: AbstractIncompressibleModel{T}
+    ℒinv::InverseLangevinApproximations.AbstractInverseLangevinApproximation
+    r⃗²::Vector{Vector{Float64}}
+    w::Vector{Float64}
+end
+
 """
-$(TYPEDEF)
+$(SIGNATURES)
 
-Non-Affine Micro-Sphere
+# Model: See Paper
 
-Model: See Paper
+# Arguments:
+- `ℒinv=CohenRounded3_2()`: Sets the inverse Langevin approximation used.
+- `n=21`: Order of quadrature for spherical integration
 
-Parameters:
+# Parameters:
 - μ: Small strain shear modulus
 - N: Number of chain segments
 - p: Non-affine stretch parameter
 - U: Tube geometry parameter
 - q: Non-affine tube parameter
 
-Fields:
-- ℒinv: Sets the inverse Langevin approximation used.
-
 > Miehe C, Göktepe S, Lulei F. A micro-macro approach to rubber-like materials—part I: the non-affine micro-sphere model of rubber elasticity. Journal of the Mechanics and Physics of Solids. 2004 Nov 1;52(11):2617-60.
 """
-struct NonaffineMicroSphere{T} <: AbstractIncompressibleModel{T}
-    ℒinv::InverseLangevinApproximations.AbstractInverseLangevinApproximation
-    r⃗²::Vector{Vector{Float64}}
-    w::Vector{Float64}
-    function NonaffineMicroSphere(
-        ::T = PrincipalValueForm();
-        ℒinv::InverseLangevinApproximations.AbstractInverseLangevinApproximation = CohenRounded3_2(),
-        n = 21,
-    ) where {T<:PrincipalValueForm}
-        a = √(2) / 2
-        b = 0.836095596749
-        c = 0.387907304067
-        r⃗² = [
-            [0, 0, 1] .^ 2,
-            [0, 1, 0] .^ 2,
-            [1, 0, 0] .^ 2,
-            [0, a, a] .^ 2,
-            [0, -a, a] .^ 2,
-            [a, 0, a] .^ 2,
-            [-a, 0, a] .^ 2,
-            [a, a, 0] .^ 2,
-            [-a, a, 0] .^ 2,
-            [b, c, c] .^ 2,
-            [-b, c, c] .^ 2,
-            [b, -c, c] .^ 2,
-            [-b, -c, c] .^ 2,
-            [c, b, c] .^ 2,
-            [-c, b, c] .^ 2,
-            [c, -b, c] .^ 2,
-            [-c, -b, c] .^ 2,
-            [c, c, b] .^ 2,
-            [-c, c, b] .^ 2,
-            [c, -c, b] .^ 2,
-            [-c, -c, b] .^ 2,
-        ]
-        w1 = 0.02652142440932
-        w2 = 0.0199301476312
-        w3 = 0.0250712367487
-        w = 2 .* [fill(w1, 3); fill(w2, 6); fill(w3, 12)] # Multiply by two since integration is over the half-sphere
-        new{T}(ℒinv, r⃗², w)
-    end
+function NonaffineMicroSphere(;
+    ℒinv::InverseLangevinApproximations.AbstractInverseLangevinApproximation = CohenRounded3_2(),
+    n = 21,
+)
+    a = √(2) / 2
+    b = 0.836095596749
+    c = 0.387907304067
+    r⃗² = [
+        [0, 0, 1] .^ 2,
+        [0, 1, 0] .^ 2,
+        [1, 0, 0] .^ 2,
+        [0, a, a] .^ 2,
+        [0, -a, a] .^ 2,
+        [a, 0, a] .^ 2,
+        [-a, 0, a] .^ 2,
+        [a, a, 0] .^ 2,
+        [-a, a, 0] .^ 2,
+        [b, c, c] .^ 2,
+        [-b, c, c] .^ 2,
+        [b, -c, c] .^ 2,
+        [-b, -c, c] .^ 2,
+        [c, b, c] .^ 2,
+        [-c, b, c] .^ 2,
+        [c, -b, c] .^ 2,
+        [-c, -b, c] .^ 2,
+        [c, c, b] .^ 2,
+        [-c, c, b] .^ 2,
+        [c, -c, b] .^ 2,
+        [-c, -c, b] .^ 2,
+    ]
+    w1 = 0.02652142440932
+    w2 = 0.0199301476312
+    w3 = 0.0250712367487
+    w = 2 .* [fill(w1, 3); fill(w2, 6); fill(w3, 12)] # Multiply by two since integration is over the half-sphere
+    NonaffineMicroSphere{PrincipalValueForm}(ℒinv, r⃗², w)
 end
 
 function ContinuumMechanicsBase.StrainEnergyDensity(
@@ -3531,14 +3443,15 @@ function parameter_bounds(::NonaffineMicroSphere, data::AbstractHyperelasticTest
     return (lb = lb, ub = ub)
 end
 
-
+struct Bootstrapped8Chain{T} <: AbstractIncompressibleModel{T}
+    ℒinv::InverseLangevinApproximations.AbstractInverseLangevinApproximation
+    W8::Function
+end
 
 """
-$(TYPEDEF)
+$(SIGNATURES)
 
-Bootstrapped 8Chain Model
-
-Model:
+# Model:
 
 ```math
 W = W_8(\\frac{\\sum\\lambda}{\\sqrt{3N}}-\\frac{\\lambda_{chain}}{\\sqrt{N}})+W_{8}(\\frac{\\lambda_{chain}}{\\sqrt{N}})
@@ -3556,30 +3469,25 @@ and
 \\lambda_{chain} = \\sqrt{\\frac{I_1}{3}}
 ```
 
-Parameters:
-- μ
-- N
+# Arguments:
+- `ℒinv=TreloarApproximation()`: Sets the inverse Langevin approximation used.
 
-Fields:
-- ℒinv: Sets the inverse Langevin approximation used.
+# Parameters:
+- `μ`
+- `N`
 
 > Miroshnychenko D, Green WA, Turner DM. Composite and filament models for the mechanical behaviour of elastomeric materials. Journal of the Mechanics and Physics of Solids. 2005 Apr 1;53(4):748-70.
 > Miroshnychenko D, Green WA. Heuristic search for a predictive strain-energy function in nonlinear elasticity. International Journal of Solids and Structures. 2009 Jan 15;46(2):271-86.
 
 """
-struct Bootstrapped8Chain{T} <: AbstractIncompressibleModel{T}
-    ℒinv::InverseLangevinApproximations.AbstractInverseLangevinApproximation
-    W8::Function
-    function Bootstrapped8Chain(
-        ::T = PrincipalValueForm();
-        ℒinv::InverseLangevinApproximations.AbstractInverseLangevinApproximation = TreloarApproximation(),
-    ) where {T<:PrincipalValueForm}
-        function W8(x, (; μ, N))
-            β = inverse_langevin_approximation(ℒinv, x)
-            μ * N * (x * β + log(β / sinh(β)))
-        end
-        new{T}(ℒinv, W8)
+function Bootstrapped8Chain(;
+    ℒinv::InverseLangevinApproximations.AbstractInverseLangevinApproximation = TreloarApproximation(),
+)
+    function W8(x, (; μ, N))
+        β = inverse_langevin_approximation(ℒinv, x)
+        μ * N * (x * β + log(β / sinh(β)))
     end
+    Bootstrapped8Chain{PrincipalValueForm}(ℒinv, W8)
 end
 
 function ContinuumMechanicsBase.StrainEnergyDensity(
@@ -3603,27 +3511,25 @@ function parameter_bounds(::Bootstrapped8Chain, data::AbstractHyperelasticTest)
     return (lb = lb, ub = ub)
 end
 
+struct DavidsonGoulbourne{T} <: AbstractIncompressibleModel{T} end
+
 """
-$(TYPEDEF)
+$(SIGNATURES)
 
-Davidson - Goulbourne
-
-Model:
+# Model:
 
 ```math
 W = \\frac{G_c I_1}{6}-G_c\\lambda_{max}\\log\\left(3\\lambda_{max}^2-I_1\\right)+G_e\\sum\\limits_{i=1}^{3}\\left(\\lambda_i+\\frac{1}{\\lambda_i}\\right)
 ```
 
-Parameters:
+# Parameters:
 - Gc
 - Ge
 - λmax
 
 > Davidson JD, Goulbourne NC. A nonaffine network model for elastomers undergoing finite deformations. Journal of the Mechanics and Physics of Solids. 2013 Aug 1;61(8):1784-97.
 """
-struct DavidsonGoulbourne{T} <: AbstractIncompressibleModel{T}
-    DavidsonGoulbourne(::T = PrincipalValueForm()) where {T<:PrincipalValueForm} = new{T}()
-end
+DavidsonGoulbourne() = DavidsonGoulbourne{PrincipalValueForm}()
 
 function ContinuumMechanicsBase.StrainEnergyDensity(
     ::DavidsonGoulbourne{T},
@@ -3646,18 +3552,20 @@ function parameter_bounds(::DavidsonGoulbourne, data::AbstractHyperelasticTest)
     return (lb = lb, ub = ub)
 end
 
+struct KhiemItskov{T} <: AbstractIncompressibleModel{T} end
 """
-$(TYPEDEF)
+$(SIGNATURES)
 
-Khiêm-Itskov Model
-
-Model:
+# Model:
 
 ```math
 W = \\mu_c \\kappa n \\log\\bigg(\\frac{\\sin(\\frac{\\pi}{\\sqrt{n}})(\\frac{I_1}{3})^{\\frac{q}{2}}}{\\sin(\\frac{\\pi}{\\sqrt{n}}(\\frac{I_1}{3})^{\\frac{q}{2}}}\\bigg)+\\mu_t\\big[\\frac{I_2}{3}^{1/2} - 1 \\big]
 ```
 
-Parameters:
+# Arguments:
+- `type=PrincipalValueForm()`: Sets the form of the strain energy density function. Either `PrincipalValueForm()` or `InvariantForm()
+
+# Parameters:
 - μcκ
 - n
 - q
@@ -3665,11 +3573,9 @@ Parameters:
 
 > Khiêm VN, Itskov M. Analytical network-averaging of the tube model:: Rubber elasticity. Journal of the Mechanics and Physics of Solids. 2016 Oct 1;95:254-69.
 """
-struct KhiemItskov{T} <: AbstractIncompressibleModel{T}
-    KhiemItskov(
-        ::T = PrincipalValueForm(),
-    ) where {T<:Union{PrincipalValueForm,InvariantForm}} = new{T}()
-end
+KhiemItskov(
+    type::T = PrincipalValueForm(),
+) where {T<:Union{PrincipalValueForm,InvariantForm}} = KhiemItskov{T}()
 
 function ContinuumMechanicsBase.StrainEnergyDensity(
     ::KhiemItskov{T},
@@ -3767,30 +3673,31 @@ function parameters(::GeneralConstitutiveModel_Tube)
     return (:Ge,)
 end
 
+struct GeneralConstitutiveModel{T} <: AbstractIncompressibleModel{T}
+    Tube::GeneralConstitutiveModel_Tube
+    Network::GeneralConstitutiveModel_Network
+end
+
 """
-$(TYPEDEF)
+$(SIGNATURES)
 
-General Constitutive Model
-
-Model:
+# Model:
 
 ```math
 W = G_c N \\log\\bigg(\\frac{3N+\\frac{1}{2}I_1}{3N-I_1}\\bigg)+G_e\\sum\\limits_{i=1}^{3}\\frac{1}{\\lambda_I}
 ```
 
-Parameters:
-- Gc
-- Ge
-- N
+# Parameters:
+- `Gc`
+- `Ge`
+- `N`
 
 > Xiang Y, Zhong D, Wang P, Mao G, Yu H, Qu S. A general constitutive model of soft elastomers. Journal of the Mechanics and Physics of Solids. 2018 Aug 1;117:110-22.
 """
-struct GeneralConstitutiveModel{T} <: AbstractIncompressibleModel{T}
-    Tube::GeneralConstitutiveModel_Tube
-    Network::GeneralConstitutiveModel_Network
-    GeneralConstitutiveModel(::T = PrincipalValueForm()) where {T<:PrincipalValueForm} =
-        new{T}(GeneralConstitutiveModel_Tube(T()), GeneralConstitutiveModel_Network(T()))
-end
+GeneralConstitutiveModel() = GeneralConstitutiveModel{PrincipalValueForm}(
+    GeneralConstitutiveModel_Tube(PrincipalValueForm()),
+    GeneralConstitutiveModel_Network(PrincipalValueForm()),
+)
 
 function ContinuumMechanicsBase.StrainEnergyDensity(
     W::GeneralConstitutiveModel{T},
@@ -3812,40 +3719,41 @@ function parameter_bounds(W::GeneralConstitutiveModel, data::AbstractHyperelasti
     return (lb = lb, ub = ub)
 end
 
+struct FullNetwork{T} <: AbstractIncompressibleModel{T}
+    ℒinv::InverseLangevinApproximations.AbstractInverseLangevinApproximation
+    Chain3::ThreeChainModel
+    Chain8::ArrudaBoyce
+end
 
 """
-$(TYPEDEF)
+$(SIGNATURES)
 
-Full Network - Wu Geisson
-
-Model:
+# Model:
 
 ```math
 W = (1-\\rho)W_{3Chain}+\\rho W_{8chain}
 ```
 
-Parameters:
-- μ
-- N
-- ρ
+# Arguments:
+- `ℒinv=TreloarApproximation()`: Sets the inverse Langevin approxamation used
 
-Fields
-- ℒinv: Sets the inverse Langevin approxamation used (default = `TreloarApproximation()`)
+# Parameters:
+- `μ`
+- `N`
+- `ρ`
 
 > Treloar LR, Riding G. A non-Gaussian theory for rubber in biaxial strain. I. Mechanical properties. Proceedings of the Royal Society of London. A. Mathematical and Physical Sciences. 1979 Dec 31;369(1737):261-80.
 > Wu PD, van der Giessen E. On improved 3-D non-Gaussian network models for rubber elasticity. Mechanics research communications. 1992 Sep 1;19(5):427-33.
 > Wu PD, Van Der Giessen E. On improved network models for rubber elasticity and their applications to orientation hardening in glassy polymers. Journal of the Mechanics and Physics of Solids. 1993 Mar 1;41(3):427-56.
 """
-struct FullNetwork{T} <: AbstractIncompressibleModel{T}
-    ℒinv::InverseLangevinApproximations.AbstractInverseLangevinApproximation
-    Chain3::ThreeChainModel
-    Chain8::ArrudaBoyce
-    function FullNetwork(
-        ::T = PrincipalValueForm();
-        ℒinv::InverseLangevinApproximations.AbstractInverseLangevinApproximation = TreloarApproximation(),
-    ) where {T<:PrincipalValueForm}
-        new{T}(ℒinv, ThreeChainModel(T(); ℒinv), ArrudaBoyce(T(); ℒinv))
-    end
+function FullNetwork(;
+    ℒinv::InverseLangevinApproximations.AbstractInverseLangevinApproximation = TreloarApproximation(),
+)
+    FullNetwork{PrincipalValueForm}(
+        ℒinv,
+        ThreeChainModel(PrincipalValueForm(); ℒinv),
+        ArrudaBoyce(PrincipalValueForm(); ℒinv),
+    )
 end
 
 function ContinuumMechanicsBase.StrainEnergyDensity(
@@ -3873,37 +3781,39 @@ function parameter_bounds(::FullNetwork, data::AbstractHyperelasticTest)
     return (lb = lb, ub = ub)
 end
 
+struct ZunigaBeatty{T} <: AbstractIncompressibleModel{T}
+    ℒinv::InverseLangevinApproximations.AbstractInverseLangevinApproximation
+    Chain3::ThreeChainModel
+    Chain8::ArrudaBoyce
+end
+
 """
-$(TYPEDEF)
+$(SIGNATURES)
 
-Zuniga - Beatty
-
-Model:
+# Model:
 
 ```math
 W = \\sqrt{\\frac{N_3+N_8}{2N_3}}W_{3Chain}+\\sqrt{\\frac{I_1}{3N_8}}W_{8Chain}
 ```
 
-Parameters:
-- μ
-- N₃
-- N₈
+# Arguments:
+- `ℒinv=TreloarApproximation()`: Sets the inverse Langevin approxamation used
 
-Fields:
-- ℒinv: Sets the inverse Langevin approxamation used (default = `TreloarApproximation()`)
+# Parameters:
+- `μ`
+- `N₃`
+- `N₈`
 
 > Elı́as-Zúñiga A, Beatty MF. Constitutive equations for amended non-Gaussian network models of rubber elasticity. International journal of engineering science. 2002 Dec 1;40(20):2265-94.
 """
-struct ZunigaBeatty{T} <: AbstractIncompressibleModel{T}
-    ℒinv::InverseLangevinApproximations.AbstractInverseLangevinApproximation
-    Chain3::ThreeChainModel
-    Chain8::ArrudaBoyce
-    function ZunigaBeatty(
-        ::T = PrincipalValueForm();
-        ℒinv::InverseLangevinApproximations.AbstractInverseLangevinApproximation = TreloarApproximation(),
-    ) where {T<:PrincipalValueForm}
-        new{T}(ℒinv, ThreeChainModel(T(); ℒinv), ArrudaBoyce(T(); ℒinv))
-    end
+function ZunigaBeatty(;
+    ℒinv::InverseLangevinApproximations.AbstractInverseLangevinApproximation = TreloarApproximation(),
+)
+    ZunigaBeatty{PrincipalValueForm}(
+        ℒinv,
+        ThreeChainModel(PrincipalValueForm(); ℒinv),
+        ArrudaBoyce(PrincipalValueForm(); ℒinv),
+    )
 end
 
 function ContinuumMechanicsBase.StrainEnergyDensity(
@@ -3933,40 +3843,41 @@ function parameter_bounds(::ZunigaBeatty, data::AbstractHyperelasticTest)
     ub = nothing
     return (lb = lb, ub = ub)
 end
-"""
-$(TYPEDEF)
 
-Lim
-
-Model:
-
-```math
-W = (1-f(\\frac{I_1-3}{\\hat{I_1}-3}))W_{NeoHookean}(μ₁)+fW_{ArrudaBoyce}(μ₂, N)
-```
-
-Parameters:
-- μ₁
-- μ₂
-- N
-- Î₁
-
-Fields:
-- ℒinv: Sets the inverse Langevin approxamation used (default = `TreloarApproximation()`)
-
-> Lim GT. Scratch behavior of polymers. Texas A&M University; 2005.
-"""
 struct Lim{T} <: AbstractIncompressibleModel{T}
     ℒinv::InverseLangevinApproximations.AbstractInverseLangevinApproximation
     F::Function
     NH::NeoHookean
     AB::ArrudaBoyce
-    function Lim(
-        form::T = PrincipalValueForm();
-        ℒinv::InverseLangevinApproximations.AbstractInverseLangevinApproximation = TreloarApproximation(),
-    ) where {T<:Union{InvariantForm,PrincipalValueForm}}
-        f(x) = x^3 * (10 - 15x + 6x^2)
-        new{T}(ℒinv, f, NeoHookean(form), ArrudaBoyce(form; ℒinv))
-    end
+end
+
+"""
+$(SIGNATURES)
+
+# Model:
+
+```math
+W = (1-f(\\frac{I_1-3}{\\hat{I_1}-3}))W_{NeoHookean}(μ₁)+fW_{ArrudaBoyce}(μ₂, N)
+```
+
+# Arguments:
+- `type=PrincipalValueForm()`: Sets the form of the strain energy density function. Either `PrincipalValueForm()` or `InvariantForm()
+- `ℒinv=TreloarApproximation()`: Sets the inverse Langevin approxamation used
+
+# Parameters:
+- `μ₁`
+- `μ₂`
+- `N`
+- `Î₁`
+
+> Lim GT. Scratch behavior of polymers. Texas A&M University; 2005.
+"""
+function Lim(
+    type::T = PrincipalValueForm();
+    ℒinv::InverseLangevinApproximations.AbstractInverseLangevinApproximation = TreloarApproximation(),
+) where {T<:Union{InvariantForm,PrincipalValueForm}}
+    f(x) = x^3 * (10 - 15x + 6x^2)
+    Lim{T}(ℒinv, f, NeoHookean(type), ArrudaBoyce(type; ℒinv))
 end
 
 function ContinuumMechanicsBase.StrainEnergyDensity(
@@ -4003,12 +3914,16 @@ function parameter_bounds(::Lim, data::AbstractHyperelasticTest)
     return (lb = lb, ub = ub)
 end
 
+struct BechirChevalier{T} <: AbstractIncompressibleModel{T}
+    ℒinv::InverseLangevinApproximations.AbstractInverseLangevinApproximation
+    Chain3::ThreeChainModel
+    Chain8::ArrudaBoyce
+end
+
 """
-$(TYPEDEF)
+$(SIGNATURES)
 
-Bechir Chevalier
-
-Model:
+# Model:
 
 ```math
 W = W_{3Chain}(\\mu_f, N_3)+W_{8Chain}(\\frac{\\mu_c}{3}, N_8)
@@ -4028,29 +3943,27 @@ where:
 \\alpha = \\max{\\lambda_1, \\lambda_2, \\lambda_3}
 ```
 
-Parameters:
-- μ₀
-- η
-- ρ
-- N₃
-- N₈
+# Arguments:
+- `ℒinv=TreloarApproximation()`: Sets the inverse Langevin approxamation used
 
-Fields:
-- ℒinv: Sets the inverse Langevin approxamation used (default = `TreloarApproximation()`)
 
+# Parameters:
+- `μ₀`
+- `η`
+- `ρ`
+- `N₃`
+- `N₈`
 
 > Bechir H, Chevalier L, Idjeri M. A three-dimensional network model for rubber elasticity: The effect of local entanglements constraints. International journal of engineering science. 2010 Mar 1;48(3):265-74.
 """
-struct BechirChevalier{T} <: AbstractIncompressibleModel{T}
-    ℒinv::InverseLangevinApproximations.AbstractInverseLangevinApproximation
-    Chain3::ThreeChainModel
-    Chain8::ArrudaBoyce
-    function BechirChevalier(
-        ::T = PrincipalValueForm();
-        ℒinv::InverseLangevinApproximations.AbstractInverseLangevinApproximation = TreloarApproximation(),
-    ) where {T<:PrincipalValueForm}
-        new{T}(ℒinv, ThreeChainModel(T(), ℒinv = ℒinv), ArrudaBoyce(T(), ℒinv = ℒinv))
-    end
+function BechirChevalier(;
+    ℒinv::InverseLangevinApproximations.AbstractInverseLangevinApproximation = TreloarApproximation(),
+)
+    BechirChevalier{PrincipalValueForm}(
+        ℒinv,
+        ThreeChainModel(PrincipalValueForm(), ℒinv = ℒinv),
+        ArrudaBoyce(PrincipalValueForm(), ℒinv = ℒinv),
+    )
 end
 
 function ContinuumMechanicsBase.StrainEnergyDensity(
@@ -4076,38 +3989,37 @@ function parameter_bounds(::BechirChevalier, data::AbstractHyperelasticTest)
     return (lb = lb, ub = ub)
 end
 
+struct AnsarriBenam{T} <: AbstractIncompressibleModel{T}
+    n::Int
+end
+
 """
-$(TYPEDEF)
+$(SIGNATURES)
 
-Ansarri-Benam
-
-Model:
+# Model:
 
 ```math
 W = \\frac{3(n-1)}{2n}\\mu N \\left[\\frac{1}{3N(n-1)}(I_1 - 3) - \\log{\\frac{I_1 - 3N}{3 -3N}} \\right]
 ```
 
-Parameters:
-- μ
-- n
-- N
+# Arguments:
+- `type=PrincipalValueForm()`: Sets the form of the strain energy density function. Either `PrincipalValueForm()` or `InvariantForm()
+- `ℒinv=TreloarApproximation()`: Sets the inverse Langevin approxamation used (default = ``)
+- `n::Int=3`: Sets the order of the model
 
-Fields:
-- ℒinv: Sets the inverse Langevin approxamation used (default = `TreloarApproximation()`)
-
-- n (Integer): Sets the order of the model (default = 3)
+# Parameters:
+- `μ`
+- `n`
+- `N`
 
 > Anssari-Benam A. On a new class of non-Gaussian molecular-based constitutive models with limiting chain extensibility for incompressible rubber-like materials. Mathematics and Mechanics of Solids. 2021 Nov;26(11):1660-74.
 """
-struct AnsarriBenam{T} <: AbstractIncompressibleModel{T}
-    n::Int
-    function AnsarriBenam(
-        ::T = PrincipalValueForm();
-        n::Int = 3,
-    ) where {T<:Union{PrincipalValueForm,InvariantForm}}
-        @assert n > 1
-        new{T}(n)
-    end
+function AnsarriBenam(
+    type::T = PrincipalValueForm();
+    n::Int = 3,
+) where {T<:Union{PrincipalValueForm,InvariantForm}}
+    @assert n > 1
+    AnsarriBenam{T}(n)
 end
 
 function ContinuumMechanicsBase.StrainEnergyDensity(

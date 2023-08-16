@@ -11,7 +11,7 @@ struct HyperelasticUniaxialTest{T,S} <: AbstractHyperelasticTest{T,S}
 
     Creates an object storing results from a uniaxial test of a hyperelatic  material.
 
-    Fields:
+    # Arguments:
     - `λ₁`: Vector of uniaxial stretches
     - `s₁`: Vector of experiemntal stresses (optional)
     - `name`: string for the name of the test
@@ -50,7 +50,7 @@ struct HyperelasticBiaxialTest{T,S} <: AbstractHyperelasticTest{T,S}
 
     Creates an object storing results from a biaxial test of a hyperelatic material.
 
-    Fields:
+    # Arguments:
     - `λ₁`: Vector of 1-direction stretches
     - `λ₂`: Vector of 2-direction stretchs
     - `s₁`: Vector of experiemntal stresses (optional)

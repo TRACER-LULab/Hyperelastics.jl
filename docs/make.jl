@@ -18,11 +18,7 @@ makedocs(
         edit_link = "main",
         assets = String[],
     ),
-    pages = [
-        "Home" => "index.md",
-        "API" => "API.md",
-        "Example" => "example.md",
-    ],
+    pages = ["Home" => "index.md", "API" => "API.md", "Example" => "example.md"],
 )
 
 deploydocs(; repo = "github.com/cfarm6/Hyperelastics.jl", devbranch = "main")

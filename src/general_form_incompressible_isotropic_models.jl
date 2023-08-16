@@ -1,26 +1,26 @@
 export GeneralMooneyRivlin, GeneralDarijaniNaghdabadi, GeneralBeda
 
-"""
-$(TYPEDEF)
 
-Model:
-
-```math
-W = \\sum\\limits_{i,j = 0}^{N,M} C_{i,j}(I_1-3)^i(I_2-3)^j
-```
-
-Parameters:
-- C: Matrix of coefficients for Cⱼᵢ coefficients
-
-> Mooney M. A theory of large elastic deformation. Journal of applied physics. 1940 Sep;11(9):582-92.
-"""
 struct GeneralMooneyRivlin{T} <: AbstractIncompressibleModel{T}
     f::Function
+    """
+    $(SIGNATURES)
+    Model:
+
+    ```math
+    W = \\sum\\limits_{i,j = 0}^{N,M} C_{i,j}(I_1-3)^i(I_2-3)^j
+    ```
+
+    Parameters:
+    - C: Matrix of coefficients for Cⱼᵢ coefficients
+
+    > Mooney M. A theory of large elastic deformation. Journal of applied physics. 1940 Sep;11(9):582-92.
+    """
     function GeneralMooneyRivlin(
         I::Union{InvariantForm,PrincipalValueForm} = PrincipalValueForm(),
     )
         function f(x, (; I1, I2, C))
-            return C[x] * I1^(x[2] - 1) * I2^(x[1] - 1)
+            return C[x] * (I1 - 3)^(x[2] - 1) * (I2 - 3)^(x[1] - 1)
         end
         new{typeof(I)}(f)
     end
@@ -34,8 +34,6 @@ function ContinuumMechanicsBase.StrainEnergyDensity(
     I1 = I₁(λ⃗)
     I2 = I₂(λ⃗)
     W = sum(Base.Fix2(ψ.f, (I1 = I1, I2 = I2, C = C⃗)), CartesianIndices(C⃗))
-    # W = [C[j+1, i+1] * I1^i * I2^j for i in 0:size(C, 2)-1 for j in 0:size(C, 1)-1] |> sum
-
     return W
 end
 
@@ -50,24 +48,25 @@ end
 
 parameters(::GeneralMooneyRivlin) = (:C⃗,)
 
-"""
-$(TYPEDEF)
 
-Model:
-
-```math
-W = \\sum\\limits_{i = 1}^{3}\\sum\\limits_{j=0}^{N} A_j (\\lambda_i^{m_j}-1) + B_j(\\lambda_i^{-n_j}-1)
-```
-
-Parameters:
-- A⃗
-- B⃗
-- m⃗
-- n⃗
-
-> Bahreman M, Darijani H. New polynomial strain energy function; application to rubbery circular cylinders under finite extension and torsion. Journal of Applied Polymer Science. 2015 Apr 5;132(13).
-"""
 struct GeneralDarijaniNaghdabadi{T} <: AbstractIncompressibleModel{T}
+    """
+    $(SIGNATURES)
+
+    Model:
+
+    ```math
+    W = \\sum\\limits_{i = 1}^{3}\\sum\\limits_{j=0}^{N} A_j (\\lambda_i^{m_j}-1) + B_j(\\lambda_i^{-n_j}-1)
+    ```
+
+    Parameters:
+    - A⃗
+    - B⃗
+    - m⃗
+    - n⃗
+
+    > Bahreman M, Darijani H. New polynomial strain energy function; application to rubbery circular cylinders under finite extension and torsion. Journal of Applied Polymer Science. 2015 Apr 5;132(13).
+    """
     GeneralDarijaniNaghdabadi(::T = PrincipalValueForm()) where {T<:PrincipalValueForm} =
         new{T}()
 end
@@ -89,24 +88,25 @@ function parameters(::GeneralDarijaniNaghdabadi)
     return (:A⃗, :B⃗, :m⃗, :n⃗)
 end
 
-"""
-$(TYPEDEF)
 
-Model:
-
-```math
-W = \\sum\\limits_{i = 1}^{N}\\frac{C_i}{\\alpha_i}(I_1-3)^{\\alpha_i} + \\sum\\limits_{j=1}^{M}\\frac{K_j}{\\beta_j}(I_2-3)^{\\beta_j}
-```
-
-Parameters:
-- C
-- K
-- α
-- β
-
-> Beda T. Reconciling the fundamental phenomenological expression of the strain energy of rubber with established experimental facts. Journal of Polymer Science Part B: Polymer Physics. 2005 Jan 15;43(2):125-34.
-"""
 struct GeneralBeda{T} <: AbstractIncompressibleModel{T}
+    """
+    $(SIGNATURES)
+
+    Model:
+
+    ```math
+    W = \\sum\\limits_{i = 1}^{N}\\frac{C_i}{\\alpha_i}(I_1-3)^{\\alpha_i} + \\sum\\limits_{j=1}^{M}\\frac{K_j}{\\beta_j}(I_2-3)^{\\beta_j}
+    ```
+
+    Parameters:
+    - C
+    - K
+    - α
+    - β
+
+    > Beda T. Reconciling the fundamental phenomenological expression of the strain energy of rubber with established experimental facts. Journal of Polymer Science Part B: Polymer Physics. 2005 Jan 15;43(2):125-34.
+    """
     GeneralBeda(I::Union{InvariantForm,PrincipalValueForm} = PrincipalValueForm()) =
         new{typeof(I)}()
 end

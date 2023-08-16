@@ -47,7 +47,7 @@ $(SIGNATURES)
 
 Creates an `OptimizationProblem` for use in [`Optimization.jl`](https://docs.sciml.ai/Optimization/stable/) to find the optimal parameters.
 
-Fields:
+# Arguments:
 - `ψ`: material model to use
 - `test` or `tests`: A single or vector of hyperelastics tests to use when fitting the parameters
 - `u₀`: Initial guess for parameters
