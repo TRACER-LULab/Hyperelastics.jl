@@ -828,7 +828,7 @@ W = \\sum\\limits_{i = 1}{3}\\sum\\limits_{j=0}^{N} A_j (\\lambda_i^{m_j}-1) + B
 > Bahreman M, Darijani H. New polynomial strain energy function; application to rubbery circular cylinders under finite extension and torsion. Journal of Applied Polymer Science. 2015 Apr 5;132(13).
 """
 BahremanDarijani(type::T = PrincipalValueForm()) where {T<:PrincipalValueForm} =
-    new{PrincipalValueForm}(GeneralDarijaniNaghdabadi(type))
+    BahremanDarijani{PrincipalValueForm}(GeneralDarijaniNaghdabadi(type))
 
 function ContinuumMechanicsBase.StrainEnergyDensity(
     W::BahremanDarijani{T},
@@ -1657,7 +1657,7 @@ function ChevalierMarco(::T = PrincipalValueForm()) where {T<:Union{PrincipalVal
         L_b = size(b⃗, 1)
         return sum(@. b⃗ / I₂^(1:L_b))
     end
-    new{T}(∂W∂I1, ∂W∂I2)
+    ChevalierMarco{T}(∂W∂I1, ∂W∂I2)
 end
 
 function ContinuumMechanicsBase.StrainEnergyDensity(
