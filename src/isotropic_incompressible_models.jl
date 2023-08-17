@@ -398,7 +398,7 @@ W = \\frac{\\mu}{2}(I_1-3)
 
 > Treloar LR. The elasticity of a network of long-chain molecules—II. Transactions of the Faraday Society. 1943;39:241-6.
 """
-NeoHookean(type::Union{InvariantForm,PrincipalValueForm} = PrincipalValueForm()) =
+NeoHookean(type::T=PrincipalValueForm()) where {T<:Union{InvariantForm,PrincipalValueForm}} =
     NeoHookean{T}()
 
 function ContinuumMechanicsBase.StrainEnergyDensity(
