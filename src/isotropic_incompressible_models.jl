@@ -160,7 +160,7 @@ $(SIGNATURES)
 # Model:
 
 ```math
-W = W_{Arruda-Boyce} + \\frac{G_e}{n}\\left(\\sum\\limits_{i=1}^{3\\lambda_i^n-3\\right)
+W = W_{Arruda-Boyce} + \\frac{G_e}{n} \\left(\\sum_{i=1}^{3\\lambda_i^n-3\\right)
 ```
 
 # Arguments:
@@ -177,7 +177,7 @@ W = W_{Arruda-Boyce} + \\frac{G_e}{n}\\left(\\sum\\limits_{i=1}^{3\\lambda_i^n-3
 > Meissner B, Matějka L. A Langevin-elasticity-theory-based constitutiveequation for rubberlike networks and its comparison with biaxialstress–strain data. Part I. Polymer. 2003 Jul 1;44(16):4599-610.
 """
 ABGI(
-    ℒinv::InverseLangevinApproximations.AbstractInverseLangevinApproximation = TreloarApproximation(),
+    ;ℒinv::InverseLangevinApproximations.AbstractInverseLangevinApproximation = TreloarApproximation(),
 ) = ABGI{PrincipalValueForm}(ℒinv, ArrudaBoyce(PrincipalValueForm(), ℒinv = ℒinv))
 
 function ContinuumMechanicsBase.StrainEnergyDensity(
@@ -2946,7 +2946,7 @@ $(SIGNATURES)
 
 # Model:
 
-```
+```math
 W = C_1^1(I_1-3)+\\sum\\limits_{n=1}^{2}\\sum\\limits_{r=1}^{2}C_n^{r}(\\lambda_1^{2n}+\\lambda_2^{2n}+\\lambda_3^{2n}-3)^r
 ```
 
@@ -3961,8 +3961,8 @@ function BechirChevalier(;
 )
     BechirChevalier{PrincipalValueForm}(
         ℒinv,
-        ThreeChainModel(PrincipalValueForm(), ℒinv = ℒinv),
-        ArrudaBoyce(PrincipalValueForm(), ℒinv = ℒinv),
+        ThreeChainModel{PrincipalValueForm}(ℒinv),
+        ArrudaBoyce{PrincipalValueForm}(ℒinv),
     )
 end
 
