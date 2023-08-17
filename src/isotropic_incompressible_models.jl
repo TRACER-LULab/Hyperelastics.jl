@@ -160,7 +160,7 @@ $(SIGNATURES)
 # Model:
 
 ```math
-W = W_{Arruda-Boyce} + \\frac{G_e}{n} \\left(\\sum_{i=1}^{3\\lambda_i^n-3\\right)
+W = W_{Arruda-Boyce} + \\frac{G_e}{n} \\left(\\sum_{i=1}^{3}\\lambda_i^n-3\\right)
 ```
 
 # Arguments:
@@ -851,7 +851,7 @@ $(SIGNATURES)
 # Model:
 
 ```math
-W = C_{-1}^1*(I_2-3)+C_{1}^{1}(I_1-3)+C_{2}^{1}(I_1^2-2I_2-3)+C_{2}^{2(I_1^2-2I_2-3)^2
+W = C_{-1}^{1}*(I_2-3)+C_{1}^{1}(I_1-3)+C_{2}^{1}(I_1^2-2I_2-3)+C_{2}^{2}(I_1^2-2I_2-3)^2
 ```
 
 # Arguments:
@@ -898,7 +898,7 @@ $(SIGNATURES)
 # Model:
 
 ```math
-W = \\frac{\\mu}{2b}((1+\\frac{b}{n}(I_1-3))^n-1)
+W = \\frac{\\mu}{2b}\\left(\\left(1+\\frac{b}{n}(I_1-3)\\right)^n-1\\right)
 ```
 
 # Arguments:
@@ -2329,7 +2329,7 @@ $(SIGNATURES)
 # Model:
 
 ```math
-W = -c\\log{1-\\big(\\frac{I_1-3}{J_m}\\big)^2}
+W = -c\\log\\left1-\\left(\\frac{I_1-3}{J_m}\\right)^2\\right
 ```
 
 # Arguments:
@@ -3857,7 +3857,7 @@ $(SIGNATURES)
 # Model:
 
 ```math
-W = (1-f(\\frac{I_1-3}{\\hat{I_1}-3}))W_{NeoHookean}(μ₁)+fW_{ArrudaBoyce}(μ₂, N)
+W = \\left(1-f\\left(\\frac{I_1-3}{\\hat{I_1}-3}\\right)\\right)W_{NeoHookean}(μ₁)+fW_{ArrudaBoyce}(μ₂, N)
 ```
 
 # Arguments:
