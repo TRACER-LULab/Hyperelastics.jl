@@ -3820,8 +3820,8 @@ function ZunigaBeatty(;
 )
     ZunigaBeatty{PrincipalValueForm}(
         ℒinv,
-        ThreeChainModel(PrincipalValueForm(); ℒinv),
-        ArrudaBoyce(PrincipalValueForm(); ℒinv),
+        ThreeChainModel{PrincipalValueForm}(ℒinv),
+        ArrudaBoyce{PrincipalValueForm}(ℒinv),
     )
 end
 
