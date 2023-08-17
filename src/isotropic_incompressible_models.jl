@@ -176,8 +176,8 @@ W = W_{Arruda-Boyce} + \\frac{G_e}{n} \\left(\\sum_{i=1}^{3}\\lambda_i^n-3\\righ
 
 > Meissner B, Matějka L. A Langevin-elasticity-theory-based constitutiveequation for rubberlike networks and its comparison with biaxialstress–strain data. Part I. Polymer. 2003 Jul 1;44(16):4599-610.
 """
-ABGI(
-    ;ℒinv::InverseLangevinApproximations.AbstractInverseLangevinApproximation = TreloarApproximation(),
+ABGI(;
+    ℒinv::InverseLangevinApproximations.AbstractInverseLangevinApproximation = TreloarApproximation(),
 ) = ABGI{PrincipalValueForm}(ℒinv, ArrudaBoyce(PrincipalValueForm(), ℒinv = ℒinv))
 
 function ContinuumMechanicsBase.StrainEnergyDensity(
@@ -398,8 +398,9 @@ W = \\frac{\\mu}{2}(I_1-3)
 
 > Treloar LR. The elasticity of a network of long-chain molecules—II. Transactions of the Faraday Society. 1943;39:241-6.
 """
-NeoHookean(type::T=PrincipalValueForm()) where {T<:Union{InvariantForm,PrincipalValueForm}} =
-    NeoHookean{T}()
+NeoHookean(
+    type::T = PrincipalValueForm(),
+) where {T<:Union{InvariantForm,PrincipalValueForm}} = NeoHookean{T}()
 
 function ContinuumMechanicsBase.StrainEnergyDensity(
     ::NeoHookean{T},
