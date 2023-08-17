@@ -3760,8 +3760,8 @@ function FullNetwork(;
 )
     FullNetwork{PrincipalValueForm}(
         ℒinv,
-        ThreeChainModel(PrincipalValueForm(); ℒinv),
-        ArrudaBoyce(PrincipalValueForm(); ℒinv),
+        ThreeChainModel{PrincipalValueForm}(ℒinv),
+        ArrudaBoyce{PrincipalValueForm}(ℒinv),
     )
 end
 
