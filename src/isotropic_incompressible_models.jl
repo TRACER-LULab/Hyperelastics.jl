@@ -2608,7 +2608,7 @@ $(SIGNATURES)
 # Model:
 
 ```math
-W = -\\frac{2\\mu J_m}{c^2}\\log\\bigg(1-\\frac{\\lambda_1^c+\\lambda_2^c+\\lambda_3^c-3}{J_m})
+W = -\\frac{2\\mu J_m}{c^2}\\log\\left(1-\\frac{\\lambda_1^c+\\lambda_2^c+\\lambda_3^c-3}{J_m}\\right)
 ```
 
 # Parameters:
@@ -2996,7 +2996,7 @@ $(SIGNATURES)
 # Model:
 
 ```math
-W = G_c (I_1-3)+ \\frac{\\nu k T}{2}(\\sum\\limits_{i=1}^{3}\\kappa\\frac{\\lambda_i-1}{\\lambda_i^2+\\kappa}+\\log{\\frac{\\lambda_i^2+\\kappa}{1+\\kappa}}-\\log{\\lambda_i^2})
+W = G_c (I_1-3)+ \\frac{\\nu k T}{2}\\left(\\sum\\limits_{i=1}^{3}\\kappa\\frac{\\lambda_i-1}{\\lambda_i^2+\\kappa}+\\log{\\frac{\\lambda_i^2+\\kappa}{1+\\kappa}}-\\log{\\lambda_i^2}\\right)
 ```
 
 # Parameters:
