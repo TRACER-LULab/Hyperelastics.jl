@@ -458,9 +458,7 @@ end
 
 parameters(ψ::Isihara) = (:C10, :C20, :C01)
 
-struct Biderman{T} <: AbstractIncompressibleModel{T}
-    GMR::GeneralMooneyRivlin{T}
-end
+struct Biderman{T} <: AbstractIncompressibleModel{T} end
 
 
 """
@@ -491,9 +489,20 @@ function ContinuumMechanicsBase.StrainEnergyDensity(
     ψ::Biderman{T},
     λ⃗::Vector{S},
     (; C10, C01, C20, C30),
-) where {T,S}
+) where {T<:PrincipalValueForm,S}
     I1 = I₁(λ⃗)
     I2 = I₂(λ⃗)
+    W = C10 * (I1 - 3) + C20 * (I1 - 3)^2 + C30 * (I1 - 3)^3 + C01 * (I2 - 3)
+    return W
+end
+
+function ContinuumMechanicsBase.StrainEnergyDensity(
+    ψ::Biderman{T},
+    I⃗::Vector{S},
+    (; C10, C01, C20, C30),
+) where {T<:InvariantForm,S}
+    I1 = I⃗[1]
+    I2 = I⃗[2]
     W = C10 * (I1 - 3) + C20 * (I1 - 3)^2 + C30 * (I1 - 3)^3 + C01 * (I2 - 3)
     return W
 end
