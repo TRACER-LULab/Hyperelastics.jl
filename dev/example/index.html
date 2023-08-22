@@ -20,8 +20,8 @@ save(&quot;treloar_data.png&quot;, f)</code></pre><pre class="documenter-example
 p = (μ = 10.0, )
 W = StrainEnergyDensity(ψ, λ⃗, p)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">10.0</code></pre><p>or</p><pre><code class="language-julia hljs">F = rand(3,3)
 p = (μ = 20.0, )
-W = StrainEnergyDensity(ψ, F, p)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">8.360029282766387</code></pre><p>A method for creating an <code>OptimizationProblem</code> compatible with <code>Optimization.jl</code> is provided. To fit the NeoHookean model to the Treloar data previously loaded, an additional field-indexed array is used as the initial guess to <code>HyperelasticProblem</code>. It is recommendedto use ComponentArrays.jl for optimization of model parameters.</p><pre><code class="language-julia hljs">prob = HyperelasticProblem(ψ, treloar_data, ComponentVector(μ = 0.2), ad_type = AutoForwardDiff())
-sol = solve(prob, LBFGS())</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">u: ComponentVector{Float64}(μ = 0.5665481963398753)</code></pre><p>For fiting multiple models to the same dataset, </p><pre><code class="language- hljs">models = Dict(
+W = StrainEnergyDensity(ψ, F, p)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">-14.016217770957075</code></pre><p>A method for creating an <code>OptimizationProblem</code> compatible with <code>Optimization.jl</code> is provided. To fit the NeoHookean model to the Treloar data previously loaded, an additional field-indexed array is used as the initial guess to <code>HyperelasticProblem</code>. It is recommendedto use ComponentArrays.jl for optimization of model parameters.</p><pre><code class="language-julia hljs">prob = HyperelasticProblem(ψ, treloar_data, ComponentVector(μ = 0.2), ad_type = AutoForwardDiff())
+sol = solve(prob, LBFGS())</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">u: ComponentVector{Float64}(μ = 0.5665481963398753)</code></pre><p>For fiting multiple models to the same dataset, </p><pre><code class="language-julia hljs">models = Dict(
     Gent =&gt; ComponentVector(μ=240e-3, Jₘ=80.0),
     EdwardVilgis =&gt; ComponentVector(Ns=0.10, Nc=0.20, α=0.001, η=0.001),
     NeoHookean =&gt; ComponentVector(μ=200e-3),
@@ -29,20 +29,24 @@ sol = solve(prob, LBFGS())</code></pre><pre class="documenter-example-output"><c
     Beda =&gt; ComponentVector(C1=0.1237, C2=0.0424, C3=7.84e-5, K1=0.0168, α=0.9, β=0.68, ζ=3.015)
 )
 
-sol = Dict{DataType, SciMLSolution}()
+sol = Dict{Any, SciMLSolution}()
 for (ψ, p₀) in models
     HEProblem = HyperelasticProblem(ψ(), treloar_data, p₀,  ad_type = AutoForwardDiff())
     sol[ψ] = solve(HEProblem, NelderMead())
-end
-return sol # hide</code></pre><p>To predict the reponse of a model to a proivded dataset and parameters, a <code>predict</code> function is provided:</p><pre><code class="language-julia hljs">f = Figure()
+end</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Dict{Any, Union{SciMLBase.DESolution, SciMLBase.SciMLSolution}} with 5 entries:
+  Gent                 =&gt; retcode: Success…
+  NonaffineMicroSphere =&gt; retcode: Success…
+  NeoHookean           =&gt; retcode: Success…
+  EdwardVilgis         =&gt; retcode: Success…
+  Beda                 =&gt; retcode: Success…</code></pre><p>To predict the reponse of a model to a proivded dataset and parameters, a <code>predict</code> function is provided:</p><pre><code class="language- hljs">f = Figure()
 ax = Makie.Axis(f[1,1])
 for (ψ, p) in sol
     pred = predict(ψ(), treloar_data, p.u)
     lines!(ax, getindex.(pred.data.λ, 1), getindex.(pred.data.s, 1), label=string(ψ))
 end
 scatter!(ax, getindex.(treloar_data.data.λ, 1), getindex.(treloar_data.data.s, 1), label = &quot;Treloar 1944 Experimental&quot;, color = :black)
-axislegend(position = :lt)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">CairoMakie.Screen{IMAGE}
-</code></pre><p><img src="../treloar_data_fits.png" alt/></p><p>While the majority of the models provided by <code>Hyperelastics.jl</code> are based on closed form strain energy density functions, a selection of data-driven models are proivded. For example, the <code>SussmanBathe</code> model is created with:</p><pre><code class="language-julia hljs">using DataInterpolations
+axislegend(position = :lt)
+save(&quot;treloar_data_fits.png&quot;, f) # hide</code></pre><p><img src="treloar_data_fits.png" alt/></p><p>While the majority of the models provided by <code>Hyperelastics.jl</code> are based on closed form strain energy density functions, a selection of data-driven models are proivded. For example, the <code>SussmanBathe</code> model is created with:</p><pre><code class="language-julia hljs">using DataInterpolations
 ψ = SussmanBathe(treloar_data, k=4, interpolant = QuadraticSpline)
 λ₁ = range(extrema(getindex.(treloar_data.data.λ, 1))..., length = 100)
 uniaxial_prediction = HyperelasticUniaxialTest(λ₁, name = &quot;Prediction&quot;)
@@ -67,4 +71,4 @@ scatter!(
         color = :black
     )
 axislegend(position = :lt)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">CairoMakie.Screen{IMAGE}
-</code></pre><p><img src="../sussman_bathe.png" alt/></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../API/">« API</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.25 on <span class="colophon-date" title="Thursday 17 August 2023 19:30">Thursday 17 August 2023</span>. Using Julia version 1.9.2.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+</code></pre><p><img src="../sussman_bathe.png" alt/></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../API/">« API</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.25 on <span class="colophon-date" title="Tuesday 22 August 2023 14:18">Tuesday 22 August 2023</span>. Using Julia version 1.9.2.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
