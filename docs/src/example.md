@@ -79,7 +79,7 @@ To predict the reponse of a model to a proivded dataset and parameters, a `predi
 f = Figure()
 ax = Makie.Axis(f[1,1])
 for (ψ, p) in sol
-    pred = predict(ψ(), treloar_data, p.u)
+    pred = predict(ψ(), treloar_data, p.u, ad_type = AutoForwardDiff())
     lines!(ax, getindex.(pred.data.λ, 1), getindex.(pred.data.s, 1), label=string(ψ))
 end
 scatter!(ax, getindex.(treloar_data.data.λ, 1), getindex.(treloar_data.data.s, 1), label = "Treloar 1944 Experimental", color = :black)
