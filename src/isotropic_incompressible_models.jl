@@ -160,7 +160,7 @@ $(SIGNATURES)
 # Model:
 
 ```math
-W = W_{Arruda-Boyce} + \\frac{G_e}{n}\\left(\\sum\\limits_{i=1}^{3\\lambda_i^n-3\\right)
+W = W_{Arruda-Boyce} + \\frac{G_e}{n} \\left(\\sum_{i=1}^{3}\\lambda_i^n-3\\right)
 ```
 
 # Arguments:
@@ -176,7 +176,7 @@ W = W_{Arruda-Boyce} + \\frac{G_e}{n}\\left(\\sum\\limits_{i=1}^{3\\lambda_i^n-3
 
 > Meissner B, Matějka L. A Langevin-elasticity-theory-based constitutiveequation for rubberlike networks and its comparison with biaxialstress–strain data. Part I. Polymer. 2003 Jul 1;44(16):4599-610.
 """
-ABGI(
+ABGI(;
     ℒinv::InverseLangevinApproximations.AbstractInverseLangevinApproximation = TreloarApproximation(),
 ) = ABGI{PrincipalValueForm}(ℒinv, ArrudaBoyce(PrincipalValueForm(), ℒinv = ℒinv))
 
@@ -398,8 +398,9 @@ W = \\frac{\\mu}{2}(I_1-3)
 
 > Treloar LR. The elasticity of a network of long-chain molecules—II. Transactions of the Faraday Society. 1943;39:241-6.
 """
-NeoHookean(type::Union{InvariantForm,PrincipalValueForm} = PrincipalValueForm()) =
-    NeoHookean{T}()
+NeoHookean(
+    type::T = PrincipalValueForm(),
+) where {T<:Union{InvariantForm,PrincipalValueForm}} = NeoHookean{T}()
 
 function ContinuumMechanicsBase.StrainEnergyDensity(
     ::NeoHookean{T},
@@ -458,9 +459,7 @@ end
 
 parameters(ψ::Isihara) = (:C10, :C20, :C01)
 
-struct Biderman{T} <: AbstractIncompressibleModel{T}
-    GMR::GeneralMooneyRivlin{T}
-end
+struct Biderman{T} <: AbstractIncompressibleModel{T} end
 
 
 """
@@ -491,9 +490,20 @@ function ContinuumMechanicsBase.StrainEnergyDensity(
     ψ::Biderman{T},
     λ⃗::Vector{S},
     (; C10, C01, C20, C30),
-) where {T,S}
+) where {T<:PrincipalValueForm,S}
     I1 = I₁(λ⃗)
     I2 = I₂(λ⃗)
+    W = C10 * (I1 - 3) + C20 * (I1 - 3)^2 + C30 * (I1 - 3)^3 + C01 * (I2 - 3)
+    return W
+end
+
+function ContinuumMechanicsBase.StrainEnergyDensity(
+    ψ::Biderman{T},
+    I⃗::Vector{S},
+    (; C10, C01, C20, C30),
+) where {T<:InvariantForm,S}
+    I1 = I⃗[1]
+    I2 = I⃗[2]
     W = C10 * (I1 - 3) + C20 * (I1 - 3)^2 + C30 * (I1 - 3)^3 + C01 * (I2 - 3)
     return W
 end
@@ -828,7 +838,7 @@ W = \\sum\\limits_{i = 1}{3}\\sum\\limits_{j=0}^{N} A_j (\\lambda_i^{m_j}-1) + B
 > Bahreman M, Darijani H. New polynomial strain energy function; application to rubbery circular cylinders under finite extension and torsion. Journal of Applied Polymer Science. 2015 Apr 5;132(13).
 """
 BahremanDarijani(type::T = PrincipalValueForm()) where {T<:PrincipalValueForm} =
-    new{PrincipalValueForm}(GeneralDarijaniNaghdabadi(type))
+    BahremanDarijani{PrincipalValueForm}(GeneralDarijaniNaghdabadi(type))
 
 function ContinuumMechanicsBase.StrainEnergyDensity(
     W::BahremanDarijani{T},
@@ -851,7 +861,7 @@ $(SIGNATURES)
 # Model:
 
 ```math
-W = C_{-1}^1*(I_2-3)+C_{1}^{1}(I_1-3)+C_{2}^{1}(I_1^2-2I_2-3)+C_{2}^{2(I_1^2-2I_2-3)^2
+W = C_{-1}^{1}*(I_2-3)+C_{1}^{1}(I_1-3)+C_{2}^{1}(I_1^2-2I_2-3)+C_{2}^{2}(I_1^2-2I_2-3)^2
 ```
 
 # Arguments:
@@ -898,7 +908,7 @@ $(SIGNATURES)
 # Model:
 
 ```math
-W = \\frac{\\mu}{2b}((1+\\frac{b}{n}(I_1-3))^n-1)
+W = \\frac{\\mu}{2b}\\left(\\left(1+\\frac{b}{n}(I_1-3)\\right)^n-1\\right)
 ```
 
 # Arguments:
@@ -1657,7 +1667,7 @@ function ChevalierMarco(::T = PrincipalValueForm()) where {T<:Union{PrincipalVal
         L_b = size(b⃗, 1)
         return sum(@. b⃗ / I₂^(1:L_b))
     end
-    new{T}(∂W∂I1, ∂W∂I2)
+    ChevalierMarco{T}(∂W∂I1, ∂W∂I2)
 end
 
 function ContinuumMechanicsBase.StrainEnergyDensity(
@@ -2329,7 +2339,7 @@ $(SIGNATURES)
 # Model:
 
 ```math
-W = -c\\log{1-\\big(\\frac{I_1-3}{J_m}\\big)^2}
+W = -c\\log\\left1-\\left(\\frac{I_1-3}{J_m}\\right)^2\\right
 ```
 
 # Arguments:
@@ -2599,7 +2609,7 @@ $(SIGNATURES)
 # Model:
 
 ```math
-W = -\\frac{2\\mu J_m}{c^2}\\log\\bigg(1-\\frac{\\lambda_1^c+\\lambda_2^c+\\lambda_3^c-3}{J_m})
+W = -\\frac{2\\mu J_m}{c^2}\\log\\left(1-\\frac{\\lambda_1^c+\\lambda_2^c+\\lambda_3^c-3}{J_m}\\right)
 ```
 
 # Parameters:
@@ -2946,7 +2956,7 @@ $(SIGNATURES)
 
 # Model:
 
-```
+```math
 W = C_1^1(I_1-3)+\\sum\\limits_{n=1}^{2}\\sum\\limits_{r=1}^{2}C_n^{r}(\\lambda_1^{2n}+\\lambda_2^{2n}+\\lambda_3^{2n}-3)^r
 ```
 
@@ -2987,7 +2997,7 @@ $(SIGNATURES)
 # Model:
 
 ```math
-W = G_c (I_1-3)+ \\frac{\\nu k T}{2}(\\sum\\limits_{i=1}^{3}\\kappa\\frac{\\lambda_i-1}{\\lambda_i^2+\\kappa}+\\log{\\frac{\\lambda_i^2+\\kappa}{1+\\kappa}}-\\log{\\lambda_i^2})
+W = G_c (I_1-3)+ \\frac{\\nu k T}{2}\\left(\\sum\\limits_{i=1}^{3}\\kappa\\frac{\\lambda_i-1}{\\lambda_i^2+\\kappa}+\\log{\\frac{\\lambda_i^2+\\kappa}{1+\\kappa}}-\\log{\\lambda_i^2}\\right)
 ```
 
 # Parameters:
@@ -3751,8 +3761,8 @@ function FullNetwork(;
 )
     FullNetwork{PrincipalValueForm}(
         ℒinv,
-        ThreeChainModel(PrincipalValueForm(); ℒinv),
-        ArrudaBoyce(PrincipalValueForm(); ℒinv),
+        ThreeChainModel{PrincipalValueForm}(ℒinv),
+        ArrudaBoyce{PrincipalValueForm}(ℒinv),
     )
 end
 
@@ -3811,8 +3821,8 @@ function ZunigaBeatty(;
 )
     ZunigaBeatty{PrincipalValueForm}(
         ℒinv,
-        ThreeChainModel(PrincipalValueForm(); ℒinv),
-        ArrudaBoyce(PrincipalValueForm(); ℒinv),
+        ThreeChainModel{PrincipalValueForm}(ℒinv),
+        ArrudaBoyce{PrincipalValueForm}(ℒinv),
     )
 end
 
@@ -3857,7 +3867,7 @@ $(SIGNATURES)
 # Model:
 
 ```math
-W = (1-f(\\frac{I_1-3}{\\hat{I_1}-3}))W_{NeoHookean}(μ₁)+fW_{ArrudaBoyce}(μ₂, N)
+W = \\left(1-f\\left(\\frac{I_1-3}{\\hat{I_1}-3}\\right)\\right)W_{NeoHookean}(μ₁)+fW_{ArrudaBoyce}(μ₂, N)
 ```
 
 # Arguments:
@@ -3961,8 +3971,8 @@ function BechirChevalier(;
 )
     BechirChevalier{PrincipalValueForm}(
         ℒinv,
-        ThreeChainModel(PrincipalValueForm(), ℒinv = ℒinv),
-        ArrudaBoyce(PrincipalValueForm(), ℒinv = ℒinv),
+        ThreeChainModel{PrincipalValueForm}(ℒinv),
+        ArrudaBoyce{PrincipalValueForm}(ℒinv),
     )
 end
 
