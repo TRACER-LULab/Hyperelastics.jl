@@ -2,6 +2,8 @@
 CurrentModule = Hyperelastics
 ```
 
+# API Reference
+
 # Incompressible Models
 
 ```@autodocs
