@@ -1,5 +1,9 @@
-
+"""
+$(DocStringExtensions.README)
+"""
 module Hyperelastics
+
+using DocStringExtensions
 
 using PackageExtensionCompat
 function __init__()
@@ -26,7 +30,6 @@ export parameters, parameter_bounds
 export InvariantForm, PrincipalValueForm, DataDrivenForm
 
 abstract type AbstractHyperelasticTest{T,S} <: ContinuumMechanicsBase.AbstractMaterialTest end
-
 abstract type AbstractHyperelasticModel{T} <: ContinuumMechanicsBase.AbstractMaterialModel end
 
 abstract type AbstractIncompressibleModel{T} <: AbstractHyperelasticModel{T} end
@@ -40,15 +43,11 @@ struct PrincipalValueForm end
 struct DataDrivenForm end
 
 """
-`HyperelasticProblem(ψ::AbstractHyperelasticModel, test::AbstractHyperelasticTest, u₀, ps=Nothing;
-    adb=AD.ForwardDiffBackend(), loss=L2DistLoss(), adtype=Optimization.AutoForwardDiff())`
-
-`HyperelasticProblem(ψ::AbstractHyperelasticModel, tests::Vector{<:AbstractHyperelasticTest}, u₀, ps=Nothing;
-    adb=AD.ForwardDiffBackend(), loss=L2DistLoss(), adtype=Optimization.AutoForwardDiff())`
+$(SIGNATURES)
 
 Creates an `OptimizationProblem` for use in [`Optimization.jl`](https://docs.sciml.ai/Optimization/stable/) to find the optimal parameters.
 
-Fields:
+# Arguments:
 - `ψ`: material model to use
 - `test` or `tests`: A single or vector of hyperelastics tests to use when fitting the parameters
 - `u₀`: Initial guess for parameters
@@ -69,7 +68,7 @@ include("general_form_incompressible_isotropic_models.jl")
 include("isotropic_incompressible_models.jl")
 include("isotropic_compressible_models.jl")
 
-include("data_driven.jl")
-include("average_chain_behavior.jl")
+include("data_driven_models/sussman_bathe.jl")
+include("data_driven_models/average_chain_behavior.jl")
 
 end

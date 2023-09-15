@@ -1,9 +1,19 @@
 [deps]
+CairoMakie = "13f3f980-e62b-5c42-98c6-ff1f3baf88f0"
+ComponentArrays = "b0b7db55-cfe3-40fc-9ded-d10e2dbeff66"
 ContinuumMechanicsBase = "3a778109-d974-46c8-ac54-09f30d605bdf"
+DataInterpolations = "82cc6244-b520-54b8-b5a6-8a565e85f1d0"
 Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
 DocumenterCitations = "daee34ce-89f3-4625-b898-19384cb65244"
+ForwardDiff = "f6369f11-7733-5829-9624-2563aa707210"
 Hyperelastics = "c20c605d-adbe-46e4-9db6-e2b04c3ba023"
 InverseLangevinApproximations = "b82787f2-62be-403e-9078-6d9feafd7ee3"
+MakiePublication = "dde8697e-0d61-460d-88dd-856f66710dd1"
+Optimization = "7f7a1694-90dd-40f0-9382-eb1efda571ba"
+OptimizationOptimJL = "36348300-93cb-4f02-beb5-3c3902f8871e"
 
 [compat]
 DocumenterCitations = "1"
+ForwardDiff = "0.10"
+OptimizationOptimJL = "0.1"
+ComponentArrays = "0.15"
