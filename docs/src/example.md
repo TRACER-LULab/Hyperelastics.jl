@@ -65,7 +65,7 @@ models = Dict(
     Beda => ComponentVector(C1=0.1237, C2=0.0424, C3=7.84e-5, K1=0.0168, α=0.9, β=0.68, ζ=3.015)
 )
 
-sol = Dict{DataType, SciMLSolution}()
+sol = Dict{Any, SciMLSolution}()
 for (ψ, p₀) in models
     HEProblem = HyperelasticProblem(ψ(), treloar_data, p₀,  ad_type = AutoForwardDiff())
     sol[ψ] = solve(HEProblem, NelderMead())
@@ -79,7 +79,7 @@ To predict the reponse of a model to a proivded dataset and parameters, a `predi
 f = Figure()
 ax = Makie.Axis(f[1,1])
 for (ψ, p) in sol
-    pred = predict(ψ(), treloar_data, p.u)
+    pred = predict(ψ(), treloar_data, p.u, ad_type = AutoForwardDiff())
     lines!(ax, getindex.(pred.data.λ, 1), getindex.(pred.data.s, 1), label=string(ψ))
 end
 scatter!(ax, getindex.(treloar_data.data.λ, 1), getindex.(treloar_data.data.s, 1), label = "Treloar 1944 Experimental", color = :black)
