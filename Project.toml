@@ -47,6 +47,7 @@ HyperelasticsPlotsExt = "Plots"
 HyperelasticsZygoteExt = "Zygote"
 
 [compat]
+QuadGK = "2"
 SciMLBase = "1"
 ADTypes = "0.2"
 Reexport = "1"
