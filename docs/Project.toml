@@ -11,3 +11,6 @@ InverseLangevinApproximations = "b82787f2-62be-403e-9078-6d9feafd7ee3"
 MakiePublication = "dde8697e-0d61-460d-88dd-856f66710dd1"
 Optimization = "7f7a1694-90dd-40f0-9382-eb1efda571ba"
 OptimizationOptimJL = "36348300-93cb-4f02-beb5-3c3902f8871e"
+
+[compat]
+ComponentArrays = "0.15"
