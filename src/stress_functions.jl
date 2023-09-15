@@ -1,12 +1,11 @@
-
 """
-`StrainEnergyDensity(ψ, λ⃗, p)`
+$(TYPEDSIGNATURES)
 
 Returns the strain energy density for the hyperelastic model `ψ` with the principle stretches `λ⃗` with parameters `p`.
 
-Fields:
-- `ψ`: Hyperelastic model
-- `λ⃗`: Vector of principal stretches
+# Arguments:
+- `ψ::AbstractHyperelasticModel`: Hyperelastic model
+- `λ⃗::Vector`: Vector of principal stretches
 - `p`: Model parameters
 """
 function ContinuumMechanicsBase.StrainEnergyDensity(
@@ -32,7 +31,7 @@ function ContinuumMechanicsBase.StrainEnergyDensity(
 end
 
 """
-`StrainEnergyDensity(ψ, F, p)`
+$(TYPEDSIGNATURES)
 
 Returns a function for the strain energy density function for the hyperelastic model based on calculating the principal stretches of the deformation gradient, `F`. The eigen values are found by the following procedure:
 ```math
@@ -42,9 +41,9 @@ C^\\ast = (U^\\ast)^2 = a^T \\cdot C \\cdot a
 \\vec{\\lambda} = diag(U)
 ```
 
-Fields:
-- `ψ`: Hyperelastic model
-- `F`: Deformation gradient matrix
+# Arguments:
+- `ψ::AbstractHyperelasticModel`: Hyperelastic model
+- `F::Matrix`: Deformation gradient matrix
 - `p`: Model parameters
 """
 function ContinuumMechanicsBase.StrainEnergyDensity(
@@ -67,14 +66,15 @@ function ContinuumMechanicsBase.StrainEnergyDensity(
 end
 
 """
-`SecondPiolaKirchoffStressTensor(ψ::AbstractHyperelasticModel, λ⃗::AbstractVector, p; ad_type=AD.ForwardDiffBackend())`
+$(TYPEDSIGNATURES)
 
 Returns the second PK stress tensor for the hyperelastic model `ψ` with the principle stretches `λ⃗` with parameters `p`.
 
-Fields:
-- `ψ`: Hyperelastic model
-- `λ⃗`: Vector of principal stretches
+# Arguments:
+- `ψ::AbstractHyperelasticModel`: Hyperelastic model
+- `λ⃗::Vector`: Vector of principal stretches
 - `p`: Model parameters
+- `ad_type`: Automatic differentiation backend (see `ADTypes.jl`)
 """
 function ContinuumMechanicsBase.SecondPiolaKirchoffStressTensor(
     ψ::AbstractHyperelasticModel{T},
@@ -87,14 +87,15 @@ function ContinuumMechanicsBase.SecondPiolaKirchoffStressTensor(
 end
 
 """
-`SecondPiolaKirchoffStressTensor(ψ::AbstractHyperelasticModel, F::AbstractMatrix, p; adb=AD.ForwardDiffBackend())`
+$(TYPEDSIGNATURES)
 
 Returns the second PK stress tensor for the hyperelastic model `ψ` with the deformation gradient `F` with parameters `p`.
 
-Fields:
-- `ψ`: Hyperelastic model
-- `F`: Deformation gradient tensor
+# Arguments:
+- `ψ::AbstractHyperelasticModel`: Hyperelastic model
+- `F::Matrix`: Deformation gradient matrix
 - `p`: Model parameters
+- `ad_type`: Automatic differentiation backend (see `ADTypes.jl`)
 """
 function ContinuumMechanicsBase.SecondPiolaKirchoffStressTensor(
     ψ::AbstractHyperelasticModel{T},
@@ -131,17 +132,17 @@ function ∂ψ(ψ, λ⃗, p, ad_type; kwargs...)
             5. Or define a custom method for the material model"))
 end
 
-"""
-`CauchyStressTensor(ψ::AbstractHyperelasticModel, λ⃗::AbstractVector, p; adb=AD.ForwardDiffBackend())`
 
+"""
+$(TYPEDSIGNATURES)
 Returns the Cauchy stress tensor for the hyperelastic model `ψ` with the principle stretches `λ⃗` with parameters `p`.
 
-Fields:
-- `ψ`: Hyperelastic model
-- `λ⃗`: Vector of principal stretches
+# Arguments:
+- `ψ::AbstractHyperelasticModel`: Hyperelastic model
+- `λ⃗::Vector`: Vector of principal stretches
 - `p`: Model parameters
-- `adb`: Differentiation backend from `AbstractDifferentiation.jl`
-    """
+- `ad_type`: Automatic differentiation backend (see `ADTypes.jl`)
+"""
 function ContinuumMechanicsBase.CauchyStressTensor(
     ψ::Hyperelastics.AbstractHyperelasticModel{T},
     λ⃗::Vector{R},
@@ -154,15 +155,15 @@ function ContinuumMechanicsBase.CauchyStressTensor(
 end
 
 """
-`CauchyStressTensor(ψ::AbstractHyperelasticModel, F::AbstractMatrix, p; adb=AD.ForwardDiffBackend())`
+$(TYPEDSIGNATURES)
 
 Returns the Cauchy stress tensor for the hyperelastic model `ψ` with the deformation gradient `F` with parameters `p`.
 
-Fields:
-- `ψ`: Hyperelastic model
-- `F`: Deformation gradient tensor
+# Arguments:
+- `ψ::AbstractHyperelasticModel`: Hyperelastic model
+- `F::Matrix`: Deformation gradient matrix
 - `p`: Model parameters
-- `adb`: Differentiation backend from `AbstractDifferentiation.jl`
+- `ad_type`: Automatic differentiation backend (see `ADTypes.jl`)
 """
 function ContinuumMechanicsBase.CauchyStressTensor(
     ψ::Hyperelastics.AbstractHyperelasticModel{T},

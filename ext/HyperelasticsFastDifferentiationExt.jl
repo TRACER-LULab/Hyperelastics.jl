@@ -10,8 +10,8 @@ function Hyperelastics.∂ψ(
     λ⃗::Vector{S},
     p,
     ad_type;
-    fast_diff=true,
-    kwargs...
+    fast_diff = true,
+    kwargs...,
 ) where {T,S}
     # @info "NOTE THIS ONLY RETURNS AN EXECUTABLE FUNCTION FOR GETTING THE VALUES REQUIRED"
 
@@ -22,4 +22,5 @@ function Hyperelastics.∂ψ(
 
     return f(λ⃗) |> vec
 end
+
 end
