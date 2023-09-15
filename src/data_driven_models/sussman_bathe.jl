@@ -1,6 +1,14 @@
 export SussmanBathe
+
+struct SussmanBathe{T,S} <: AbstractDataDrivenHyperelasticModel{PrincipalValueForm}
+    w′::Function
+    test::AbstractHyperelasticTest
+    k::T
+    itp::S
+end
+
 """
-`SussmanBathe(data::HyperelasticUniaxialTest;  interpolant=CubicSpline, k::Integer = 5)`
+$(SIGNATURES)
 
 Model:
 - See paper
@@ -15,17 +23,10 @@ Fields:
 
 > Sussman T, Bathe KJ. A model of incompressible isotropic hyperelastic material behavior using spline interpolations of tension–compression test data. Communications in numerical methods in engineering. 2009 Jan;25(1):53-63.
 """
-struct SussmanBathe{T,S} <: AbstractDataDrivenHyperelasticModel{PrincipalValueForm}
-    w′::Function
-    test::AbstractHyperelasticTest
-    k::T
-    itp::S
-end
-
 function SussmanBathe(
     data::HyperelasticUniaxialTest;
-    interpolant=CubicSpline,
-    k::Integer=5
+    interpolant = CubicSpline,
+    k::Integer = 5,
 )
     σ̂ = interpolant(
         getindex.(data.data.s, 1) .* getindex.(data.data.λ, 1),
@@ -39,7 +40,11 @@ end
 ContinuumMechanicsBase.StrainEnergyDensity(ψ::SussmanBathe, λ⃗::Vector{T}, p) where {T} =
     sum(x -> quadgk(ψ.w′, 1.0, x)[1], λ⃗)
 
-function ContinuumMechanicsBase.StrainEnergyDensity(ψ::SussmanBathe, F::Matrix{T}, p) where {T}
+function ContinuumMechanicsBase.StrainEnergyDensity(
+    ψ::SussmanBathe,
+    F::Matrix{T},
+    p,
+) where {T}
     λ⃗ = eigvals(F)
     return StrainEnergyDensity(ψ, λ⃗, p)
 end
@@ -48,7 +53,7 @@ ContinuumMechanicsBase.SecondPiolaKirchoffStressTensor(
     ψ::SussmanBathe,
     λ⃗::Vector{T},
     p;
-    kwargs...
+    kwargs...,
 ) where {T} = ψ.w′.(λ⃗)
 
 
@@ -56,7 +61,7 @@ ContinuumMechanicsBase.CauchyStressTensor(
     ψ::SussmanBathe,
     λ⃗::Vector{T},
     p;
-    kwargs...
+    kwargs...,
 ) where {T} = ψ.w′.(λ⃗) .* λ⃗
 
 parameters(ψ::SussmanBathe) = ()

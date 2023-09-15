@@ -1,26 +1,23 @@
 """
-`parameters(ψ::AbstractHyperelasticModel)`
+$(TYPEDSIGNATURES)
 
 Returns a tuple of the parameters required for the model
 
-Fields
-- `ψ`: Hyperelastics model
+# Arguments:
+- `ψ::AbstractHyperelasticModel`: Hyperelastics model
 """
 function parameters(ψ::AbstractHyperelasticModel)
-    # @error "$(typeof(ψ)) does not have a parameters function implemented"
     return throw(
         ArgumentError("$(typeof(ψ)) does not have a parameters function implemented"),
     )
 end
 
 """
-`parameter_bounds(ψ::AbstractHyperelasticModel, test::AbstractHyperelasticTest)`
-`parameter_bounds(ψ::AbstractHyperelasticModel, tests::Vector{AbstractHyperelasticTest})`
-
+$(TYPEDSIGNATURES)
 Returns a tuple of the parameter bounds provided the experimental data and model
 
-Fields
-- `ψ`: Hyperelastic model
+# Arguments:
+- `ψ::AbstractHyperelasticModel`: Hyperelastic model
 - `test` or `tests`: The test or vector of tests to use in finding the parameter bounds.
 """
 function parameter_bounds(::AbstractHyperelasticModel, ::AbstractHyperelasticTest)
@@ -51,10 +48,3 @@ function parameter_bounds(
     end
     return (lb = lb, ub = ub)
 end
-
-# """
-# Returns a constraint equation for models were parameters bounds are interdependent
-# """
-# function constraints(ψ::AbstractHyperelasticModel, data::AbstractHyperelasticTest)
-#     return nothing
-# end
