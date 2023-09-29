@@ -7,7 +7,8 @@ bib = CitationBibliography(joinpath(@__DIR__, "src", "paper.bib"); style = :nume
 DocMeta.setdocmeta!(Hyperelastics, :DocTestSetup, :(using Hyperelastics); recursive = true)
 
 makedocs(
-    bib;
+    ;
+    plugins = [bib],
     modules = [Hyperelastics],
     authors = "Carson Farmer <59753859+cfarm6@users.noreply.github.com> and contributors",
     repo = "https://github.com/cfarm6/Hyperelastics.jl/blob/{commit}{path}#{line}",
