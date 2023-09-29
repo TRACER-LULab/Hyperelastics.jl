@@ -1,6 +1,3 @@
-"""
-$(DocStringExtensions.README)
-"""
 module Hyperelastics
 
 using DocStringExtensions

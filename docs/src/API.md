@@ -25,20 +25,9 @@ Modules = [Hyperelastics]
 Filter = x -> typeof(x) === UnionAll && x <:Hyperelastics.AbstractDataDrivenHyperelasticModel
 ```
 
-# Helper Functions
+# Functions
 
 ```@autodocs
 Modules = [Hyperelastics]
 Order = [:function]
-```
-
-# Miscellaneous
-
-```@autodocs
-Modules = [Hyperelastics]
-Order = [:module, :constant, :type, :macro]
-```
-
-
-```@bibliography
 ```
