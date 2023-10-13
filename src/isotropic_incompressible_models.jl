@@ -123,7 +123,7 @@ function ContinuumMechanicsBase.StrainEnergyDensity(
     (; μ, N),
 ) where {T}
     rchain_Nl = √(I₁(λ⃗) / 3 / N)
-    β = inverse_langevin_approximation(ψ.ℒinv, rchain_Nl)
+    β = inverse_langevin_approximation(chain_Nl, ψ.ℒinv, r)
     return μ * N * (rchain_Nl * β + log(β / sinh(β)))
 end
 
@@ -133,7 +133,7 @@ function ContinuumMechanicsBase.StrainEnergyDensity(
     (; μ, N),
 ) where {T,I<:InvariantForm}
     rchain_Nl = √(I⃗[1] / 3 / N)
-    β = inverse_langevin_approximation(ψ.ℒinv, rchain_Nl)
+    β = inverse_langevin_approximation(rchain_Nl, ψ.ℒinv,)
     return μ * N * (rchain_Nl * β + log(β / sinh(β)))
 end
 
@@ -268,7 +268,7 @@ function ContinuumMechanicsBase.StrainEnergyDensity(
     (; μ, N),
 ) where {T}
     λr = map(Base.Fix1(ψ.λr, (λ = λ⃗, N = N)), ψ.r⃗)
-    β = @. inverse_langevin_approximation(ψ.ℒinv, λr)
+    β = @. inverse_langevin_approximation(λr, ψ.ℒinv)
     ψf = @. μ * N * (λr * β + log(β / sinh(β))) * ψ.w
     return sum(ψf)
 end
@@ -3239,7 +3239,7 @@ function ContinuumMechanicsBase.StrainEnergyDensity(
     λ⃗::Vector{S},
     (; μ, N),
 ) where {T,S}
-    β = @. inverse_langevin_approximation(ψ.ℒinv, λ⃗ / sqrt(N))
+    β = @. inverse_langevin_approximation(λ⃗ / sqrt(N), ψ.ℒinv)
     return μ * sqrt(N) / 3 * sum(@. λ⃗ * β + sqrt(N) * log(β / sinh(β)))
 end
 
@@ -3434,7 +3434,7 @@ function ContinuumMechanicsBase.StrainEnergyDensity(
 
     λ = sum((λ⃗²_r⃗² .^ p) .* ψ.w)
     λr = λ^(1 / p) / √N
-    β = inverse_langevin_approximation(ψ.ℒinv, λr)
+    β = inverse_langevin_approximation(λr, ψ.ℒinv)
     ψf = μ * N * (λr * β + log(β / sinh(β)))
 
     ν = sum((sqrt.(inv_λ⃗²_r⃗²) .^ q) .* ψ.w)
@@ -3494,7 +3494,7 @@ function Bootstrapped8Chain(;
     ℒinv::InverseLangevinApproximations.AbstractInverseLangevinApproximation = TreloarApproximation(),
 )
     function W8(x, (; μ, N))
-        β = inverse_langevin_approximation(ℒinv, x)
+        β = inverse_langevin_approximation(x, ℒinv)
         μ * N * (x * β + log(β / sinh(β)))
     end
     Bootstrapped8Chain{PrincipalValueForm}(ℒinv, W8)
