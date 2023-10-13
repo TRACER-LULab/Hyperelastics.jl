@@ -123,7 +123,7 @@ function ContinuumMechanicsBase.StrainEnergyDensity(
     (; μ, N),
 ) where {T}
     rchain_Nl = √(I₁(λ⃗) / 3 / N)
-    β = inverse_langevin_approximation(rchain_Nl, ψ.ℒinv, r)
+    β = inverse_langevin_approximation(rchain_Nl, ψ.ℒinv)
     return μ * N * (rchain_Nl * β + log(β / sinh(β)))
 end
 
