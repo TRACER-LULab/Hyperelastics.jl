@@ -18,7 +18,7 @@ using DataInterpolations
 using QuadGK
 using ComponentArrays, LabelledArrays, StructArrays
 using LinearAlgebra, Statistics
-# using SciMLBase
+@reexport using ADTypes
 
 export HyperelasticUniaxialTest, HyperelasticBiaxialTest
 export HyperelasticProblem

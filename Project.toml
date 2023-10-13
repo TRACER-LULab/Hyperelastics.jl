@@ -35,16 +35,16 @@ Optimization = "7f7a1694-90dd-40f0-9382-eb1efda571ba"
 Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
 Unitful = "1986cc42-f94f-5a68-af5c-568840ba703d"
 Zygote = "e88e6eb3-aa80-5325-afca-941959d7151f"
+FiniteDifferences = "26cc04aa-876d-5657-8c51-4c34ba976000"
 
 [extensions]
 HyperelasticsEnzymeExt = "Enzyme"
 HyperelasticsFastDifferentiationExt = "FastDifferentiation"
 HyperelasticsFiniteDiffExt = "FiniteDiff"
 HyperelasticsForwardDiffExt = "ForwardDiff"
-HyperelasticsMakieCoreExt = "MakieCore"
 HyperelasticsOptimizationExt = "Optimization"
-HyperelasticsPlotsExt = "Plots"
 HyperelasticsZygoteExt = "Zygote"
+HyperelasticsFiniteDifferences = "FiniteDifferences"
 
 [compat]
 ADTypes = "0.2"
@@ -86,4 +86,4 @@ theme = "_Tracer-Theme"
 title = "Hyperelastics.jl"
 
 [targets]
-test = ["Test", "ComponentArrays", "ForwardDiff", "InteractiveUtils", "FiniteDiff", "Zygote", "Enzyme", "Optimization", "OptimizationOptimJL", "FastDifferentiation"]
+test = ["Test", "ComponentArrays", "ForwardDiff", "InteractiveUtils", "FiniteDiff", "Zygote", "Enzyme", "Optimization", "OptimizationOptimJL", "FiniteDifferences"]
