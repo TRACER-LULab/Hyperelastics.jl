@@ -5,7 +5,6 @@ using ComponentArrays
 using Hyperelastics
 using LossFunctions
 using Statistics
-using ADTypes
 
 export HyperelasticProblem
 
@@ -13,7 +12,7 @@ function Hyperelastics.HyperelasticProblem(
     ψ::Hyperelastics.AbstractHyperelasticModel,
     test::Hyperelastics.AbstractHyperelasticTest{T,S},
     u0;
-    ad_type::ADTypes.AbstractADType,
+    ad_type,
     loss = L2DistLoss(),
     lb = parameter_bounds(ψ, test).lb,
     ub = parameter_bounds(ψ, test).ub,
@@ -66,14 +65,14 @@ function Hyperelastics.HyperelasticProblem(
     func = OptimizationFunction(f, ad_type)
     # Check for Bounds
     p = (ψ, test, loss, ad_type, kwargs)
-    OptimizationProblem(func, u0, p; lb, ub, int, lcons, ucons, sense)
+    return OptimizationProblem(func, u0, p; lb, ub, int, lcons, ucons, sense)
 end
 
 function Hyperelastics.HyperelasticProblem(
     ψ::Hyperelastics.AbstractHyperelasticModel,
     tests::Vector{R},
     u0;
-    ad_type::ADTypes.AbstractADType,
+    ad_type,
     loss = L2DistLoss(),
     lb = parameter_bounds(ψ, tests).lb,
     ub = parameter_bounds(ψ, tests).ub,
