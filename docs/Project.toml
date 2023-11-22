@@ -13,7 +13,7 @@ Optimization = "7f7a1694-90dd-40f0-9382-eb1efda571ba"
 OptimizationOptimJL = "36348300-93cb-4f02-beb5-3c3902f8871e"
 
 [compat]
-CairoMakie = "0.10"
+CairoMakie = "0.10, 0.11"
 ComponentArrays = "0.15"
 ContinuumMechanicsBase = "0.1"
 DataInterpolations = "4"
