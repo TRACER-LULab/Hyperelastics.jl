@@ -61,7 +61,6 @@ models = Dict(
     Gent => ComponentVector(μ=240e-3, Jₘ=80.0),
     EdwardVilgis => ComponentVector(Ns=0.10, Nc=0.20, α=0.001, η=0.001),
     NeoHookean => ComponentVector(μ=200e-3),
-    NonaffineMicroSphere => ComponentVector(μ=0.292, N=22.5, p=1.471, U=0.744, q=0.1086),
     Beda => ComponentVector(C1=0.1237, C2=0.0424, C3=7.84e-5, K1=0.0168, α=0.9, β=0.68, ζ=3.015)
 )
 
