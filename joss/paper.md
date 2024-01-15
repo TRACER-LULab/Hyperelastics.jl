@@ -27,7 +27,7 @@ bibliography: paper.bib
 
 The development of `Hyperelastics.jl` began as a study of the accuracy for a variety of material models for a set of experimental data. Often, researchers rely on custom implementations of material models and the data fitting process to find material parameters that match their experimental data. Hyperelastic models can well represent the nonlinear stress-deformation behavior of many biological tissues as well as engineering polymeric materials.
 
-The SEDFs included in this package cover most (if not all)of the available analytical models from the literature to date, from constitutive to phenomelogical models. Furthermore, a selection of data-driven models are incldued as a starting point for the development of new methods.
+The SEDFs included in this package cover most (if not all) of the available analytical models from the literature to date, from constitutive to phenomelogical models. Furthermore, a selection of data-driven models are incldued as a starting point for the development of new methods.
 
 `Hyperelastics.jl` is part of a spinoff Multi-Scale Material Modelling ($M^3$) Suite being developed by Vagus LLC (wwww.vagusllc.com), as a byproduct result of ongoing multi-functional material research being carried out in the Translational Robotics and Controls Engineering Research (TRACER) Lab at Liberty University. A pure Julia implementation allows for the use of automatic differentiation (AD) packages to calculate the partial derivatives of the SEDF. `Hyperelastics.jl` is designed to leverage multiple-dispatch to define a common set of functions for calculating the SED, Second Piola Kirchoff Stress Tensor, and the Cauchy Stress Tensor. The package provides a set of hyperelastic models and an interface to `Optimization.jl` for fitting model parameters. 
 
@@ -58,14 +58,13 @@ axislegend(position = :lt)
 
 ![](treloar_data.png)
 
-Multiple dispatch is used on the corresponding function to calculate the values. Based on the model passed to the function, the correct method will be used in the calculation. StrainEnergyDensity, SecondPiolaKirchoffStressTensor, and CauchyStressTensor accept the deformation state as either the principal components in a vector, `[λ_1, λ₂, λ₃]` or as the deformation gradient matrix, `Fᵢⱼ`. The returned value matches the type of the input. Parameters are accessed by field allowing for `structs`, `NamedTuples`, or other field-based data-types such as those in ComponentArrays.jl and LabelledArrays.jl. For example, the NeoHookean model is accessed with:
+Multiple dispatch is used on the corresponding function to calculate the values. Based on the model passed to the function, the correct method will be used in the calculation. StrainEnergyDensity, SecondPiolaKirchoffStressTensor, and CauchyStressTensor accept the deformation state as either the principal components in a vector, $[\lambda_1, \lambda_2, \lambda_3]$ or as the deformation gradient matrix, $F_{ij}$. The returned value matches the type of the input. Parameters are accessed by field allowing for `structs`, `NamedTuples`, or other field-based data-types such as those in ComponentArrays.jl and LabelledArrays.jl. For example, the NeoHookean model is accessed with:
 
 ```julia
 ψ = NeoHookean()
-λ⃗ = [2.0, sqrt(1/2), sqrt(1/2)]
+λ_vec = [2.0, sqrt(1/2), sqrt(1/2)]
 p = (μ = 10.0, )
-W = StrainEnergyDensity(ψ, λ⃗, p)
-return W # hide
+W = StrainEnergyDensity(ψ, λ_vec, p)
 ```
 
 or
@@ -74,7 +73,6 @@ or
 F = rand(3,3)
 p = (μ = 20.0, )
 W = StrainEnergyDensity(ψ, F, p)
-return W # hide
 ```
 
 A method for creating an `OptimizationProblem` compatible with `Optimization.jl` is provided. To fit the NeoHookean model to the Treloar data previously loaded, an additional field-indexed array is used as the initial guess to `HyperelasticProblem`. It is recommendedto use ComponentArrays.jl for optimization of model parameters.
@@ -87,7 +85,6 @@ prob = HyperelasticProblem(
         ad_type = AutoForwardDiff()
     )
 sol = solve(prob, LBFGS())
-return sol # hide
 ```
 
 For fiting multiple models to the same dataset:
@@ -96,7 +93,7 @@ For fiting multiple models to the same dataset:
 models = Dict(
     Gent => ComponentVector(
                 μ=240e-3, 
-                Jₘ=80.0
+                J_m=80.0
             ),
     EdwardVilgis => ComponentVector(
                 Ns=0.10, 
@@ -119,16 +116,15 @@ models = Dict(
 )
 
 sol = Dict{Any, SciMLSolution}()
-for (ψ, p₀) in models
+for (ψ, p_0) in models
     HEProblem = HyperelasticProblem(
         ψ(), 
         treloar_data, 
-        p₀,  
+        p_0,  
         ad_type = AutoForwardDiff()
     )
     sol[ψ] = solve(HEProblem, NelderMead())
 end
-return sol # hide
 ```
 
 To predict the reponse of a model to a proivded dataset and parameters, a `predict` function is provided:
