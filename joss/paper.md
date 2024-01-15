@@ -1,21 +1,22 @@
 ---
-title: 'Hyperelastics.jl: A Julia package for hyperelastic material modelling'
+title: 'Hyperelastics.jl: A Julia package for hyperelastic material modelling with a large collection of models'
 tags:
   - Julia
   - hyperelasticity
   - solid mechanics
 authors:
   - name: Carson Farmer
-    orcid: 0000-0000-0000-0000
+    orcid: 0000-0002-0456-8301
     equal-contrib: false
     affiliation: 1
   - name: Hector Medina
-    orcid: 0000-0000-0000-0000
+    orcid: 0000-0003-1014-2275
+    affiliation: 1
     equal-contrib: false # (This is how you can denote equal contributions between multiple authors)
 affiliations:
  - name: School of Engineering, Liberty University, Lynchburg, VA, United States
    index: 1
-date: 28 March 2023
+date: 15 January 2024
 bibliography: paper.bib
 ---
 
@@ -35,7 +36,7 @@ Currently, most commercial finite element codes only offer a limited number, oft
 
 # Short Example with Code
 
-For commonly used datasets in hyperelastic modelling, such as the `Treloar1944Uniaxial` data [@treloar1943elasticity], functions are available for getting the datasets:
+For commonly used datasets in hyperelastic modelling, such as the `Treloar1944Uniaxial` data [@treloar1943elasticity]\autoref{fig:fig1}, functions are available for getting the datasets:
 
 ```julia
 using Hyperelastics
@@ -56,7 +57,7 @@ scatter!(ax,
 axislegend(position = :lt)
 ```
 
-![](treloar_data.png)
+![For commonly used datasets, constructors are provided for importing a dataset for evaluating a model, such as the Treloar data. \label{fig:fig1}](treloar_data.png)
 
 Multiple dispatch is used on the corresponding function to calculate the values. Based on the model passed to the function, the correct method will be used in the calculation. StrainEnergyDensity, SecondPiolaKirchoffStressTensor, and CauchyStressTensor accept the deformation state as either the principal components in a vector, $[\lambda_1, \lambda_2, \lambda_3]$ or as the deformation gradient matrix, $F_{ij}$. The returned value matches the type of the input. Parameters are accessed by field allowing for `structs`, `NamedTuples`, or other field-based data-types such as those in ComponentArrays.jl and LabelledArrays.jl. For example, the NeoHookean model is accessed with:
 
@@ -127,7 +128,7 @@ for (ψ, p_0) in models
 end
 ```
 
-To predict the reponse of a model to a proivded dataset and parameters, a `predict` function is provided:
+To predict the reponse of a model to a proivded dataset and parameters, a `predict` function is provided. The results are shown in \autoref{fig:fig2}:
 
 ```julia
 f = Figure()
@@ -155,9 +156,9 @@ scatter!(ax,
 axislegend(position = :lt)
 ```
 
-![](treloar_data_fits.png)
+![The usage of a common interface for a variety of material models allows for rapid evaluation of the accuracy of a model to an experimental dataset. \label{fig:fig2}](treloar_data_fits.png)
 
-While the majority of the models provided by `Hyperelastics.jl` are based on closed form strain energy density functions, a selection of data-driven models are proivded. For example, the `SussmanBathe` model is created with:
+While the majority of the models provided by `Hyperelastics.jl` are based on closed form strain energy density functions, a selection of data-driven models are proivded. For example, the `SussmanBathe` model is created and used to predict the Treloar data \autoref{fig:fig3}:
 
 ```julia
 using DataInterpolations
@@ -186,7 +187,7 @@ scatter!(
     )
 axislegend(position = :lt)
 ```
-![](sussman_bathe.png)
+![The common interface for models allows for newer methods, such as the data-driven Sussman-Bathe model, to be applied for predicting a material's behavior. \label{fig:fig3}](sussman_bathe.png)
 
 # Availability
 
