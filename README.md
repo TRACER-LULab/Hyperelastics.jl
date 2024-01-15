@@ -1,5 +1,5 @@
 # Hyperelastics
-[![Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://cfarm6.github.io/Hyperelastics.jl/stable) [![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://cfarm6.github.io/Hyperelastics.jl/dev)
+[![Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://TRACER-LULab.github.io/Hyperelastics.jl/stable) [![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://TRACER-LULab.github.io/Hyperelastics.jl/dev)
 [![codecov](https://codecov.io/gh/TRACER-LULab/Hyperelastics.jl/graph/badge.svg?token=EML9TQUEP9)](https://codecov.io/gh/TRACER-LULab/Hyperelastics.jl)
 
 
