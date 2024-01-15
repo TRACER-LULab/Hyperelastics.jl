@@ -1,6 +1,6 @@
 # Package Imports
 
-```@example 1
+```@example
 using Hyperelastics
 using Optimization, OptimizationOptimJL
 using ComponentArrays: ComponentVector
