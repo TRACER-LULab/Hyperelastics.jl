@@ -31,7 +31,7 @@ function SussmanBathe(
     σ̂ = interpolant(
         getindex.(data.data.s, 1) .* getindex.(data.data.λ, 1),
         getindex.(data.data.λ, 1);
-        extrapolate=true
+        extrapolate = true,
     )
     f(i, λ) = (σ̂(λ^((4.0)^(-i))) + σ̂(λ^(-0.5 * (4.0^(-i))))) / λ
     w′(λ) = sum(Base.Fix2(f, λ), 0:k)
