@@ -2307,26 +2307,26 @@ function ContinuumMechanicsBase.StrainEnergyDensity(
     λ⃗::Vector{S},
     p,
 ) where {T<:PrincipalValueForm,S}
-    (; μ, Jₘ) = p
-    return -(μ * Jₘ) / 2 * log(1 - (I₁(λ⃗) - 3) / Jₘ)
+    (; μ, J_m) = p
+    return -(μ * J_m) / 2 * log(1 - (I₁(λ⃗) - 3) / J_m)
 end
 
 function ContinuumMechanicsBase.StrainEnergyDensity(
     ::Gent{T},
     I⃗::Vector{S},
-    (; μ, Jₘ),
+    (; μ, J_m),
 ) where {T<:InvariantForm,S}
-    -(μ * Jₘ) / 2 * log(1 - (I⃗[1] - 3) / Jₘ)
+    -(μ * J_m) / 2 * log(1 - (I⃗[1] - 3) / J_m)
 end
 
 function parameters(::Gent)
-    return (:μ, :Jₘ)
+    return (:μ, :J_m)
 end
 
 function parameter_bounds(::Gent, test::AbstractHyperelasticTest{S,T}) where {S,T}
     I₁_max = maximum(I₁.(test.data.λ))
     Jₘ_min = I₁_max - 3
-    lb = (μ = zero(T), Jₘ = Jₘ_min)
+    lb = (μ=zero(T), J_m=Jₘ_min)
     ub = nothing
     return (lb = lb, ub = ub)
 end
