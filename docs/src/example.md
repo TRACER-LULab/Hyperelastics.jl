@@ -6,14 +6,14 @@ using Optimization, OptimizationOptimJL
 using ComponentArrays: ComponentVector
 using ForwardDiff
 using CairoMakie, MakiePublication
-set_theme!(theme_web(width = 800))
+set_theme!(theme_latexfonts())
 ```
 
 For commonly used datasets in hyperelastic modelling, such as the `Treloar1944Uniaxial` data, functions are available for getting the datasets:
 
 ```@example 1
-f = Figure()
-ax = Makie.Axis(f[1,1])
+f = Figure(size = (800,800))
+ax = Makie.Axis(f[1,1], xlabel = "Stretch [-]", ylabel = "Stress [kg/cm²]")
 treloar_data = Treloar1944Uniaxial()
 scatter!(ax, 
     getindex.(treloar_data.data.λ, 1), 
@@ -58,16 +58,15 @@ For fiting multiple models to the same dataset,
 
 ```@example 1
 models = Dict(
-    Gent => ComponentVector(μ=240e-3, Jₘ=80.0),
+    Gent => ComponentVector(μ=240e-3, J_m=80.0),
     EdwardVilgis => ComponentVector(Ns=0.10, Nc=0.20, α=0.001, η=0.001),
     NeoHookean => ComponentVector(μ=200e-3),
-    NonaffineMicroSphere => ComponentVector(μ=0.292, N=22.5, p=1.471, U=0.744, q=0.1086),
     Beda => ComponentVector(C1=0.1237, C2=0.0424, C3=7.84e-5, K1=0.0168, α=0.9, β=0.68, ζ=3.015)
 )
 
 sol = Dict{Any, SciMLSolution}()
-for (ψ, p₀) in models
-    HEProblem = HyperelasticProblem(ψ(), treloar_data, p₀,  ad_type = AutoForwardDiff())
+for (ψ, p_0) in models
+    HEProblem = HyperelasticProblem(ψ(), treloar_data, p_0,  ad_type = AutoForwardDiff())
     sol[ψ] = solve(HEProblem, NelderMead())
 end
 return sol # hide
@@ -76,8 +75,8 @@ return sol # hide
 To predict the reponse of a model to a proivded dataset and parameters, a `predict` function is provided:
 
 ```@example 1
-f = Figure()
-ax = Makie.Axis(f[1,1])
+f = Figure(size = (800,800))
+ax = Makie.Axis(f[1,1], xlabel = "Stretch [-]", ylabel = "Stress [kg/cm²]")
 for (ψ, p) in sol
     pred = predict(ψ(), treloar_data, p.u, ad_type = AutoForwardDiff())
     lines!(ax, getindex.(pred.data.λ, 1), getindex.(pred.data.s, 1), label=string(ψ))
@@ -102,8 +101,10 @@ s₁ = getindex.(treloar_data.data.s, 1)
 λ̂₁ = getindex.(pred.data.λ, 1)
 ŝ₁ = getindex.(pred.data.s, 1)
 
-
-f, ax, p = lines( 
+f = Figure(size = (800,800))
+ax = Makie.Axis(f[1,1], xlabel = "Stretch [-]", ylabel = "Stress [kg/cm²]")
+lines!(
+    ax, 
     λ̂₁, 
     ŝ₁, 
     label = "Sussman-Bathe Approximation"
