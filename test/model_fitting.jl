@@ -22,7 +22,7 @@
     for model in [NeoHookean]
         # Test the incompressible form of the model
         ψ = model()
-        @show model
+        # @show model
         # Get the parameters for the model and check return type
         ps = parameters(ψ)
         # Create an empty parameter set
@@ -76,7 +76,7 @@
             end
         elseif !isnothing(lb)
             for (k, v) in pairs(lb)
-                @show v
+                # @show v
                 guess[k] = !isinf(v) && guess[k] < v ? (float(v) + 0.9) : (1.0)
             end
         elseif !isnothing(ub)

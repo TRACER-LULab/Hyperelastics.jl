@@ -19,10 +19,11 @@
 <article-id pub-id-type="doi">N/A</article-id>
 <title-group>
 <article-title>Hyperelastics.jl: A Julia package for hyperelastic
-material modelling</article-title>
+material modelling with a large collection of models</article-title>
 </title-group>
 <contrib-group>
 <contrib contrib-type="author">
+<contrib-id contrib-id-type="orcid">https://orcid.org/0000-0002-0456-8301</contrib-id>
 <name>
 <surname>Farmer</surname>
 <given-names>Carson</given-names>
@@ -30,11 +31,12 @@ material modelling</article-title>
 <xref ref-type="aff" rid="aff-1"/>
 </contrib>
 <contrib contrib-type="author">
+<contrib-id contrib-id-type="orcid">https://orcid.org/0000-0003-1014-2275</contrib-id>
 <name>
 <surname>Medina</surname>
 <given-names>Hector</given-names>
 </name>
-<xref ref-type="aff" rid="aff-"/>
+<xref ref-type="aff" rid="aff-1"/>
 </contrib>
 <aff id="aff-1">
 <institution-wrap>
@@ -43,10 +45,10 @@ United States</institution>
 </institution-wrap>
 </aff>
 </contrib-group>
-<pub-date date-type="pub" publication-format="electronic" iso-8601-date="2023-03-28">
-<day>28</day>
-<month>3</month>
-<year>2023</year>
+<pub-date date-type="pub" publication-format="electronic" iso-8601-date="2024-01-15">
+<day>15</day>
+<month>1</month>
+<year>2024</year>
 </pub-date>
 <volume>¿VOL?</volume>
 <issue>¿ISSUE?</issue>
@@ -98,7 +100,7 @@ a Creative Commons Attribution 4.0 International License (CC BY
   parameters that match their experimental data. Hyperelastic models can
   well represent the nonlinear stress-deformation behavior of many
   biological tissues as well as engineering polymeric materials.</p>
-  <p>The SEDFs included in this package cover most (if not all)of the
+  <p>The SEDFs included in this package cover most (if not all) of the
   available analytical models from the literature to date, from
   constitutive to phenomelogical models. Furthermore, a selection of
   data-driven models are incldued as a starting point for the
@@ -125,15 +127,16 @@ a Creative Commons Attribution 4.0 International License (CC BY
   given material. The closest project to
   <monospace>Hyperelastics.jl</monospace> is the
   <monospace>matADi</monospace> project by Andreas Dutzler
-  (<xref alt="Dutzlet, n.d." rid="ref-matAdi2023" ref-type="bibr">Dutzlet,
-  n.d.</xref>) which has AD support for 18 material models.</p>
+  (<xref alt="Dutzler, 2023" rid="ref-matAdi2023" ref-type="bibr">Dutzler,
+  2023</xref>) which has AD support for 18 material models.</p>
 </sec>
 <sec id="short-example-with-code">
   <title>Short Example with Code</title>
   <p>For commonly used datasets in hyperelastic modelling, such as the
   <monospace>Treloar1944Uniaxial</monospace> data
   (<xref alt="Treloar, 1943" rid="ref-treloar1943elasticity" ref-type="bibr">Treloar,
-  1943</xref>), functions are available for getting the datasets:</p>
+  1943</xref>)<xref alt="[fig:fig1]" rid="figU003Afig1">[fig:fig1]</xref>,
+  functions are available for getting the datasets:</p>
   <code language="julia">using Hyperelastics
 using Optimization, OptimizationOptimJL
 using ComponentArrays: ComponentVector
@@ -150,29 +153,37 @@ scatter!(ax,
     color = :black
 )
 axislegend(position = :lt)</code>
-  <graphic mimetype="image" mime-subtype="png" xlink:href="media/treloar_data.png" />
+  <fig>
+    <caption><p>For commonly used datasets, constructors are provided
+    for importing a dataset for evaluating a model, such as the Treloar
+    data.
+    <styled-content id="figU003Afig1"></styled-content></p></caption>
+    <graphic mimetype="image" mime-subtype="png" xlink:href="media/treloar_data.png" />
+  </fig>
   <p>Multiple dispatch is used on the corresponding function to
   calculate the values. Based on the model passed to the function, the
   correct method will be used in the calculation. StrainEnergyDensity,
   SecondPiolaKirchoffStressTensor, and CauchyStressTensor accept the
   deformation state as either the principal components in a vector,
-  <monospace>[λ_1, λ₂, λ₃]</monospace> or as the deformation gradient
-  matrix, <monospace>Fᵢⱼ</monospace>. The returned value matches the
-  type of the input. Parameters are accessed by field allowing for
-  <monospace>structs</monospace>, <monospace>NamedTuples</monospace>, or
-  other field-based data-types such as those in ComponentArrays.jl and
-  LabelledArrays.jl. For example, the NeoHookean model is accessed
-  with:</p>
+  <inline-formula><alternatives>
+  <tex-math><![CDATA[[\lambda_1, \lambda_2, \lambda_3]]]></tex-math>
+  <mml:math display="inline" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mrow><mml:mo stretchy="true" form="prefix">[</mml:mo><mml:msub><mml:mi>λ</mml:mi><mml:mn>1</mml:mn></mml:msub><mml:mo>,</mml:mo><mml:msub><mml:mi>λ</mml:mi><mml:mn>2</mml:mn></mml:msub><mml:mo>,</mml:mo><mml:msub><mml:mi>λ</mml:mi><mml:mn>3</mml:mn></mml:msub><mml:mo stretchy="true" form="postfix">]</mml:mo></mml:mrow></mml:math></alternatives></inline-formula>
+  or as the deformation gradient matrix, <inline-formula><alternatives>
+  <tex-math><![CDATA[F_{ij}]]></tex-math>
+  <mml:math display="inline" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:msub><mml:mi>F</mml:mi><mml:mrow><mml:mi>i</mml:mi><mml:mi>j</mml:mi></mml:mrow></mml:msub></mml:math></alternatives></inline-formula>.
+  The returned value matches the type of the input. Parameters are
+  accessed by field allowing for <monospace>structs</monospace>,
+  <monospace>NamedTuples</monospace>, or other field-based data-types
+  such as those in ComponentArrays.jl and LabelledArrays.jl. For
+  example, the NeoHookean model is accessed with:</p>
   <code language="julia">ψ = NeoHookean()
-λ⃗ = [2.0, sqrt(1/2), sqrt(1/2)]
+λ_vec = [2.0, sqrt(1/2), sqrt(1/2)]
 p = (μ = 10.0, )
-W = StrainEnergyDensity(ψ, λ⃗, p)
-return W # hide</code>
+W = StrainEnergyDensity(ψ, λ_vec, p)</code>
   <p>or</p>
   <code language="julia">F = rand(3,3)
 p = (μ = 20.0, )
-W = StrainEnergyDensity(ψ, F, p)
-return W # hide</code>
+W = StrainEnergyDensity(ψ, F, p)</code>
   <p>A method for creating an <monospace>OptimizationProblem</monospace>
   compatible with <monospace>Optimization.jl</monospace> is provided. To
   fit the NeoHookean model to the Treloar data previously loaded, an
@@ -185,13 +196,12 @@ return W # hide</code>
         ComponentVector(μ = 0.2), 
         ad_type = AutoForwardDiff()
     )
-sol = solve(prob, LBFGS())
-return sol # hide</code>
+sol = solve(prob, LBFGS())</code>
   <p>For fiting multiple models to the same dataset:</p>
   <code language="julia">models = Dict(
     Gent =&gt; ComponentVector(
                 μ=240e-3, 
-                Jₘ=80.0
+                J_m=80.0
             ),
     EdwardVilgis =&gt; ComponentVector(
                 Ns=0.10, 
@@ -214,18 +224,19 @@ return sol # hide</code>
 )
 
 sol = Dict{Any, SciMLSolution}()
-for (ψ, p₀) in models
+for (ψ, p_0) in models
     HEProblem = HyperelasticProblem(
         ψ(), 
         treloar_data, 
-        p₀,  
+        p_0,  
         ad_type = AutoForwardDiff()
     )
     sol[ψ] = solve(HEProblem, NelderMead())
-end
-return sol # hide</code>
+end</code>
   <p>To predict the reponse of a model to a proivded dataset and
-  parameters, a <monospace>predict</monospace> function is provided:</p>
+  parameters, a <monospace>predict</monospace> function is provided. The
+  results are shown in
+  <xref alt="[fig:fig2]" rid="figU003Afig2">[fig:fig2]</xref>:</p>
   <code language="julia">f = Figure()
 ax = Axis(f[1,1])
 for (ψ, p) in sol
@@ -249,12 +260,19 @@ scatter!(ax,
     color = :black
 )
 axislegend(position = :lt)</code>
-  <graphic mimetype="image" mime-subtype="png" xlink:href="media/treloar_data_fits.png" />
+  <fig>
+    <caption><p>The usage of a common interface for a variety of
+    material models allows for rapid evaluation of the accuracy of a
+    model to an experimental dataset.
+    <styled-content id="figU003Afig2"></styled-content></p></caption>
+    <graphic mimetype="image" mime-subtype="png" xlink:href="media/treloar_data_fits.png" />
+  </fig>
   <p>While the majority of the models provided by
   <monospace>Hyperelastics.jl</monospace> are based on closed form
   strain energy density functions, a selection of data-driven models are
   proivded. For example, the <monospace>SussmanBathe</monospace> model
-  is created with:</p>
+  is created and used to predict the Treloar data
+  <xref alt="[fig:fig3]" rid="figU003Afig3">[fig:fig3]</xref>:</p>
   <code language="julia">using DataInterpolations
 ψ = SussmanBathe(treloar_data, k=4, interpolant = QuadraticSpline)
 λ_1 = range(extrema(getindex.(treloar_data.data.λ, 1))..., length = 100)
@@ -280,7 +298,13 @@ scatter!(
         color = :black
     )
 axislegend(position = :lt)</code>
-  <graphic mimetype="image" mime-subtype="png" xlink:href="media/sussman_bathe.png" />
+  <fig>
+    <caption><p>The common interface for models allows for newer
+    methods, such as the data-driven Sussman-Bathe model, to be applied
+    for predicting a material’s behavior.
+    <styled-content id="figU003Afig3"></styled-content></p></caption>
+    <graphic mimetype="image" mime-subtype="png" xlink:href="media/sussman_bathe.png" />
+  </fig>
 </sec>
 <sec id="availability">
   <title>Availability</title>
@@ -299,9 +323,10 @@ axislegend(position = :lt)</code>
   <ref id="ref-matAdi2023">
     <element-citation publication-type="software">
       <person-group person-group-type="author">
-        <name><surname>Dutzlet</surname><given-names>Andreas</given-names></name>
+        <name><surname>Dutzler</surname><given-names>Andreas</given-names></name>
       </person-group>
       <article-title>matADi: Material definition with automatic differentiation</article-title>
+      <year iso-8601-date="2023">2023</year>
       <uri>https://github.com/adtzlr/matadi</uri>
     </element-citation>
   </ref>
@@ -319,8 +344,8 @@ axislegend(position = :lt)</code>
       <volume>59</volume>
       <issue>1</issue>
       <uri>
-                    https://doi.org/10.1137/141000671
-                    </uri>
+                   https://doi.org/10.1137/141000671
+                   </uri>
       <pub-id pub-id-type="doi">10.1137/141000671</pub-id>
       <fpage>65</fpage>
       <lpage>98</lpage>
