@@ -59,9 +59,7 @@ jobs:
           julia --project=docs/ -e '
             using Pkg
             Pkg.develop([
-            PackageSpec(path=pwd()),
-            PackageSpec(url="https://github.com/cfarm6/ContinuumMechanicsBase.jl.git"),
-            PackageSpec(url="https://github.com/cfarm6/InverseLangevinApproximations.jl.git"),
+                PackageSpec(path=pwd()),
             ])
             Pkg.instantiate()
             Pkg.update()'
