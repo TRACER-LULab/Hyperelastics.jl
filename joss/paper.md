@@ -57,8 +57,6 @@ scatter!(ax,
 axislegend(position = :lt)
 ```
 
-![For commonly used datasets, constructors are provided for importing a dataset for evaluating a model, such as the Treloar data. \label{fig:fig1}](treloar_data.png)
-
 Multiple dispatch is used on the corresponding function to calculate the values. Based on the model passed to the function, the correct method will be used in the calculation. StrainEnergyDensity, SecondPiolaKirchoffStressTensor, and CauchyStressTensor accept the deformation state as either the principal components in a vector, $[\lambda_1, \lambda_2, \lambda_3]$ or as the deformation gradient matrix, $F_{ij}$. The returned value matches the type of the input. Parameters are accessed by field allowing for `structs`, `NamedTuples`, or other field-based data-types such as those in ComponentArrays.jl and LabelledArrays.jl. For example, the NeoHookean model is accessed with:
 
 ```julia
@@ -88,7 +86,7 @@ prob = HyperelasticProblem(
 sol = solve(prob, LBFGS())
 ```
 
-For fiting multiple models to the same dataset:
+For fiting multiple models, such as the Gent[@gent1996new], Edward-Vilgis [@edwards1986effect], Neo-Hookean [@treloar1979non], and Beda [@beda2005reconciling] models, to the same Treloar dataset:
 
 ```julia
 models = Dict(
@@ -128,7 +126,7 @@ for (ψ, p_0) in models
 end
 ```
 
-To predict the reponse of a model to a proivded dataset and parameters, a `predict` function is provided. The results are shown in \autoref{fig:fig2}:
+To predict the reponse of a model to a proivded dataset and parameters, a `predict` function is provided. The results are shown in \autoref{fig:fig1}:
 
 ```julia
 f = Figure()
@@ -156,9 +154,9 @@ scatter!(ax,
 axislegend(position = :lt)
 ```
 
-![The usage of a common interface for a variety of material models allows for rapid evaluation of the accuracy of a model to an experimental dataset. \label{fig:fig2}](treloar_data_fits.png)
+![The Gent, Beda, Edward-Vilgis, and Neo-Hookean material models calibrated to the Treloar data. \label{fig:fig1}](treloar_data_fits.png)
 
-While the majority of the models provided by `Hyperelastics.jl` are based on closed form strain energy density functions, a selection of data-driven models are proivded. For example, the `SussmanBathe` model is created and used to predict the Treloar data \autoref{fig:fig3}:
+While the majority of the models provided by `Hyperelastics.jl` are based on closed form strain energy density functions, a selection of data-driven models are proivded. For example, the `SussmanBathe` [@sussman2009model] model is created and used to predict the Treloar data \autoref{fig:fig3}:
 
 ```julia
 using DataInterpolations
@@ -187,7 +185,7 @@ scatter!(
     )
 axislegend(position = :lt)
 ```
-![The common interface for models allows for newer methods, such as the data-driven Sussman-Bathe model, to be applied for predicting a material's behavior. \label{fig:fig3}](sussman_bathe.png)
+![The Sussman-Bathe model approach for predicting the Treloar data. The data-driven approaches utilize the same interface as the analytical methods allowing for rapid development of new models. \label{fig:fig3}](sussman_bathe.png)
 
 # Availability
 

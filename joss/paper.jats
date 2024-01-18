@@ -153,13 +153,6 @@ scatter!(ax,
     color = :black
 )
 axislegend(position = :lt)</code>
-  <fig>
-    <caption><p>For commonly used datasets, constructors are provided
-    for importing a dataset for evaluating a model, such as the Treloar
-    data.
-    <styled-content id="figU003Afig1"></styled-content></p></caption>
-    <graphic mimetype="image" mime-subtype="png" xlink:href="media/treloar_data.png" />
-  </fig>
   <p>Multiple dispatch is used on the corresponding function to
   calculate the values. Based on the model passed to the function, the
   correct method will be used in the calculation. StrainEnergyDensity,
@@ -197,7 +190,15 @@ W = StrainEnergyDensity(ψ, F, p)</code>
         ad_type = AutoForwardDiff()
     )
 sol = solve(prob, LBFGS())</code>
-  <p>For fiting multiple models to the same dataset:</p>
+  <p>For fiting multiple models, such as the
+  Gent(<xref alt="Gent, 1996" rid="ref-gent1996new" ref-type="bibr">Gent,
+  1996</xref>), Edward-Vilgis
+  (<xref alt="Edwards &amp; Vilgis, 1986" rid="ref-edwards1986effect" ref-type="bibr">Edwards
+  &amp; Vilgis, 1986</xref>), Neo-Hookean
+  (<xref alt="Treloar &amp; Riding, 1979" rid="ref-treloar1979non" ref-type="bibr">Treloar
+  &amp; Riding, 1979</xref>), and Beda
+  (<xref alt="Beda, 2005" rid="ref-beda2005reconciling" ref-type="bibr">Beda,
+  2005</xref>) models, to the same Treloar dataset:</p>
   <code language="julia">models = Dict(
     Gent =&gt; ComponentVector(
                 μ=240e-3, 
@@ -236,7 +237,7 @@ end</code>
   <p>To predict the reponse of a model to a proivded dataset and
   parameters, a <monospace>predict</monospace> function is provided. The
   results are shown in
-  <xref alt="[fig:fig2]" rid="figU003Afig2">[fig:fig2]</xref>:</p>
+  <xref alt="[fig:fig1]" rid="figU003Afig1">[fig:fig1]</xref>:</p>
   <code language="julia">f = Figure()
 ax = Axis(f[1,1])
 for (ψ, p) in sol
@@ -261,17 +262,18 @@ scatter!(ax,
 )
 axislegend(position = :lt)</code>
   <fig>
-    <caption><p>The usage of a common interface for a variety of
-    material models allows for rapid evaluation of the accuracy of a
-    model to an experimental dataset.
-    <styled-content id="figU003Afig2"></styled-content></p></caption>
+    <caption><p>The Gent, Beda, Edward-Vilgis, and Neo-Hookean material
+    models calibrated to the Treloar data.
+    <styled-content id="figU003Afig1"></styled-content></p></caption>
     <graphic mimetype="image" mime-subtype="png" xlink:href="media/treloar_data_fits.png" />
   </fig>
   <p>While the majority of the models provided by
   <monospace>Hyperelastics.jl</monospace> are based on closed form
   strain energy density functions, a selection of data-driven models are
-  proivded. For example, the <monospace>SussmanBathe</monospace> model
-  is created and used to predict the Treloar data
+  proivded. For example, the <monospace>SussmanBathe</monospace>
+  (<xref alt="Sussman &amp; Bathe, 2009" rid="ref-sussman2009model" ref-type="bibr">Sussman
+  &amp; Bathe, 2009</xref>) model is created and used to predict the
+  Treloar data
   <xref alt="[fig:fig3]" rid="figU003Afig3">[fig:fig3]</xref>:</p>
   <code language="julia">using DataInterpolations
 ψ = SussmanBathe(treloar_data, k=4, interpolant = QuadraticSpline)
@@ -299,9 +301,10 @@ scatter!(
     )
 axislegend(position = :lt)</code>
   <fig>
-    <caption><p>The common interface for models allows for newer
-    methods, such as the data-driven Sussman-Bathe model, to be applied
-    for predicting a material’s behavior.
+    <caption><p>The Sussman-Bathe model approach for predicting the
+    Treloar data. The data-driven approaches utilize the same interface
+    as the analytical methods allowing for rapid development of new
+    models.
     <styled-content id="figU003Afig3"></styled-content></p></caption>
     <graphic mimetype="image" mime-subtype="png" xlink:href="media/sussman_bathe.png" />
   </fig>
@@ -330,6 +333,22 @@ axislegend(position = :lt)</code>
       <uri>https://github.com/adtzlr/matadi</uri>
     </element-citation>
   </ref>
+  <ref id="ref-sussman2009model">
+    <element-citation publication-type="article-journal">
+      <person-group person-group-type="author">
+        <name><surname>Sussman</surname><given-names>Theodore</given-names></name>
+        <name><surname>Bathe</surname><given-names>Klaus-Jürgen</given-names></name>
+      </person-group>
+      <article-title>A model of incompressible isotropic hyperelastic material behavior using spline interpolations of tension–compression test data</article-title>
+      <source>Communications in numerical methods in engineering</source>
+      <publisher-name>Wiley Online Library</publisher-name>
+      <year iso-8601-date="2009">2009</year>
+      <volume>25</volume>
+      <issue>1</issue>
+      <fpage>53</fpage>
+      <lpage>63</lpage>
+    </element-citation>
+  </ref>
   <ref id="ref-Bezanson2017">
     <element-citation publication-type="article-journal">
       <person-group person-group-type="author">
@@ -351,6 +370,21 @@ axislegend(position = :lt)</code>
       <lpage>98</lpage>
     </element-citation>
   </ref>
+  <ref id="ref-beda2005reconciling">
+    <element-citation publication-type="article-journal">
+      <person-group person-group-type="author">
+        <name><surname>Beda</surname><given-names>T</given-names></name>
+      </person-group>
+      <article-title>Reconciling the fundamental phenomenological expression of the strain energy of rubber with established experimental facts</article-title>
+      <source>Journal of Polymer Science Part B: Polymer Physics</source>
+      <publisher-name>Wiley Online Library</publisher-name>
+      <year iso-8601-date="2005">2005</year>
+      <volume>43</volume>
+      <issue>2</issue>
+      <fpage>125</fpage>
+      <lpage>134</lpage>
+    </element-citation>
+  </ref>
   <ref id="ref-treloar1943elasticity">
     <element-citation publication-type="article-journal">
       <person-group person-group-type="author">
@@ -363,6 +397,70 @@ axislegend(position = :lt)</code>
       <volume>39</volume>
       <fpage>241</fpage>
       <lpage>246</lpage>
+    </element-citation>
+  </ref>
+  <ref id="ref-beda2005reconciling">
+    <element-citation publication-type="article-journal">
+      <person-group person-group-type="author">
+        <name><surname>Beda</surname><given-names>T</given-names></name>
+      </person-group>
+      <article-title>Reconciling the fundamental phenomenological expression of the strain energy of rubber with established experimental facts</article-title>
+      <source>Journal of Polymer Science Part B: Polymer Physics</source>
+      <publisher-name>Wiley Online Library</publisher-name>
+      <year iso-8601-date="2005">2005</year>
+      <volume>43</volume>
+      <issue>2</issue>
+      <fpage>125</fpage>
+      <lpage>134</lpage>
+    </element-citation>
+  </ref>
+  <ref id="ref-gent1996new">
+    <element-citation publication-type="article-journal">
+      <person-group person-group-type="author">
+        <name><surname>Gent</surname><given-names>A. N.</given-names></name>
+      </person-group>
+      <article-title>A New Constitutive Relation for Rubber</article-title>
+      <source>Rubber Chemistry and Technology</source>
+      <year iso-8601-date="1996-03">1996</year><month>03</month>
+      <volume>69</volume>
+      <issue>1</issue>
+      <issn>0035-9475</issn>
+      <uri>https://doi.org/10.5254/1.3538357</uri>
+      <pub-id pub-id-type="doi">10.5254/1.3538357</pub-id>
+      <fpage>59</fpage>
+      <lpage>61</lpage>
+    </element-citation>
+  </ref>
+  <ref id="ref-edwards1986effect">
+    <element-citation publication-type="article-journal">
+      <person-group person-group-type="author">
+        <name><surname>Edwards</surname><given-names>SF</given-names></name>
+        <name><surname>Vilgis</surname><given-names>Th</given-names></name>
+      </person-group>
+      <article-title>The effect of entanglements in rubber elasticity</article-title>
+      <source>Polymer</source>
+      <publisher-name>Elsevier</publisher-name>
+      <year iso-8601-date="1986">1986</year>
+      <volume>27</volume>
+      <issue>4</issue>
+      <fpage>483</fpage>
+      <lpage>492</lpage>
+    </element-citation>
+  </ref>
+  <ref id="ref-treloar1979non">
+    <element-citation publication-type="article-journal">
+      <person-group person-group-type="author">
+        <name><surname>Treloar</surname><given-names>LRG</given-names></name>
+        <name><surname>Riding</surname><given-names>G</given-names></name>
+      </person-group>
+      <article-title>A non-gaussian theory for rubber in biaxial strain. I. Mechanical properties</article-title>
+      <source>Proceedings of the Royal Society of London. A. Mathematical and Physical Sciences</source>
+      <publisher-name>The Royal Society London</publisher-name>
+      <year iso-8601-date="1979">1979</year>
+      <volume>369</volume>
+      <issue>1737</issue>
+      <fpage>261</fpage>
+      <lpage>280</lpage>
     </element-citation>
   </ref>
 </ref-list>
