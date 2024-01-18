@@ -2326,7 +2326,7 @@ end
 function parameter_bounds(::Gent, test::AbstractHyperelasticTest{S,T}) where {S,T}
     I₁_max = maximum(I₁.(test.data.λ))
     Jₘ_min = I₁_max - 3
-    lb = (μ=zero(T), J_m=Jₘ_min)
+    lb = (μ = zero(T), J_m = Jₘ_min)
     ub = nothing
     return (lb = lb, ub = ub)
 end
