@@ -6,6 +6,15 @@ CurrentModule = Hyperelastics
 
 `Hyperelastics.jl` relies on `ContinuumMechanicsBase.jl` for the definitions of key continuum terms. Please cite the package if you use it in your work.
 
+## Installation 
+
+To install `Hyperelastics.jl`, use the Julia package manager:
+
+```julia
+using Pkg
+Pkg.add("Hyperelastics")
+```
+
 ## Statement of Need
 
 The development of `Hyperelastics.jl` began as a study of the accuracy for a variety of material models for a set of experimental data. Often, researchers rely on custom implementations of material models and the data fitting process to find material parameters that match their experimental data. Hyperelastic models can well represent the nonlinear stress-deformation behavior of many biological tissues as well as engineering polymeric materials.

@@ -3,7 +3,16 @@
 [![codecov](https://codecov.io/gh/TRACER-LULab/Hyperelastics.jl/graph/badge.svg?token=EML9TQUEP9)](https://codecov.io/gh/TRACER-LULab/Hyperelastics.jl)
 
 
-A hyperelastic model library and fitting toolkit developed by TRACER Lab at Liberty University. A constructor is provided for [Optimization.jl](https://github.com/SciML/Optimization.jl) for parameter fitting based on experimental data.
+A hyperelastic model library and fitting toolkit developed by TRACER Lab at Liberty University. An extension is provided for [Optimization.jl](https://github.com/SciML/Optimization.jl) for model calibration based on experimental data.
+
+## Installation
+
+To install `Hyperelastics.jl`, use the Julia package manager:
+
+```julia
+using Pkg
+Pkg.add("Hyperelastics")
+```
 
 ## Statement of Need
 
