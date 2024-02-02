@@ -10,15 +10,15 @@ makedocs(;
     # plugins = [bib],
     modules = [Hyperelastics],
     authors = "Carson Farmer <59753859+cfarm6@users.noreply.github.com> and contributors",
-    repo = "https://github.com/cfarm6/Hyperelastics.jl/blob/{commit}{path}#{line}",
+    repo = "https://github.com/TRACER-LULab/Hyperelastics.jl/blob/{commit}{path}#{line}",
     sitename = "Hyperelastics.jl",
     format = Documenter.HTML(;
         prettyurls = get(ENV, "CI", "false") == "true",
-        canonical = "https://cfarm6.github.io/Hyperelastics.jl",
+        canonical = "https://TRACER-LULab.github.io/Hyperelastics.jl",
         edit_link = "main",
         assets = String[],
     ),
     pages = ["Home" => "index.md", "API" => "API.md", "Example" => "example.md"],
 )
 
-deploydocs(; repo = "github.com/cfarm6/Hyperelastics.jl", devbranch = "main")
+deploydocs(; repo = "github.com/TRACER-LULab/Hyperelastics.jl", devbranch = "main")
