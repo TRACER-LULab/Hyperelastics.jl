@@ -92,14 +92,18 @@ a Creative Commons Attribution 4.0 International License (CC BY
   relationships.</p>
 </sec>
 <sec id="statement-of-need">
-  <title>Statement of need</title>
+  <title>Statement of Need</title>
   <p>The development of <monospace>Hyperelastics.jl</monospace> began as
   a study of the accuracy for a variety of material models for a set of
   experimental data. Often, researchers rely on custom implementations
   of material models and the data fitting process to find material
   parameters that match their experimental data. Hyperelastic models can
   well represent the nonlinear stress-deformation behavior of many
-  biological tissues as well as engineering polymeric materials.</p>
+  biological tissues
+  (<xref alt="Wex et al., 2015" rid="ref-wex2015isotropic" ref-type="bibr">Wex
+  et al., 2015</xref>) as well as engineering polymeric materials
+  (<xref alt="Beda, 2014" rid="ref-beda2014approach" ref-type="bibr">Beda,
+  2014</xref>).</p>
   <p>The SEDFs included in this package cover most (if not all) of the
   available analytical models from the literature to date, from
   constitutive to phenomelogical models. Furthermore, a selection of
@@ -119,8 +123,9 @@ a Creative Commons Attribution 4.0 International License (CC BY
   multiple-dispatch to define a common set of functions for calculating
   the SED, Second Piola Kirchoff Stress Tensor, and the Cauchy Stress
   Tensor. The package provides a set of hyperelastic models and an
-  interface to <monospace>Optimization.jl</monospace> for fitting model
-  parameters.</p>
+  interface to <monospace>Optimization.jl</monospace>
+  (<xref alt="Dixit &amp; Rackauckas, 2023" rid="ref-vaibhav_kumar_dixit_2023_7738525" ref-type="bibr">Dixit
+  &amp; Rackauckas, 2023</xref>) for fitting model parameters.</p>
   <p>Currently, most commercial finite element codes only offer a
   limited number, often less than 10, of hyperelastic models which
   limits the extent to which researchers are able to accurately model a
@@ -331,6 +336,52 @@ axislegend(position = :lt)</code>
       <article-title>matADi: Material definition with automatic differentiation</article-title>
       <year iso-8601-date="2023">2023</year>
       <uri>https://github.com/adtzlr/matadi</uri>
+    </element-citation>
+  </ref>
+  <ref id="ref-wex2015isotropic">
+    <element-citation publication-type="article-journal">
+      <person-group person-group-type="author">
+        <name><surname>Wex</surname><given-names>Cora</given-names></name>
+        <name><surname>Arndt</surname><given-names>Susann</given-names></name>
+        <name><surname>Stoll</surname><given-names>Anke</given-names></name>
+        <name><surname>Bruns</surname><given-names>Christiane</given-names></name>
+        <name><surname>Kupriyanova</surname><given-names>Yuliya</given-names></name>
+      </person-group>
+      <article-title>Isotropic incompressible hyperelastic models for modelling the mechanical behaviour of biological tissues: A review</article-title>
+      <source>Biomedical Engineering/Biomedizinische Technik</source>
+      <publisher-name>De Gruyter</publisher-name>
+      <year iso-8601-date="2015">2015</year>
+      <volume>60</volume>
+      <issue>6</issue>
+      <fpage>577</fpage>
+      <lpage>592</lpage>
+    </element-citation>
+  </ref>
+  <ref id="ref-beda2014approach">
+    <element-citation publication-type="article-journal">
+      <person-group person-group-type="author">
+        <name><surname>Beda</surname><given-names>T</given-names></name>
+      </person-group>
+      <article-title>An approach for hyperelastic model-building and parameters estimation a review of constitutive models</article-title>
+      <source>European Polymer Journal</source>
+      <publisher-name>Elsevier</publisher-name>
+      <year iso-8601-date="2014">2014</year>
+      <volume>50</volume>
+      <fpage>97</fpage>
+      <lpage>108</lpage>
+    </element-citation>
+  </ref>
+  <ref id="ref-vaibhav_kumar_dixit_2023_7738525">
+    <element-citation publication-type="software">
+      <person-group person-group-type="author">
+        <name><surname>Dixit</surname><given-names>Vaibhav Kumar</given-names></name>
+        <name><surname>Rackauckas</surname><given-names>Christopher</given-names></name>
+      </person-group>
+      <article-title>Optimization.jl: A unified optimization package</article-title>
+      <publisher-name>Zenodo</publisher-name>
+      <year iso-8601-date="2023-03">2023</year><month>03</month>
+      <uri>https://doi.org/10.5281/zenodo.7738525</uri>
+      <pub-id pub-id-type="doi">10.5281/zenodo.7738525</pub-id>
     </element-citation>
   </ref>
   <ref id="ref-sussman2009model">
