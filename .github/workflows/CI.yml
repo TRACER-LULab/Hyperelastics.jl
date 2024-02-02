@@ -71,3 +71,7 @@ jobs:
             using Hyperelastics
             DocMeta.setdocmeta!(Hyperelastics, :DocTestSetup, :(using Hyperelastics); recursive=true)
             doctest(Hyperelastics)'
+      - name: Build and deploy
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # If authenticating with GitHub Actions token
+        run: julia --project=docs docs/make.jl
