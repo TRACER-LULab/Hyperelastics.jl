@@ -28,7 +28,7 @@ Currently, most commercial finite element codes only offer a limited number, oft
 ## Community Guidelines
 
 To sustainably develop the package, we will use the established practices from the SciML community for guidlines:
-- For any issues with or contributions, please open an (issue in GitHub)[https://github.com/TRACER-LULab/Hyperelastics.jl/issues] or a (PR)[https://github.com/TRACER-LULab/Hyperelastics.jl/pulls] as appropriate.
+- For any issues with or contributions, please open an [issue in GitHub](https://github.com/TRACER-LULab/Hyperelastics.jl/issues) or a [PR](https://github.com/TRACER-LULab/Hyperelastics.jl/pulls) as appropriate.
 
 - Please refer to the
     [SciML ColPrac: Contributor's Guide on Collaborative Practices for Community Packages](https://github.com/SciML/ColPrac/blob/master/README.md)
