@@ -34,158 +34,29 @@ The SEDFs included in this package cover most (if not all) of the available anal
 
 Currently, most commercial finite element codes only offer a limited number, often less than 10, of hyperelastic models which limits the extent to which researchers are able to accurately model a given material. The closest project to `Hyperelastics.jl` is the `matADi` project by Andreas Dutzler [@matAdi2023] which has AD support for 18 material models. 
 
-# Short Example with Code
+# Comparison with Similar Packages
 
-For commonly used datasets in hyperelastic modelling, such as the `Treloar1944Uniaxial` data [@treloar1943elasticity]\autoref{fig:fig1}, functions are available for getting the datasets:
+Similar to the `matADi` project by Andreas Dutzler, `Hyperelastics.jl` provides AD compatible implementations of hyperelastic models. However, `Hyperelastics.jl` provides a significantly larger set of material models and offers the potential for including different compressible material model terms. `matADi` does include models for anisotropic hyperelastic materials which is not support in the current version of `Hyperelastics.jl`. `matADi` is focused on python based implementations while `Hyperelastics.jl` is a pure Julia implementation. 
 
-```julia
-using Hyperelastics
-using Optimization, OptimizationOptimJL
-using ComponentArrays: ComponentVector
-using ForwardDiff
-using CairoMakie, MakiePublication
-set_theme!(theme_web(width = 800))
-f = Figure()
-ax = Axis(f[1,1])
-treloar_data = Treloar1944Uniaxial()
-scatter!(ax, 
-    getindex.(treloar_data.data.λ, 1), 
-    getindex.(treloar_data.data.s, 1), 
-    label = "Treloar 1944 Experimental",
-    color = :black
-)
-axislegend(position = :lt)
-```
+For using material models in a simulation, the leading commercial finite element analysis (FEA) programs, such as Abaqus, Ansys, and LS-DYNA, provide a significantly smaller set of hyperelastic models (often less than 10). Implementing a new model in the commercial programs is often a complex and time-consuming process requiring explicit definition of different partial derivative terms. Furthermore, the model implementations are not compatible between commercial programs. To fill the commercial gap, PolymerFEM [link](www.polymerfem.com) provides a slightly larger set of models for implementation with a focus on visco-elastic and visco-plastic models. From the inital work done with `Hyperelastics.jl`, it is expected that the AD compatibility will allow for a significant improvement in terms of model construction for visco-hyperelastic models. More recently, Wan et al. [@wan2024user] implemented over 70 hyperelastic material models as Abaqus subroutines. The implementation is not AD compatible and is limited to the Abaqus FEA software.
 
-Multiple dispatch is used on the corresponding function to calculate the values. Based on the model passed to the function, the correct method will be used in the calculation. StrainEnergyDensity, SecondPiolaKirchoffStressTensor, and CauchyStressTensor accept the deformation state as either the principal components in a vector, $[\lambda_1, \lambda_2, \lambda_3]$ or as the deformation gradient matrix, $F_{ij}$. The returned value matches the type of the input. Parameters are accessed by field allowing for `structs`, `NamedTuples`, or other field-based data-types such as those in ComponentArrays.jl and LabelledArrays.jl. For example, the NeoHookean model is accessed with:
+The `Hyperelastics.jl` package aims to fill the gap of providing an open-source and AD compatible implementation of the largest set of Hyperelatic material models available. AD-compatibility reduces the time from model selection to implementation when compared to implementing a new model in a commercial program. Furthermore, the open-source nature allows for the models to be accesible to researchers for further study.
 
-```julia
-ψ = NeoHookean()
-λ_vec = [2.0, sqrt(1/2), sqrt(1/2)]
-p = (μ = 10.0, )
-W = StrainEnergyDensity(ψ, λ_vec, p)
-```
+## Use Case: Fitting a Hyperelastic Model to Experimental Data
 
-or
+The common workflow for modelling a new hyperelastic material is shown in figure \autoref{fig:workflow}. The process commonly begins with the user proving a set of stress-stretch data for a set of uniaxial and/or biaxial tension/compression experiments. The data is loaded into `HyperelasticUniaxialTest` or `HyperelasticBiaxialTest` depending on the nature of the experiment. If the material is assumed to be incompressible, the data for the other principal stretches is calculated. The selection of hyperelastic models is based on multiple dispatch. The primary functions for computations are: `StrainEnergyDensity`, `SecondPiolaKirchoffStressTensor`, and `CauchyStressTensor`. The Second Piola-Kirchoff and Cauchy Stress Tensors are computed by using the partial derivatives of the strain energy density function. By using AD, the implementation of partial derivatives for the majority of the models can be skipped. Furthmore, extensions are provided to load compatible AD functions based on the AD-backend selected. Material models are considered as `structs` and multiple dispatch is used to select the correct equation for the given model. The model parameters are similarly stored in either `structs`, `NamedTuples`, or other field-based data-types such as those in `ComponentArrays.jl` and `LabelledArrays.jl`.
 
-```julia
-F = rand(3,3)
-p = (μ = 20.0, )
-W = StrainEnergyDensity(ψ, F, p)
-```
+Once a user has their experimental data, model, and model parameters, an extension is loaded when `Optimization.jl` is used to load a function for calibrating the material model to the experimental data. The `HyperelasticProblem` function take the experimental data, model, model parameters, and AD-backend and creates an `OptimizationProblem` for use with the solvers from `Optimization.jl`. Once the model is calibrated, the `predict` function is used to predict the response of the model to the experimental data. The results are can then be plotted to compare the experimental data to the model prediction.
 
-A method for creating an `OptimizationProblem` compatible with `Optimization.jl` is provided. To fit the NeoHookean model to the Treloar data previously loaded, an additional field-indexed array is used as the initial guess to `HyperelasticProblem`. It is recommendedto use ComponentArrays.jl for optimization of model parameters.
+Additionally, by leveraging multiple dispatch, a selection of data-driven hyperelastic material models have been implemented for use with the same interface as the analytical models. This allows for rapid development of new models and the inclusion of new data-driven models as they become available.
 
-```julia
-prob = HyperelasticProblem(
-        ψ, 
-        treloar_data, 
-        ComponentVector(μ = 0.2), 
-        ad_type = AutoForwardDiff()
-    )
-sol = solve(prob, LBFGS())
-```
+Lastly, with the optimized model parameters, the material model is able to be implemented into a larger simulation or analysis. Some examples would include performing a finite element simulation with `Gridap.jl` or `Ferrite.jl` or interpreting the model parameters in the context of the material microstructure. The package is designed to be extensible and to allow for the rapid development of new models and the inclusion of new data-driven models as they become available. 
 
-For fiting multiple models, such as the Gent[@gent1996new], Edward-Vilgis [@edwards1986effect], Neo-Hookean [@treloar1979non], and Beda [@beda2005reconciling] models, to the same Treloar dataset:
+![The most common use case for `Hyperelastics.jl` is to go from experimental or *ab initio* stress-stretch data for uniaxial or biaxial test(s) and proceed to fit and implement the model into a larger simulation or analysis. The respective data types used throughout the process are shown in the figure. \label{fig:workflow}](image.png)
 
-```julia
-models = Dict(
-    Gent => ComponentVector(
-                μ=240e-3, 
-                J_m=80.0
-            ),
-    EdwardVilgis => ComponentVector(
-                Ns=0.10, 
-                Nc=0.20, 
-                α=0.001, 
-                η=0.001
-            ),
-    NeoHookean => ComponentVector(
-                μ=200e-3
-            ),
-    Beda => ComponentVector(
-                C1=0.1237, 
-                C2=0.0424, 
-                C3=7.84e-5, 
-                K1=0.0168, 
-                α=0.9, 
-                β=0.68, 
-                ζ=3.015
-            )
-)
+# Example Usage
 
-sol = Dict{Any, SciMLSolution}()
-for (ψ, p_0) in models
-    HEProblem = HyperelasticProblem(
-        ψ(), 
-        treloar_data, 
-        p_0,  
-        ad_type = AutoForwardDiff()
-    )
-    sol[ψ] = solve(HEProblem, NelderMead())
-end
-```
-
-To predict the reponse of a model to a proivded dataset and parameters, a `predict` function is provided. The results are shown in \autoref{fig:fig1}:
-
-```julia
-f = Figure()
-ax = Axis(f[1,1])
-for (ψ, p) in sol
-    pred = predict(
-        ψ(), 
-        treloar_data, 
-        p.u, 
-        ad_type = AutoForwardDiff()
-    )
-    lines!(
-        ax, 
-        getindex.(pred.data.λ, 1), 
-        getindex.(pred.data.s, 1), 
-        label=string(ψ)
-    )
-end
-scatter!(ax, 
-    getindex.(treloar_data.data.λ, 1), 
-    getindex.(treloar_data.data.s, 1), 
-    label = "Treloar 1944 Experimental", 
-    color = :black
-)
-axislegend(position = :lt)
-```
-
-![The Gent, Beda, Edward-Vilgis, and Neo-Hookean material models calibrated to the Treloar data. \label{fig:fig1}](treloar_data_fits.png)
-
-While the majority of the models provided by `Hyperelastics.jl` are based on closed form strain energy density functions, a selection of data-driven models are proivded. For example, the `SussmanBathe` [@sussman2009model] model is created and used to predict the Treloar data \autoref{fig:fig3}:
-
-```julia
-using DataInterpolations
-ψ = SussmanBathe(treloar_data, k=4, interpolant = QuadraticSpline)
-λ_1 = range(extrema(getindex.(treloar_data.data.λ, 1))..., length = 100)
-uniaxial_prediction = HyperelasticUniaxialTest(λ_1, name = "Prediction")
-pred = predict(ψ, uniaxial_prediction, [])
-λ_1 = getindex.(treloar_data.data.λ, 1)
-s_1 = getindex.(treloar_data.data.s, 1)
-λ_hat_1 = getindex.(pred.data.λ, 1)
-s_hat_1 = getindex.(pred.data.s, 1)
-
-
-f, ax, p = lines( 
-    λ_hat_1, 
-    s_hat_1, 
-    label = "Sussman-Bathe Approximation"
-)
-
-scatter!(
-        ax,
-        λ_1, 
-        s_1, 
-        label = "Treloar 1944 Experimental",
-        color = :black
-    )
-axislegend(position = :lt)
-```
-![The Sussman-Bathe model approach for predicting the Treloar data. The data-driven approaches utilize the same interface as the analytical methods allowing for rapid development of new models. \label{fig:fig3}](sussman_bathe.png)
+For an example of going from experimental data to fitting a model, refer to the package documentation.
 
 # Availability
 
