@@ -7,7 +7,7 @@ A hyperelastic model library and fitting toolkit developed by TRACER Lab at Libe
 
 ## Installation
 
-To install `Hyperelastics.jl`, use the Julia package manager:
+To install `Hyperelastics.jl` in Julia >= v1.9, use the Julia package manager:
 
 ```julia
 using Pkg
