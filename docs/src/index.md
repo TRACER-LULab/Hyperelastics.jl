@@ -8,7 +8,7 @@ CurrentModule = Hyperelastics
 
 ## Installation 
 
-To install `Hyperelastics.jl`, use the Julia package manager:
+To install `Hyperelastics.jl` in Julia >= 1.9, use the Julia package manager:
 
 ```julia
 using Pkg
