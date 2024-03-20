@@ -103,7 +103,15 @@ a Creative Commons Attribution 4.0 International License (CC BY
   (<xref alt="Wex et al., 2015" rid="ref-wex2015isotropic" ref-type="bibr">Wex
   et al., 2015</xref>) as well as engineering polymeric materials
   (<xref alt="Beda, 2014" rid="ref-beda2014approach" ref-type="bibr">Beda,
-  2014</xref>).</p>
+  2014</xref>). Such material models find applications in developing new
+  materials
+  (<xref alt="Zhu et al., 2024" rid="ref-zhu2024comparative" ref-type="bibr">Zhu
+  et al., 2024</xref>), understanding biological tissue mechanical
+  response
+  (<xref alt="Agarwal &amp; Pelegri, 2024" rid="ref-agarwal2024ogden" ref-type="bibr">Agarwal
+  &amp; Pelegri, 2024</xref>), and soft robotics
+  (<xref alt="Dalklint et al., 2024" rid="ref-dalklint2024simultaneous" ref-type="bibr">Dalklint
+  et al., 2024</xref>).</p>
   <p>The SEDFs included in this package cover most (if not all) of the
   available analytical models from the literature to date, from
   constitutive to phenomelogical models. Furthermore, a selection of
@@ -181,8 +189,9 @@ a Creative Commons Attribution 4.0 International License (CC BY
     <p>The common workflow for modelling a new hyperelastic material is
     shown in figure
     <xref alt="[fig:workflow]" rid="figU003Aworkflow">[fig:workflow]</xref>.
-    The process commonly begins with the user proving a set of
-    stress-stretch data for a set of uniaxial and/or biaxial
+    The package is available for Julia 1.9 and above on all support
+    operating systems. The process commonly begins with the user proving
+    a set of stress-stretch data for a set of uniaxial and/or biaxial
     tension/compression experiments. The data is loaded into
     <monospace>HyperelasticUniaxialTest</monospace> or
     <monospace>HyperelasticBiaxialTest</monospace> depending on the
@@ -262,6 +271,52 @@ a Creative Commons Attribution 4.0 International License (CC BY
 </body>
 <back>
 <ref-list>
+  <ref id="ref-dalklint2024simultaneous">
+    <element-citation publication-type="article-journal">
+      <person-group person-group-type="author">
+        <name><surname>Dalklint</surname><given-names>Anna</given-names></name>
+        <name><surname>Wallin</surname><given-names>Mathias</given-names></name>
+        <name><surname>Tortorelli</surname><given-names>Daniel</given-names></name>
+      </person-group>
+      <article-title>Simultaneous shape and topology optimization of inflatable soft robots</article-title>
+      <source>Computer Methods in Applied Mechanics and Engineering</source>
+      <publisher-name>Elsevier</publisher-name>
+      <year iso-8601-date="2024">2024</year>
+      <volume>420</volume>
+      <pub-id pub-id-type="doi">10.1016/j.cma.2024.116751</pub-id>
+      <fpage>116751</fpage>
+      <lpage></lpage>
+    </element-citation>
+  </ref>
+  <ref id="ref-zhu2024comparative">
+    <element-citation publication-type="article-journal">
+      <person-group person-group-type="author">
+        <name><surname>Zhu</surname><given-names>Lingrui</given-names></name>
+        <name><surname>Zhan</surname><given-names>Lin</given-names></name>
+        <name><surname>Xiao</surname><given-names>Rui</given-names></name>
+      </person-group>
+      <article-title>A comparative study of the entanglement models toward simulating hyperelastic behaviors</article-title>
+      <source>Journal of Applied Mechanics</source>
+      <publisher-name>American Society of Mechanical Engineers Digital Collection</publisher-name>
+      <year iso-8601-date="2024">2024</year>
+      <volume>91</volume>
+      <issue>2</issue>
+      <pub-id pub-id-type="doi">10.1115/1.4063348</pub-id>
+    </element-citation>
+  </ref>
+  <ref id="ref-agarwal2024ogden">
+    <element-citation publication-type="article-journal">
+      <person-group person-group-type="author">
+        <name><surname>Agarwal</surname><given-names>Mohit</given-names></name>
+        <name><surname>Pelegri</surname><given-names>Assimina A</given-names></name>
+      </person-group>
+      <article-title>An ogden hyperelastic 3D micromechanical model to depict poynting effect in brain white matter</article-title>
+      <source>Heliyon</source>
+      <publisher-name>Elsevier</publisher-name>
+      <year iso-8601-date="2024">2024</year>
+      <pub-id pub-id-type="doi">10.1016/j.heliyon.2024.e25379</pub-id>
+    </element-citation>
+  </ref>
   <ref id="ref-wan2024user">
     <element-citation publication-type="article-journal">
       <person-group person-group-type="author">
@@ -276,6 +331,7 @@ a Creative Commons Attribution 4.0 International License (CC BY
       <publisher-name>Elsevier</publisher-name>
       <year iso-8601-date="2024">2024</year>
       <volume>237</volume>
+      <pub-id pub-id-type="doi">10.1016/j.commatsci.2024.112885</pub-id>
       <fpage>112885</fpage>
       <lpage></lpage>
     </element-citation>
@@ -288,6 +344,7 @@ a Creative Commons Attribution 4.0 International License (CC BY
       <article-title>matADi: Material definition with automatic differentiation</article-title>
       <year iso-8601-date="2023">2023</year>
       <uri>https://github.com/adtzlr/matadi</uri>
+      <pub-id pub-id-type="doi">10.5281/zenodo.5519971</pub-id>
     </element-citation>
   </ref>
   <ref id="ref-wex2015isotropic">
@@ -305,6 +362,7 @@ a Creative Commons Attribution 4.0 International License (CC BY
       <year iso-8601-date="2015">2015</year>
       <volume>60</volume>
       <issue>6</issue>
+      <pub-id pub-id-type="doi">10.1515/bmt-2014-0146</pub-id>
       <fpage>577</fpage>
       <lpage>592</lpage>
     </element-citation>
@@ -319,6 +377,7 @@ a Creative Commons Attribution 4.0 International License (CC BY
       <publisher-name>Elsevier</publisher-name>
       <year iso-8601-date="2014">2014</year>
       <volume>50</volume>
+      <pub-id pub-id-type="doi">10.1016/j.eurpolymj.2013.10.006</pub-id>
       <fpage>97</fpage>
       <lpage>108</lpage>
     </element-citation>
