@@ -187,7 +187,7 @@ a Creative Commons Attribution 4.0 International License (CC BY
     <title>Use Case: Fitting a Hyperelastic Model to Experimental
     Data</title>
     <p>The common workflow for modelling a new hyperelastic material is
-    shown in figure
+    shown in
     <xref alt="[fig:workflow]" rid="figU003Aworkflow">[fig:workflow]</xref>.
     The package is available for Julia 1.9 and above on all support
     operating systems. The process commonly begins with the user proving
@@ -224,8 +224,8 @@ a Creative Commons Attribution 4.0 International License (CC BY
     the solvers from <monospace>Optimization.jl</monospace>. Once the
     model is calibrated, the <monospace>predict</monospace> function is
     used to predict the response of the model to the experimental data.
-    The results are can then be plotted to compare the experimental data
-    to the model prediction.</p>
+    The results can then be plotted to compare the experimental data to
+    the model prediction.</p>
     <p>Additionally, by leveraging multiple dispatch, a selection of
     data-driven hyperelastic material models have been implemented for
     use with the same interface as the analytical models. This allows
@@ -260,7 +260,7 @@ a Creative Commons Attribution 4.0 International License (CC BY
 <sec id="availability">
   <title>Availability</title>
   <p>Hyperelastics.jl can be found on
-  <ext-link ext-link-type="uri" xlink:href="https://github.com/TRACER-LULab/Hyperelastics.jl">github</ext-link>.</p>
+  <ext-link ext-link-type="uri" xlink:href="https://github.com/TRACER-LULab/Hyperelastics.jl">GitHub</ext-link>.</p>
 </sec>
 <sec id="acknowledgements">
   <title>Acknowledgements</title>
