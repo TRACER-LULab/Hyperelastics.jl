@@ -5,7 +5,7 @@
 
 A hyperelastic model library and fitting toolkit developed by TRACER Lab at Liberty University. An extension is provided for [Optimization.jl](https://github.com/SciML/Optimization.jl) for model calibration based on experimental data.
 
-## Installation
+## Installation:
 
 To install `Hyperelastics.jl` in Julia >= v1.9, use the Julia package manager:
 
@@ -14,7 +14,7 @@ using Pkg
 Pkg.add("Hyperelastics")
 ```
 
-## Statement of Need
+## Statement of Need:
 
 The development of `Hyperelastics.jl` began as a study of the accuracy for a variety of material models for a set of experimental data. Often, researchers rely on custom implementations of material models and the data fitting process to find material parameters that match their experimental data. Hyperelastic models can well represent the nonlinear stress-deformation behavior of many biological tissues as well as engineering polymeric materials.
 
@@ -24,5 +24,18 @@ The SEDFs included in this package cover most (if not all) of the available anal
 
 Currently, most commercial finite element codes only offer a limited number, often less than 10, of hyperelastic models which limits the extent to which researchers are able to accurately model a given material. The closest project to `Hyperelastics.jl` is the `matADi` project by Andreas Dutzler [@matAdi2023] which has AD support for 18 material models. 
 
-## Citations
+## Citations:
 All relevant citations are located in `CITATIONS.bib`
+
+## Paper:
+Markdown:
+[![DOI](https://joss.theoj.org/papers/10.21105/joss.06314/status.svg)](https://doi.org/10.21105/joss.06314)
+
+HTML:
+<a style="border-width:0" href="https://doi.org/10.21105/joss.06314">
+  <img src="https://joss.theoj.org/papers/10.21105/joss.06314/status.svg" alt="DOI badge" >
+</a>
+
+reStructuredText:
+.. image:: https://joss.theoj.org/papers/10.21105/joss.06314/status.svg
+   :target: https://doi.org/10.21105/joss.06314
