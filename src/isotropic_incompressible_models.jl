@@ -1881,7 +1881,7 @@ W = C_1(I_1-3)+C_2\\log(\\frac{I_2}{3})
 # Arguments:
 - `type=PrincipalValueForm()`: Sets the form of the strain energy density function. Either `PrincipalValueForm()` or `InvariantForm()
 
-# Paramters:
+# Parameters:
 - `C1`
 - `C2`
 
@@ -3625,7 +3625,22 @@ end
 #     return f
 # end
 
+"""
+$(SIGNATURES)
 
+# Model:
+
+```math
+W = G_c N \\log\\bigg(\\frac{3N+\\frac{1}{2}I_1}{3N-I_1}\\bigg)
+```
+
+# Parameters:
+
+- `Gc`
+- `N`
+
+> Xiang Y, Zhong D, Wang P, Mao G, Yu H, Qu S. A general constitutive model of soft elastomers. Journal of the Mechanics and Physics of Solids. 2018 Aug 1;117:110-22.
+"""
 struct GeneralConstitutiveModel_Network{T} <: AbstractIncompressibleModel{T}
     GeneralConstitutiveModel_Network(
         ::T = PrincipalValueForm(),
@@ -3665,6 +3680,21 @@ function parameter_bounds(
     return (lb = lb, ub = ub)
 end
 
+"""
+$(SIGNATURES)
+
+# Model:
+
+```math
+W = G_e\\sum\\limits_{i=1}^{3}\\frac{1}{\\lambda_I}
+```
+
+# Parameters:
+
+- `Ge`
+
+> Xiang Y, Zhong D, Wang P, Mao G, Yu H, Qu S. A general constitutive model of soft elastomers. Journal of the Mechanics and Physics of Solids. 2018 Aug 1;117:110-22.
+"""
 struct GeneralConstitutiveModel_Tube{T} <: AbstractIncompressibleModel{T}
     GeneralConstitutiveModel_Tube(
         ::T = PrincipalValueForm(),
