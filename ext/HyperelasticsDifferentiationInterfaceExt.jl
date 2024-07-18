@@ -2,20 +2,18 @@ module HyperelasticsDifferentiationInterfaceExt
 
 using DifferentiationInterface
 using Hyperelastics
-using ADTypes.AbstractADType
+using ADTypes
 
 function Hyperelastics.∂ψ(
     ψ::Hyperelastics.AbstractHyperelasticModel{R},
-    λ⃗::Vector{S},
+    λ⃗::Vector{T},
     p,
-    ad_type <: AbstractADType;
+    ad_type::ADTypes.AbstractADType;
     kwargs...,
-) where {R,T,S}
-
+) where {R,T}
+    W(λ⃗) = StrainEnergyDensity(ψ, λ⃗, p)
+    ∂W∂λ = gradient(W, ad_type, λ⃗; kwargs...)
+    return ∂W∂λ
 end
-    return gradient(
-        (λ⃗::Vector{S}) -> ψ(λ⃗, p; kwargs...),
-        λ⃗,
-        ad_type,
-    )
+
 end
