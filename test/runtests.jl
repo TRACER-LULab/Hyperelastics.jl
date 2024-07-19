@@ -2,7 +2,8 @@ using LinearAlgebra
 
 using Hyperelastics
 using Test
-using ForwardDiff, FiniteDiff, Zygote, Enzyme
+using DifferentiationInterface
+import ForwardDiff, FiniteDiff, Zygote, Enzyme
 using InteractiveUtils
 using ADTypes
 
