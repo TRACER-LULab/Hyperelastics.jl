@@ -1,5 +1,6 @@
 @testset "Model Fitting" begin
-    using Optimization, OptimizationOptimJL, ComponentArrays, ForwardDiff
+    using Optimization, OptimizationOptimJL, ComponentArrays, DifferentiationInterface
+    using ForwardDiff
     # Determine if the model is exported by hyperelastics.
     usemodel(model) = Base.isexported(Hyperelastics, Symbol(model))
 
