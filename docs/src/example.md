@@ -6,7 +6,7 @@ using Optimization, OptimizationOptimJL
 using ComponentArrays: ComponentVector
 import ForwardDiff
 using DifferentiationInterface
-using CairoMakie, MakiePublication
+using CairoMakie
 set_theme!(theme_latexfonts())
 ```
 
