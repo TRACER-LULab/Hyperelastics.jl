@@ -8,3 +8,6 @@ ForwardDiff = "f6369f11-7733-5829-9624-2563aa707210"
 Hyperelastics = "c20c605d-adbe-46e4-9db6-e2b04c3ba023"
 Optimization = "7f7a1694-90dd-40f0-9382-eb1efda571ba"
 OptimizationOptimJL = "36348300-93cb-4f02-beb5-3c3902f8871e"
+
+[compat]
+Documenter = "1"
