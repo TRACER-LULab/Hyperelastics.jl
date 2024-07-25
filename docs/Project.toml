@@ -11,3 +11,4 @@ OptimizationOptimJL = "36348300-93cb-4f02-beb5-3c3902f8871e"
 
 [compat]
 Optimization = "3"
+ComponentArrays = "0.15"
