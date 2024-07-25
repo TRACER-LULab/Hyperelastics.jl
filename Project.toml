@@ -36,6 +36,7 @@ HyperelasticsDifferentiationInterfaceExt = "DifferentiationInterface"
 HyperelasticsOptimizationExt = "Optimization"
 
 [compat]
+Integrals = "4"
 InverseLangevinApproximations = "0.2"
 SpecialFunctions = "2"
 ContinuumMechanicsBase = "0.1"
