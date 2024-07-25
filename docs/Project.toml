@@ -11,3 +11,11 @@ OptimizationOptimJL = "36348300-93cb-4f02-beb5-3c3902f8871e"
 
 [compat]
 DataInterpolations = "5"
+OptimizationOptimJL = "0.3"
+Hyperelastics = "0.1"
+ForwardDiff = "0.10"
+DocumenterCitations = "1"
+CairoMakie = "0.12"
+Documenter = "1"
+Optimization = "3"
+ComponentArrays = "0.15"
