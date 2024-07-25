@@ -36,6 +36,7 @@ HyperelasticsDifferentiationInterfaceExt = "DifferentiationInterface"
 HyperelasticsOptimizationExt = "Optimization"
 
 [compat]
+SciMLBase = "2"
 ADTypes = "1"
 Reexport = "1"
 LossFunctions = "0.11"
