@@ -36,6 +36,7 @@ HyperelasticsDifferentiationInterfaceExt = "DifferentiationInterface"
 HyperelasticsOptimizationExt = "Optimization"
 
 [compat]
+RecursiveArrayTools = "3"
 QuadGK = "2"
 LabelledArrays = "1"
 DifferentiationInterface = "0.5"
