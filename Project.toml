@@ -36,6 +36,7 @@ HyperelasticsDifferentiationInterfaceExt = "DifferentiationInterface"
 HyperelasticsOptimizationExt = "Optimization"
 
 [compat]
+StructArrays = "0.6"
 ComponentArrays = "0.15"
 PackageExtensionCompat = "1"
 DataInterpolations = "5"
