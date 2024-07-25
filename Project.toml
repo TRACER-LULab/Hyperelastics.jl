@@ -36,6 +36,7 @@ HyperelasticsDifferentiationInterfaceExt = "DifferentiationInterface"
 HyperelasticsOptimizationExt = "Optimization"
 
 [compat]
+DocStringExtensions = "0.9"
 MakieCore = "0.8"
 NaNMath = "1"
 RecursiveArrayTools = "3"
