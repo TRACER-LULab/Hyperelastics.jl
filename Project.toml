@@ -36,6 +36,7 @@ HyperelasticsDifferentiationInterfaceExt = "DifferentiationInterface"
 HyperelasticsOptimizationExt = "Optimization"
 
 [compat]
+LossFunctions = "0.11"
 Statistics = "1"
 Unitful = "1"
 DocStringExtensions = "0.9"
