@@ -1,16 +1,17 @@
 # # Package Imports
 using Hyperelastics
-using Unitful
-using ForwardDiff, FiniteDiff
+# using Unitful
+using DifferentiationInterface
+import ForwardDiff, FiniteDiff
 using Optimization
 using OptimizationOptimJL
 using ComponentArrays
-
+using CairoMakie
 # # Load the Treloar 1994 Uniaxial Dataset
 # treloar_data = [Treloar1944Uniaxial(),Treloar1944Uniaxial()]
 treloar_data = Treloar1944Uniaxial()
-λ₁ = getindex.(treloar_data.data.λ, 1)u"m/m"
-s₁ = getindex.(treloar_data.data.s, 1)u"MPa"
+λ₁ = getindex.(treloar_data.data.λ, 1)
+s₁ = getindex.(treloar_data.data.s, 1)
 treloar_data = HyperelasticUniaxialTest(λ₁, s₁, name = "test")
 
 # ## Fit the Gent Model
@@ -18,7 +19,7 @@ treloar_data = HyperelasticUniaxialTest(λ₁, s₁, name = "test")
 #
 ## Initial guess for the parameters
 models = Dict(
-    Gent => ComponentVector((μ = 240e-3, Jₘ = 79.0)),
+    Gent => ComponentVector((μ = 240e-3, J_m = 79.0)),
     # EdwardVilgis => ComponentVector(Ns=0.10, Nc=0.20, α=0.001, η=0.001),
     # ModifiedFloryErman => ComponentVector(μ=0.24, N=50.0, κ=10.0),
     # NeoHookean => ComponentVector(μ=200e-3),

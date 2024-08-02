@@ -129,8 +129,8 @@ function solve()
         x, y, z = X
         return t * Vec{3}((
             0.0,
-            L / 2 - y + (y - L / 2) * cos(θ) - (z - L / 2) * sin(θ),
-            L / 2 - z + (y - L / 2) * sin(θ) + (z - L / 2) * cos(θ)
+            L / 2 - y + (y - L / 2) * cos(-θ) - (z - L / 2) * sin(-θ),
+            L / 2 - z + (y - L / 2) * sin(-θ) + (z - L / 2) * cos(-θ)
         ))
     end
 
