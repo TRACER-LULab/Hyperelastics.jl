@@ -4,9 +4,15 @@
 using Hyperelastics
 using Optimization, OptimizationOptimJL
 using ComponentArrays: ComponentVector
+<<<<<<< HEAD
 using DifferentiationInterface
 import ForwardDiff
 using CairoMakie, MakiePublication
+=======
+import ForwardDiff
+using DifferentiationInterface
+using CairoMakie
+>>>>>>> 602d4c70ec14c8c4d41dfcc0d828b3ebcda2db1a
 set_theme!(theme_latexfonts())
 ```
 
