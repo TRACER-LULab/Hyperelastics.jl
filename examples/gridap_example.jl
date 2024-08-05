@@ -23,7 +23,7 @@ end
 S(F) = ∇(ψ)(F)
 
 domain = (0.0, 1.0, 0.0, 1.0, 0.0, 1.0)
-partition = (5, 5, 5)
+partition = (10, 10, 10)
 model = CartesianDiscreteModel(domain, partition)
 
 labels = get_face_labeling(model)

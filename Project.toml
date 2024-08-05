@@ -46,9 +46,12 @@ Integrals = "4"
 InverseLangevinApproximations = "0.2"
 LabelledArrays = "1"
 LossFunctions = "0.11"
+<<<<<<< HEAD
+=======
 MakieCore = "0.8"
 NaNMath = "1"
 Optimization = "3"
+>>>>>>> 602d4c70ec14c8c4d41dfcc0d828b3ebcda2db1a
 PackageExtensionCompat = "1"
 QuadGK = "2"
 RecursiveArrayTools = "3"

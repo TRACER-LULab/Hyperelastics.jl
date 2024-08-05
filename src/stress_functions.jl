@@ -115,9 +115,10 @@ function ContinuumMechanicsBase.SecondPiolaKirchoffStressTensor(
     ad_type = nothing,
     kwargs...,
 ) where {T<:InvariantForm,R}
-    I1 = I₁(F)
-    I2 = I₂(F)
-    I3 = I₃(F)
+    C = F'*F
+    I1 = I₁(C)
+    I2 = I₂(C)
+    I3 = I₃(C)
     ∂ψ∂I = ∂ψ(ψ, [I1, I2, I3], p, ad_type; kwargs...)
     S = 2∂ψ∂I[1] * F' + 2∂ψ∂I[2] * (I1 * F' + F' * F * F') + 2I3 * ∂ψ∂I[3] * inv(F)
     return S
@@ -190,9 +191,10 @@ function ContinuumMechanicsBase.CauchyStressTensor(
     ad_type,
     kwargs...,
 ) where {T<:InvariantForm,S}
-    I1 = I₁(F)
-    I2 = I₂(F)
-    I3 = I₃(F)
+    C = F'*F
+    I1 = I₁(C)
+    I2 = I₂(C)
+    I3 = I₃(C)
     J = sqrt(I3)
     B = F * F'
     ∂ψ∂I = ∂ψ(ψ, [I1, I2, I3], p, ad_type; kwargs...)
@@ -200,4 +202,34 @@ function ContinuumMechanicsBase.CauchyStressTensor(
         2 * inv(J) * (∂ψ∂I[1] + I1 * ∂ψ∂I[2]) * B - 2 * inv(J) * ∂ψ∂I[2] * B^2 +
         2 * J * ∂ψ∂I[3] * I
     return σ
+end
+
+function ContinuumMechanicsBase.MaterialElasticStiffnessTensor(
+ ψ::Hyperelastics.AbstractHyperelasticModel{T},
+    F::Matrix{S},
+    p;
+    ad_type,
+    kwargs...,
+) where {T<:InvariantForm,S}
+    I1 = I₁(F)
+    I2 = I₂(F)
+    I3 = I₃(F)
+    J = sqrt(I3)
+    B = F * F'
+    ∂²ψ∂I² = ∂²ψ(ψ, [I1, I2, I3], p, ad_type; kwargs...)
+    C = zeros(3, 3, 3, 3)
+    for i in 1:3
+        for j in 1:3
+            for k in 1:3
+                for l in 1:3
+                    C[i, j, k, l] =
+                        2 * inv(J) * ∂²ψ∂I²[1][i, j, k, l] +
+                        2 * I1 * ∂²ψ∂I²[2][i, j, k, l] +
+                        2 * I2 * ∂²ψ∂I²[3][i, j, k, l] +
+                        2 * J * ∂²ψ∂I²[4][i, j, k, l]
+                end
+            end
+        end
+    end
+    return C
 end

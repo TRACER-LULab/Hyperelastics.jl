@@ -380,3 +380,102 @@ function ContinuumMechanicsBase.CauchyStressTensor(
     σ_vol = 2 * J * ∂ψ∂I3 * I
     return σ_dev + σ_vol
 end
+
+
+struct CHIPFoam <: AbstractCompressibleModel
+    Wg::Function
+    """
+    $(SIGNATURES)
+
+    CHIPFoam Model
+
+    # Model:
+    Refer to: Lewis M. A robust, compressible, hyperelastic constitutive model for the mechanical response of foamed rubber. Technische Mechanik-European Journal of Engineering Mechanics. 2016;36(1-2):88-101.
+
+    # Arguments:
+    - isothermal
+        - Boolean to determine if the model is isothermal or adiabatic
+
+    # Parameters:
+    - Ĝ
+    - K̂
+    - Jb
+    - pg
+    - C10
+    - φ₀,
+    - K
+    - p₀
+    - γ
+
+    """
+    function CHIPFoam(isothermal::Bool=true)
+        if isothermal
+            Wg(Jg, p₀, φ₀, γ) = p₀ * φ₀ * (Jg - log(Jg) - 1)
+        else
+            Wg(Jg, p₀, φ₀, γ) = p₀ * φ₀ * (Jg - 1 / (γ - 1) * (γ - Jg^(1 - γ)))
+        end
+        new(Wg)
+    end
+end
+
+function ContinuumMechanicsBase.StrainEnergyDensity(
+    ψ::CHIPFoam,
+    I::Vector,
+    (; Ĝ, K̂, Jb, pg, C10, φ₀, K, p₀, γ)
+)
+    I1 = I[1]
+    J = sqrt(I[3])
+    p̃ = pg + C10 * (φ₀^(1 / 3) * (4J - 4 + 5φ₀) / (J - 1 + φ₀) - (4J - 1) * (4J + 1) / (3J^(4 / 3)))
+    Jm = exp(-p̃ / K)
+    J̄ = J / Jm
+    Jg = Jm * (J̄ - 1 + φ₀) / (φ₀)
+    f = (2J - 1) / (cbrt(J)) + (2 - 2J + φ₀) * cbrt((φ₀) / (J - (1 - φ₀)))
+
+    cbrt_φ₀ = cbrt(φ₀)
+    cbrt_φ₀2 = cbrt_φ₀^(2)
+    dJ̄dJ_1 = (-C10 - 4C10 * (cbrt_φ₀2) + K * (cbrt_φ₀2)) / (K * exp((5.0C10 - pg - 5.0C10 * (cbrt_φ₀)) / K) * (cbrt_φ₀2))
+
+    W_LB = Ĝ / 2 * (I1 - 3) + K̂ * (
+        (Jb - 1) * (J - (Jb + 1) / 2) + ((J - Jb) >= 0) * ((J - 1)^2 / 2 - (Jb - 1) * (J - (Jb + 1) / 2))
+    )
+
+    W_D = C10 * (Jm * (I1 * f - 3 * (1 - φ₀)) - J * (I1 - 3) * (1 - φ₀) * dJ̄dJ_1)
+
+    W_M = (1 - φ₀) * K * (Jm * log(Jm) - Jm + 1)
+    W_g = ψ.Wg(Jg, p₀, φ₀, γ)
+    return W_LB + +W_D + W_M + W_g
+end
+
+function ContinuumMechanicsBase.CauchyStressTensor(
+    ψ::CHIPFoam,
+    F::Matrix,
+    p;
+    ad_type=nothing,
+    kwargs...
+)
+    J = det(F)
+    F̄ = F ./ cbrt(J)
+    C̄ = F̄' * F̄
+    Ī₁ = tr(C̄)
+    Ī₂ = zero(Ī₁)
+    I₃ = J^2
+    ∂W∂Ī₁, _, ∂W∂I₃ = ∂ψ(ψ, [Ī₁, Ī₂, I₃], p, ad_type)
+    ∂W∂Ī₁
+    ∂W∂J = ∂W∂I₃ * 2 * J
+
+    B̄ = F̄ * F̄'
+
+    σ = 2 / J * ∂W∂Ī₁ * (B̄ - (LinearAlgebra.I * (Ī₁ / 3))) + ∂W∂J * LinearAlgebra.I
+    return σ
+end
+
+function ContinuumMechanicsBase.SecondPiolaKirchoffStressTensor(
+    ψ::CHIPFoam,
+    F::Matrix,
+    p;
+    ad_type=nothing,
+    kwargs...
+)
+    σ = CauchyStressTensor(ψ, F, p)
+    S = det(F) * inv(F) * σ' * inv(F)'
+end
